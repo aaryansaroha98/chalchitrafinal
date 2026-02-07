@@ -351,7 +351,7 @@ const NavigationBar = () => {
                     marginRight: '0.125rem'
                   }}
                 >
-                  Hi, {user.name.split(' ')[0]}
+                  Hi, {user?.name?.split(' ')[0] || 'User'}
                 </div>
                 <Nav.Link as={Link} to="/my-bookings" onClick={() => setMenuOpen(false)} style={{
                   padding: '0.25rem 0.5rem',
@@ -454,7 +454,7 @@ const NavigationBar = () => {
                     marginRight: '0.125rem'
                   }}
                 >
-                  Hi, {user.name.split(' ')[0]}
+                  Hi, {user?.name?.split(' ')[0] || 'User'}
                 </div>
                 <button
                   onClick={() => {

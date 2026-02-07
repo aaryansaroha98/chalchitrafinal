@@ -44,9 +44,9 @@ const Home = () => {
     try {
       const res = await api.get('/api/movies/all');
       const now = new Date();
-      const upcoming = (res.data || [])
+      const upcoming = Array.isArray(res.data) ? res.data
         .filter((movie) => isUpcomingMovie(movie.date, now))
-        .sort(compareMovieDatesAsc);
+        .sort(compareMovieDatesAsc) : [];
       setUpcomingMovies(upcoming);
     } catch (err) {
       console.error('Error fetching movies:', err);
