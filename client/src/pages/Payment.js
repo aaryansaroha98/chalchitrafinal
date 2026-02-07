@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import api from './api/axios';
 import { useAuth } from '../contexts/AuthContext';
 
 const Payment = () => {
@@ -52,7 +52,7 @@ const Payment = () => {
   const fetchMovie = async () => {
     try {
       const movieIdToUse = movieIdFromState || movieId;
-      const res = await axios.get(`/api/movies/${movieIdToUse}`);
+      const res = await api.get(`/api/movies/${movieIdToUse}`);
       setMovie(res.data);
     } catch (err) {
       setError('Movie not found');
@@ -62,7 +62,7 @@ const Payment = () => {
   const fetchFoodData = async () => {
     try {
       const movieIdToUse = movieIdFromState || movieId;
-      const res = await axios.get(`/api/foods/available/${movieIdToUse}`);
+      const res = await api.get(`/api/foods/available/${movieIdToUse}`);
 
       const foodDataObj = {};
       res.data.forEach(food => {
@@ -299,7 +299,7 @@ const Payment = () => {
                 setCouponError('');
 
                 try {
-                  const res = await axios.post('/api/admin/coupons/validate', {
+                  const res = await api.post('/api/admin/coupons/validate', {
                     code: couponCode,
                     total_amount: getTotalPrice()
                   });
@@ -354,7 +354,7 @@ const Payment = () => {
                   handler: async function (response) {
                     try {
                       const movieIdToUse = movieIdFromState || movieId;
-                      const bookingRes = await axios.post('/api/bookings', {
+                      const bookingRes = await api.post('/api/bookings', {
                         movie_id: movieIdToUse,
                         selectedSeats: selectedSeats,
                         quantity: quantity,

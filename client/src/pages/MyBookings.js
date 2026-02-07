@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Modal, Card, Badge, Alert } from 'react-bootstrap';
-import axios from 'axios';
+import api from './api/axios';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
@@ -22,7 +22,7 @@ const MyBookings = () => {
 
   const fetchBookings = async () => {
     try {
-      const res = await axios.get('/api/bookings/my');
+      const res = await api.get('/api/bookings/my');
       setBookings(res.data);
       setLoading(false);
     } catch (err) {
@@ -34,7 +34,7 @@ const MyBookings = () => {
   const handleDeleteBooking = async (bookingId) => {
     if (window.confirm('Are you sure you want to delete this booking?')) {
       try {
-        await axios.delete(`/api/bookings/${bookingId}`);
+        await api.delete(`/api/bookings/${bookingId}`);
         setBookings(bookings.filter(booking => booking.id !== bookingId));
         alert('Booking deleted successfully!');
       } catch (err) {
@@ -45,7 +45,7 @@ const MyBookings = () => {
 
   const handleSubmitFeedback = async () => {
     try {
-      await axios.post('/api/feedback', {
+      await api.post('/api/feedback', {
         movie_id: selectedBooking.movie_id,
         rating: feedbackRating,
         comment: feedbackComment
@@ -65,7 +65,7 @@ const MyBookings = () => {
       const bookingIds = Array.from(selectedBookings);
       
       // Delete all selected bookings
-      await Promise.all(bookingIds.map(id => axios.delete(`/api/bookings/${id}`)));
+      await Promise.all(bookingIds.map(id => api.delete(`/api/bookings/${id}`)));
       
       // Update state to remove deleted bookings
       setBookings(bookings.filter(booking => !selectedBookings.has(booking.id)));

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Alert } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import axios from 'axios';
+import api from './api/axios';
 import { useAuth } from '../contexts/AuthContext';
 import { isUpcomingMovie, compareMovieDatesAsc } from '../utils/movieStatus';
 
@@ -21,7 +21,7 @@ const UpcomingMovies = () => {
   const fetchMovies = async () => {
     try {
       // Fetch all movies and filter based on current date & time (client-side)
-      const res = await axios.get('/api/movies/all');
+      const res = await api.get('/api/movies/all');
       const now = new Date();
       const upcoming = (res.data || [])
         .filter((movie) => isUpcomingMovie(movie.date, now))

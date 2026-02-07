@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Alert, Tab, Tabs, Table, Modal, Form, Badge } from 'react-bootstrap';
-import axios from 'axios';
+import api from './api/axios';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import autoTable from 'jspdf-autotable';
 import { getMovieStatus } from '../utils/movieStatus';
 
 // Configure axios to send cookies with requests
-axios.defaults.withCredentials = true;
+api.defaults.withCredentials = true;
 
 const AdminPanel = () => {
   console.log('🔧 AdminPanel component starting...');
@@ -216,7 +216,7 @@ const AdminPanel = () => {
     try {
       console.log('Checking authentication...');
       // First check if user is authenticated and is admin
-      const authRes = await axios.get('/api/auth/current_user');
+      const authRes = await api.get('/api/auth/current_user');
       const user = authRes.data;
       console.log('Auth response:', user);
 
@@ -236,17 +236,17 @@ const AdminPanel = () => {
 
       // Fetch user's permissions
       try {
-        const permRes = await axios.get('/api/admin/my-permissions');
+        const permRes = await api.get('/api/admin/my-permissions');
         setMyPermissions(permRes.data);
         console.log('User permissions loaded:', permRes.data);
         
         // Fetch available tabs for permission management
-        const tabsRes = await axios.get('/api/admin/available-tabs');
+        const tabsRes = await api.get('/api/admin/available-tabs');
         setAvailableTabs(tabsRes.data);
         
         // If super admin, fetch all admin users for permission management
         if (isSuperAdmin) {
-          const adminsRes = await axios.get('/api/admin/permission-admins');
+          const adminsRes = await api.get('/api/admin/permission-admins');
           setAdminUsers(adminsRes.data);
         }
       } catch (permErr) {
@@ -268,51 +268,51 @@ const AdminPanel = () => {
       console.log('🔄 Starting to fetch all admin data...');
 
       const [statsRes, allMoviesRes, pastMoviesRes, bookingsRes, usersRes, feedbackRes, teamRes, galleryRes, couponsRes, couponWinnersRes, settingsRes, foodsRes] = await Promise.all([
-        axios.get('/api/admin/stats').catch(err => {
+        api.get('/api/admin/stats').catch(err => {
           console.log('❌ Stats API failed:', err.message);
           return { data: { total_users: 0, total_movies: 0, upcoming_movies: 0, total_bookings: 0, recent_bookings: 0 } };
         }),
-        axios.get('/api/movies/all').catch(err => {
+        api.get('/api/movies/all').catch(err => {
           console.log('❌ All Movies API failed:', err.message);
           return { data: [] };
         }),
-        axios.get('/api/movies/past').catch(err => {
+        api.get('/api/movies/past').catch(err => {
           console.log('❌ Past Movies API failed:', err.message);
           return { data: [] };
         }),
-        axios.get('/api/admin/bookings').catch(err => {
+        api.get('/api/admin/bookings').catch(err => {
           console.log('❌ Bookings API failed:', err.message);
           return { data: [] };
         }),
-        axios.get('/api/admin/users').catch(err => {
+        api.get('/api/admin/users').catch(err => {
           console.log('❌ Users API failed:', err.message);
           return { data: [] };
         }),
-        axios.get('/api/admin/feedback').catch(err => {
+        api.get('/api/admin/feedback').catch(err => {
           console.log('❌ Feedback API failed:', err.message);
           return { data: [] };
         }),
-        axios.get('/api/admin/team').catch(err => {
+        api.get('/api/admin/team').catch(err => {
           console.log('❌ Team API failed:', err.message);
           return { data: [] };
         }),
-        axios.get('/api/admin/gallery').catch(err => {
+        api.get('/api/admin/gallery').catch(err => {
           console.log('❌ Gallery API failed:', err.message);
           return { data: [] };
         }),
-        axios.get('/api/admin/coupons').catch(err => {
+        api.get('/api/admin/coupons').catch(err => {
           console.log('❌ Coupons API failed:', err.message);
           return { data: [] };
         }),
-        axios.get('/api/admin/coupon-winners').catch(err => {
+        api.get('/api/admin/coupon-winners').catch(err => {
           console.log('❌ Coupon Winners API failed:', err.message);
           return { data: { winners: [] } };
         }),
-        axios.get('/api/admin/settings').catch(err => {
+        api.get('/api/admin/settings').catch(err => {
           console.log('❌ Settings API failed:', err.message);
           return { data: { tagline: 'Student-led movie screening initiative at IIT Jammu', hero_background: '#007bff' } };
         }),
-        axios.get('/api/foods').catch(err => {
+        api.get('/api/foods').catch(err => {
           console.log('❌ Foods API failed:', err.message);
           return { data: [] };
         })
@@ -340,7 +340,7 @@ const AdminPanel = () => {
       const bookingsWithFood = await Promise.all(
         bookingsData.map(async (booking) => {
           try {
-            const foodRes = await axios.get(`/api/foods/booking/${booking.id}`);
+            const foodRes = await api.get(`/api/foods/booking/${booking.id}`);
             const foodOrders = foodRes.data;
 
             // Calculate food cost
@@ -405,7 +405,7 @@ const AdminPanel = () => {
 
     setRevenueLoading(true);
     try {
-      const response = await axios.get('/api/admin/revenue-stats');
+      const response = await api.get('/api/admin/revenue-stats');
       setRevenueStats(response.data || {
         total_revenue: 0,
         food_revenue: 0,
@@ -432,7 +432,7 @@ const AdminPanel = () => {
     setMailSettingsLoading(true);
     setMailSettingsError('');
     try {
-      const response = await axios.get('/api/admin/mail-settings');
+      const response = await api.get('/api/admin/mail-settings');
       setMailSettings(response.data || {
         email_host: 'smtp.gmail.com',
         email_port: 587,
@@ -460,7 +460,7 @@ const AdminPanel = () => {
     setMailSettingsSuccess('');
 
     try {
-      await axios.put('/api/admin/mail-settings', mailSettings);
+      await api.put('/api/admin/mail-settings', mailSettings);
       setMailSettingsSuccess('Mail settings saved successfully!');
       console.log('✅ Mail settings saved');
     } catch (err) {
@@ -480,7 +480,7 @@ const AdminPanel = () => {
     setMailSettingsSuccess('');
 
     try {
-      const response = await axios.post('/api/admin/mail-settings/test', mailSettings);
+      const response = await api.post('/api/admin/mail-settings/test', mailSettings);
       setMailSettingsSuccess(`Test email sent successfully! Message ID: ${response.data.message_id}`);
       console.log('✅ Test email sent');
     } catch (err) {
@@ -523,7 +523,7 @@ const AdminPanel = () => {
           });
 
           console.log('Sending PUT request for movie:', editingMovie.id);
-          const response = await axios.put(`/api/movies/${editingMovie.id}`, formData, {
+          const response = await api.put(`/api/movies/${editingMovie.id}`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
           });
           console.log('PUT response:', response.data);
@@ -548,7 +548,7 @@ const AdminPanel = () => {
             }
           });
 
-          const response = await axios.post('/api/movies', formData, {
+          const response = await api.post('/api/movies', formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
           });
 
@@ -594,7 +594,7 @@ const AdminPanel = () => {
             console.log('Local state updated for edited movie');
           } else {
             // For new movie, refresh the data to get the new movie with ID
-            const allMoviesRes = await axios.get('/api/movies/all');
+            const allMoviesRes = await api.get('/api/movies/all');
             setMovies(Array.isArray(allMoviesRes.data) ? allMoviesRes.data : []);
             console.log('Movies state refreshed after adding new movie');
           }
@@ -615,20 +615,20 @@ const AdminPanel = () => {
   const updateMovieFoodLinks = async (movieId, foodIds) => {
     try {
       // Get current food links for this movie
-      const currentLinksRes = await axios.get(`/api/foods/movie/${movieId}`);
+      const currentLinksRes = await api.get(`/api/foods/movie/${movieId}`);
       const currentFoodIds = currentLinksRes.data.map(link => link.id);
 
       // Remove links that are no longer selected
       for (const currentFoodId of currentFoodIds) {
         if (!foodIds.includes(currentFoodId)) {
-          await axios.delete(`/api/foods/link/${movieId}/${currentFoodId}`);
+          await api.delete(`/api/foods/link/${movieId}/${currentFoodId}`);
         }
       }
 
       // Add new links for selected foods
       for (const foodId of foodIds) {
         if (!currentFoodIds.includes(foodId)) {
-          await axios.post(`/api/foods/link/${movieId}/${foodId}`);
+          await api.post(`/api/foods/link/${movieId}/${foodId}`);
         }
       }
     } catch (err) {
@@ -653,11 +653,11 @@ const AdminPanel = () => {
       }
 
       if (editingTeam) {
-        await axios.put(`/api/admin/team/${editingTeam.id}`, formData, {
+        await api.put(`/api/admin/team/${editingTeam.id}`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
       } else {
-        await axios.post('/api/admin/team', formData, {
+        await api.post('/api/admin/team', formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
       }
@@ -684,7 +684,7 @@ const AdminPanel = () => {
       formData.append('event_name', galleryForm.event_name || '');
       formData.append('image', galleryForm.image);
 
-      await axios.post('/api/admin/gallery', formData, {
+      await api.post('/api/admin/gallery', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
@@ -754,7 +754,7 @@ const AdminPanel = () => {
 
     try {
       await Promise.all(selectedCoupons.map(couponId =>
-        axios.delete(`/api/admin/coupons/${couponId}`)
+        api.delete(`/api/admin/coupons/${couponId}`)
       ));
 
       alert(`Successfully deleted ${selectedCoupons.length} coupon(s)!`);
@@ -770,7 +770,7 @@ const AdminPanel = () => {
   // Handle single coupon delete
   const handleDeleteCoupon = async (couponId) => {
     try {
-      await axios.delete(`/api/admin/coupons/${couponId}`);
+      await api.delete(`/api/admin/coupons/${couponId}`);
       alert('Coupon deleted successfully!');
       fetchAllData();
     } catch (err) {
@@ -791,7 +791,7 @@ const AdminPanel = () => {
         return;
       }
       const payload = { movie_id: Number(feedbackMovieId) };
-      const result = await axios.post('/api/admin/email/feedback-request', payload);
+      const result = await api.post('/api/admin/email/feedback-request', payload);
       const targetLabel = selectedFeedbackMovie?.title
         ? ` for "${selectedFeedbackMovie.title}"`
         : '';
@@ -818,7 +818,7 @@ const AdminPanel = () => {
     if (selectedWinners.length === 0) return;
 
     try {
-      await axios.delete('/api/admin/coupon-winners', {
+      await api.delete('/api/admin/coupon-winners', {
         data: { ids: selectedWinners }
       });
 
@@ -1134,7 +1134,7 @@ const AdminPanel = () => {
     setShowPermissionModal(true);
 
     try {
-      const res = await axios.get(`/api/admin/permissions/${admin.id}`);
+      const res = await api.get(`/api/admin/permissions/${admin.id}`);
       setSelectedAdminTabs(res.data.allowed_tabs || []);
       setSelectedAdminScanner(admin.code_scanner === 1 || admin.code_scanner === true);
     } catch (err) {
@@ -1165,21 +1165,21 @@ const AdminPanel = () => {
 
     try {
       // Save tab permissions
-      await axios.put(`/api/admin/permissions/${selectedAdminForPermission.id}`, {
+      await api.put(`/api/admin/permissions/${selectedAdminForPermission.id}`, {
         allowed_tabs: selectedAdminTabs
       });
 
       // Save scanner permission
       if (selectedAdminScanner) {
-        await axios.put(`/api/admin/users/${selectedAdminForPermission.id}/make_scanner`);
+        await api.put(`/api/admin/users/${selectedAdminForPermission.id}/make_scanner`);
       } else {
-        await axios.put(`/api/admin/users/${selectedAdminForPermission.id}/remove_scanner`);
+        await api.put(`/api/admin/users/${selectedAdminForPermission.id}/remove_scanner`);
       }
 
       alert(`Permissions updated for ${selectedAdminForPermission.name}`);
 
       // Refresh admin list
-      const adminsRes = await axios.get('/api/admin/permission-admins');
+      const adminsRes = await api.get('/api/admin/permission-admins');
       setAdminUsers(adminsRes.data);
 
       setShowPermissionModal(false);
@@ -1199,11 +1199,11 @@ const AdminPanel = () => {
     }
 
     try {
-      await axios.delete(`/api/admin/permissions/${adminId}`);
+      await api.delete(`/api/admin/permissions/${adminId}`);
       alert('Permissions reset to default');
 
       // Refresh admin list
-      const adminsRes = await axios.get('/api/admin/permission-admins');
+      const adminsRes = await api.get('/api/admin/permission-admins');
       setAdminUsers(adminsRes.data);
     } catch (err) {
       console.error('Error resetting permissions:', err);
@@ -1238,14 +1238,14 @@ const AdminPanel = () => {
   // Make a user admin
   const makeUserAdmin = async (userId) => {
     try {
-      await axios.put(`/api/admin/users/${userId}/make_admin`);
+      await api.put(`/api/admin/users/${userId}/make_admin`);
       alert('User promoted to admin successfully!');
       
       // Refresh users and admin lists
-      const usersRes = await axios.get('/api/admin/users');
+      const usersRes = await api.get('/api/admin/users');
       setUsers(usersRes.data);
       
-      const adminsRes = await axios.get('/api/admin/permission-admins');
+      const adminsRes = await api.get('/api/admin/permission-admins');
       setAdminUsers(adminsRes.data);
       
       setShowMakeAdminModal(false);
@@ -1264,14 +1264,14 @@ const AdminPanel = () => {
     }
     
     try {
-      await axios.put(`/api/admin/users/${userId}/remove_admin`);
+      await api.put(`/api/admin/users/${userId}/remove_admin`);
       alert('Admin privileges removed successfully!');
       
       // Refresh users and admin lists
-      const usersRes = await axios.get('/api/admin/users');
+      const usersRes = await api.get('/api/admin/users');
       setUsers(usersRes.data);
       
-      const adminsRes = await axios.get('/api/admin/permission-admins');
+      const adminsRes = await api.get('/api/admin/permission-admins');
       setAdminUsers(adminsRes.data);
       
       // Refresh search results if modal is open
@@ -1294,14 +1294,14 @@ const AdminPanel = () => {
       console.log('🔄 Updating admin tag for user:', adminId, 'to:', newTag);
       
       // Make the API call to update the tag
-      const response = await axios.put(`/api/admin/users/${adminId}/make_scanner`, { admin_tag: newTag });
+      const response = await api.put(`/api/admin/users/${adminId}/make_scanner`, { admin_tag: newTag });
       console.log('✅ Admin tag update response:', response.data);
       
       alert('Admin tag updated successfully!');
       
       // Force refresh admin list with a fresh fetch
       console.log('🔄 Fetching fresh admin list...');
-      const adminsRes = await axios.get('/api/admin/permission-admins');
+      const adminsRes = await api.get('/api/admin/permission-admins');
       console.log('✅ Fresh admin data:', adminsRes.data);
       
       // Update the state with fresh data
@@ -1312,7 +1312,7 @@ const AdminPanel = () => {
       
       // If updating own tag, refresh auth data to update navbar
       if (adminId === currentUser?.id) {
-        const authRes = await axios.get('/api/auth/current_user');
+        const authRes = await api.get('/api/auth/current_user');
         setCurrentUser(authRes.data);
         console.log('✅ Updated current user:', authRes.data);
       }
@@ -1332,18 +1332,18 @@ const AdminPanel = () => {
       console.log('🔄 Updating my tag to:', newTag);
       
       // Make the API call to update the tag
-      const response = await axios.put(`/api/admin/users/${currentUser.id}/make_scanner`, { admin_tag: newTag });
+      const response = await api.put(`/api/admin/users/${currentUser.id}/make_scanner`, { admin_tag: newTag });
       console.log('✅ Tag update response:', response.data);
       
       alert('Your tag name updated successfully!');
       
       // Refresh current user data from server
-      const authRes = await axios.get('/api/auth/current_user');
+      const authRes = await api.get('/api/auth/current_user');
       setCurrentUser(authRes.data);
       console.log('✅ Updated current user:', authRes.data);
       
       // Also refresh the admin list in the Config tab to update the table
-      const adminsRes = await axios.get('/api/admin/permission-admins');
+      const adminsRes = await api.get('/api/admin/permission-admins');
       setAdminUsers(adminsRes.data);
       
       // Force re-render
@@ -1752,7 +1752,7 @@ const AdminPanel = () => {
                                     poster: null
                                   });
                                   // Load existing food links
-                                  axios.get(`/api/foods/movie/${movie.id}`)
+                                  api.get(`/api/foods/movie/${movie.id}`)
                                     .then(res => {
                                       const foodIds = res.data.map(f => f.id);
                                       setSelectedFoodsForMovie(foodIds);
@@ -1780,7 +1780,7 @@ const AdminPanel = () => {
                                 size="sm"
                                 onClick={() => {
                                   if (window.confirm(`Move "${movie.title}" to past movies? This will mark it as completed.`)) {
-                                    axios.put(`/api/movies/${movie.id}/move_to_past`)
+                                    api.put(`/api/movies/${movie.id}/move_to_past`)
                                     .then(() => {
                                       alert('Movie moved to past successfully!');
                                       fetchAllData();
@@ -1807,7 +1807,7 @@ const AdminPanel = () => {
                                 size="sm"
                                 onClick={() => {
                                   if (window.confirm(`Are you sure you want to permanently delete "${movie.title}"? This action cannot be undone.`)) {
-                                    axios.delete(`/api/movies/${movie.id}`)
+                                    api.delete(`/api/movies/${movie.id}`)
                                       .then(() => {
                                         alert('Movie deleted successfully!');
                                         fetchAllData();
@@ -2061,7 +2061,7 @@ const AdminPanel = () => {
                         onClick={async () => {
                           // First check if food is linked to movies
                           try {
-                            const moviesResponse = await axios.get(`/api/foods/${food.id}/movies`);
+                            const moviesResponse = await api.get(`/api/foods/${food.id}/movies`);
                             const linkedMovies = moviesResponse.data;
 
                             let confirmMessage = `Are you sure you want to delete "${food.name}"?`;
@@ -2080,7 +2080,7 @@ const AdminPanel = () => {
                               const choice = window.confirm(confirmMessage + '\n\nForce delete?');
                               if (choice) {
                                 // Force delete
-                                axios.delete(`/api/foods/${food.id}/force`)
+                                api.delete(`/api/foods/${food.id}/force`)
                                   .then((response) => {
                                     alert(`Food deleted successfully! Removed from ${response.data.movies_removed_from} movie(s).`);
                                     fetchAllData();
@@ -2094,7 +2094,7 @@ const AdminPanel = () => {
                               // No movies linked, regular delete
                               const confirm = window.confirm(confirmMessage + ' This action cannot be undone.');
                               if (confirm) {
-                                axios.delete(`/api/foods/${food.id}`)
+                                api.delete(`/api/foods/${food.id}`)
                                   .then(() => {
                                     alert('Food item deleted successfully!');
                                     fetchAllData();
@@ -2109,7 +2109,7 @@ const AdminPanel = () => {
                             console.error('Error checking food links:', err);
                             // Fallback to regular delete attempt
                             if (window.confirm(`Are you sure you want to delete "${food.name}"? This action cannot be undone.`)) {
-                              axios.delete(`/api/foods/${food.id}`)
+                              api.delete(`/api/foods/${food.id}`)
                                 .then(() => {
                                   alert('Food item deleted successfully!');
                                   fetchAllData();
@@ -2308,7 +2308,7 @@ const AdminPanel = () => {
                         className="me-1"
                         onClick={() => {
                           // Mark as used/unused
-                          axios.put(`/api/admin/bookings/${booking.id}`, {
+                          api.put(`/api/admin/bookings/${booking.id}`, {
                             is_used: !booking.is_used
                           }).then(() => {
                             fetchAllData();
@@ -2532,7 +2532,7 @@ const AdminPanel = () => {
                         size="sm"
                         onClick={() => {
                           if (window.confirm(`Are you sure you want to remove ${member.name} from the team?`)) {
-                            axios.delete(`/api/admin/team/${member.id}`)
+                            api.delete(`/api/admin/team/${member.id}`)
                               .then(() => {
                                 fetchAllData();
                                 alert('Team member removed successfully!');
@@ -2612,7 +2612,7 @@ const AdminPanel = () => {
                         className="mt-2"
                         onClick={() => {
                           if (window.confirm('Are you sure you want to delete this image?')) {
-                            axios.delete(`/api/admin/gallery/${image.id}`)
+                            api.delete(`/api/admin/gallery/${image.id}`)
                               .then(() => {
                                 fetchAllData();
                               })
@@ -2669,7 +2669,7 @@ const AdminPanel = () => {
                   size="sm"
                   onClick={() => {
                     // Refresh coupons data
-                    axios.get('/api/admin/coupons')
+                    api.get('/api/admin/coupons')
                       .then(res => {
                         setCoupons(Array.isArray(res.data) ? res.data : []);
                         alert('Coupons list refreshed!');
@@ -2913,7 +2913,7 @@ const AdminPanel = () => {
                     size="sm"
                     onClick={() => {
                       // Refresh winners data
-                      axios.get('/api/admin/coupon-winners')
+                      api.get('/api/admin/coupon-winners')
                         .then(res => {
                           setCouponWinners(res.data);
                           alert('Winners list refreshed!');
@@ -3069,13 +3069,13 @@ const AdminPanel = () => {
                               onClick={() => {
                                 if (window.confirm(`Are you sure you want to delete the winner record for "${winner.user_name || winner.user_email}" with coupon "${winner.coupon_code}"? This action cannot be undone.`)) {
                                   // Delete individual winner
-                                  axios.delete('/api/admin/coupon-winners', {
+                                  api.delete('/api/admin/coupon-winners', {
                                     data: { ids: [winner.id] }
                                   })
                                   .then(() => {
                                     alert(`Winner record deleted successfully!`);
                                     // Refresh the winners list
-                                    axios.get('/api/admin/coupon-winners')
+                                    api.get('/api/admin/coupon-winners')
                                       .then(res => {
                                         setCouponWinners(res.data);
                                       })
@@ -3414,7 +3414,7 @@ const AdminPanel = () => {
                   formData.append('about_image', settingsForm.about_image);
                 }
 
-                await axios.put('/api/admin/settings', formData, {
+                await api.put('/api/admin/settings', formData, {
                   headers: { 'Content-Type': 'multipart/form-data' }
                 });
 
@@ -4461,7 +4461,7 @@ const AdminPanel = () => {
                   variant="info"
                   onClick={async () => {
                     try {
-                      const adminsRes = await axios.get('/api/admin/permission-admins');
+                      const adminsRes = await api.get('/api/admin/permission-admins');
                       console.log('✅ Refreshed admin users:', adminsRes.data);
                       setAdminUsers(adminsRes.data);
                       alert('Admin list refreshed!');
@@ -5041,11 +5041,11 @@ const AdminPanel = () => {
               }
 
               if (editingFood) {
-                await axios.put(`/api/foods/${editingFood.id}`, formData, {
+                await api.put(`/api/foods/${editingFood.id}`, formData, {
                   headers: { 'Content-Type': 'multipart/form-data' }
                 });
               } else {
-                await axios.post('/api/foods', formData, {
+                await api.post('/api/foods', formData, {
                   headers: { 'Content-Type': 'multipart/form-data' }
                 });
               }
@@ -5138,7 +5138,7 @@ const AdminPanel = () => {
                   alert('Please enter an email address.');
                   return;
                 }
-                await axios.post('/api/admin/email/custom', {
+                await api.post('/api/admin/email/custom', {
                   email: emailForm.email,
                   recipient_name: emailForm.recipient_name,
                   subject: emailForm.subject,
@@ -5152,7 +5152,7 @@ const AdminPanel = () => {
                   alert('Please select a user.');
                   return;
                 }
-                await axios.post('/api/admin/email/single', {
+                await api.post('/api/admin/email/single', {
                   user_id: emailForm.user_id,
                   subject: emailForm.subject,
                   message: emailForm.message,
@@ -5349,7 +5349,7 @@ const AdminPanel = () => {
               return;
             }
             try {
-              const result = await axios.post('/api/admin/email/bulk', {
+              const result = await api.post('/api/admin/email/bulk', {
                 user_ids: selectedUsers,
                 subject: bulkEmailForm.subject,
                 message: bulkEmailForm.message
@@ -5488,11 +5488,11 @@ const AdminPanel = () => {
             try {
               if (editingCoupon) {
                 // Update existing coupon
-                await axios.put(`/api/admin/coupons/${editingCoupon.id}`, couponForm);
+                await api.put(`/api/admin/coupons/${editingCoupon.id}`, couponForm);
                 alert('Coupon updated successfully!');
               } else {
                 // Create new coupon
-                await axios.post('/api/admin/coupons', couponForm);
+                await api.post('/api/admin/coupons', couponForm);
                 alert('Coupon created successfully!');
               }
 
@@ -5817,7 +5817,7 @@ const AdminPanel = () => {
               return;
             }
             try {
-              const result = await axios.post('/api/admin/coupon-winners/send', {
+              const result = await api.post('/api/admin/coupon-winners/send', {
                 user_ids: selectedWinners,
                 discount_amount: winnerForm.discount_amount,
                 discount_type: winnerForm.discount_type,
@@ -5839,7 +5839,7 @@ const AdminPanel = () => {
 
               // Refresh coupon winners data specifically and immediately update state
               try {
-                const winnersRes = await axios.get('/api/admin/coupon-winners');
+                const winnersRes = await api.get('/api/admin/coupon-winners');
                 console.log('Refreshed coupon winners data:', winnersRes.data);
                 setCouponWinners(winnersRes.data);
               } catch (err) {

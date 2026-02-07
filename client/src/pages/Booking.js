@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from './api/axios';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { useAuth } from '../contexts/AuthContext';
@@ -49,7 +49,7 @@ const Booking = () => {
 
   const fetchOccupiedSeats = async () => {
     try {
-      const res = await axios.get(`/api/bookings/occupied/${movieId}`);
+      const res = await api.get(`/api/bookings/occupied/${movieId}`);
       setOccupiedSeats(res.data.occupied_seats || []);
     } catch (err) {
       console.error('Failed to fetch occupied seats:', err);
@@ -58,7 +58,7 @@ const Booking = () => {
 
   const fetchMovie = async () => {
     try {
-      const res = await axios.get(`/api/movies/${movieId}`);
+      const res = await api.get(`/api/movies/${movieId}`);
       setMovie(res.data);
       setLoading(false);
     } catch (err) {
@@ -69,7 +69,7 @@ const Booking = () => {
 
   const fetchAvailableFoods = async () => {
     try {
-      const res = await axios.get(`/api/foods/available/${movieId}`);
+      const res = await api.get(`/api/foods/available/${movieId}`);
       setAvailableFoods(res.data);
     } catch (err) {
       console.error('Failed to fetch available foods:', err);

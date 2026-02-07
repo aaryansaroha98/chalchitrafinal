@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Alert } from 'react-bootstrap';
-import axios from 'axios';
+import api from './api/axios';
 
 const Team = () => {
   const [team, setTeam] = useState([]);
@@ -13,7 +13,7 @@ const Team = () => {
 
   const fetchTeam = async () => {
     try {
-      const res = await axios.get('/api/team');
+      const res = await api.get('/api/team');
       setTeam(res.data);
       setLoading(false);
     } catch (err) {

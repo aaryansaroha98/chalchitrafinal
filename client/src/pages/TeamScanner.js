@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Alert, Badge, Modal } from 'react-bootstrap';
-import axios from 'axios';
+import api from './api/axios';
 import QRScanner from '../components/QRScanner';
 
 const TeamScanner = () => {
@@ -55,7 +55,7 @@ const TeamScanner = () => {
 
   const checkScannerAccess = async () => {
     try {
-      const response = await axios.get('/api/auth/current_user');
+      const response = await api.get('/api/auth/current_user');
       const user = response.data;
       setCurrentUser(user);
 
@@ -89,7 +89,7 @@ const TeamScanner = () => {
         requestData.num_people = numPeople;
       }
 
-      const response = await axios.post('/api/bookings/scan', requestData);
+      const response = await api.post('/api/bookings/scan', requestData);
 
       const data = response.data;
 

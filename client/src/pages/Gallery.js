@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Alert, Modal } from 'react-bootstrap';
-import axios from 'axios';
+import api from './api/axios';
 
 const Gallery = () => {
   const [gallery, setGallery] = useState([]);
@@ -15,7 +15,7 @@ const Gallery = () => {
 
   const fetchGallery = async () => {
     try {
-      const res = await axios.get('/api/admin/gallery');
+      const res = await api.get('/api/admin/gallery');
       setGallery(res.data);
       setLoading(false);
     } catch (err) {

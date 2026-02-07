@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Container, Row, Col, Card, Button, Alert, Modal, Badge, Spinner } from 'react-bootstrap';
-import axios from 'axios';
+import api from './api/axios';
 import jsQR from 'jsqr';
 
 // Configure axios for the correct server URL - use relative URLs for proxy
-axios.defaults.baseURL = '';
-axios.defaults.headers.common['Content-Type'] = 'application/json';
+api.defaults.baseURL = '';
+api.defaults.headers.common['Content-Type'] = 'application/json';
 
 const Scanner = () => {
   const [isScanning, setIsScanning] = useState(false);
@@ -308,7 +308,7 @@ const Scanner = () => {
         requestData.num_people = numPeople;
       }
 
-      const response = await axios.post('/api/bookings/scan', requestData);
+      const response = await api.post('/api/bookings/scan', requestData);
 
       const result = response.data;
       console.log('Scan result:', result);
@@ -426,7 +426,7 @@ const Scanner = () => {
     setScanResult({ status: 'processing' });
 
     try {
-      const response = await axios.post('/api/bookings/scan', {
+      const response = await api.post('/api/bookings/scan', {
         qr_code: partialAdmissionData.booking_id, // Use booking ID for partial admission
         num_people: numPeople
       });
@@ -516,7 +516,7 @@ const Scanner = () => {
     setScanResult({ status: 'processing' });
 
     try {
-      const response = await axios.post('/api/bookings/scan', {
+      const response = await api.post('/api/bookings/scan', {
         qr_code: qrCode.trim()
       });
 
@@ -722,7 +722,7 @@ const Scanner = () => {
   const loadFoodStatus = async (bookingId) => {
     try {
       console.log('🔄 Loading complete food status for booking:', bookingId);
-      const response = await axios.get(`/api/foods/status/${bookingId}`);
+      const response = await api.get(`/api/foods/status/${bookingId}`);
       console.log('📋 API Response for food status:', response.data);
       console.log('📋 Response data type:', typeof response.data);
       console.log('📋 Response data length:', response.data.length);
@@ -750,7 +750,7 @@ const Scanner = () => {
 
   const markFoodAsGiven = async (bookingId, foodId, quantity = 1) => {
     try {
-      const response = await axios.post(`/api/foods/mark-given/${bookingId}/${foodId}`, {
+      const response = await api.post(`/api/foods/mark-given/${bookingId}/${foodId}`, {
         quantity,
         given_by: 1 // TODO: Get from auth context
       });
@@ -1236,7 +1236,7 @@ const Scanner = () => {
                         size="lg"
                         onClick={async () => {
                           try {
-                            const response = await axios.get('/api/bookings');
+                            const response = await api.get('/api/bookings');
                             alert('Server connection OK! Found ' + response.data.length + ' bookings.');
                           } catch (error) {
                             alert('Server connection failed: ' + error.message);
