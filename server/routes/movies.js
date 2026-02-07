@@ -63,6 +63,14 @@ router.get('/all', (req, res) => {
   });
 });
 
+// Get all movies (root endpoint)
+router.get('/', (req, res) => {
+  db.all('SELECT * FROM movies ORDER BY date DESC', [], (err, movies) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(movies || []);
+  });
+});
+
 // Get movie by ID
 router.get('/:id', (req, res) => {
   db.get('SELECT * FROM movies WHERE id = ?', [req.params.id], (err, movie) => {
