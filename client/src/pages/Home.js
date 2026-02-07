@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Alert } from 'react-bootstrap';
 import { motion, AnimatePresence } from 'framer-motion';
-import api from './api/axios';
+import api from '../api/axios';
 import { useAuth } from '../contexts/AuthContext';
 import { isUpcomingMovie, compareMovieDatesAsc } from '../utils/movieStatus';
 

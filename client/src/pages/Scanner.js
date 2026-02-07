@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Container, Row, Col, Card, Button, Alert, Modal, Badge, Spinner } from 'react-bootstrap';
-import api from './api/axios';
+import api from '../api/axios';
 import jsQR from 'jsqr';
 
 // Configure axios for the correct server URL - use relative URLs for proxy

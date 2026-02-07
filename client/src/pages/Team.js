@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Alert } from 'react-bootstrap';
-import api from './api/axios';
+import api from '../api/axios';
 
 const Team = () => {
   const [team, setTeam] = useState([]);

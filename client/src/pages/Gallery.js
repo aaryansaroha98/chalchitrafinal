@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Alert, Modal } from 'react-bootstrap';
-import api from './api/axios';
+import api from '../api/axios';
 
 const Gallery = () => {
   const [gallery, setGallery] = useState([]);

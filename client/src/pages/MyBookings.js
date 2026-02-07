@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Modal, Card, Badge, Alert } from 'react-bootstrap';
-import api from './api/axios';
+import api from '../api/axios';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 

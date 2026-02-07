@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Alert, Badge, Modal } from 'react-bootstrap';
-import api from './api/axios';
+import api from '../api/axios';
 import QRScanner from '../components/QRScanner';
 
 const TeamScanner = () => {

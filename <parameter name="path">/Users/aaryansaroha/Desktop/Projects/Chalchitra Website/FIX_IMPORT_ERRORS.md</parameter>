@@ -1,0 +1,57 @@
+<parameter name="content"># Fix Import Path Errors
+
+## The Problem
+The import statements in your page files have wrong paths. From `client/src/pages/`, the API file is at `../api/axios.js` not `./api/axios.js`.
+
+## Quick Fix - Run These Commands in Terminal:
+
+```bash
+cd "/Users/aaryansaroha/Desktop/Projects/Chalchitra Website"
+
+# Fix all pages to use correct import path
+sed -i '' "s|from './api/axios'|from '../api/axios'|g" client/src/pages/*.js client/src/contexts/*.js
+
+# Commit and push
+git add -A
+git commit -m "Fix import paths: use ../api/axios instead of ./api/axios"
+git push origin main
+```
+
+## Manual Fix - Edit Each File:
+
+For each file in `client/src/pages/` and `client/src/contexts/`, change:
+```javascript
+// WRONG - causes red error
+import api from './api/axios';
+
+// CORRECT
+import api from '../api/axios';
+```
+
+## Files to Fix:
+- client/src/pages/AdminPanel.js
+- client/src/pages/Booking.js
+- client/src/pages/Gallery.js
+- client/src/pages/Home.js
+- client/src/pages/Login.js
+- client/src/pages/MyBookings.js
+- client/src/pages/PastMovies.js
+- client/src/pages/Payment.js
+- client/src/pages/PaymentSuccess.js
+- client/src/pages/Scanner.js
+- client/src/pages/Team.js
+- client/src/pages/TeamScanner.js
+- client/src/pages/UpcomingMovies.js
+- client/src/contexts/AuthContext.js
+
+## After Fixing:
+1. Push to GitHub: `git add -A && git commit -m "Fix imports" && git push`
+2. Go to Netlify → Deploys → Trigger deploy
+3. Test: https://chalchitraseries.netlify.app
+
+## If Still Getting Errors:
+1. Open VSCode terminal (Ctrl+`)
+2. Run: `cd "/Users/aaryansaroha/Desktop/Projects/Chalchitra Website" && npm run build`
+3. Check for build errors
+4. Copy the error messages and share them with me
+</parameter>
