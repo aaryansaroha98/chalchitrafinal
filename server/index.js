@@ -15,18 +15,31 @@ const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
 const bodyParser = require('body-parser');
-const sqlite3 = require('sqlite3').verbose();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Database setup
+// Database setup - Use SQLite by default (persistent filesystem)
+const isProduction = process.env.NODE_ENV === 'production';
 const dbPath = path.join(__dirname, '..', 'database.db');
-const db = new sqlite3.Database(dbPath);
+
+console.log(`📦 Database: ${isProduction ? 'SQLite (persistent disk)' : 'Local SQLite'}`);
+
+// Initialize database
+const sqlite3 = require('sqlite3').verbose();
+const db = new sqlite3.Database(dbPath, (err) => {
+  if (err) {
+    console.error('❌ Error opening database:', err.message);
+  } else {
+    console.log('✅ Database connected successfully');
+  }
+});
+
+// Make db available globally
+global.db = db;
 
 // Middleware
 app.use((req, res, next) => {
-  // Allow all origins for mobile testing
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -40,7 +53,7 @@ app.use((req, res, next) => {
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 app.use(session({
-  secret: 'chalchitra-secret-key',
+  secret: process.env.SESSION_SECRET || 'chalchitra-secret-key',
   resave: false,
   saveUninitialized: true
 }));
@@ -51,8 +64,17 @@ app.use(passport.session());
 app.use(express.static(path.join(__dirname, '..', 'public')));
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
-// Serve client build
-app.use(express.static(path.join(__dirname, '..', 'client', 'build')));
+// Check if client build exists before serving it
+const clientBuildPath = path.join(__dirname, '..', 'client', 'build', 'index.html');
+const clientBuildExists = fs.existsSync(clientBuildPath);
+
+if (clientBuildExists) {
+  console.log('✅ React build found - serving frontend from server');
+  app.use(express.static(path.join(__dirname, '..', 'client', 'build')));
+} else {
+  console.log('⚠️  React build not found - server will only serve API endpoints');
+  console.log('   Deploy frontend to Netlify separately for free hosting');
+}
 
 // Clear any cached auth module
 delete require.cache[require.resolve('./routes/auth')];
@@ -71,6 +93,8 @@ app.use('/api/movies', require('./routes/movies'));
 console.log('✅ Movies routes loaded');
 app.use('/api/bookings', require('./routes/bookings'));
 console.log('✅ Bookings routes loaded');
+app.use('/api/payments', require('./routes/payments'));
+console.log('✅ Payments routes loaded');
 app.use('/api/admin', require('./routes/admin'));
 console.log('✅ Admin routes loaded');
 app.use('/api/feedback', require('./routes/feedback'));
@@ -81,17 +105,42 @@ app.use('/api/team', require('./routes/team'));
 console.log('✅ Team routes loaded');
 console.log('🎯 All API routes configured successfully');
 
-// Catch all handler: send back React's index.html file for client-side routing
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+// Catch all handler: serve React app if it exists, otherwise API error
 app.use((req, res, next) => {
   if (req.path.startsWith('/api')) {
     return res.status(404).json({ error: 'API endpoint not found' });
   }
-  res.sendFile(path.join(__dirname, '..', 'client', 'build', 'index.html'));
+  if (clientBuildExists) {
+    res.sendFile(clientBuildPath);
+  } else {
+    res.status(404).json({ 
+      error: 'Not found',
+      message: 'Frontend not served from this server. Deploy to Netlify!',
+      apiBase: '/api/*',
+      healthCheck: '/health'
+    });
+  }
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT} (accessible from all network interfaces)`);
-  console.log(`Local access: http://localhost:${PORT}`);
-  console.log(`Network access: http://172.18.8.146:${PORT}`);
-  console.log(`ALSO TRY: http://YOUR_LOCAL_IP:${PORT} (find your IP with ifconfig/ipconfig)`);
+  console.log(`
+╔════════════════════════════════════════════════════════╗
+║                                                        ║
+║   🚀 Server running on port ${PORT}                        ║
+║                                                        ║
+║   Local access:     http://localhost:${PORT}              ║
+║   API endpoint:    http://localhost:${PORT}/api/*        ║
+║   Health check:    http://localhost:${PORT}/health       ║
+║                                                        ║
+╚════════════════════════════════════════════════════════╝
+  `);
 });
