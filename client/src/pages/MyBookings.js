@@ -653,7 +653,7 @@ const MyBookings = () => {
                       }}>
                         {booking.poster_url ? (
                           <img
-                            src={booking.poster_url.startsWith('http') ? booking.poster_url : `http://localhost:3000${booking.poster_url}`}
+                            src={booking.poster_url.startsWith('http') ? booking.poster_url : `https://chalchitra-api.onrender.com${booking.poster_url}`}
                             alt={booking.title}
                             style={{
                               width: '100%',

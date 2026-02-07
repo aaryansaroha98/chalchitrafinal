@@ -177,7 +177,7 @@ const Payment = () => {
             <div className="movie-section">
               <div className="movie-poster-wrapper">
                 <img
-                  src={movie?.poster_url ? (movie.poster_url.startsWith('http') ? movie.poster_url : `http://localhost:3000${movie.poster_url}`) : '/placeholder-movie.jpg'}
+                  src={movie?.poster_url ? (movie.poster_url.startsWith('http') ? movie.poster_url : `https://chalchitra-api.onrender.com${movie.poster_url}`) : '/placeholder-movie.jpg'}
                   alt={movie?.title}
                   className="movie-poster"
                 />
