@@ -1,0 +1,31 @@
+services:
+  # Backend Web Service
+  - type: web
+    name: chalchitra-backend
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: chalchitra-db
+          property: connectionString
+      - key: SESSION_SECRET
+        value: chalchitra-secret-key-change-this
+      - key: GOOGLE_CLIENT_ID
+        value: your-google-client-id
+      - key: GOOGLE_CLIENT_SECRET
+        value: your-google-client-secret
+      - key: GOOGLE_CALLBACK_URL
+        value: https://chalchitra-backend.onrender.com/api/auth/google/callback
+      - key: FRONTEND_URL
+        value: https://chalchitraseries.netlify.app
+
+databases:
+  - name: chalchitra-db
+    plan: free
+
