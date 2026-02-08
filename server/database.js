@@ -1,253 +1,281 @@
-const sqlite3 = require('sqlite3').verbose();
+// Database Configuration - Supports both SQLite (local) and PostgreSQL (production)
+// Uses pg-sqlite adapter to maintain same API for all route files
+
 const path = require('path');
+const fs = require('fs');
 
-const dbPath = path.join(__dirname, '..', 'database.db');
-const db = new sqlite3.Database(dbPath);
+// Check if we have PostgreSQL connection string
+const usePostgres = process.env.DATABASE_URL && process.env.NODE_ENV === 'production';
 
-console.log('📦 Connecting to SQLite database...');
+let db;
 
-// Helper function to create table
-function createTable(sql, tableName) {
-  return new Promise((resolve) => {
-    db.run(sql, (err) => {
-      if (err) {
-        console.log(`⚠️  ${tableName} table:`, err.message);
-      } else {
-        console.log(`✅ ${tableName} table ready`);
-      }
-      resolve();
-    });
+if (usePostgres) {
+  // PostgreSQL Setup with pg library directly
+  console.log('🔄 Connecting to PostgreSQL database...');
+  const { Pool } = require('pg');
+  
+  db = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
+  });
+  
+  db.on('connect', () => console.log('✅ PostgreSQL connected!'));
+  db.on('error', (err) => console.error('❌ PostgreSQL error:', err));
+  
+  // Wrap pg to mimic sqlite3 API
+  const sqlite3 = require('sqlite3').verbose();
+  
+  // Create wrapper that makes pg work like sqlite3
+  db.run = function(sql, params, callback) {
+    const cb = typeof params === 'function' ? params : callback;
+    const values = Array.isArray(params) ? params : [];
+    this.query(sql, values)
+      .then(() => cb && cb(null))
+      .catch(err => cb && cb(err));
+  };
+  
+  db.get = function(sql, params, callback) {
+    const cb = typeof params === 'function' ? params : callback;
+    const values = Array.isArray(params) ? params : [];
+    this.query(sql, values)
+      .then(res => cb && cb(null, res.rows[0] || null))
+      .catch(err => cb && cb(err, null));
+  };
+  
+  db.all = function(sql, params, callback) {
+    const cb = typeof params === 'function' ? params : callback;
+    const values = Array.isArray(params) ? params : [];
+    this.query(sql, values)
+      .then(res => cb && cb(null, res.rows))
+      .catch(err => cb && cb(err, []));
+  };
+  
+  db.serialize = function(callback) {
+    callback();
+  };
+  
+} else {
+  // SQLite Setup (for local development)
+  const sqlite3 = require('sqlite3').verbose();
+  const dbPath = path.join(__dirname, '..', 'database.db');
+  
+  console.log('📦 Connecting to SQLite database...');
+  db = new sqlite3.Database(dbPath);
+  
+  db.serialize(() => {
+    console.log('✅ SQLite database connected!');
   });
 }
 
-// Initialize database
-db.serialize(async () => {
+// Export database object
+module.exports = db;
+
+// Auto-initialize database tables on startup
+db.serialize(() => {
   console.log('🗄️  Initializing database schema...');
   
-  // Create tables - IF NOT EXISTS handles existing tables
-  await createTable(`CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    google_id TEXT UNIQUE,
-    email TEXT UNIQUE,
-    name TEXT,
-    is_admin INTEGER DEFAULT 0,
-    code_scanner INTEGER DEFAULT 0
-  )`, 'users');
+  const tables = [
+    `CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      google_id TEXT UNIQUE,
+      email TEXT UNIQUE,
+      name TEXT,
+      is_admin INTEGER DEFAULT 0,
+      code_scanner INTEGER DEFAULT 0,
+      admin_tag TEXT
+    )`,
+    `CREATE TABLE IF NOT EXISTS movies (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT,
+      description TEXT,
+      poster_url TEXT,
+      date TEXT,
+      venue TEXT,
+      price REAL,
+      available_foods TEXT,
+      category TEXT,
+      duration TEXT,
+      imdb_rating TEXT,
+      language TEXT,
+      is_upcoming INTEGER DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
+    `CREATE TABLE IF NOT EXISTS bookings (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER,
+      movie_id INTEGER,
+      num_people INTEGER,
+      food_option TEXT,
+      coupon_code TEXT,
+      total_price REAL,
+      discount_amount REAL,
+      payment_method TEXT,
+      payment_id TEXT,
+      payment_amount REAL,
+      payment_order_id TEXT,
+      payment_status TEXT,
+      qr_code TEXT UNIQUE,
+      selected_seats TEXT,
+      food_order TEXT,
+      admitted_people INTEGER DEFAULT 0,
+      remaining_people INTEGER DEFAULT 0,
+      ticket_html TEXT,
+      booking_code TEXT UNIQUE,
+      is_used INTEGER DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
+    `CREATE TABLE IF NOT EXISTS feedback (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER,
+      movie_id INTEGER,
+      rating INTEGER,
+      comment TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
+    `CREATE TABLE IF NOT EXISTS team (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT,
+      student_id TEXT,
+      photo_url TEXT,
+      role TEXT,
+      section TEXT DEFAULT 'current_team',
+      scanner_access INTEGER DEFAULT 0
+    )`,
+    `CREATE TABLE IF NOT EXISTS gallery (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      image_url TEXT,
+      event_name TEXT,
+      uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
+    `CREATE TABLE IF NOT EXISTS settings (
+      id INTEGER PRIMARY KEY,
+      tagline TEXT,
+      hero_background TEXT,
+      hero_background_image TEXT,
+      hero_background_video TEXT,
+      about_text TEXT,
+      about_image TEXT,
+      contact_head_name TEXT,
+      contact_head_email TEXT
+    )`,
+    `CREATE TABLE IF NOT EXISTS coupons (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      code TEXT UNIQUE,
+      description TEXT,
+      discount_type TEXT,
+      discount_value REAL,
+      min_purchase REAL DEFAULT 0,
+      max_discount REAL,
+      usage_limit INTEGER,
+      used_count INTEGER DEFAULT 0,
+      expiry_date DATETIME,
+      is_active INTEGER DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
+    `CREATE TABLE IF NOT EXISTS foods (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      description TEXT,
+      price REAL NOT NULL,
+      category TEXT,
+      image_url TEXT,
+      is_available INTEGER DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
+    `CREATE TABLE IF NOT EXISTS email_history (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      email_type TEXT NOT NULL,
+      recipient_email TEXT NOT NULL,
+      recipient_name TEXT,
+      subject TEXT NOT NULL,
+      message TEXT NOT NULL,
+      sent_by INTEGER,
+      status TEXT DEFAULT 'sent',
+      error_message TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
+    `CREATE TABLE IF NOT EXISTS coupon_winners (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      coupon_code TEXT NOT NULL,
+      discount_amount REAL NOT NULL,
+      discount_type TEXT DEFAULT 'fixed',
+      max_discount REAL,
+      expiry_date DATETIME,
+      is_used INTEGER DEFAULT 0,
+      used_at DATETIME,
+      sent_by INTEGER,
+      shared_coupon_id INTEGER,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
+    `CREATE TABLE IF NOT EXISTS movie_foods (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      movie_id INTEGER NOT NULL,
+      food_id INTEGER NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
+    `CREATE TABLE IF NOT EXISTS booking_foods (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      booking_id INTEGER NOT NULL,
+      food_id INTEGER NOT NULL,
+      quantity INTEGER NOT NULL DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
+    `CREATE TABLE IF NOT EXISTS booking_food_status (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      booking_id INTEGER NOT NULL,
+      food_id INTEGER NOT NULL,
+      quantity_given INTEGER NOT NULL DEFAULT 0,
+      given_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      given_by INTEGER
+    )`,
+    `CREATE TABLE IF NOT EXISTS admin_permissions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      admin_user_id INTEGER NOT NULL UNIQUE,
+      allowed_tabs TEXT NOT NULL DEFAULT '{"dashboard": true, "movies": true, "bookings": true, "foods": true, "team": true, "gallery": true, "coupons": true, "coupon-winners": true, "feedback": true, "mail": true, "settings": true, "config": true}',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      created_by INTEGER
+    )`,
+    `CREATE TABLE IF NOT EXISTS mail_settings (
+      id INTEGER PRIMARY KEY,
+      email_host TEXT NOT NULL DEFAULT 'smtp.gmail.com',
+      email_port INTEGER DEFAULT 587,
+      email_user TEXT,
+      email_pass TEXT,
+      sender_name TEXT DEFAULT 'Chalchitra IIT Jammu',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
+    `CREATE TABLE IF NOT EXISTS razorpay_settings (
+      id INTEGER PRIMARY KEY,
+      key_id TEXT,
+      key_secret TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`
+  ];
 
-  await createTable(`CREATE TABLE IF NOT EXISTS movies (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT,
-    description TEXT,
-    poster_url TEXT,
-    date TEXT,
-    venue TEXT,
-    price REAL,
-    available_foods TEXT,
-    category TEXT,
-    duration TEXT,
-    imdb_rating TEXT,
-    language TEXT,
-    is_upcoming INTEGER DEFAULT 1,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )`, 'movies');
-
-  await createTable(`CREATE TABLE IF NOT EXISTS bookings (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER,
-    movie_id INTEGER,
-    num_people INTEGER,
-    food_option TEXT,
-    coupon_code TEXT,
-    total_price REAL,
-    discount_amount REAL,
-    payment_method TEXT,
-    payment_id TEXT,
-    payment_amount REAL,
-    payment_order_id TEXT,
-    payment_status TEXT,
-    qr_code TEXT UNIQUE,
-    selected_seats TEXT,
-    food_order TEXT,
-    admitted_people INTEGER DEFAULT 0,
-    remaining_people INTEGER DEFAULT 0,
-    ticket_html TEXT,
-    booking_code TEXT UNIQUE,
-    is_used INTEGER DEFAULT 0,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (movie_id) REFERENCES movies(id)
-  )`, 'bookings');
-
-  await createTable(`CREATE TABLE IF NOT EXISTS feedback (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER,
-    movie_id INTEGER,
-    rating INTEGER,
-    comment TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (movie_id) REFERENCES movies(id)
-  )`, 'feedback');
-
-  await createTable(`CREATE TABLE IF NOT EXISTS team (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    student_id TEXT,
-    photo_url TEXT,
-    role TEXT,
-    section TEXT DEFAULT 'current_team',
-    scanner_access INTEGER DEFAULT 0
-  )`, 'team');
-
-  await createTable(`CREATE TABLE IF NOT EXISTS gallery (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    image_url TEXT,
-    event_name TEXT,
-    uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )`, 'gallery');
-
-  await createTable(`CREATE TABLE IF NOT EXISTS settings (
-    id INTEGER PRIMARY KEY,
-    tagline TEXT,
-    hero_background TEXT,
-    hero_background_image TEXT,
-    hero_background_video TEXT,
-    about_text TEXT,
-    about_image TEXT,
-    contact_head_name TEXT,
-    contact_head_email TEXT
-  )`, 'settings');
-
-  await createTable(`CREATE TABLE IF NOT EXISTS coupons (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    code TEXT UNIQUE,
-    description TEXT,
-    discount_type TEXT CHECK(discount_type IN ('percentage', 'fixed')),
-    discount_value REAL,
-    min_purchase REAL DEFAULT 0,
-    max_discount REAL,
-    usage_limit INTEGER,
-    used_count INTEGER DEFAULT 0,
-    expiry_date DATETIME,
-    is_active INTEGER DEFAULT 1,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )`, 'coupons');
-
-  await createTable(`CREATE TABLE IF NOT EXISTS email_history (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    email_type TEXT NOT NULL,
-    recipient_email TEXT NOT NULL,
-    recipient_name TEXT,
-    subject TEXT NOT NULL,
-    message TEXT NOT NULL,
-    sent_by INTEGER,
-    status TEXT DEFAULT 'sent',
-    error_message TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (sent_by) REFERENCES users(id)
-  )`, 'email_history');
-
-  await createTable(`CREATE TABLE IF NOT EXISTS coupon_winners (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    coupon_code TEXT NOT NULL,
-    discount_amount REAL NOT NULL,
-    discount_type TEXT DEFAULT 'fixed',
-    max_discount REAL,
-    expiry_date DATETIME,
-    is_used INTEGER DEFAULT 0,
-    used_at DATETIME,
-    sent_by INTEGER,
-    shared_coupon_id INTEGER,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (sent_by) REFERENCES users(id),
-    FOREIGN KEY (shared_coupon_id) REFERENCES coupons(id)
-  )`, 'coupon_winners');
-
-  await createTable(`CREATE TABLE IF NOT EXISTS foods (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    description TEXT,
-    price REAL NOT NULL,
-    category TEXT,
-    image_url TEXT,
-    is_available INTEGER DEFAULT 1,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )`, 'foods');
-
-  await createTable(`CREATE TABLE IF NOT EXISTS movie_foods (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    movie_id INTEGER NOT NULL,
-    food_id INTEGER NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (movie_id) REFERENCES movies(id),
-    FOREIGN KEY (food_id) REFERENCES foods(id),
-    UNIQUE(movie_id, food_id)
-  )`, 'movie_foods');
-
-  await createTable(`CREATE TABLE IF NOT EXISTS booking_foods (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    booking_id INTEGER NOT NULL,
-    food_id INTEGER NOT NULL,
-    quantity INTEGER NOT NULL DEFAULT 1,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (booking_id) REFERENCES bookings(id),
-    FOREIGN KEY (food_id) REFERENCES foods(id)
-  )`, 'booking_foods');
-
-  await createTable(`CREATE TABLE IF NOT EXISTS booking_food_status (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    booking_id INTEGER NOT NULL,
-    food_id INTEGER NOT NULL,
-    quantity_given INTEGER NOT NULL DEFAULT 0,
-    given_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    given_by INTEGER,
-    FOREIGN KEY (booking_id) REFERENCES bookings(id),
-    FOREIGN KEY (food_id) REFERENCES foods(id),
-    UNIQUE(booking_id, food_id)
-  )`, 'booking_food_status');
-
-  await createTable(`CREATE TABLE IF NOT EXISTS admin_permissions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    admin_user_id INTEGER NOT NULL UNIQUE,
-    allowed_tabs TEXT NOT NULL DEFAULT '{"dashboard": true, "movies": true, "bookings": true, "foods": true, "team": true, "gallery": true, "coupons": true, "coupon-winners": true, "feedback": true, "mail": true, "settings": true, "config": true}',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    created_by INTEGER,
-    FOREIGN KEY (admin_user_id) REFERENCES users(id),
-    FOREIGN KEY (created_by) REFERENCES users(id)
-  )`, 'admin_permissions');
-
-  await createTable(`CREATE TABLE IF NOT EXISTS mail_settings (
-    id INTEGER PRIMARY KEY,
-    email_host TEXT NOT NULL DEFAULT 'smtp.gmail.com',
-    email_port INTEGER DEFAULT 587,
-    email_user TEXT,
-    email_pass TEXT,
-    sender_name TEXT DEFAULT 'Chalchitra IIT Jammu',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )`, 'mail_settings');
-
-  await createTable(`CREATE TABLE IF NOT EXISTS razorpay_settings (
-    id INTEGER PRIMARY KEY,
-    key_id TEXT,
-    key_secret TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )`, 'razorpay_settings');
-
-  // Add unique index for booking_code (IF NOT EXISTS works for indexes)
-  db.run(`CREATE UNIQUE INDEX IF NOT EXISTS idx_booking_code ON bookings(booking_code)`, (err) => {
-    if (err && !err.message.includes('already exists') && !err.message.includes('duplicate')) {
-      console.log(`⚠️  Index creation:`, err.message);
-    } else {
-      console.log(`✅ Unique index on booking_code ready`);
-    }
+  let completed = 0;
+  tables.forEach(sql => {
+    const tableName = sql.match(/CREATE TABLE IF NOT EXISTS (\w+)/)[1];
+    db.run(sql, function(err) {
+      if (err) {
+        console.log(`⚠️  ${tableName} table error:`, err.message);
+      } else {
+        console.log(`✅ ${tableName} table ready`);
+      }
+      completed++;
+      if (completed === tables.length) {
+        console.log('🗄️  Database initialization complete!');
+        createDefaultData();
+      }
+    });
   });
+});
 
+function createDefaultData() {
   // Add admin user if not exists
   db.get('SELECT * FROM users WHERE email = ?', ['2025uee0154@iitjammu.ac.in'], (err, user) => {
     if (err) {
@@ -265,9 +293,5 @@ db.serialize(async () => {
       console.log(`✅ Admin user exists: 2025uee0154@iitjammu.ac.in`);
     }
   });
-
-  console.log(`🗄️  Database initialization complete!`);
-});
-
-module.exports = db;
+}
 
