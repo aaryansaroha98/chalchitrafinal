@@ -55,11 +55,19 @@ if (usePostgres) {
   };
   
 } else {
-  // SQLite Setup (for local development)
+  // SQLite Setup (for local development and production with persistent disk)
   const sqlite3 = require('sqlite3').verbose();
-  const dbPath = path.join(__dirname, '..', 'database.db');
+  const dbPath = process.env.DATABASE_PATH || path.join(__dirname, '..', 'database.db');
   
-  console.log('📦 Connecting to SQLite database...');
+  console.log(`📦 Connecting to SQLite database at: ${dbPath}`);
+  
+  // Ensure database directory exists
+  const dbDir = path.dirname(dbPath);
+  if (!fs.existsSync(dbDir)) {
+    fs.mkdirSync(dbDir, { recursive: true });
+    console.log(`✅ Created database directory: ${dbDir}`);
+  }
+  
   db = new sqlite3.Database(dbPath);
   
   db.serialize(() => {
@@ -74,186 +82,193 @@ module.exports = db;
 db.serialize(() => {
   console.log('🗄️  Initializing database schema...');
   
+  // Use PostgreSQL syntax if connected to PostgreSQL, otherwise SQLite
+  const idField = usePostgres ? 'id SERIAL PRIMARY KEY' : 'id INTEGER PRIMARY KEY AUTOINCREMENT';
+  const integerType = usePostgres ? 'INTEGER' : 'INTEGER';
+  const textType = usePostgres ? 'TEXT' : 'TEXT';
+  const realType = usePostgres ? 'REAL' : 'REAL';
+  const timestampDefault = usePostgres ? 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP' : 'DATETIME DEFAULT CURRENT_TIMESTAMP';
+  
   const tables = [
     `CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      google_id TEXT UNIQUE,
-      email TEXT UNIQUE,
-      name TEXT,
-      is_admin INTEGER DEFAULT 0,
-      code_scanner INTEGER DEFAULT 0,
-      admin_tag TEXT
+      ${idField},
+      google_id ${textType} UNIQUE,
+      email ${textType} UNIQUE,
+      name ${textType},
+      is_admin ${integerType} DEFAULT 0,
+      code_scanner ${integerType} DEFAULT 0,
+      admin_tag ${textType}
     )`,
     `CREATE TABLE IF NOT EXISTS movies (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      title TEXT,
-      description TEXT,
-      poster_url TEXT,
-      date TEXT,
-      venue TEXT,
-      price REAL,
-      available_foods TEXT,
-      category TEXT,
-      duration TEXT,
-      imdb_rating TEXT,
-      language TEXT,
-      is_upcoming INTEGER DEFAULT 1,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      ${idField},
+      title ${textType},
+      description ${textType},
+      poster_url ${textType},
+      date ${textType},
+      venue ${textType},
+      price ${realType},
+      available_foods ${textType},
+      category ${textType},
+      duration ${textType},
+      imdb_rating ${textType},
+      language ${textType},
+      is_upcoming ${integerType} DEFAULT 1,
+      created_at ${timestampDefault}
     )`,
     `CREATE TABLE IF NOT EXISTS bookings (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER,
-      movie_id INTEGER,
-      num_people INTEGER,
-      food_option TEXT,
-      coupon_code TEXT,
-      total_price REAL,
-      discount_amount REAL,
-      payment_method TEXT,
-      payment_id TEXT,
-      payment_amount REAL,
-      payment_order_id TEXT,
-      payment_status TEXT,
-      qr_code TEXT UNIQUE,
-      selected_seats TEXT,
-      food_order TEXT,
-      admitted_people INTEGER DEFAULT 0,
-      remaining_people INTEGER DEFAULT 0,
-      ticket_html TEXT,
-      booking_code TEXT UNIQUE,
-      is_used INTEGER DEFAULT 0,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      ${idField},
+      user_id ${integerType},
+      movie_id ${integerType},
+      num_people ${integerType},
+      food_option ${textType},
+      coupon_code ${textType},
+      total_price ${realType},
+      discount_amount ${realType},
+      payment_method ${textType},
+      payment_id ${textType},
+      payment_amount ${realType},
+      payment_order_id ${textType},
+      payment_status ${textType},
+      qr_code ${textType} UNIQUE,
+      selected_seats ${textType},
+      food_order ${textType},
+      admitted_people ${integerType} DEFAULT 0,
+      remaining_people ${integerType} DEFAULT 0,
+      ticket_html ${textType},
+      booking_code ${textType} UNIQUE,
+      is_used ${integerType} DEFAULT 0,
+      created_at ${timestampDefault}
     )`,
     `CREATE TABLE IF NOT EXISTS feedback (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER,
-      movie_id INTEGER,
-      rating INTEGER,
-      comment TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      ${idField},
+      user_id ${integerType},
+      movie_id ${integerType},
+      rating ${integerType},
+      comment ${textType},
+      created_at ${timestampDefault}
     )`,
     `CREATE TABLE IF NOT EXISTS team (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT,
-      student_id TEXT,
-      photo_url TEXT,
-      role TEXT,
-      section TEXT DEFAULT 'current_team',
-      scanner_access INTEGER DEFAULT 0
+      ${idField},
+      name ${textType},
+      student_id ${textType},
+      photo_url ${textType},
+      role ${textType},
+      section ${textType} DEFAULT 'current_team',
+      scanner_access ${integerType} DEFAULT 0
     )`,
     `CREATE TABLE IF NOT EXISTS gallery (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      image_url TEXT,
-      event_name TEXT,
-      uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      ${idField},
+      image_url ${textType},
+      event_name ${textType},
+      uploaded_at ${timestampDefault}
     )`,
     `CREATE TABLE IF NOT EXISTS settings (
-      id INTEGER PRIMARY KEY,
-      tagline TEXT,
-      hero_background TEXT,
-      hero_background_image TEXT,
-      hero_background_video TEXT,
-      about_text TEXT,
-      about_image TEXT,
-      contact_head_name TEXT,
-      contact_head_email TEXT
+      id ${integerType} PRIMARY KEY,
+      tagline ${textType},
+      hero_background ${textType},
+      hero_background_image ${textType},
+      hero_background_video ${textType},
+      about_text ${textType},
+      about_image ${textType},
+      contact_head_name ${textType},
+      contact_head_email ${textType}
     )`,
     `CREATE TABLE IF NOT EXISTS coupons (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      code TEXT UNIQUE,
-      description TEXT,
-      discount_type TEXT,
-      discount_value REAL,
-      min_purchase REAL DEFAULT 0,
-      max_discount REAL,
-      usage_limit INTEGER,
-      used_count INTEGER DEFAULT 0,
-      expiry_date DATETIME,
-      is_active INTEGER DEFAULT 1,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      ${idField},
+      code ${textType} UNIQUE,
+      description ${textType},
+      discount_type ${textType},
+      discount_value ${realType},
+      min_purchase ${realType} DEFAULT 0,
+      max_discount ${realType},
+      usage_limit ${integerType},
+      used_count ${integerType} DEFAULT 0,
+      expiry_date ${timestampDefault.replace('DEFAULT CURRENT_TIMESTAMP', '')},
+      is_active ${integerType} DEFAULT 1,
+      created_at ${timestampDefault},
+      updated_at ${timestampDefault}
     )`,
     `CREATE TABLE IF NOT EXISTS foods (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      description TEXT,
-      price REAL NOT NULL,
-      category TEXT,
-      image_url TEXT,
-      is_available INTEGER DEFAULT 1,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      ${idField},
+      name ${textType} NOT NULL,
+      description ${textType},
+      price ${realType} NOT NULL,
+      category ${textType},
+      image_url ${textType},
+      is_available ${integerType} DEFAULT 1,
+      created_at ${timestampDefault}
     )`,
     `CREATE TABLE IF NOT EXISTS email_history (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      email_type TEXT NOT NULL,
-      recipient_email TEXT NOT NULL,
-      recipient_name TEXT,
-      subject TEXT NOT NULL,
-      message TEXT NOT NULL,
-      sent_by INTEGER,
-      status TEXT DEFAULT 'sent',
-      error_message TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      ${idField},
+      email_type ${textType} NOT NULL,
+      recipient_email ${textType} NOT NULL,
+      recipient_name ${textType},
+      subject ${textType} NOT NULL,
+      message ${textType} NOT NULL,
+      sent_by ${integerType},
+      status ${textType} DEFAULT 'sent',
+      error_message ${textType},
+      created_at ${timestampDefault}
     )`,
     `CREATE TABLE IF NOT EXISTS coupon_winners (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
-      coupon_code TEXT NOT NULL,
-      discount_amount REAL NOT NULL,
-      discount_type TEXT DEFAULT 'fixed',
-      max_discount REAL,
-      expiry_date DATETIME,
-      is_used INTEGER DEFAULT 0,
-      used_at DATETIME,
-      sent_by INTEGER,
-      shared_coupon_id INTEGER,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      ${idField},
+      user_id ${integerType} NOT NULL,
+      coupon_code ${textType} NOT NULL,
+      discount_amount ${realType} NOT NULL,
+      discount_type ${textType} DEFAULT 'fixed',
+      max_discount ${realType},
+      expiry_date ${timestampDefault.replace('DEFAULT CURRENT_TIMESTAMP', '')},
+      is_used ${integerType} DEFAULT 0,
+      used_at ${timestampDefault.replace('DEFAULT CURRENT_TIMESTAMP', '')},
+      sent_by ${integerType},
+      shared_coupon_id ${integerType},
+      created_at ${timestampDefault}
     )`,
     `CREATE TABLE IF NOT EXISTS movie_foods (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      movie_id INTEGER NOT NULL,
-      food_id INTEGER NOT NULL,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      ${idField},
+      movie_id ${integerType} NOT NULL,
+      food_id ${integerType} NOT NULL,
+      created_at ${timestampDefault}
     )`,
     `CREATE TABLE IF NOT EXISTS booking_foods (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      booking_id INTEGER NOT NULL,
-      food_id INTEGER NOT NULL,
-      quantity INTEGER NOT NULL DEFAULT 1,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      ${idField},
+      booking_id ${integerType} NOT NULL,
+      food_id ${integerType} NOT NULL,
+      quantity ${integerType} NOT NULL DEFAULT 1,
+      created_at ${timestampDefault}
     )`,
     `CREATE TABLE IF NOT EXISTS booking_food_status (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      booking_id INTEGER NOT NULL,
-      food_id INTEGER NOT NULL,
-      quantity_given INTEGER NOT NULL DEFAULT 0,
-      given_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      given_by INTEGER
+      ${idField},
+      booking_id ${integerType} NOT NULL,
+      food_id ${integerType} NOT NULL,
+      quantity_given ${integerType} NOT NULL DEFAULT 0,
+      given_at ${timestampDefault},
+      given_by ${integerType}
     )`,
     `CREATE TABLE IF NOT EXISTS admin_permissions (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      admin_user_id INTEGER NOT NULL UNIQUE,
-      allowed_tabs TEXT NOT NULL DEFAULT '{"dashboard": true, "movies": true, "bookings": true, "foods": true, "team": true, "gallery": true, "coupons": true, "coupon-winners": true, "feedback": true, "mail": true, "settings": true, "config": true}',
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      created_by INTEGER
+      ${idField},
+      admin_user_id ${integerType} NOT NULL UNIQUE,
+      allowed_tabs ${textType} NOT NULL DEFAULT '{"dashboard": true, "movies": true, "bookings": true, "foods": true, "team": true, "gallery": true, "coupons": true, "coupon-winners": true, "feedback": true, "mail": true, "settings": true, "config": true}',
+      created_at ${timestampDefault},
+      updated_at ${timestampDefault},
+      created_by ${integerType}
     )`,
     `CREATE TABLE IF NOT EXISTS mail_settings (
-      id INTEGER PRIMARY KEY,
-      email_host TEXT NOT NULL DEFAULT 'smtp.gmail.com',
-      email_port INTEGER DEFAULT 587,
-      email_user TEXT,
-      email_pass TEXT,
-      sender_name TEXT DEFAULT 'Chalchitra IIT Jammu',
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      id ${integerType} PRIMARY KEY,
+      email_host ${textType} NOT NULL DEFAULT 'smtp.gmail.com',
+      email_port ${integerType} DEFAULT 587,
+      email_user ${textType},
+      email_pass ${textType},
+      sender_name ${textType} DEFAULT 'Chalchitra IIT Jammu',
+      created_at ${timestampDefault},
+      updated_at ${timestampDefault}
     )`,
     `CREATE TABLE IF NOT EXISTS razorpay_settings (
-      id INTEGER PRIMARY KEY,
-      key_id TEXT,
-      key_secret TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      id ${integerType} PRIMARY KEY,
+      key_id ${textType},
+      key_secret ${textType},
+      created_at ${timestampDefault},
+      updated_at ${timestampDefault}
     )`
   ];
 

@@ -1,9 +1,10 @@
 [build]
+  base = "client"
   command = "npm run build"
   publish = "build"
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "20"
 
 [[redirects]]
   from = "/*"

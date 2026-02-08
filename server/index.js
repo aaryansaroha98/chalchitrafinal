@@ -19,11 +19,19 @@ const bodyParser = require('body-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Database setup - Use SQLite by default (persistent filesystem)
+// Database setup - Use environment variable path or default
 const isProduction = process.env.NODE_ENV === 'production';
-const dbPath = path.join(__dirname, '..', 'database.db');
+const dbPath = process.env.DATABASE_PATH || path.join(__dirname, '..', 'database.db');
 
-console.log(`📦 Database: ${isProduction ? 'SQLite (persistent disk)' : 'Local SQLite'}`);
+console.log(`📦 Database path: ${dbPath}`);
+console.log(`📦 Environment: ${isProduction ? 'Production' : 'Development'}`);
+
+// Ensure database directory exists
+const dbDir = path.dirname(dbPath);
+if (!fs.existsSync(dbDir)) {
+  fs.mkdirSync(dbDir, { recursive: true });
+  console.log(`✅ Created database directory: ${dbDir}`);
+}
 
 // Initialize database
 const sqlite3 = require('sqlite3').verbose();
@@ -32,6 +40,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
     console.error('❌ Error opening database:', err.message);
   } else {
     console.log('✅ Database connected successfully');
+    console.log(`✅ Database file: ${dbPath}`);
   }
 });
 
