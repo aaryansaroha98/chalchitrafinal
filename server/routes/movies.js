@@ -2,6 +2,7 @@ const express = require('express');
 const db = require('../database');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 
 const router = express.Router();
 
@@ -10,7 +11,15 @@ console.log('🎬 Movies routes file loaded');
 // Multer for file uploads (posters)
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '..', '..', 'uploads'));
+    const dir = path.join(__dirname, '..', '..', 'uploads');
+    try {
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+    } catch (e) {
+      console.error('Failed ensuring uploads dir for movies:', e);
+    }
+    cb(null, dir);
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));
@@ -18,10 +27,43 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
+// Helper function to validate movie data
+const validateMovieData = (data) => {
+  const errors = [];
+  
+  if (!data.title || data.title.trim() === '') {
+    errors.push('Movie title is required');
+  }
+  
+  if (!data.date || data.date.trim() === '') {
+    errors.push('Movie date is required');
+  } else {
+    const date = new Date(data.date);
+    if (isNaN(date.getTime())) {
+      errors.push('Invalid date format');
+    }
+  }
+  
+  if (!data.venue || data.venue.trim() === '') {
+    errors.push('Venue is required');
+  }
+  
+  if (data.price === undefined || data.price === '' || data.price === null) {
+    errors.push('Price is required');
+  } else if (isNaN(parseFloat(data.price)) || parseFloat(data.price) < 0) {
+    errors.push('Price must be a valid number');
+  }
+  
+  return errors;
+};
+
 // Get upcoming movies - filter by current date & time (JS to respect local datetime strings)
 router.get('/upcoming', (req, res) => {
   db.all('SELECT * FROM movies', [], (err, movies) => {
-    if (err) return res.status(500).json({ error: err.message });
+    if (err) {
+      console.error('❌ Database error in /upcoming:', err);
+      return res.status(500).json({ error: 'Failed to fetch movies' });
+    }
     const now = new Date();
     const upcoming = (movies || [])
       .filter((movie) => {
@@ -37,7 +79,10 @@ router.get('/upcoming', (req, res) => {
 // Get past movies - filter by current date & time (JS to respect local datetime strings)
 router.get('/past', (req, res) => {
   db.all('SELECT * FROM movies', [], (err, movies) => {
-    if (err) return res.status(500).json({ error: err.message });
+    if (err) {
+      console.error('❌ Database error in /past:', err);
+      return res.status(500).json({ error: 'Failed to fetch movies' });
+    }
     const now = new Date();
     const past = (movies || [])
       .filter((movie) => {
@@ -52,46 +97,88 @@ router.get('/past', (req, res) => {
 
 // Get all movies (fallback for admin panel)
 router.get('/all', (req, res) => {
-  console.log('GET /api/movies/all - Fetching all movies');
+  console.log('🔍 GET /api/movies/all - Fetching all movies');
   db.all('SELECT * FROM movies ORDER BY date DESC', [], (err, movies) => {
     if (err) {
-      console.log('Database error in /all:', err);
-      return res.status(500).json({ error: err.message });
+      console.error('❌ Database error in /all:', err);
+      return res.status(500).json({ error: 'Failed to fetch movies: ' + err.message });
     }
-    console.log('Returning', movies.length, 'movies from /all endpoint');
-    res.json(movies);
+    console.log('✅ Returning', movies?.length || 0, 'movies from /all endpoint');
+    res.json(movies || []);
   });
 });
 
 // Get all movies (root endpoint)
 router.get('/', (req, res) => {
   db.all('SELECT * FROM movies ORDER BY date DESC', [], (err, movies) => {
-    if (err) return res.status(500).json({ error: err.message });
+    if (err) {
+      console.error('❌ Database error in GET /:', err);
+      return res.status(500).json({ error: 'Failed to fetch movies' });
+    }
     res.json(movies || []);
   });
 });
 
 // Get movie by ID
 router.get('/:id', (req, res) => {
-  db.get('SELECT * FROM movies WHERE id = ?', [req.params.id], (err, movie) => {
-    if (err) return res.status(500).json({ error: err.message });
-    if (!movie) return res.status(404).json({ error: 'Movie not found' });
+  const movieId = parseInt(req.params.id);
+  if (isNaN(movieId)) {
+    return res.status(400).json({ error: 'Invalid movie ID' });
+  }
+  
+  db.get('SELECT * FROM movies WHERE id = ?', [movieId], (err, movie) => {
+    if (err) {
+      console.error('❌ Database error in GET /:id:', err);
+      return res.status(500).json({ error: 'Failed to fetch movie' });
+    }
+    if (!movie) {
+      return res.status(404).json({ error: 'Movie not found' });
+    }
     res.json(movie);
   });
 });
 
 // Add movie (admin only)
 router.post('/', upload.single('poster'), (req, res) => {
+  console.log('📝 POST /api/movies - Creating new movie');
+  
   // Check for OAuth user first
-  if (req.user && req.user.is_admin) {
-    // Continue
-  } else if (req.session && req.session.adminUser && req.session.adminUser.is_admin) {
-    // Continue for temporary admin
-  } else {
+  const isAdmin = (req.user && req.user.is_admin) || 
+                 (req.session && req.session.adminUser && req.session.adminUser.is_admin) ||
+                 (req.session && req.session.user && req.session.user.is_admin);
+  
+  if (!isAdmin) {
+    console.log('❌ Unauthorized attempt to create movie');
     return res.status(403).json({ error: 'Admin access required' });
   }
 
-  const { title, description, date, venue, price, availableFoods, category, duration, imdb_rating, language } = req.body;
+  // Parse the request body
+  let body = req.body;
+  if (typeof body === 'string') {
+    try {
+      body = JSON.parse(body);
+    } catch (e) {
+      console.error('❌ Error parsing request body:', e);
+      return res.status(400).json({ error: 'Invalid request body format' });
+    }
+  }
+
+  console.log('📋 Movie data received:', {
+    title: body.title,
+    date: body.date,
+    venue: body.venue,
+    price: body.price,
+    hasPoster: !!req.file
+  });
+
+  // Validate required fields
+  const validationErrors = validateMovieData(body);
+  if (validationErrors.length > 0) {
+    console.log('❌ Validation errors:', validationErrors);
+    return res.status(400).json({ error: 'Validation failed', details: validationErrors });
+  }
+
+  const { title, description, date, venue, price, availableFoods, category, duration, imdb_rating, language } = body;
   const poster_url = req.file ? `/uploads/${req.file.filename}` : null;
 
   // Determine is_upcoming based on date
@@ -103,36 +190,84 @@ router.post('/', upload.single('poster'), (req, res) => {
   let availableFoodsString = '';
   if (availableFoods) {
     try {
-      const foodsArray = JSON.parse(availableFoods);
-      availableFoodsString = foodsArray.join(',');
+      const foodsArray = typeof availableFoods === 'string' ? JSON.parse(availableFoods) : availableFoods;
+      availableFoodsString = Array.isArray(foodsArray) ? foodsArray.join(',') : foodsArray;
     } catch (e) {
-      console.log('Error parsing availableFoods:', e);
+      console.log('⚠️ Error parsing availableFoods:', e);
+      availableFoodsString = String(availableFoods);
     }
   }
 
-  db.run('INSERT INTO movies (title, description, poster_url, date, venue, price, is_upcoming, available_foods, category, duration, imdb_rating, language) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-    [title, description, poster_url, date, venue, price, isUpcoming, availableFoodsString, category, duration, imdb_rating, language], function(err) {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json({ id: this.lastID });
+  const sql = `INSERT INTO movies (title, description, poster_url, date, venue, price, is_upcoming, available_foods, category, duration, imdb_rating, language) 
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const params = [title, description, poster_url, date, venue, price, isUpcoming, availableFoodsString, category, duration, imdb_rating, language];
+
+  console.log('💾 Executing INSERT query...');
+  
+  db.run(sql, params, function(err) {
+    if (err) {
+      console.error('❌ Database INSERT error:', err);
+      return res.status(500).json({ error: 'Failed to create movie: ' + err.message });
+    }
+    
+    console.log('✅ Movie created successfully with ID:', this.lastID);
+    res.status(201).json({ 
+      id: this.lastID,
+      message: 'Movie created successfully'
     });
+  });
 });
 
 // Update movie (admin)
 router.put('/:id', upload.single('poster'), (req, res) => {
+  const movieId = parseInt(req.params.id);
+  
+  console.log(`📝 PUT /api/movies/${movieId} - Updating movie`);
+  
+  if (isNaN(movieId)) {
+    console.log('❌ Invalid movie ID:', req.params.id);
+    return res.status(400).json({ error: 'Invalid movie ID' });
+  }
+
   // Check for OAuth user first
-  if (req.user && req.user.is_admin) {
-    // Continue
-  } else if (req.session && req.session.adminUser && req.session.adminUser.is_admin) {
-    // Continue for temporary admin
-  } else {
+  const isAdmin = (req.user && req.user.is_admin) || 
+                 (req.session && req.session.adminUser && req.session.adminUser.is_admin) ||
+                 (req.session && req.session.user && req.session.user.is_admin);
+  
+  if (!isAdmin) {
+    console.log('❌ Unauthorized attempt to update movie');
     return res.status(403).json({ error: 'Admin access required' });
   }
 
+  // Parse the request body
+  let body = req.body;
+  if (typeof body === 'string') {
+    try {
+      body = JSON.parse(body);
+    } catch (e) {
+      console.error('❌ Error parsing request body:', e);
+      return res.status(400).json({ error: 'Invalid request body format' });
+    }
+  }
 
+  console.log('📋 Movie update data received:', {
+    title: body.title,
+    date: body.date,
+    venue: body.venue,
+    price: body.price,
+    hasPoster: !!req.file
+  });
 
-  const { title, description, date, venue, price, is_upcoming, availableFoods, category, duration, imdb_rating, language } = req.body;
+  const { title, description, date, venue, price, availableFoods, category, duration, imdb_rating, language } = body;
+  
+  // Validate required fields
+  const validationErrors = validateMovieData(body);
+  if (validationErrors.length > 0) {
+    console.log('❌ Validation errors:', validationErrors);
+    return res.status(400).json({ error: 'Validation failed', details: validationErrors });
+  }
+
   let poster_url = req.body.poster_url; // Keep existing poster if no new file uploaded
-
   if (req.file) {
     poster_url = `/uploads/${req.file.filename}`;
   }
@@ -141,12 +276,11 @@ router.put('/:id', upload.single('poster'), (req, res) => {
   let availableFoodsString = '';
   if (availableFoods) {
     try {
-      const foodsArray = JSON.parse(availableFoods);
-      availableFoodsString = foodsArray.join(',');
+      const foodsArray = typeof availableFoods === 'string' ? JSON.parse(availableFoods) : availableFoods;
+      availableFoodsString = Array.isArray(foodsArray) ? foodsArray.join(',') : foodsArray;
     } catch (e) {
-      console.log('Error parsing availableFoods:', e);
-      // Try to use as-is if it's already a string
-      availableFoodsString = availableFoods;
+      console.log('⚠️ Error parsing availableFoods:', e);
+      availableFoodsString = String(availableFoods);
     }
   }
 
@@ -157,63 +291,128 @@ router.put('/:id', upload.single('poster'), (req, res) => {
     const now = new Date();
     if (!isNaN(movieDate.getTime())) {
       finalIsUpcoming = movieDate > now ? 1 : 0;
-      console.log('Calculated is_upcoming =', finalIsUpcoming, 'based on date:', movieDate);
+      console.log('📅 Calculated is_upcoming =', finalIsUpcoming, 'based on date:', movieDate);
     } else {
-      console.log('Invalid date format, defaulting to upcoming (1)');
+      console.log('⚠️ Invalid date format, defaulting to upcoming (1)');
     }
   } else {
-    console.log('No date provided, defaulting to upcoming (1)');
+    console.log('⚠️ No date provided, defaulting to upcoming (1)');
   }
-
-  console.log('Final UPDATE query - title:', title, 'date:', date, 'is_upcoming:', finalIsUpcoming, 'movie_id:', req.params.id);
 
   // Ensure finalIsUpcoming is always 0 or 1
   finalIsUpcoming = finalIsUpcoming === 1 ? 1 : 0;
-  console.log('Final is_upcoming after validation:', finalIsUpcoming);
 
-  db.run('UPDATE movies SET title = ?, description = ?, poster_url = ?, date = ?, venue = ?, price = ?, is_upcoming = ?, available_foods = ?, category = ?, duration = ?, imdb_rating = ?, language = ? WHERE id = ?',
-    [title, description, poster_url, date, venue, price, finalIsUpcoming, availableFoodsString, category, duration, imdb_rating, language, req.params.id], function(err) {
-      if (err) {
-        console.log('Database error:', err);
-        return res.status(500).json({ error: err.message });
-      }
-      console.log('Database update successful, changes:', this.changes, 'for movie ID:', req.params.id);
-      res.json({ changes: this.changes });
+  const sql = `UPDATE movies SET 
+               title = ?, description = ?, poster_url = ?, date = ?, venue = ?, price = ?, 
+               is_upcoming = ?, available_foods = ?, category = ?, duration = ?, 
+               imdb_rating = ?, language = ? 
+               WHERE id = ?`;
+  const params = [
+    title, description, poster_url, date, venue, price, 
+    finalIsUpcoming, availableFoodsString, category, duration, 
+    imdb_rating, language, movieId
+  ];
+
+  console.log('💾 Executing UPDATE query for movie ID:', movieId);
+
+  db.run(sql, params, function(err) {
+    if (err) {
+      console.error('❌ Database UPDATE error:', err);
+      return res.status(500).json({ error: 'Failed to update movie: ' + err.message });
+    }
+    
+    if (this.changes === 0) {
+      console.log('⚠️ No movie found with ID:', movieId);
+      return res.status(404).json({ error: 'Movie not found' });
+    }
+    
+    console.log('✅ Movie updated successfully. Changes:', this.changes, 'for movie ID:', movieId);
+    res.json({ 
+      changes: this.changes,
+      message: 'Movie updated successfully'
     });
+  });
 });
 
 // Delete movie (admin)
 router.delete('/:id', (req, res) => {
+  const movieId = parseInt(req.params.id);
+  
+  console.log(`🗑️ DELETE /api/movies/${movieId}`);
+  
+  if (isNaN(movieId)) {
+    console.log('❌ Invalid movie ID:', req.params.id);
+    return res.status(400).json({ error: 'Invalid movie ID' });
+  }
+
   // Check for OAuth user first
-  if (req.user && req.user.is_admin) {
-    // Continue
-  } else if (req.session && req.session.adminUser && req.session.adminUser.is_admin) {
-    // Continue for temporary admin
-  } else {
+  const isAdmin = (req.user && req.user.is_admin) || 
+                 (req.session && req.session.adminUser && req.session.adminUser.is_admin) ||
+                 (req.session && req.session.user && req.session.user.is_admin);
+  
+  if (!isAdmin) {
+    console.log('❌ Unauthorized attempt to delete movie');
     return res.status(403).json({ error: 'Admin access required' });
   }
 
-  db.run('DELETE FROM movies WHERE id = ?', [req.params.id], function(err) {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ changes: this.changes });
+  db.run('DELETE FROM movies WHERE id = ?', [movieId], function(err) {
+    if (err) {
+      console.error('❌ Database DELETE error:', err);
+      return res.status(500).json({ error: 'Failed to delete movie: ' + err.message });
+    }
+    
+    if (this.changes === 0) {
+      console.log('⚠️ No movie found with ID:', movieId);
+      return res.status(404).json({ error: 'Movie not found' });
+    }
+    
+    console.log('✅ Movie deleted successfully. Changes:', this.changes, 'for movie ID:', movieId);
+    res.json({ 
+      changes: this.changes,
+      message: 'Movie deleted successfully'
+    });
   });
 });
 
 // Move to past (admin)
 router.put('/:id/move_to_past', (req, res) => {
+  const movieId = parseInt(req.params.id);
+  
+  console.log(`📝 PUT /api/movies/${movieId}/move_to_past`);
+  
+  if (isNaN(movieId)) {
+    console.log('❌ Invalid movie ID:', req.params.id);
+    return res.status(400).json({ error: 'Invalid movie ID' });
+  }
+
   // Check for OAuth user first
-  if (req.user && req.user.is_admin) {
-    // Continue
-  } else if (req.session && req.session.adminUser && req.session.adminUser.is_admin) {
-    // Continue for temporary admin
-  } else {
+  const isAdmin = (req.user && req.user.is_admin) || 
+                 (req.session && req.session.adminUser && req.session.adminUser.is_admin) ||
+                 (req.session && req.session.user && req.session.user.is_admin);
+  
+  if (!isAdmin) {
+    console.log('❌ Unauthorized attempt to move movie to past');
     return res.status(403).json({ error: 'Admin access required' });
   }
 
-  db.run('UPDATE movies SET is_upcoming = 0 WHERE id = ?', [req.params.id], function(err) {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ changes: this.changes });
+  db.run('UPDATE movies SET is_upcoming = 0 WHERE id = ?', [movieId], function(err) {
+    if (err) {
+      console.error('❌ Database error in move_to_past:', err);
+      return res.status(500).json({ error: 'Failed to move movie to past: ' + err.message });
+    }
+    
+    if (this.changes === 0) {
+      console.log('⚠️ No movie found with ID:', movieId);
+      return res.status(404).json({ error: 'Movie not found' });
+    }
+    
+    console.log('✅ Movie moved to past successfully. Changes:', this.changes);
+    res.json({ 
+      changes: this.changes,
+      message: 'Movie moved to past successfully'
+    });
   });
 });
 
 module.exports = router;
+

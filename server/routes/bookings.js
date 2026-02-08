@@ -1136,7 +1136,32 @@ router.post('/send-ticket-email', async (req, res) => {
           </html>
         `;
 
-        const { transporter, settings } = await createEmailTransporter();
+        // Try to get a configured transporter; if not configured, skip gracefully
+        let transporter, settings;
+        try {
+          ({ transporter, settings } = await createEmailTransporter());
+        } catch (transporterErr) {
+          console.warn('Email not configured or verification failed, skipping ticket email:', transporterErr?.message || transporterErr);
+          // Log skipped email for traceability
+          db.run(
+            `INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status, error_message)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+              'ticket',
+              customerEmail,
+              customerName,
+              `🎫 Your Movie Ticket - ${booking.movie_title}`,
+              'Ticket email skipped (email not configured)',
+              booking.user_id || 1,
+              'skipped',
+              transporterErr?.message || 'Email not configured'
+            ],
+            (logErr) => { if (logErr) console.error('Error logging skipped ticket email:', logErr); }
+          );
+
+          return res.json({ message: 'Email disabled or not configured; skipped sending ticket email.' });
+        }
+
         const senderName = settings?.sender_name || 'Chalchitra IIT Jammu';
         const emailUser = settings?.email_user || process.env.EMAIL_USER;
 
@@ -1157,17 +1182,29 @@ router.post('/send-ticket-email', async (req, res) => {
           ]
         };
 
-        await transporter.sendMail(mailOptions);
+        // Respond immediately to avoid client timeouts; send email asynchronously
+        res.json({ message: 'Ticket email queued' });
 
-        db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?)`,
-          ['ticket', customerEmail, customerName, mailOptions.subject, 'Ticket PDF sent', booking.user_id || 1, 'sent'],
-          (logErr) => {
-            if (logErr) console.error('Error logging ticket email history:', logErr);
+        setImmediate(async () => {
+          try {
+            await transporter.sendMail(mailOptions);
+            db.run(
+              `INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
+               VALUES (?, ?, ?, ?, ?, ?, ?)`,
+              ['ticket', customerEmail, customerName, mailOptions.subject, 'Ticket PDF sent', booking.user_id || 1, 'sent'],
+              (logErr) => { if (logErr) console.error('Error logging ticket email history:', logErr); }
+            );
+            console.log('Ticket email sent successfully to', customerEmail);
+          } catch (sendErr) {
+            console.error('Ticket email send failed:', sendErr);
+            db.run(
+              `INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status, error_message)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+              ['ticket', customerEmail, customerName, mailOptions.subject, 'Ticket email failed', booking.user_id || 1, 'failed', sendErr?.message || String(sendErr)],
+              (logErr) => { if (logErr) console.error('Error logging failed ticket email:', logErr); }
+            );
           }
-        );
-
-        res.json({ message: 'Ticket email sent successfully!' });
+        });
       }
     );
   } catch (error) {

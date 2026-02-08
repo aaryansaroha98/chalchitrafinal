@@ -10,7 +10,9 @@ function initializeGoogleStrategy() {
   const db = require('../database');
 
   const port = process.env.PORT || 3000;
-  const baseUrl = process.env.NODE_ENV === 'production' ? 'https://your-production-domain.com' : `http://localhost:${port}`;
+  // Always use localhost for OAuth callback (Google allows localhost for development)
+  // Don't use private IP or dynamic host which causes "device_id and device_name required" error
+  const baseUrl = `http://localhost:${port}`;
 
   console.log('=== AUTH.JS ENVIRONMENT VARIABLES ===');
   console.log('GOOGLE_CLIENT_ID in auth.js:', process.env.GOOGLE_CLIENT_ID);
@@ -201,12 +203,14 @@ router.post('/login', (req, res) => {
 router.get('/google', (req, res) => {
   const clientId = process.env.GOOGLE_CLIENT_ID || 'your-google-client-id';
   const port = process.env.PORT || 3000;
-  const baseUrl = process.env.NODE_ENV === 'production' ? 'https://your-production-domain.com' : `http://localhost:${port}`;
+  
+  // Always use localhost for OAuth callback (Google allows localhost, not private IPs)
+  const baseUrl = `http://localhost:${port}`;
 
   console.log('=== GOOGLE LOGIN ROUTE EXECUTED AT', new Date().toISOString(), '===');
   console.log('Using clientId:', clientId);
+  console.log('Base URL:', baseUrl);
   console.log('Callback URL:', `${baseUrl}/api/auth/google/callback`);
-  console.log('Request headers:', JSON.stringify(req.headers, null, 2));
   console.log('============================================================');
 
   // Manual redirect to Google OAuth
@@ -220,10 +224,17 @@ router.get('/google', (req, res) => {
   res.redirect(googleAuthUrl);
 });
 
-router.get('/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), (req, res) => {
-  // Redirect to admin panel after successful authentication
-  const port = process.env.PORT || 3000;
-  res.redirect(`http://localhost:${port}/admin`);
+router.get('/google/callback', (req, res, next) => {
+  if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+    return res.status(501).json({ error: 'OAuth not configured for local development' });
+  }
+  next();
+}, passport.authenticate('google', { failureRedirect: '/login' }), (req, res) => {
+  // Redirect back to the frontend from the original request
+  // Use the host from the original request to handle mobile/desktop access
+  const frontendHost = req.get('host') || 'localhost:3000';
+  const frontendProtocol = req.protocol || 'http';
+  res.redirect(`${frontendProtocol}://${frontendHost}/`);
 });
 
 router.get('/logout', (req, res) => {
@@ -232,9 +243,10 @@ router.get('/logout', (req, res) => {
     if (req.session) {
       req.session.adminUser = null;
     }
-    // Redirect to frontend after logout
-    const port = process.env.PORT || 3000;
-    res.redirect(`http://localhost:${port}`);
+    // Redirect to frontend after logout using dynamic host
+    const host = req.get('host') || 'localhost:3000';
+    const protocol = req.protocol;
+    res.redirect(`${protocol}://${host}`);
   });
 });
 

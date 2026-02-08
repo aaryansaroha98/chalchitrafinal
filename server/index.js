@@ -1,14 +1,10 @@
 const path = require('path');
 const fs = require('fs');
 
-// Load server-specific .env if it exists, otherwise fall back to root .env
-const serverEnvPath = path.join(__dirname, '.env');
-const rootEnvPath = path.join(__dirname, '..', '.env');
-
-if (fs.existsSync(serverEnvPath)) {
-  require('dotenv').config({ path: serverEnvPath });
-} else {
-  require('dotenv').config({ path: rootEnvPath });
+// Load .env file
+const envPath = path.join(__dirname, '..', '.env');
+if (fs.existsSync(envPath)) {
+  require('dotenv').config({ path: envPath });
 }
 
 const express = require('express');
@@ -19,12 +15,11 @@ const bodyParser = require('body-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Database setup - Use environment variable path or default
-const isProduction = process.env.NODE_ENV === 'production';
-const dbPath = process.env.DATABASE_PATH || path.join(__dirname, '..', 'database.db');
+// Database setup - SQLite only for localhost
+const dbPath = path.join(__dirname, '..', 'database.db');
 
 console.log(`📦 Database path: ${dbPath}`);
-console.log(`📦 Environment: ${isProduction ? 'Production' : 'Development'}`);
+console.log(`📦 Environment: Development (localhost)`);
 
 // Ensure database directory exists
 const dbDir = path.dirname(dbPath);
@@ -71,18 +66,26 @@ app.use(passport.session());
 
 // Serve static files
 app.use(express.static(path.join(__dirname, '..', 'public')));
-app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
+
+// Ensure uploads directory exists before serving and using it for multer
+const uploadsDir = path.join(__dirname, '..', 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+  console.log(`✅ Created uploads directory: ${uploadsDir}`);
+}
+app.use('/uploads', express.static(uploadsDir));
 
 // Check if client build exists before serving it
 const clientBuildPath = path.join(__dirname, '..', 'client', 'build', 'index.html');
 const clientBuildExists = fs.existsSync(clientBuildPath);
+// Local development client URL (CRA dev server)
+const DEV_CLIENT_URL = process.env.DEV_CLIENT_URL || 'http://localhost:3001';
 
 if (clientBuildExists) {
   console.log('✅ React build found - serving frontend from server');
   app.use(express.static(path.join(__dirname, '..', 'client', 'build')));
 } else {
-  console.log('⚠️  React build not found - server will only serve API endpoints');
-  console.log('   Deploy frontend to Netlify separately for free hosting');
+  console.log('ℹ️ React build not found - using CRA dev server for frontend at', DEV_CLIENT_URL);
 }
 
 // Clear any cached auth module
@@ -129,15 +132,10 @@ app.use((req, res, next) => {
     return res.status(404).json({ error: 'API endpoint not found' });
   }
   if (clientBuildExists) {
-    res.sendFile(clientBuildPath);
-  } else {
-    res.status(404).json({ 
-      error: 'Not found',
-      message: 'Frontend not served from this server. Deploy to Netlify!',
-      apiBase: '/api/*',
-      healthCheck: '/health'
-    });
+    return res.sendFile(clientBuildPath);
   }
+  // In development, redirect non-API routes to CRA dev server
+  return res.redirect(DEV_CLIENT_URL + req.path);
 });
 
 app.listen(PORT, '0.0.0.0', () => {

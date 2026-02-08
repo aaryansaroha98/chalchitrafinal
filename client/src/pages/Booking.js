@@ -6,6 +6,12 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { useAuth } from '../contexts/AuthContext';
 
+// Derive API base URL for building absolute URLs to /uploads assets
+const apiBaseUrl = process.env.REACT_APP_API_URL ||
+  process.env.REACT_APP_API_BASE_URL ||
+  process.env.VITE_API_BASE_URL ||
+  'http://localhost:3000';
+
 const Booking = () => {
   const { movieId } = useParams();
   const navigate = useNavigate();
@@ -369,7 +375,7 @@ const Booking = () => {
             {/* Movie Poster - Left Side */}
             <div>
               <img
-                src={movie.poster_url ? (movie.poster_url.startsWith('http') ? movie.poster_url : `https://chalchitra-api.onrender.com${movie.poster_url}`) : '/placeholder-movie.jpg'}
+                src={movie.poster_url ? (movie.poster_url.startsWith('http') ? movie.poster_url : `${apiBaseUrl}${movie.poster_url}`) : '/placeholder-movie.jpg'}
                 alt={movie.title}
                 className="booking-poster"
               />
@@ -1171,7 +1177,7 @@ const Booking = () => {
                   >
                     <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center'}}>
                       <img
-                        src={food.image_url ? (food.image_url.startsWith('http') ? food.image_url : `https://chalchitra-api.onrender.com${food.image_url}`) : '/placeholder-movie.jpg'}
+                        src={food.image_url ? (food.image_url.startsWith('http') ? food.image_url : `${apiBaseUrl}${food.image_url}`) : '/placeholder-movie.jpg'}
                         alt={food.name}
                         className="booking-food-image"
                         style={{

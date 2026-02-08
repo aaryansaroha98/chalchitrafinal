@@ -4,6 +4,12 @@ import api from '../api/axios';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
+// Derive API base URL to build absolute URLs for poster assets
+const apiBaseUrl = process.env.REACT_APP_API_URL ||
+  process.env.REACT_APP_API_BASE_URL ||
+  process.env.VITE_API_BASE_URL ||
+  'http://localhost:3000';
+
 const MyBookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -653,7 +659,7 @@ const MyBookings = () => {
                       }}>
                         {booking.poster_url ? (
                           <img
-                            src={booking.poster_url.startsWith('http') ? booking.poster_url : `https://chalchitra-api.onrender.com${booking.poster_url}`}
+                            src={booking.poster_url.startsWith('http') ? booking.poster_url : `${apiBaseUrl}${booking.poster_url}`}
                             alt={booking.title}
                             style={{
                               width: '100%',

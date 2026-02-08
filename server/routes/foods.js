@@ -7,7 +7,16 @@ const path = require('path');
 // Configure multer for food image uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '../../uploads'));
+    const dir = path.join(__dirname, '../../uploads');
+    try {
+      // Ensure uploads directory exists
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+    } catch (e) {
+      console.error('Failed ensuring uploads dir for foods:', e);
+    }
+    cb(null, dir);
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -17,9 +26,12 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Middleware to check if user is admin
+// Middleware to check if user is admin (supports both passport user and session user)
 const requireAdmin = (req, res, next) => {
-  if (!req.user || !req.user.is_admin) {
+  const isAdmin = (req.user && req.user.is_admin) ||
+                  (req.session && req.session.adminUser && req.session.adminUser.is_admin) ||
+                  (req.session && req.session.user && req.session.user.is_admin);
+  if (!isAdmin) {
     return res.status(403).json({ error: 'Admin access required' });
   }
   next();
@@ -454,28 +466,41 @@ router.post('/mark-given/:bookingId/:foodId', (req, res) => {
           });
         }
 
-        // Update or insert status
+        // Use INSERT with IGNORE to handle existing records, then UPDATE if needed
+        // This avoids the ON CONFLICT issue that requires a UNIQUE constraint
         const upsertQuery = `
-          INSERT INTO booking_food_status (booking_id, food_id, quantity_given, given_by)
-          VALUES (?, ?, ?, ?)
-          ON CONFLICT(booking_id, food_id) DO UPDATE SET
-            quantity_given = quantity_given + ?,
-            given_at = CURRENT_TIMESTAMP,
-            given_by = ?
+          INSERT OR IGNORE INTO booking_food_status (booking_id, food_id, quantity_given, given_by, given_at)
+          VALUES (?, ?, 0, NULL, NULL)
         `;
 
-        db.run(upsertQuery, [actualBookingId, foodId, quantity, given_by, quantity, given_by], function(err) {
+        db.run(upsertQuery, [actualBookingId, foodId], function(err) {
           if (err) {
-            console.error('Error updating food status:', err);
-            return res.status(500).json({ error: 'Failed to update food status' });
+            console.error('Error inserting food status placeholder:', err);
+            return res.status(500).json({ error: 'Failed to initialize food status' });
           }
 
-          res.json({
-            message: `Marked ${quantity} ${row.name} as given`,
-            food_id: foodId,
-            quantity_given: newTotalGiven,
-            total_ordered: row.ordered_quantity,
-            is_completed: newTotalGiven >= row.ordered_quantity
+          // Now update the record
+          const updateQuery = `
+            UPDATE booking_food_status
+            SET quantity_given = quantity_given + ?,
+                given_at = CURRENT_TIMESTAMP,
+                given_by = ?
+            WHERE booking_id = ? AND food_id = ?
+          `;
+
+          db.run(updateQuery, [quantity, given_by, actualBookingId, foodId], function(err) {
+            if (err) {
+              console.error('Error updating food status:', err);
+              return res.status(500).json({ error: 'Failed to update food status' });
+            }
+
+            res.json({
+              message: `Marked ${quantity} ${row.name} as given`,
+              food_id: foodId,
+              quantity_given: newTotalGiven,
+              total_ordered: row.ordered_quantity,
+              is_completed: newTotalGiven >= row.ordered_quantity
+            });
           });
         });
       });

@@ -8,7 +8,8 @@ const Login = () => {
 
   const handleGoogleLogin = () => {
     setIsLoading(true);
-    const apiBaseUrl = process.env.VITE_API_BASE_URL || 'https://chalchitra-api.onrender.com';
+    // Use current browser origin for mobile compatibility
+    const apiBaseUrl = window.location.origin;
     window.location.href = `${apiBaseUrl}/api/auth/google`;
   };
 

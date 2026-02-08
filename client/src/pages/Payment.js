@@ -4,6 +4,12 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import api from '../api/axios';
 import { useAuth } from '../contexts/AuthContext';
 
+// Derive API base URL to build absolute URLs for poster/image assets
+const apiBaseUrl = process.env.REACT_APP_API_URL ||
+  process.env.REACT_APP_API_BASE_URL ||
+  process.env.VITE_API_BASE_URL ||
+  'http://localhost:3000';
+
 const Payment = () => {
   const { movieId } = useParams();
   const navigate = useNavigate();
@@ -177,7 +183,7 @@ const Payment = () => {
             <div className="movie-section">
               <div className="movie-poster-wrapper">
                 <img
-                  src={movie?.poster_url ? (movie.poster_url.startsWith('http') ? movie.poster_url : `https://chalchitra-api.onrender.com${movie.poster_url}`) : '/placeholder-movie.jpg'}
+                  src={movie?.poster_url ? (movie.poster_url.startsWith('http') ? movie.poster_url : `${apiBaseUrl}${movie.poster_url}`) : '/placeholder-movie.jpg'}
                   alt={movie?.title}
                   className="movie-poster"
                 />

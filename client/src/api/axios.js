@@ -1,12 +1,10 @@
 import axios from 'axios';
 
-// Configure axios base URL for production
-// In development, use localhost:3000
-// In production, use the Render backend URL
+// Configure axios base URL for localhost development
 const apiBaseUrl = process.env.REACT_APP_API_URL || 
   process.env.REACT_APP_API_BASE_URL || 
   process.env.VITE_API_BASE_URL || 
-  'https://chalchitra-api.onrender.com';
+  'http://localhost:3000';
 
 const api = axios.create({
   baseURL: apiBaseUrl,
