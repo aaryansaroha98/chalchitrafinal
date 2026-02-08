@@ -3,8 +3,8 @@ services:
   - type: web
     name: chalchitra-backend
     env: node
-    buildCommand: cd server && npm install
-    startCommand: cd server && npm start
+    buildCommand: npm install
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
