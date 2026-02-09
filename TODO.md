@@ -1,18 +1,14 @@
-# Task: Add Upcoming Movies Section to Homepage
+# TODO: Fix GitHub Directory Truncation
 
-## Plan:
-1. Add loading state component to Home.js
-2. Add section header for "Upcoming Movies" with icon and description
-3. Show all upcoming movies (not limited to 3)
-4. Add "Past Movies" section at the bottom
-5. Keep existing "View All Upcoming Movies" CTA
-6. Preserve About Us section and other homepage elements
+## Steps to Organize Public Directory
 
-## Status: In Progress
-- [ ] Add loading state to Home.js
-- [ ] Update movie fetching to get all movies
-- [ ] Add "Upcoming Movies" section header
-- [ ] Add full upcoming movies grid
-- [ ] Add "Past Movies" section
-- [ ] Test the implementation
-
+- [x] Create subdirectories in public/: team, gallery, hero, logos, about, misc
+- [x] Move team-* files to team/
+- [x] Move gallery-* files to gallery/
+- [x] Move hero-* files to hero/
+- [x] Move about-image-* files to about/
+- [x] Move logo-related files (logo.jpg, iitjammu-logo.png, instalogo.png, maillogo.png, google-logo-icon-PNG-Transparent-Background.png, login_b_inverted.png, logo-removebg-preview.png, newlogo.png) to logos/
+- [x] Move remaining files to misc/
+- [x] Search for file references in client/src/ and update paths (no references found, no updates needed)
+- [x] Test the application to ensure no broken links
+- [ ] Commit changes and push to verify GitHub truncation is fixed
