@@ -2601,10 +2601,10 @@ const AdminPanel = () => {
                       }}
                     />
                     <Card.Body>
-                      <Card.Title className="text-truncate text-white">{image.event_name || 'Gallery Image'}</Card.Title>
-                      <small className="text-white">
-                        {new Date(image.uploaded_at).toLocaleDateString()}
-                      </small>
+                    <Card.Title className="text-truncate" style={{color: 'black'}}>{image.event_name || 'Gallery Image'}</Card.Title>
+                    <small style={{color: 'black'}}>
+                      {new Date(image.uploaded_at).toLocaleDateString()}
+                    </small>
                       <br/>
                       <Button
                         variant="outline-danger"
