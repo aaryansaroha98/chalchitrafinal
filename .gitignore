@@ -32,3 +32,7 @@ uploads/
 .vscode/
 .idea/
 *.swp
+
+# Database
+database.db
+*.db
