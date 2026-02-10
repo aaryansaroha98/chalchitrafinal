@@ -36,3 +36,9 @@ uploads/
 # Database
 database.db
 *.db
+
+# Large directories
+public/
+uploads/
+.env
+database.db
