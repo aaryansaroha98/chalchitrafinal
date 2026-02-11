@@ -204,8 +204,8 @@ router.get('/google', (req, res) => {
   const clientId = process.env.GOOGLE_CLIENT_ID || 'your-google-client-id';
   const port = process.env.PORT || 3000;
   
-  // Always use localhost for OAuth callback (Google allows localhost, not private IPs)
-  const baseUrl = `http://localhost:${port}`;
+  // Use BACKEND_URL for production, localhost for development
+  const baseUrl = process.env.BACKEND_URL || `http://localhost:${port}`;
 
   console.log('=== GOOGLE LOGIN ROUTE EXECUTED AT', new Date().toISOString(), '===');
   console.log('Using clientId:', clientId);
