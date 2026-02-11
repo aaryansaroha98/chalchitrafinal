@@ -1,0 +1,7 @@
+{
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://chalchitra-backend.onrender.com/api/:path*" },
+    { "source": "/uploads/:path*", "destination": "https://chalchitra-backend.onrender.com/uploads/:path*" },
+    { "source": "/health", "destination": "https://chalchitra-backend.onrender.com/health" }
+  ]
+}

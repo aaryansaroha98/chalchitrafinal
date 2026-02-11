@@ -1,14 +1,14 @@
 import axios from 'axios';
 
-// Configure axios base URL for localhost development
-const apiBaseUrl = process.env.REACT_APP_API_URL || 
-  process.env.REACT_APP_API_BASE_URL || 
-  process.env.VITE_API_BASE_URL || 
-  'http://localhost:3000';
+// In production: use relative URLs (Vercel rewrites proxy /api/* to Render backend)
+// In development: use localhost
+const isProduction = process.env.NODE_ENV === 'production';
+const apiBaseUrl = isProduction 
+  ? '' // Empty = relative URLs, Vercel proxy handles routing to backend
+  : (process.env.REACT_APP_API_URL || 'http://localhost:3000');
 
-// Debug: Log the API URL being used (remove in production after debugging)
-console.log('[Chalchitra] API Base URL:', apiBaseUrl);
-console.log('[Chalchitra] REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
+console.log('[Chalchitra] Environment:', process.env.NODE_ENV);
+console.log('[Chalchitra] API Base URL:', apiBaseUrl || '(relative - using Vercel proxy)');
 
 const api = axios.create({
   baseURL: apiBaseUrl,
