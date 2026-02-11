@@ -37,8 +37,10 @@ uploads/
 database.db
 *.db
 
-# Large directories
-public/
+# Large directories (but NOT client/public which is needed for React)
 uploads/
 .env
 database.db
+
+# Include client/public folder (React needs this)
+!client/public/
