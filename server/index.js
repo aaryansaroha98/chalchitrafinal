@@ -166,6 +166,12 @@ app.use((req, res, next) => {
   if (req.path.startsWith('/api')) {
     return res.status(404).json({ error: 'API endpoint not found' });
   }
+  // For static file requests (images, videos, etc.), return 404 instead of redirecting
+  // This prevents infinite redirect loops when Vercel proxies to Render
+  const staticExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.avif', '.svg', '.mp4', '.webm', '.ico', '.css', '.js', '.map', '.woff', '.woff2', '.ttf', '.eot'];
+  if (staticExtensions.some(ext => req.path.toLowerCase().endsWith(ext))) {
+    return res.status(404).json({ error: 'File not found' });
+  }
   if (clientBuildExists) {
     return res.sendFile(clientBuildPath);
   }
