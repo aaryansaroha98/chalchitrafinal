@@ -15,6 +15,9 @@ const bodyParser = require('body-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust proxy - required when behind Vercel/Render proxies for secure cookies
+app.set('trust proxy', 1);
+
 // Database setup - SQLite only for localhost
 const dbPath = path.join(__dirname, '..', 'database.db');
 
@@ -77,9 +80,9 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 app.use(session({
   secret: process.env.SESSION_SECRET || 'chalchitra-secret-key',
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
   cookie: {
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    sameSite: 'lax',
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
