@@ -185,7 +185,9 @@ router.post('/', upload.single('poster'), (req, res) => {
 
   const sql = `INSERT INTO movies (title, description, poster_url, date, venue, price, is_upcoming, available_foods, category, duration, imdb_rating, language) 
                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-  const params = [title, description, poster_url, date, venue, price, isUpcoming, availableFoodsString, category, duration, imdb_rating, language];
+  const params = [title || '', description || '', poster_url || '', date || '', venue || '', 
+    price !== undefined && price !== '' ? parseFloat(price) : 0, 
+    isUpcoming, availableFoodsString, category || '', duration || '', imdb_rating || '', language || ''];
 
   console.log('💾 Executing INSERT query...');
   
@@ -204,7 +206,14 @@ router.post('/', upload.single('poster'), (req, res) => {
 });
 
 // Update movie (admin)
-router.put('/:id', upload.single('poster'), (req, res) => {
+router.put('/:id', (req, res) => {
+  // Handle multer upload with error catching
+  upload.single('poster')(req, res, (multerErr) => {
+    if (multerErr) {
+      console.error('❌ Multer upload error:', multerErr);
+      return res.status(500).json({ error: 'File upload failed: ' + multerErr.message });
+    }
+
   const movieId = parseInt(req.params.id);
   
   console.log(`📝 PUT /api/movies/${movieId} - Updating movie`);
@@ -298,9 +307,10 @@ router.put('/:id', upload.single('poster'), (req, res) => {
                imdb_rating = ?, language = ? 
                WHERE id = ?`;
   const params = [
-    title, description, poster_url, date, venue, price, 
-    finalIsUpcoming, availableFoodsString, category, duration, 
-    imdb_rating, language, movieId
+    title || '', description || '', poster_url || '', date || '', venue || '', 
+    price !== undefined && price !== '' ? parseFloat(price) : 0, 
+    finalIsUpcoming, availableFoodsString, category || '', duration || '', 
+    imdb_rating || '', language || '', movieId
   ];
 
   console.log('💾 Executing UPDATE query for movie ID:', movieId);
@@ -322,6 +332,7 @@ router.put('/:id', upload.single('poster'), (req, res) => {
       message: 'Movie updated successfully'
     });
   });
+  }); // end multer wrapper
 });
 
 // Delete movie (admin)

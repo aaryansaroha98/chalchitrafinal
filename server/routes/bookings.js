@@ -852,8 +852,9 @@ router.post('/generate-pdf', (req, res) => {
     let movieName = 'Movie';
     
     // Try to get movie name from booking
+    const numericPdfId = parseInt(booking_id);
     db.get('SELECT m.title FROM bookings b JOIN movies m ON b.movie_id = m.id WHERE b.booking_code = ? OR b.id = ?',
-      [booking_id, parseInt(booking_id)], (err, movieRow) => {
+      [String(booking_id), isNaN(numericPdfId) ? -1 : numericPdfId], (err, movieRow) => {
         if (err) {
           console.error('Error fetching movie name:', err);
           console.log('Error details:', err.message);
@@ -1046,6 +1047,10 @@ router.post('/send-ticket-email', async (req, res) => {
   }
 
   try {
+    // Parse booking_id safely - PostgreSQL requires integer for b.id column
+    const numericBookingId = parseInt(booking_id);
+    const safeNumericId = isNaN(numericBookingId) ? -1 : numericBookingId;
+
     db.get(
       `SELECT b.*, u.name as user_name, u.email as user_email,
               m.title as movie_title, m.date as movie_date, m.venue as movie_venue, m.poster_url as poster_url
@@ -1053,7 +1058,7 @@ router.post('/send-ticket-email', async (req, res) => {
        LEFT JOIN users u ON b.user_id = u.id
        LEFT JOIN movies m ON b.movie_id = m.id
        WHERE b.id = ? OR b.booking_code = ?`,
-      [booking_id, booking_id],
+      [safeNumericId, String(booking_id)],
       async (err, booking) => {
         if (err) {
           console.error('Error fetching booking for email:', err);
