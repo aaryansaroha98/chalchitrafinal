@@ -39,7 +39,7 @@ const uploadFields = upload.fields([
 // Multer for team photos
 const teamStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '..', '..', 'public'));
+    cb(null, path.join(__dirname, '..', '..', 'public', 'team'));
   },
   filename: (req, file, cb) => {
     cb(null, 'team-' + Date.now() + path.extname(file.originalname));
@@ -50,7 +50,7 @@ const uploadTeam = multer({ storage: teamStorage });
 // Multer for gallery photos
 const galleryStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '..', '..', 'public'));
+    cb(null, path.join(__dirname, '..', '..', 'public', 'gallery'));
   },
   filename: (req, file, cb) => {
     cb(null, 'gallery-' + Date.now() + path.extname(file.originalname));
@@ -645,7 +645,7 @@ router.post('/gallery', requireAdmin, uploadGallery.single('image'), (req, res) 
 
   try {
     const { event_name } = req.body;
-    const image_url = req.file ? `/${req.file.filename}` : req.body.image_url;
+    const image_url = req.file ? `/gallery/${req.file.filename}` : req.body.image_url;
 
     console.log('Image URL:', image_url);
     console.log('Event name:', event_name);
@@ -732,7 +732,7 @@ router.get('/team', (req, res) => {
 // Add team member
 router.post('/team', requireAdmin, uploadTeam.single('photo'), (req, res) => {
   const { name, student_id, role, section } = req.body;
-  const photo_url = req.file ? `/${req.file.filename}` : req.body.photo_url;
+  const photo_url = req.file ? `/team/${req.file.filename}` : req.body.photo_url;
   db.run('INSERT INTO team (name, student_id, photo_url, role, section) VALUES (?, ?, ?, ?, ?)', [name, student_id, photo_url, role, section || 'foundation_team'], function(err) {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ id: this.lastID });
@@ -742,7 +742,7 @@ router.post('/team', requireAdmin, uploadTeam.single('photo'), (req, res) => {
 // Update team member
 router.put('/team/:id', requireAdmin, uploadTeam.single('photo'), (req, res) => {
   const { name, student_id, role, section } = req.body;
-  const photo_url = req.file ? `/${req.file.filename}` : req.body.photo_url;
+  const photo_url = req.file ? `/team/${req.file.filename}` : req.body.photo_url;
   db.run('UPDATE team SET name = ?, student_id = ?, photo_url = ?, role = ?, section = ? WHERE id = ?',
     [name, student_id, photo_url, role, section, req.params.id], function(err) {
       if (err) return res.status(500).json({ error: err.message });
