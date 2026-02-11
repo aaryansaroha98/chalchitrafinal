@@ -1,17 +1,26 @@
-# Render Blueprint - Deploy backend
+# Render Blueprint - Deploy backend with PostgreSQL
+databases:
+  - name: chalchitra-db
+    databaseName: chalchitra
+    user: chalchitra
+    plan: free
+    region: singapore
+
 services:
   - type: web
     name: chalchitra-backend
     env: node
-    region: oregon
+    region: singapore
     plan: free
     buildCommand: npm install
     startCommand: node server/index.js
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 10000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: chalchitra-db
+          property: connectionString
       - key: SESSION_SECRET
         sync: false
       - key: GOOGLE_CLIENT_ID
@@ -34,9 +43,5 @@ services:
         value: Chalchitra IIT Jammu
       - key: FRONTEND_URL
         sync: false
-      - key: DATABASE_PATH
-        value: /var/data/database.db
-    disk:
-      name: chalchitra-data
-      mountPath: /var/data
-      sizeGB: 1
+      - key: BACKEND_URL
+        sync: false
