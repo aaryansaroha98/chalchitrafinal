@@ -156,8 +156,9 @@ app.use((req, res, next) => {
   if (clientBuildExists) {
     return res.sendFile(clientBuildPath);
   }
-  // In development, redirect non-API routes to CRA dev server
-  return res.redirect(DEV_CLIENT_URL + req.path);
+  // In production, redirect to frontend URL; in development, use CRA dev server
+  const redirectUrl = process.env.FRONTEND_URL || DEV_CLIENT_URL;
+  return res.redirect(redirectUrl + req.path);
 });
 
 app.listen(PORT, '0.0.0.0', () => {
