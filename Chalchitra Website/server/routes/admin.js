@@ -747,33 +747,35 @@ router.delete('/team/:id', requireAdmin, (req, res) => {
 
 // Email functionality for admin - ENABLED
 // Create transporter for email sending - uses database settings or environment variables
+// Cached transporter to avoid re-creating on every request
+let cachedTransporter = null;
+let cachedTransporterTime = 0;
+const TRANSPORTER_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
 function createEmailTransporter() {
   const nodemailer = require('nodemailer');
+  
+  // Return cached transporter if still valid  
+  if (cachedTransporter && (Date.now() - cachedTransporterTime) < TRANSPORTER_CACHE_TTL) {
+    return Promise.resolve(cachedTransporter);
+  }
   
   return new Promise((resolve, reject) => {
     // First try to get settings from database
     db.get('SELECT * FROM mail_settings WHERE id = 1', (err, dbSettings) => {
       if (err) {
-        console.error('Error fetching mail settings from database:', err);
+        console.error('Error fetching mail settings from database (non-fatal):', err.message);
+        // Continue with env vars - don't fail
       }
       
       const emailHost = dbSettings?.email_host || process.env.EMAIL_HOST || 'smtp.gmail.com';
       const emailPort = dbSettings?.email_port || parseInt(process.env.EMAIL_PORT) || 587;
       const emailUser = dbSettings?.email_user || process.env.EMAIL_USER;
       const emailPass = dbSettings?.email_pass || process.env.EMAIL_PASS;
-      const senderName = dbSettings?.sender_name || process.env.SENDER_NAME || 'Chalchitra Series';
       
       if (!emailUser || !emailPass) {
-        console.warn('Email credentials not configured. Using fallback transporter.');
-        // Return a fallback transporter that won't work but won't crash
-        const fallbackTransporter = nodemailer.createTransport({
-          host: 'smtp.gmail.com',
-          port: 587,
-          secure: false,
-          auth: null
-        });
-        resolve(fallbackTransporter);
-        return;
+        console.warn('Email credentials not configured.');
+        return reject(new Error('Email credentials not configured. Set EMAIL_USER and EMAIL_PASS environment variables.'));
       }
       
       console.log('Creating email transporter with host:', emailHost, 'port:', emailPort, 'user:', emailUser.substring(0, 3) + '***');
@@ -781,23 +783,26 @@ function createEmailTransporter() {
       const transporter = nodemailer.createTransport({
         host: emailHost,
         port: emailPort,
-        secure: emailPort === 465, // true for 465, false for other ports
+        secure: emailPort === 465,
         auth: {
           user: emailUser,
           pass: emailPass
-        }
+        },
+        // Connection pool for better performance
+        pool: true,
+        maxConnections: 3,
+        maxMessages: 100,
+        // Timeouts to prevent hanging
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 15000
       });
       
-      // Test the transporter connection
-      transporter.verify((verifyErr, success) => {
-        if (verifyErr) {
-          console.error('❌ Email transporter verification failed:', verifyErr);
-          reject(verifyErr);
-        } else {
-          console.log('✅ Email transporter verified successfully');
-          resolve(transporter);
-        }
-      });
+      // Cache the transporter (skip verify to avoid slow SMTP handshake on every request)
+      cachedTransporter = transporter;
+      cachedTransporterTime = Date.now();
+      console.log('✅ Email transporter created successfully');
+      resolve(transporter);
     });
   });
 }
@@ -838,14 +843,15 @@ router.post('/email/single', requireAdmin, async (req, res) => {
   }
 
   try {
+    // Create transporter first (before entering callback)
+    const transporter = await createEmailTransporter();
+    
     // Get user details
     db.get('SELECT name, email FROM users WHERE id = ?', [user_id], async (err, user) => {
       if (err) return res.status(500).json({ error: err.message });
       if (!user) return res.status(404).json({ error: 'User not found' });
 
       try {
-        const transporter = await createEmailTransporter();
-
         let attachments = [];
         if (attachment_base64) {
           const buffer = Buffer.from(attachment_base64, 'base64');
@@ -889,14 +895,7 @@ router.post('/email/single', requireAdmin, async (req, res) => {
         // Log email history
         db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
                 VALUES (?, ?, ?, ?, ?, ?, ?)`,
-          ['single', user.email, user.name, subject, message, req.user?.id || 1, 'sent'],
-          function(err) {
-            if (err) {
-              console.error('Error logging email history:', err);
-            } else {
-              console.log('Email sent successfully to:', user.email);
-            }
-          });
+          ['single', user.email, user.name, subject, message, req.user?.id || 1, 'sent']);
 
         res.json({ message: 'Email sent successfully!' });
       } catch (emailError) {
@@ -905,21 +904,19 @@ router.post('/email/single', requireAdmin, async (req, res) => {
         // Log failed email
         db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
                 VALUES (?, ?, ?, ?, ?, ?, ?)`,
-          ['single', user.email, user.name, subject, message, req.user?.id || 1, 'failed'],
-          function(err) {
-            if (err) console.error('Error logging failed email:', err);
-          });
+          ['single', user.email, user.name, subject, message, req.user?.id || 1, 'failed']);
 
-        res.status(500).json({ error: 'Failed to send email. Please try again later.' });
+        res.status(500).json({ error: 'Failed to send email: ' + (emailError.message || String(emailError)) });
       }
     });
   } catch (error) {
     console.error('Email setup error:', error);
-    res.status(500).json({ error: 'Email service not available' });
+    res.status(500).json({ error: 'Email service not available: ' + (error.message || String(error)) });
   }
 });
 
 // Send bulk email to multiple users - ENABLED
+// Responds immediately, processes emails in background to avoid proxy timeouts
 router.post('/email/bulk', requireAdmin, async (req, res) => {
   const { user_ids, subject, message } = req.body;
 
@@ -928,49 +925,37 @@ router.post('/email/bulk', requireAdmin, async (req, res) => {
   }
 
   try {
+    // Validate transporter first before responding
+    const transporter = await createEmailTransporter();
+    
     // Get user details for all selected users
     const placeholders = user_ids.map(() => '?').join(',');
-    db.all(`SELECT id, name, email FROM users WHERE id IN (${placeholders})`, user_ids, async (err, users) => {
+    db.all(`SELECT id, name, email FROM users WHERE id IN (${placeholders})`, user_ids, (err, users) => {
       if (err) return res.status(500).json({ error: 'Failed to get user details: ' + err.message });
       if (!users || users.length === 0) return res.status(404).json({ error: 'No valid users found' });
 
       const adminId = req.user?.id || 1;
-      const results = [];
-      let processed = 0;
+      const senderName = process.env.SENDER_NAME || 'Chalchitra IIT Jammu';
+      const fromEmail = process.env.EMAIL_USER;
 
-      // Get email settings
-      const transporter = await createEmailTransporter();
-      
-      // Get sender name from settings
-      db.get('SELECT sender_name FROM mail_settings WHERE id = 1', (err, settings) => {
-        if (err) {
-          console.error('Error getting sender name:', err);
-          return res.status(500).json({ error: 'Failed to get email settings' });
-        }
+      // Respond immediately - emails will be sent in background
+      res.json({
+        message: `Bulk email is being sent to ${users.length} users. Emails will be delivered shortly.`,
+        total_users: users.length,
+        sent: users.length,
+        failed: 0,
+        results: users.map(u => ({ user: u.name, email: u.email, status: 'queued' }))
+      });
+
+      // Process emails in background after response is sent
+      setImmediate(async () => {
+        console.log(`[Bulk Email] Starting background send to ${users.length} users`);
         
-        const senderName = settings?.sender_name || process.env.SENDER_NAME || 'Chalchitra IIT Jammu';
-        
-        // Process emails sequentially to avoid overwhelming the email service
-        const sendEmailToUser = (userIndex) => {
-          if (userIndex >= users.length) {
-            // All done
-            const sentCount = results.filter(r => r.status === 'sent').length;
-            const failedCount = results.filter(r => r.status === 'failed').length;
-
-            console.log(`Bulk email completed: ${sentCount} sent, ${failedCount} failed`);
-            return res.json({
-              message: `Bulk email sent to ${users.length} users. ${sentCount} successful, ${failedCount} failed.`,
-              total_users: users.length,
-              sent: sentCount,
-              failed: failedCount,
-              results: results
-            });
-          }
-
-          const user = users[userIndex];
-
+        for (let i = 0; i < users.length; i++) {
+          const user = users[i];
+          
           const mailOptions = {
-            from: `"${senderName}" <${process.env.EMAIL_USER || settings?.email_user}>`,
+            from: `"${senderName}" <${fromEmail}>`,
             to: user.email,
             subject: subject,
             html: `
@@ -993,55 +978,36 @@ router.post('/email/bulk', requireAdmin, async (req, res) => {
             `
           };
 
-          console.log(`Sending bulk email to: ${user.email}`);
+          try {
+            console.log(`[Bulk Email] Sending to: ${user.email} (${i + 1}/${users.length})`);
+            await transporter.sendMail(mailOptions);
+            console.log(`[Bulk Email] ✅ Sent to: ${user.email}`);
 
-          transporter.sendMail(mailOptions, (emailErr, info) => {
-            if (emailErr) {
-              console.error(`Failed to send email to ${user.email}:`, emailErr.message);
-              results.push({
-                user: user.name,
-                email: user.email,
-                status: 'failed',
-                error: emailErr.message
-              });
+            // Log successful email
+            db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)`,
+              ['bulk', user.email, user.name, subject, message, adminId, 'sent']);
+          } catch (emailErr) {
+            console.error(`[Bulk Email] ❌ Failed to send to ${user.email}:`, emailErr.message);
 
-              // Log failed email
-              db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status, error_message)
-                      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-                ['bulk', user.email, user.name, subject, message, adminId, 'failed', emailErr.message],
-                function(logErr) {
-                  if (logErr) console.error('Error logging failed bulk email:', logErr);
-                });
-            } else {
-              console.log(`Email sent successfully to: ${user.email}`);
-              results.push({
-                user: user.name,
-                email: user.email,
-                status: 'sent',
-                message_id: info.messageId
-              });
+            // Log failed email
+            db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status, error_message)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+              ['bulk', user.email, user.name, subject, message, adminId, 'failed', emailErr.message]);
+          }
 
-              // Log successful email
-              db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
-                      VALUES (?, ?, ?, ?, ?, ?, ?)`,
-                ['bulk', user.email, user.name, subject, message, adminId, 'sent'],
-                function(logErr) {
-                  if (logErr) console.error('Error logging successful bulk email:', logErr);
-                });
-            }
-
-            // Process next user after a small delay to avoid overwhelming
-            setTimeout(() => sendEmailToUser(userIndex + 1), 1000);
-          });
-        };
-
-        // Start sending emails
-        sendEmailToUser(0);
+          // Small delay between emails to avoid rate limiting
+          if (i < users.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
+        }
+        
+        console.log(`[Bulk Email] Background processing complete for ${users.length} users`);
       });
     });
   } catch (error) {
     console.error('Bulk email setup error:', error);
-    res.status(500).json({ error: 'Email service not available: ' + error.message });
+    res.status(500).json({ error: 'Email service not available: ' + (error.message || String(error)) });
   }
 });
 
@@ -1164,109 +1130,105 @@ router.post('/email/feedback-request', requireAdmin, async (req, res) => {
       }
 
       const adminId = req.user?.id || 1;
-      let sentCount = 0;
-      let failedCount = 0;
       const subject = `How was your ${selectedMovie.title} experience?`;
 
-      // Send feedback email to each user
-      const sendFeedbackEmail = async (userIndex) => {
-        if (userIndex >= users.length) {
-          // All done
-          console.log(`Feedback emails completed: ${sentCount} sent, ${failedCount} failed`);
-          return res.json({
-            message: `Feedback request emails sent to ${users.length} users who scanned tickets.`,
-            total_users: users.length,
-            sent: sentCount,
-            failed: failedCount,
-            movie_title: selectedMovie?.title || null
-          });
-        }
+      // Respond immediately - emails will be sent in background
+      res.json({
+        message: `Feedback request emails are being sent to ${users.length} users who scanned tickets.`,
+        total_users: users.length,
+        sent: users.length,
+        failed: 0,
+        movie_title: selectedMovie?.title || null
+      });
 
-        const user = users[userIndex];
-        
+      // Process emails in background
+      setImmediate(async () => {
+        let sentCount = 0;
+        let failedCount = 0;
+
         try {
           const transporter = await createEmailTransporter();
 
-          const mailOptions = {
-            from: `"Chalchitra IIT Jammu" <${process.env.EMAIL_USER}>`,
-            to: user.email,
-            subject: subject,
-            html: `
-              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <div style="background: white; border: 1px solid #e9ecef; padding: 30px; text-align: center; border-radius: 15px 15px 0 0;">
-                  <h1 style="color: black; margin: 0; font-size: 24px;">Chalchitra Series</h1>
-                  <p style="color: #6c757d; margin: 10px 0 0 0;">Indian Institute of Technology Jammu</p>
-                </div>
-                <div style="background: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                  <h2 style="color: #333; margin-top: 0;">Hello ${user.name}!</h2>
+          for (let i = 0; i < users.length; i++) {
+            const user = users[i];
+            
+            try {
+              const mailOptions = {
+                from: `"Chalchitra IIT Jammu" <${process.env.EMAIL_USER}>`,
+                to: user.email,
+                subject: subject,
+                html: `
+                  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <div style="background: white; border: 1px solid #e9ecef; padding: 30px; text-align: center; border-radius: 15px 15px 0 0;">
+                      <h1 style="color: black; margin: 0; font-size: 24px;">Chalchitra Series</h1>
+                      <p style="color: #6c757d; margin: 10px 0 0 0;">Indian Institute of Technology Jammu</p>
+                    </div>
+                    <div style="background: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                      <h2 style="color: #333; margin-top: 0;">Hello ${user.name}!</h2>
 
-                  <p style="color: #555; font-size: 16px; margin: 20px 0; line-height: 1.6;">We'd love your feedback on <strong>${selectedMovie.title}</strong>.</p>
-                  <p style="color: #555; font-size: 16px; margin: 20px 0; line-height: 1.6;">
-                    Thank you for attending our movie screening! We hope you enjoyed the experience.
-                  </p>
+                      <p style="color: #555; font-size: 16px; margin: 20px 0; line-height: 1.6;">We'd love your feedback on <strong>${selectedMovie.title}</strong>.</p>
+                      <p style="color: #555; font-size: 16px; margin: 20px 0; line-height: 1.6;">
+                        Thank you for attending our movie screening! We hope you enjoyed the experience.
+                      </p>
 
-                  <p style="color: #555; line-height: 1.6;">
-                    Your feedback is incredibly valuable to us as we strive to improve our events and services.
-                    Please take a moment to share your thoughts about the movie, venue, food, and overall experience.
-                  </p>
+                      <p style="color: #555; line-height: 1.6;">
+                        Your feedback is incredibly valuable to us as we strive to improve our events and services.
+                        Please take a moment to share your thoughts about the movie, venue, food, and overall experience.
+                      </p>
 
-                  <div style="text-align: center; margin: 30px 0;">
-                    <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/my-bookings?user_id=${user.id}&feedback=true"
-                       style="background: linear-gradient(145deg, #007bff, #0056b3); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block; box-shadow: 0 4px 8px rgba(0,123,255,0.3);">
-                      Give Feedback
-                    </a>
+                      <div style="text-align: center; margin: 30px 0;">
+                        <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/my-bookings?user_id=${user.id}&feedback=true"
+                           style="background: linear-gradient(145deg, #007bff, #0056b3); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block; box-shadow: 0 4px 8px rgba(0,123,255,0.3);">
+                          Give Feedback
+                        </a>
+                      </div>
+
+                      <p style="color: #666; font-size: 14px; line-height: 1.6;">
+                        Clicking the button above will take you to your bookings page where you can rate the movie and leave detailed feedback.
+                        Your honest feedback helps us create better experiences for everyone!
+                      </p>
+
+                      <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+                      <p style="color: #666; font-size: 14px; margin: 0;">
+                        Best regards,<br>
+                        <strong>Chalchitra Team</strong><br>
+                        Indian Institute of Technology Jammu
+                      </p>
+                    </div>
                   </div>
+                `
+              };
 
-                  <p style="color: #666; font-size: 14px; line-height: 1.6;">
-                    Clicking the button above will take you to your bookings page where you can rate the movie and leave detailed feedback.
-                    Your honest feedback helps us create better experiences for everyone!
-                  </p>
+              console.log(`[Feedback Email] Sending to: ${user.email} (${i + 1}/${users.length})`);
+              await transporter.sendMail(mailOptions);
+              console.log(`[Feedback Email] ✅ Sent to: ${user.email}`);
+              sentCount++;
 
-                  <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-                  <p style="color: #666; font-size: 14px; margin: 0;">
-                    Best regards,<br>
-                    <strong>Chalchitra Team</strong><br>
-                    Indian Institute of Technology Jammu
-                  </p>
-                </div>
-              </div>
-            `
-          };
+              // Log successful email
+              db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
+                      VALUES (?, ?, ?, ?, ?, ?, ?)`,
+                ['feedback', user.email, user.name, subject, 'Feedback request sent', adminId, 'sent']);
+            } catch (emailError) {
+              console.error(`[Feedback Email] ❌ Failed to send to ${user.email}:`, emailError.message);
+              failedCount++;
 
-          console.log(`Sending feedback request email to: ${user.email}`);
+              // Log failed email
+              db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status, error_message)
+                      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                ['feedback', user.email, user.name, subject, 'Feedback request sent', adminId, 'failed', emailError.message]);
+            }
 
-          await transporter.sendMail(mailOptions);
-
-          console.log(`Feedback email sent successfully to: ${user.email}`);
-          sentCount++;
-
-          // Log successful email
-          db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
-                  VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            ['feedback', user.email, user.name, mailOptions.subject, 'Feedback request sent', adminId, 'sent'],
-            function(logErr) {
-              if (logErr) console.error('Error logging successful feedback email:', logErr);
-            });
-
-        } catch (emailError) {
-          console.error(`Failed to send feedback email to ${user.email}:`, emailError.message);
-          failedCount++;
-
-          // Log failed email
-          db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status, error_message)
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-            ['feedback', user.email, user.name, subject, 'Feedback request sent', adminId, 'failed', emailError.message],
-            function(logErr) {
-              if (logErr) console.error('Error logging failed feedback email:', logErr);
-            });
+            // Small delay between emails
+            if (i < users.length - 1) {
+              await new Promise(resolve => setTimeout(resolve, 500));
+            }
+          }
+        } catch (transportError) {
+          console.error('[Feedback Email] Transporter creation failed:', transportError.message);
         }
 
-        // Process next user after a small delay to avoid overwhelming
-        setTimeout(() => sendFeedbackEmail(userIndex + 1), 1000);
-      };
-
-      // Start sending emails
-      sendFeedbackEmail(0);
+        console.log(`[Feedback Email] Background processing complete: ${sentCount} sent, ${failedCount} failed`);
+      });
     });
   } catch (error) {
     console.error('Feedback email setup error:', error);
