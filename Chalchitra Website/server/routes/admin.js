@@ -108,13 +108,20 @@ router.get('/stats', requireAdmin, (req, res) => {
 
   const results = {};
   let completed = 0;
+  let responded = false;
 
   Object.keys(queries).forEach(key => {
     db.get(queries[key], [], (err, row) => {
-      if (err) return res.status(500).json({ error: err.message });
-      results[key] = row.count;
+      if (responded) return;
+      if (err) {
+        responded = true;
+        console.error('Stats query error for', key, ':', err.message);
+        return res.status(500).json({ error: err.message });
+      }
+      results[key] = row ? row.count : 0;
       completed++;
       if (completed === Object.keys(queries).length) {
+        responded = true;
         res.json(results);
       }
     });
@@ -134,14 +141,27 @@ router.get('/revenue-stats', requireAdmin, (req, res) => {
 
     const results = {};
     let completed = 0;
+    let responded = false;
     const totalQueries = 8;
+
+    function handleResult(key, err, data) {
+      if (responded) return;
+      if (err) {
+        responded = true;
+        console.error('Revenue stats error for', key, ':', err.message);
+        return res.status(500).json({ error: err.message });
+      }
+      results[key] = data;
+      completed++;
+      if (completed === totalQueries) {
+        responded = true;
+        res.json(results);
+      }
+    }
 
     // 1. Total Revenue from bookings
     db.get('SELECT COALESCE(SUM(total_price), 0) as total FROM bookings', [], (err, row) => {
-      if (err) return res.status(500).json({ error: err.message });
-      results.total_revenue = row.total;
-      completed++;
-      if (completed === totalQueries) res.json(results);
+      handleResult('total_revenue', err, row ? row.total : 0);
     });
 
     // 2. Total Food Revenue
@@ -150,10 +170,7 @@ router.get('/revenue-stats', requireAdmin, (req, res) => {
       FROM food_orders fo
       JOIN bookings b ON fo.booking_id = b.id
     `, [], (err, row) => {
-      if (err) return res.status(500).json({ error: err.message });
-      results.food_revenue = row.total;
-      completed++;
-      if (completed === totalQueries) res.json(results);
+      handleResult('food_revenue', err, row ? row.total : 0);
     });
 
     // 3. Total Discounts Given (from coupons used)
@@ -162,18 +179,12 @@ router.get('/revenue-stats', requireAdmin, (req, res) => {
       FROM bookings b 
       WHERE b.discount_amount > 0
     `, [], (err, row) => {
-      if (err) return res.status(500).json({ error: err.message });
-      results.total_discounts = row.total;
-      completed++;
-      if (completed === totalQueries) res.json(results);
+      handleResult('total_discounts', err, row ? row.total : 0);
     });
 
     // 4. Total Bookings Count
     db.get('SELECT COUNT(*) as count FROM bookings', [], (err, row) => {
-      if (err) return res.status(500).json({ error: err.message });
-      results.total_bookings = row.count;
-      completed++;
-      if (completed === totalQueries) res.json(results);
+      handleResult('total_bookings', err, row ? row.count : 0);
     });
 
     // 5. Revenue by Movie (top 10)
@@ -185,10 +196,7 @@ router.get('/revenue-stats', requireAdmin, (req, res) => {
       ORDER BY revenue DESC
       LIMIT 10
     `, [], (err, rows) => {
-      if (err) return res.status(500).json({ error: err.message });
-      results.revenue_by_movie = rows || [];
-      completed++;
-      if (completed === totalQueries) res.json(results);
+      handleResult('revenue_by_movie', err, rows || []);
     });
 
     // 6. Recent Transactions (last 20)
@@ -200,10 +208,7 @@ router.get('/revenue-stats', requireAdmin, (req, res) => {
       ORDER BY b.created_at DESC
       LIMIT 20
     `, [], (err, rows) => {
-      if (err) return res.status(500).json({ error: err.message });
-      results.recent_transactions = rows || [];
-      completed++;
-      if (completed === totalQueries) res.json(results);
+      handleResult('recent_transactions', err, rows || []);
     });
 
     // 7. Monthly Revenue Breakdown (last 6 months)
@@ -217,10 +222,7 @@ router.get('/revenue-stats', requireAdmin, (req, res) => {
       GROUP BY month
       ORDER BY month DESC
     `, [], (err, rows) => {
-      if (err) return res.status(500).json({ error: err.message });
-      results.monthly_revenue = rows || [];
-      completed++;
-      if (completed === totalQueries) res.json(results);
+      handleResult('monthly_revenue', err, rows || []);
     });
 
     // 8. Payment Method Breakdown
@@ -229,10 +231,7 @@ router.get('/revenue-stats', requireAdmin, (req, res) => {
       FROM bookings
       GROUP BY payment_method
     `, [], (err, rows) => {
-      if (err) return res.status(500).json({ error: err.message });
-      results.payment_methods = rows || [];
-      completed++;
-      if (completed === totalQueries) res.json(results);
+      handleResult('payment_methods', err, rows || []);
     });
   });
 });
@@ -1298,13 +1297,20 @@ router.get('/email/stats', requireAdmin, (req, res) => {
 
   const results = {};
   let completed = 0;
+  let responded = false;
 
   Object.keys(queries).forEach(key => {
     db.get(queries[key], [], (err, row) => {
-      if (err) return res.status(500).json({ error: err.message });
-      results[key] = row.count;
+      if (responded) return;
+      if (err) {
+        responded = true;
+        console.error('Email stats error for', key, ':', err.message);
+        return res.status(500).json({ error: err.message });
+      }
+      results[key] = row ? row.count : 0;
       completed++;
       if (completed === Object.keys(queries).length) {
+        responded = true;
         res.json(results);
       }
     });

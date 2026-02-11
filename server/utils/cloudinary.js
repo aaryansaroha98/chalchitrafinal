@@ -31,8 +31,8 @@ function createCloudinaryStorage(folder) {
     cloudinary: cloudinary,
     params: {
       folder: `chalchitra/${folder}`,
-      allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'],
-      transformation: [{ quality: 'auto', fetch_format: 'auto' }],
+      allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'mp4', 'webm'],
+      resource_type: 'auto',
     },
   });
 }

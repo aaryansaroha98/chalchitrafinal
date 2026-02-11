@@ -75,14 +75,28 @@ if (usePostgres) {
   // Function to convert SQLite syntax to PostgreSQL
   function convertToPostgres(sql) {
     let pgSql = sql;
+    
+    // Convert SQLite date functions BEFORE replacing ? placeholders
+    // datetime("now", "-7 days") or datetime('now', '-7 days') → NOW() - INTERVAL '7 days'
+    pgSql = pgSql.replace(/datetime\s*\(\s*["']now["']\s*,\s*["']-(\d+)\s+(days?|months?|hours?|minutes?|years?)["']\s*\)/gi, 
+      (_, num, unit) => `(NOW() - INTERVAL '${num} ${unit}')`);
+    // datetime("now") or datetime('now') → NOW()
+    pgSql = pgSql.replace(/datetime\s*\(\s*["']now["']\s*\)/gi, 'NOW()');
+    // strftime('%Y-%m', column) → TO_CHAR(column, 'YYYY-MM')
+    pgSql = pgSql.replace(/strftime\s*\(\s*['"]%Y-%m['"]\s*,\s*(\w+)\s*\)/gi, 
+      (_, col) => `TO_CHAR(${col}, 'YYYY-MM')`);
+    // strftime('%Y-%m-%d', column) → TO_CHAR(column, 'YYYY-MM-DD')
+    pgSql = pgSql.replace(/strftime\s*\(\s*['"]%Y-%m-%d['"]\s*,\s*(\w+)\s*\)/gi, 
+      (_, col) => `TO_CHAR(${col}, 'YYYY-MM-DD')`);
+    
     // Replace ? placeholders with $1, $2, etc.
     let paramIndex = 0;
     pgSql = pgSql.replace(/\?/g, () => `$${++paramIndex}`);
     // Replace AUTOINCREMENT with SERIAL (handled in CREATE TABLE)
     pgSql = pgSql.replace(/INTEGER PRIMARY KEY AUTOINCREMENT/gi, 'SERIAL PRIMARY KEY');
     pgSql = pgSql.replace(/INTEGER PRIMARY KEY/gi, 'SERIAL PRIMARY KEY');
-    // Replace DATETIME with TIMESTAMP
-    pgSql = pgSql.replace(/DATETIME/gi, 'TIMESTAMP');
+    // Replace DATETIME with TIMESTAMP (but not in function calls already converted)
+    pgSql = pgSql.replace(/\bDATETIME\b(?!\s*\()/gi, 'TIMESTAMP');
     // Replace REAL with DOUBLE PRECISION
     pgSql = pgSql.replace(/\bREAL\b/gi, 'DOUBLE PRECISION');
     return pgSql;
