@@ -10,8 +10,8 @@ function initializeGoogleStrategy() {
   const db = require('../database');
 
   const port = process.env.PORT || 3000;
-  // Use BACKEND_URL for production, otherwise localhost
-  const baseUrl = process.env.BACKEND_URL || `http://localhost:${port}`;
+  // Use BACKEND_URL or FRONTEND_URL for production (Vercel proxy), otherwise localhost
+  const baseUrl = process.env.BACKEND_URL || process.env.FRONTEND_URL || `http://localhost:${port}`;
 
   console.log('=== AUTH.JS ENVIRONMENT VARIABLES ===');
   console.log('GOOGLE_CLIENT_ID in auth.js:', process.env.GOOGLE_CLIENT_ID);
@@ -204,8 +204,8 @@ router.get('/google', (req, res) => {
   const clientId = process.env.GOOGLE_CLIENT_ID || 'your-google-client-id';
   const port = process.env.PORT || 3000;
   
-  // Use BACKEND_URL for production, localhost for development
-  const baseUrl = process.env.BACKEND_URL || `http://localhost:${port}`;
+  // Use BACKEND_URL or FRONTEND_URL for production (Vercel proxy), otherwise localhost
+  const baseUrl = process.env.BACKEND_URL || process.env.FRONTEND_URL || `http://localhost:${port}`;
 
   console.log('=== GOOGLE LOGIN ROUTE EXECUTED AT', new Date().toISOString(), '===');
   console.log('Using clientId:', clientId);
