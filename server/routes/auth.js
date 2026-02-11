@@ -10,13 +10,13 @@ function initializeGoogleStrategy() {
   const db = require('../database');
 
   const port = process.env.PORT || 3000;
-  // Always use localhost for OAuth callback (Google allows localhost for development)
-  // Don't use private IP or dynamic host which causes "device_id and device_name required" error
-  const baseUrl = `http://localhost:${port}`;
+  // Use BACKEND_URL for production, otherwise localhost
+  const baseUrl = process.env.BACKEND_URL || `http://localhost:${port}`;
 
   console.log('=== AUTH.JS ENVIRONMENT VARIABLES ===');
   console.log('GOOGLE_CLIENT_ID in auth.js:', process.env.GOOGLE_CLIENT_ID);
   console.log('GOOGLE_CLIENT_SECRET in auth.js:', process.env.GOOGLE_CLIENT_SECRET ? '[SET]' : '[NOT SET]');
+  console.log('BACKEND_URL:', baseUrl);
   console.log('=====================================');
 
   const clientId = process.env.GOOGLE_CLIENT_ID || 'your-google-client-id';
@@ -230,11 +230,15 @@ router.get('/google/callback', (req, res, next) => {
   }
   next();
 }, passport.authenticate('google', { failureRedirect: '/login' }), (req, res) => {
-  // Redirect back to the frontend from the original request
-  // Use the host from the original request to handle mobile/desktop access
-  const frontendHost = req.get('host') || 'localhost:3000';
-  const frontendProtocol = req.protocol || 'http';
-  res.redirect(`${frontendProtocol}://${frontendHost}/`);
+  // Use FRONTEND_URL for production, otherwise use request host
+  const frontendUrl = process.env.FRONTEND_URL;
+  if (frontendUrl) {
+    res.redirect(frontendUrl);
+  } else {
+    const frontendHost = req.get('host') || 'localhost:3000';
+    const frontendProtocol = req.protocol || 'http';
+    res.redirect(`${frontendProtocol}://${frontendHost}/`);
+  }
 });
 
 router.get('/logout', (req, res) => {
@@ -243,10 +247,15 @@ router.get('/logout', (req, res) => {
     if (req.session) {
       req.session.adminUser = null;
     }
-    // Redirect to frontend after logout using dynamic host
-    const host = req.get('host') || 'localhost:3000';
-    const protocol = req.protocol;
-    res.redirect(`${protocol}://${host}`);
+    // Use FRONTEND_URL for production, otherwise use request host
+    const frontendUrl = process.env.FRONTEND_URL;
+    if (frontendUrl) {
+      res.redirect(frontendUrl);
+    } else {
+      const host = req.get('host') || 'localhost:3000';
+      const protocol = req.protocol;
+      res.redirect(`${protocol}://${host}`);
+    }
   });
 });
 

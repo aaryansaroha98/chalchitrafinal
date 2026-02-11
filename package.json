@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node --max-old-space-size=2048 server/index.js",
-    "dev": "node --max-old-space-size=2048 server/index.js",
-    "server": "node --max-old-space-size=2048 server/index.js",
-    "client": "cd client && PORT=3000 npm start",
-    "build": "cd client && npm run build",
+    "start": "node --max-old-space-size=2048 \"Chalchitra Website/server/index.js\"",
+    "dev": "node --max-old-space-size=2048 \"Chalchitra Website/server/index.js\"",
+    "server": "node --max-old-space-size=2048 \"Chalchitra Website/server/index.js\"",
+    "client": "cd \"Chalchitra Website/client\" && PORT=3000 npm start",
+    "build": "cd \"Chalchitra Website/client\" && npm run build",
     "fullstack": "concurrently \"npm run server\" \"npm run client\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

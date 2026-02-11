@@ -1213,5 +1213,61 @@ router.post('/send-ticket-email', async (req, res) => {
   }
 });
 
+// Check if user has already booked a specific movie
+router.get('/check/:movieId', (req, res) => {
+  const movieId = req.params.movieId;
+  
+  // Use dummy user ID for testing if not authenticated
+  const userId = req.user ? req.user.id : 1;
+
+  // Check if user has any booking for this movie
+  db.get(
+    `SELECT b.*, m.title as movie_title, m.date as movie_date, m.venue as movie_venue, m.poster_url as poster_url
+     FROM bookings b
+     LEFT JOIN movies m ON b.movie_id = m.id
+     WHERE b.user_id = ? AND b.movie_id = ?
+     ORDER BY b.created_at DESC
+     LIMIT 1`,
+    [userId, movieId],
+    (err, booking) => {
+      if (err) {
+        console.error('Error checking existing booking:', err);
+        return res.status(500).json({ error: 'Failed to check booking status' });
+      }
+
+      if (!booking) {
+        return res.json({ hasBooking: false, booking: null });
+      }
+
+      // Parse selected seats if it's a string
+      let selectedSeats = [];
+      try {
+        selectedSeats = booking.selected_seats ? JSON.parse(booking.selected_seats) : [];
+      } catch (e) {
+        selectedSeats = [];
+      }
+
+      res.json({
+        hasBooking: true,
+        booking: {
+          id: booking.id,
+          booking_code: booking.booking_code,
+          movie_id: booking.movie_id,
+          movie_title: booking.movie_title,
+          movie_date: booking.movie_date,
+          venue: booking.movie_venue,
+          poster_url: booking.poster_url,
+          selected_seats: selectedSeats,
+          num_people: booking.num_people,
+          total_price: booking.total_price,
+          created_at: booking.created_at,
+          is_used: booking.is_used,
+          remaining_people: booking.remaining_people
+        }
+      });
+    }
+  );
+});
+
 
 module.exports = router;

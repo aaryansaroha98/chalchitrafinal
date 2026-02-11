@@ -55,8 +55,20 @@ router.post('/order', async (req, res) => {
       return res.status(couponErr.status || 400).json({ error: couponErr.message || 'Invalid coupon' });
     }
 
-    if (finalAmount <= 0) {
-      return res.status(400).json({ error: 'Final amount must be greater than zero' });
+    if (finalAmount < 0) {
+      return res.status(400).json({ error: 'Final amount cannot be negative' });
+    }
+
+    // Handle free bookings (₹0) - skip Razorpay payment
+    if (finalAmount === 0) {
+      return res.json({
+        order_id: null,
+        amount: 0,
+        currency: 'INR',
+        key_id: keyId,
+        final_amount: 0,
+        is_free: true
+      });
     }
 
     const amountPaise = Math.round(finalAmount * 100);
@@ -88,7 +100,8 @@ router.post('/order', async (req, res) => {
         amount: orderResponse.data.amount,
         currency: orderResponse.data.currency,
         key_id: keyId,
-        final_amount: finalAmount
+        final_amount: finalAmount,
+        is_free: false
       });
     } catch (orderErr) {
       const status = orderErr.response?.status || 500;

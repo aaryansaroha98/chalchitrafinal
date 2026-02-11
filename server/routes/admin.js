@@ -9,7 +9,13 @@ const router = express.Router();
 // Multer for file uploads (settings images and videos)
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '..', '..', 'public'));
+    if (file.fieldname === 'about_image') {
+      cb(null, path.join(__dirname, '..', '..', 'public', 'about'));
+    } else if (file.fieldname === 'hero_background_image' || file.fieldname === 'hero_background_video') {
+      cb(null, path.join(__dirname, '..', '..', 'public', 'hero'));
+    } else {
+      cb(null, path.join(__dirname, '..', '..', 'public'));
+    }
   },
   filename: (req, file, cb) => {
     let prefix = 'image';
@@ -409,7 +415,7 @@ router.put('/bookings/:id', requireAdmin, (req, res) => {
 
 // Get feedback
 router.get('/feedback', requireAdmin, (req, res) => {
-  db.all('SELECT f.*, u.name, m.title FROM feedback f JOIN users u ON f.user_id = u.id JOIN movies m ON f.movie_id = m.id ORDER BY f.created_at DESC',
+  db.all('SELECT f.*, u.name as user_name, u.email as user_email, m.title as movie_title FROM feedback f LEFT JOIN users u ON f.user_id = u.id LEFT JOIN movies m ON f.movie_id = m.id ORDER BY f.created_at DESC',
     [], (err, feedback) => {
       if (err) return res.status(500).json({ error: err.message });
       res.json(feedback);
@@ -696,9 +702,9 @@ router.put('/settings', requireAdmin, uploadFields, (req, res) => {
   console.log('Files:', req.files);
 
   const { tagline, hero_background, about_text } = req.body;
-  const about_image = req.files && req.files.about_image ? `/${req.files.about_image[0].filename}` : req.body.about_image;
-  const hero_background_image = req.files && req.files.hero_background_image ? `/${req.files.hero_background_image[0].filename}` : req.body.hero_background_image;
-  const hero_background_video = req.files && req.files.hero_background_video ? `/${req.files.hero_background_video[0].filename}` : (req.body.hero_background_video === '' ? null : req.body.hero_background_video);
+  const about_image = req.files && req.files.about_image ? `/about/${req.files.about_image[0].filename}` : req.body.about_image;
+  const hero_background_image = req.files && req.files.hero_background_image ? `/hero/${req.files.hero_background_image[0].filename}` : req.body.hero_background_image;
+  const hero_background_video = req.files && req.files.hero_background_video ? `/hero/${req.files.hero_background_video[0].filename}` : (req.body.hero_background_video === '' ? null : req.body.hero_background_video);
 
   console.log('About to update settings with:', {
     tagline, hero_background, hero_background_image, hero_background_video, about_text, about_image
@@ -2402,6 +2408,112 @@ router.post('/mail-settings/test', requireAdmin, async (req, res) => {
         hint: 'Make sure your App Password is correct. For Gmail, you need to use an App Password, not your regular password.'
       });
     }
+  });
+});
+
+// ===== RAZORPAY SETTINGS =====
+
+// Get Razorpay settings
+router.get('/razorpay-settings', requireAdmin, (req, res) => {
+  // First check if this is the super admin
+  db.get('SELECT email FROM users WHERE id = ?', [req.user?.id || req.session?.adminUser?.id], (err, user) => {
+    if (err) return res.status(500).json({ error: err.message });
+    
+    // Only super admin can access razorpay settings
+    if (!user || user.email !== '2025uee0154@iitjammu.ac.in') {
+      return res.status(403).json({ error: 'Access denied. Super admin only.' });
+    }
+
+    // Create table if not exists
+    db.run(`CREATE TABLE IF NOT EXISTS razorpay_settings (
+      id INTEGER PRIMARY KEY,
+      key_id TEXT,
+      key_secret TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`, (tableErr) => {
+      if (tableErr) return res.status(500).json({ error: tableErr.message });
+
+      db.get('SELECT * FROM razorpay_settings WHERE id = 1', (getErr, settings) => {
+        if (getErr) return res.status(500).json({ error: getErr.message });
+        
+        if (!settings) {
+          // Return environment variables as default or fallback values
+          return res.json({
+            id: 1,
+            key_id: process.env.RAZORPAY_KEY_ID || '',
+            key_secret: process.env.RAZORPAY_KEY_SECRET ? '••••••••' : '',
+            has_secret: !!process.env.RAZORPAY_KEY_SECRET
+          });
+        }
+        
+        // Don't return the actual secret for security - mask it
+        res.json({
+          id: settings.id,
+          key_id: settings.key_id || '',
+          key_secret: settings.key_secret ? '••••••••' : '',
+          has_secret: !!settings.key_secret
+        });
+      });
+    });
+  });
+});
+
+// Update Razorpay settings
+router.put('/razorpay-settings', requireAdmin, (req, res) => {
+  // First check if this is the super admin
+  db.get('SELECT email FROM users WHERE id = ?', [req.user?.id || req.session?.adminUser?.id], (err, user) => {
+    if (err) return res.status(500).json({ error: err.message });
+    
+    // Only super admin can update razorpay settings
+    if (!user || user.email !== '2025uee0154@iitjammu.ac.in') {
+      return res.status(403).json({ error: 'Access denied. Super admin only.' });
+    }
+
+    const { key_id, key_secret } = req.body;
+
+    // Create table if not exists
+    db.run(`CREATE TABLE IF NOT EXISTS razorpay_settings (
+      id INTEGER PRIMARY KEY,
+      key_id TEXT,
+      key_secret TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`, (tableErr) => {
+      if (tableErr) return res.status(500).json({ error: tableErr.message });
+
+      db.get('SELECT id, key_secret FROM razorpay_settings WHERE id = 1', (checkErr, existing) => {
+        if (checkErr) return res.status(500).json({ error: checkErr.message });
+
+        if (existing) {
+          // Update existing settings
+          // Only update secret if it's not the masked value
+          let query = 'UPDATE razorpay_settings SET key_id = ?, updated_at = CURRENT_TIMESTAMP';
+          let params = [key_id];
+          
+          if (key_secret && key_secret !== '••••••••') {
+            query = 'UPDATE razorpay_settings SET key_id = ?, key_secret = ?, updated_at = CURRENT_TIMESTAMP WHERE id = 1';
+            params = [key_id, key_secret];
+          } else {
+            query += ' WHERE id = 1';
+          }
+          
+          db.run(query, params, function(updateErr) {
+            if (updateErr) return res.status(500).json({ error: updateErr.message });
+            res.json({ message: 'Razorpay settings updated successfully', changes: this.changes });
+          });
+        } else {
+          db.run(`INSERT INTO razorpay_settings (id, key_id, key_secret)
+                  VALUES (1, ?, ?)`,
+            [key_id, key_secret !== '••••••••' ? key_secret : ''],
+            function(insertErr) {
+              if (insertErr) return res.status(500).json({ error: insertErr.message });
+              res.json({ message: 'Razorpay settings created successfully', id: this.lastID });
+            }
+          );
+        }
+      });
+    });
   });
 });
 

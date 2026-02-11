@@ -25,7 +25,7 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
-# Uploads
+# Uploads (user-uploaded files - backup separately)
 uploads/
 
 # IDEs
@@ -33,12 +33,9 @@ uploads/
 .idea/
 *.swp
 
-# Database
+# Database (SQLite file - data stays on server)
 database.db
 *.db
 
-# Large directories
-public/
-uploads/
-.env
-database.db
+# DO NOT ignore public folder - it contains essential images
+# public/ - REMOVED to include images in repo

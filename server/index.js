@@ -42,9 +42,20 @@ const db = new sqlite3.Database(dbPath, (err) => {
 // Make db available globally
 global.db = db;
 
+// CORS configuration for production
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  FRONTEND_URL
+];
+
 // Middleware
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin) || !origin) {
+    res.header('Access-Control-Allow-Origin', origin || '*');
+  }
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
@@ -75,15 +86,26 @@ if (!fs.existsSync(uploadsDir)) {
 }
 app.use('/uploads', express.static(uploadsDir));
 
-// Check if client build exists before serving it
-const clientBuildPath = path.join(__dirname, '..', 'client', 'build', 'index.html');
-const clientBuildExists = fs.existsSync(clientBuildPath);
+// Check if client build exists before serving it - check multiple possible locations
+const possibleBuildPaths = [
+  path.join(__dirname, '..', 'client', 'build', 'index.html'), // Original location
+  path.join(__dirname, '..', 'Chalchitra Website', 'client', 'build', 'index.html'), // Nested location
+  path.join(__dirname, '..', '..', 'Chalchitra Website', 'client', 'build', 'index.html') // Alternative nested location
+];
+
+let clientBuildPath = possibleBuildPaths.find(p => fs.existsSync(p));
+const clientBuildExists = !!clientBuildPath;
 // Local development client URL (CRA dev server)
 const DEV_CLIENT_URL = process.env.DEV_CLIENT_URL || 'http://localhost:3001';
 
+if (!clientBuildPath) {
+  clientBuildPath = possibleBuildPaths[0]; // Default to first path
+}
+
 if (clientBuildExists) {
   console.log('✅ React build found - serving frontend from server');
-  app.use(express.static(path.join(__dirname, '..', 'client', 'build')));
+  const staticPath = path.dirname(clientBuildPath);
+  app.use(express.static(staticPath));
 } else {
   console.log('ℹ️ React build not found - using CRA dev server for frontend at', DEV_CLIENT_URL);
 }
