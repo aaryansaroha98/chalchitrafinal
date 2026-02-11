@@ -3,60 +3,78 @@ const db = require('../database');
 const multer = require('multer');
 const path = require('path');
 const nodemailer = require('nodemailer');
+const { isCloudinaryConfigured, getUpload, getUploadUrl, deleteImage } = require('../utils/cloudinary');
 
 const router = express.Router();
 
-// Multer for file uploads (settings images and videos)
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    if (file.fieldname === 'about_image') {
-      cb(null, path.join(__dirname, '..', '..', 'public', 'about'));
-    } else if (file.fieldname === 'hero_background_image' || file.fieldname === 'hero_background_video') {
-      cb(null, path.join(__dirname, '..', '..', 'public', 'hero'));
-    } else {
-      cb(null, path.join(__dirname, '..', '..', 'public'));
-    }
-  },
-  filename: (req, file, cb) => {
-    let prefix = 'image';
-    if (file.fieldname === 'about_image') {
-      prefix = 'about-image';
-    } else if (file.fieldname === 'hero_background_image') {
-      prefix = 'hero-bg';
-    } else if (file.fieldname === 'hero_background_video') {
-      prefix = 'hero-video';
-    }
-    cb(null, prefix + '-' + Date.now() + path.extname(file.originalname));
-  }
-});
-const upload = multer({ storage });
-const uploadFields = upload.fields([
-  { name: 'about_image', maxCount: 1 },
-  { name: 'hero_background_image', maxCount: 1 },
-  { name: 'hero_background_video', maxCount: 1 }
-]);
+// Multer for file uploads - uses Cloudinary in production, local disk in development
+let uploadFields;
+let uploadTeam;
+let uploadGallery;
 
-// Multer for team photos
-const teamStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '..', '..', 'public', 'team'));
-  },
-  filename: (req, file, cb) => {
-    cb(null, 'team-' + Date.now() + path.extname(file.originalname));
-  }
-});
-const uploadTeam = multer({ storage: teamStorage });
+if (isCloudinaryConfigured) {
+  // Cloudinary storage for all upload types
+  const settingsUpload = getUpload('settings');
+  uploadFields = settingsUpload.fields([
+    { name: 'about_image', maxCount: 1 },
+    { name: 'hero_background_image', maxCount: 1 },
+    { name: 'hero_background_video', maxCount: 1 }
+  ]);
+  uploadTeam = getUpload('team');
+  uploadGallery = getUpload('gallery');
+} else {
+  // Local disk storage
+  const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      if (file.fieldname === 'about_image') {
+        cb(null, path.join(__dirname, '..', '..', 'public', 'about'));
+      } else if (file.fieldname === 'hero_background_image' || file.fieldname === 'hero_background_video') {
+        cb(null, path.join(__dirname, '..', '..', 'public', 'hero'));
+      } else {
+        cb(null, path.join(__dirname, '..', '..', 'public'));
+      }
+    },
+    filename: (req, file, cb) => {
+      let prefix = 'image';
+      if (file.fieldname === 'about_image') {
+        prefix = 'about-image';
+      } else if (file.fieldname === 'hero_background_image') {
+        prefix = 'hero-bg';
+      } else if (file.fieldname === 'hero_background_video') {
+        prefix = 'hero-video';
+      }
+      cb(null, prefix + '-' + Date.now() + path.extname(file.originalname));
+    }
+  });
+  const upload = multer({ storage });
+  uploadFields = upload.fields([
+    { name: 'about_image', maxCount: 1 },
+    { name: 'hero_background_image', maxCount: 1 },
+    { name: 'hero_background_video', maxCount: 1 }
+  ]);
 
-// Multer for gallery photos
-const galleryStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '..', '..', 'public', 'gallery'));
-  },
-  filename: (req, file, cb) => {
-    cb(null, 'gallery-' + Date.now() + path.extname(file.originalname));
-  }
-});
-const uploadGallery = multer({ storage: galleryStorage });
+  // Local team storage
+  const teamStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, path.join(__dirname, '..', '..', 'public', 'team'));
+    },
+    filename: (req, file, cb) => {
+      cb(null, 'team-' + Date.now() + path.extname(file.originalname));
+    }
+  });
+  uploadTeam = multer({ storage: teamStorage });
+
+  // Local gallery storage
+  const galleryStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, path.join(__dirname, '..', '..', 'public', 'gallery'));
+    },
+    filename: (req, file, cb) => {
+      cb(null, 'gallery-' + Date.now() + path.extname(file.originalname));
+    }
+  });
+  uploadGallery = multer({ storage: galleryStorage });
+}
 
 // Middleware to check admin
 const requireAdmin = (req, res, next) => {
@@ -645,7 +663,7 @@ router.post('/gallery', requireAdmin, uploadGallery.single('image'), (req, res) 
 
   try {
     const { event_name } = req.body;
-    const image_url = req.file ? `/gallery/${req.file.filename}` : req.body.image_url;
+    const image_url = getUploadUrl(req.file, '/gallery') || req.body.image_url;
 
     console.log('Image URL:', image_url);
     console.log('Event name:', event_name);
@@ -702,9 +720,9 @@ router.put('/settings', requireAdmin, uploadFields, (req, res) => {
   console.log('Files:', req.files);
 
   const { tagline, hero_background, about_text } = req.body;
-  const about_image = req.files && req.files.about_image ? `/about/${req.files.about_image[0].filename}` : req.body.about_image;
-  const hero_background_image = req.files && req.files.hero_background_image ? `/hero/${req.files.hero_background_image[0].filename}` : req.body.hero_background_image;
-  const hero_background_video = req.files && req.files.hero_background_video ? `/hero/${req.files.hero_background_video[0].filename}` : (req.body.hero_background_video === '' ? null : req.body.hero_background_video);
+  const about_image = getUploadUrl(req.files?.about_image?.[0], '/about') || req.body.about_image;
+  const hero_background_image = getUploadUrl(req.files?.hero_background_image?.[0], '/hero') || req.body.hero_background_image;
+  const hero_background_video = getUploadUrl(req.files?.hero_background_video?.[0], '/hero') || (req.body.hero_background_video === '' ? null : req.body.hero_background_video);
 
   console.log('About to update settings with:', {
     tagline, hero_background, hero_background_image, hero_background_video, about_text, about_image
@@ -732,7 +750,7 @@ router.get('/team', (req, res) => {
 // Add team member
 router.post('/team', requireAdmin, uploadTeam.single('photo'), (req, res) => {
   const { name, student_id, role, section } = req.body;
-  const photo_url = req.file ? `/team/${req.file.filename}` : req.body.photo_url;
+  const photo_url = getUploadUrl(req.file, '/team') || req.body.photo_url;
   db.run('INSERT INTO team (name, student_id, photo_url, role, section) VALUES (?, ?, ?, ?, ?)', [name, student_id, photo_url, role, section || 'foundation_team'], function(err) {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ id: this.lastID });
@@ -742,7 +760,7 @@ router.post('/team', requireAdmin, uploadTeam.single('photo'), (req, res) => {
 // Update team member
 router.put('/team/:id', requireAdmin, uploadTeam.single('photo'), (req, res) => {
   const { name, student_id, role, section } = req.body;
-  const photo_url = req.file ? `/team/${req.file.filename}` : req.body.photo_url;
+  const photo_url = getUploadUrl(req.file, '/team') || req.body.photo_url;
   db.run('UPDATE team SET name = ?, student_id = ?, photo_url = ?, role = ?, section = ? WHERE id = ?',
     [name, student_id, photo_url, role, section, req.params.id], function(err) {
       if (err) return res.status(500).json({ error: err.message });

@@ -3,29 +3,14 @@ const db = require('../database');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { getUpload, getUploadUrl, deleteImage } = require('../utils/cloudinary');
 
 const router = express.Router();
 
 console.log('🎬 Movies routes file loaded');
 
-// Multer for file uploads (posters)
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const dir = path.join(__dirname, '..', '..', 'uploads');
-    try {
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
-    } catch (e) {
-      console.error('Failed ensuring uploads dir for movies:', e);
-    }
-    cb(null, dir);
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
-});
-const upload = multer({ storage });
+// Use Cloudinary in production, local disk in development
+const upload = getUpload('posters', 'uploads');
 
 // Helper function to validate movie data
 const validateMovieData = (data) => {
@@ -179,7 +164,7 @@ router.post('/', upload.single('poster'), (req, res) => {
   }
 
   const { title, description, date, venue, price, availableFoods, category, duration, imdb_rating, language } = body;
-  const poster_url = req.file ? `/uploads/${req.file.filename}` : null;
+  const poster_url = getUploadUrl(req.file, '/uploads');
 
   // Determine is_upcoming based on date
   const movieDate = new Date(date);
@@ -269,7 +254,12 @@ router.put('/:id', upload.single('poster'), (req, res) => {
 
   let poster_url = req.body.poster_url; // Keep existing poster if no new file uploaded
   if (req.file) {
-    poster_url = `/uploads/${req.file.filename}`;
+    poster_url = getUploadUrl(req.file, '/uploads');
+    
+    // Delete old poster from Cloudinary if it was a cloud image
+    if (req.body.poster_url) {
+      deleteImage(req.body.poster_url).catch(() => {});
+    }
   }
 
   // Handle availableFoods - convert array to comma-separated string

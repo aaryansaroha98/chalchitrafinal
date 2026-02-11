@@ -3,28 +3,10 @@ const router = express.Router();
 const db = require('../database');
 const multer = require('multer');
 const path = require('path');
+const { getUpload, getUploadUrl } = require('../utils/cloudinary');
 
-// Configure multer for food image uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const dir = path.join(__dirname, '../../uploads');
-    try {
-      // Ensure uploads directory exists
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
-    } catch (e) {
-      console.error('Failed ensuring uploads dir for foods:', e);
-    }
-    cb(null, dir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, 'food-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
-
-const upload = multer({ storage });
+// Use Cloudinary in production, local disk in development
+const upload = getUpload('foods', 'uploads');
 
 // Middleware to check if user is admin (supports both passport user and session user)
 const requireAdmin = (req, res, next) => {
@@ -86,7 +68,7 @@ router.get('/:id', (req, res) => {
 // Create new food item (admin only)
 router.post('/', requireAdmin, upload.single('image'), (req, res) => {
   const { name, description, price, category } = req.body;
-  const image_url = req.file ? `/uploads/${req.file.filename}` : null;
+  const image_url = getUploadUrl(req.file, '/uploads');
 
   if (!name || !price) {
     return res.status(400).json({ error: 'Name and price are required' });
@@ -113,7 +95,7 @@ router.post('/', requireAdmin, upload.single('image'), (req, res) => {
 router.put('/:id', requireAdmin, upload.single('image'), (req, res) => {
   const { id } = req.params;
   const { name, description, price, category, is_available } = req.body;
-  const image_url = req.file ? `/uploads/${req.file.filename}` : null;
+  const image_url = getUploadUrl(req.file, '/uploads');
 
   let query, params;
 
