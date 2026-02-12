@@ -32,16 +32,19 @@ const createEmailTransporter = () => new Promise((resolve, reject) => {
       auth: {
         user: emailUser,
         pass: emailPass
+      },
+      // Generous timeouts for Render free tier
+      connectionTimeout: 60000,
+      greetingTimeout: 30000,
+      socketTimeout: 120000,
+      tls: {
+        rejectUnauthorized: false
       }
     });
 
-    transporter.verify((verifyErr) => {
-      if (verifyErr) {
-        console.error('Email transporter verification failed:', verifyErr);
-        return reject(verifyErr);
-      }
-      resolve({ transporter, settings: dbSettings });
-    });
+    // Skip verify() - it creates an extra SMTP connection that times out on Render
+    // If credentials are wrong, sendMail will fail with a clear error
+    resolve({ transporter, settings: dbSettings });
   });
 });
 

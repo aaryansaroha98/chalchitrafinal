@@ -124,7 +124,14 @@ router.get('/:id', (req, res) => {
 });
 
 // Add movie (admin only)
-router.post('/', upload.single('poster'), (req, res) => {
+router.post('/', (req, res) => {
+  // Handle multer upload with error catching
+  upload.single('poster')(req, res, (multerErr) => {
+    if (multerErr) {
+      console.error('❌ Multer/Cloudinary upload error:', multerErr);
+      console.log('⚠️ Continuing movie creation without poster due to upload error');
+    }
+
   console.log('📝 POST /api/movies - Creating new movie');
   
   // Check for OAuth user first
@@ -203,6 +210,7 @@ router.post('/', upload.single('poster'), (req, res) => {
       message: 'Movie created successfully'
     });
   });
+  }); // end multer wrapper
 });
 
 // Update movie (admin)
@@ -210,8 +218,8 @@ router.put('/:id', (req, res) => {
   // Handle multer upload with error catching
   upload.single('poster')(req, res, (multerErr) => {
     if (multerErr) {
-      console.error('❌ Multer upload error:', multerErr);
-      return res.status(500).json({ error: 'File upload failed: ' + multerErr.message });
+      console.error('❌ Multer/Cloudinary upload error:', multerErr);
+      console.log('⚠️ Continuing movie update without new poster due to upload error');
     }
 
   const movieId = parseInt(req.params.id);

@@ -818,14 +818,16 @@ function createEmailTransporter() {
           user: emailUser,
           pass: emailPass
         },
-        // Connection pool for better performance
-        pool: true,
-        maxConnections: 3,
-        maxMessages: 100,
-        // Timeouts to prevent hanging
-        connectionTimeout: 10000,
-        greetingTimeout: 10000,
-        socketTimeout: 15000
+        // Disable pool mode - causes issues on Render free tier
+        pool: false,
+        // Generous timeouts for Render free tier cold starts
+        connectionTimeout: 60000,
+        greetingTimeout: 30000,
+        socketTimeout: 120000,
+        // TLS options for compatibility
+        tls: {
+          rejectUnauthorized: false
+        }
       });
       
       // Cache the transporter (skip verify to avoid slow SMTP handshake on every request)

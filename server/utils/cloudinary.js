@@ -20,9 +20,14 @@ if (isCloudinaryConfigured) {
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
   });
-  console.log('☁️  Cloudinary configured for cloud image storage');
+  console.log('☁️  Cloudinary configured for cloud image storage (cloud:', process.env.CLOUDINARY_CLOUD_NAME, ')');
 } else {
-  console.log('📁 Cloudinary not configured - using local disk storage for uploads');
+  console.log('📁 Cloudinary not configured - missing env vars:', 
+    !process.env.CLOUDINARY_CLOUD_NAME ? 'CLOUDINARY_CLOUD_NAME' : '',
+    !process.env.CLOUDINARY_API_KEY ? 'CLOUDINARY_API_KEY' : '',
+    !process.env.CLOUDINARY_API_SECRET ? 'CLOUDINARY_API_SECRET' : ''
+  );
+  console.log('📁 Using local disk storage for uploads');
 }
 
 // Create Cloudinary storage for a specific folder

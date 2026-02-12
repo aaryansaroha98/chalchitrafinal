@@ -41,6 +41,12 @@ services:
         sync: false
       - key: SENDER_NAME
         value: Chalchitra IIT Jammu
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
       - key: FRONTEND_URL
         sync: false
       - key: BACKEND_URL

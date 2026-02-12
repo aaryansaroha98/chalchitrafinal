@@ -138,6 +138,15 @@ app.use((req, res, next) => {
   return res.redirect(DEV_CLIENT_URL + req.path);
 });
 
+// Global error handler for multer/upload errors
+app.use((err, req, res, next) => {
+  console.error('Global error handler:', err.message || err);
+  if (err.name === 'MulterError' || err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(400).json({ error: 'File upload error: ' + err.message });
+  }
+  res.status(500).json({ error: 'Internal server error: ' + (err.message || 'Unknown error') });
+});
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`
 ╔════════════════════════════════════════════════════════╗
