@@ -2,7 +2,6 @@ const express = require('express');
 const db = require('../database');
 const multer = require('multer');
 const path = require('path');
-const nodemailer = require('nodemailer');
 const { isCloudinaryConfigured, getUpload, getUploadUrl, deleteImage } = require('../utils/cloudinary');
 
 const router = express.Router();
@@ -26,7 +25,13 @@ if (isCloudinaryConfigured) {
   // Local disk storage
   const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, path.join(__dirname, '..', '..', 'public'));
+      if (file.fieldname === 'about_image') {
+        cb(null, path.join(__dirname, '..', '..', 'public', 'about'));
+      } else if (file.fieldname === 'hero_background_image' || file.fieldname === 'hero_background_video') {
+        cb(null, path.join(__dirname, '..', '..', 'public', 'hero'));
+      } else {
+        cb(null, path.join(__dirname, '..', '..', 'public'));
+      }
     },
     filename: (req, file, cb) => {
       let prefix = 'image';
@@ -50,7 +55,7 @@ if (isCloudinaryConfigured) {
   // Local team storage
   const teamStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, path.join(__dirname, '..', '..', 'public'));
+      cb(null, path.join(__dirname, '..', '..', 'public', 'team'));
     },
     filename: (req, file, cb) => {
       cb(null, 'team-' + Date.now() + path.extname(file.originalname));
@@ -61,7 +66,7 @@ if (isCloudinaryConfigured) {
   // Local gallery storage
   const galleryStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, path.join(__dirname, '..', '..', 'public'));
+      cb(null, path.join(__dirname, '..', '..', 'public', 'gallery'));
     },
     filename: (req, file, cb) => {
       cb(null, 'gallery-' + Date.now() + path.extname(file.originalname));
@@ -426,7 +431,7 @@ router.put('/bookings/:id', requireAdmin, (req, res) => {
 
 // Get feedback
 router.get('/feedback', requireAdmin, (req, res) => {
-  db.all('SELECT f.*, u.name, m.title FROM feedback f JOIN users u ON f.user_id = u.id JOIN movies m ON f.movie_id = m.id ORDER BY f.created_at DESC',
+  db.all('SELECT f.*, u.name as user_name, u.email as user_email, m.title as movie_title FROM feedback f LEFT JOIN users u ON f.user_id = u.id LEFT JOIN movies m ON f.movie_id = m.id ORDER BY f.created_at DESC',
     [], (err, feedback) => {
       if (err) return res.status(500).json({ error: err.message });
       res.json(feedback);
@@ -614,20 +619,27 @@ router.post('/coupons/validate', (req, res) => {
       // Ensure discount doesn't exceed total amount
       discount = Math.min(discount, total_amount);
 
-      // Note: Coupon usage count will be incremented only after successful booking
-      // in the bookings.js route when the booking is actually created
-
-      res.json({
-        valid: true,
-        coupon: {
-          id: coupon.id,
-          code: coupon.code,
-          description: coupon.description,
-          discount_type: coupon.discount_type,
-          discount_value: coupon.discount_value,
-          discount_amount: discount,
-          final_amount: total_amount - discount
+      // Increment usage count when coupon is validated for use
+      db.run('UPDATE coupons SET used_count = used_count + 1 WHERE id = ?', [coupon.id], function(updateErr) {
+        if (updateErr) {
+          console.error('Error updating coupon usage count:', updateErr);
+          return res.status(500).json({ error: 'Failed to update coupon usage' });
         }
+
+        console.log(`Coupon ${coupon.code} usage count incremented: ${this.changes} rows affected`);
+
+        res.json({
+          valid: true,
+          coupon: {
+            id: coupon.id,
+            code: coupon.code,
+            description: coupon.description,
+            discount_type: coupon.discount_type,
+            discount_value: coupon.discount_value,
+            discount_amount: discount,
+            final_amount: total_amount - discount
+          }
+        });
       });
     });
 });
@@ -649,7 +661,7 @@ router.post('/gallery', requireAdmin, uploadGallery.single('image'), (req, res) 
 
   try {
     const { event_name } = req.body;
-    const image_url = getUploadUrl(req.file, '/gallery') || `/gallery/${req.body.image_url}`;
+    const image_url = getUploadUrl(req.file, '/gallery') || req.body.image_url;
 
     console.log('Image URL:', image_url);
     console.log('Event name:', event_name);
@@ -736,7 +748,7 @@ router.get('/team', (req, res) => {
 // Add team member
 router.post('/team', requireAdmin, uploadTeam.single('photo'), (req, res) => {
   const { name, student_id, role, section } = req.body;
-  const photo_url = getUploadUrl(req.file, '/team') || `/team/${req.body.photo_url}`;
+  const photo_url = getUploadUrl(req.file, '/team') || req.body.photo_url;
   db.run('INSERT INTO team (name, student_id, photo_url, role, section) VALUES (?, ?, ?, ?, ?)', [name, student_id, photo_url, role, section || 'foundation_team'], function(err) {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ id: this.lastID });
@@ -746,7 +758,7 @@ router.post('/team', requireAdmin, uploadTeam.single('photo'), (req, res) => {
 // Update team member
 router.put('/team/:id', requireAdmin, uploadTeam.single('photo'), (req, res) => {
   const { name, student_id, role, section } = req.body;
-  const photo_url = getUploadUrl(req.file, '/team') || `/team/${req.body.photo_url}`;
+  const photo_url = getUploadUrl(req.file, '/team') || req.body.photo_url;
   db.run('UPDATE team SET name = ?, student_id = ?, photo_url = ?, role = ?, section = ? WHERE id = ?',
     [name, student_id, photo_url, role, section, req.params.id], function(err) {
       if (err) return res.status(500).json({ error: err.message });
@@ -762,65 +774,15 @@ router.delete('/team/:id', requireAdmin, (req, res) => {
   });
 });
 
-// Email functionality for admin - ENABLED
-// Create transporter for email sending - uses database settings or environment variables
-// Cached transporter to avoid re-creating on every request
-let cachedTransporter = null;
-let cachedTransporterTime = 0;
-const TRANSPORTER_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+// Email functionality for admin - ENABLED (via Resend HTTP API)
+const { Resend } = require('resend');
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-function createEmailTransporter() {
-  const nodemailer = require('nodemailer');
-  
-  // Return cached transporter if still valid  
-  if (cachedTransporter && (Date.now() - cachedTransporterTime) < TRANSPORTER_CACHE_TTL) {
-    return Promise.resolve(cachedTransporter);
-  }
-  
-  return new Promise((resolve, reject) => {
-    // First try to get settings from database
-    db.get('SELECT * FROM mail_settings WHERE id = 1', (err, dbSettings) => {
-      if (err) {
-        console.error('Error fetching mail settings from database (non-fatal):', err.message);
-        // Continue with env vars - don't fail
-      }
-      
-      const emailUser = dbSettings?.email_user || process.env.EMAIL_USER;
-      // Skip db password if it looks masked
-      const dbPass = dbSettings?.email_pass;
-      const emailPass = (dbPass && dbPass !== '••••••••' && dbPass.length > 0) ? dbPass : process.env.EMAIL_PASS;
-      
-      if (!emailUser || !emailPass) {
-        console.warn('Email credentials not configured.');
-        return reject(new Error('Email credentials not configured. Set EMAIL_USER and EMAIL_PASS environment variables.'));
-      }
-      
-      console.log('Creating email transporter — service: gmail, user:', emailUser.substring(0, 3) + '***');
-      
-      // Use service:'gmail' — works for @gmail.com AND Google Workspace domains
-      // Uses port 465 SSL by default, which is more reliable on Render than 587 STARTTLS
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: emailUser,
-          pass: emailPass
-        },
-        pool: false,
-        connectionTimeout: 120000,
-        greetingTimeout: 60000,
-        socketTimeout: 120000,
-        tls: {
-          rejectUnauthorized: false
-        }
-      });
-      
-      // Cache the transporter (skip verify to avoid slow SMTP handshake on every request)
-      cachedTransporter = transporter;
-      cachedTransporterTime = Date.now();
-      console.log('✅ Email transporter created successfully');
-      resolve(transporter);
-    });
-  });
+// Get the "from" email address for sending
+function getFromEmail(senderName) {
+  const name = senderName || 'Chalchitra IIT Jammu';
+  const email = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
+  return `${name} <${email}>`;
 }
 
 // Get all users for email sending
@@ -859,9 +821,6 @@ router.post('/email/single', requireAdmin, async (req, res) => {
   }
 
   try {
-    // Create transporter first (before entering callback)
-    const transporter = await createEmailTransporter();
-    
     // Get user details
     db.get('SELECT name, email FROM users WHERE id = ?', [user_id], async (err, user) => {
       if (err) return res.status(500).json({ error: err.message });
@@ -877,16 +836,10 @@ router.post('/email/single', requireAdmin, async (req, res) => {
           attachments = [{
             filename: attachment_name || 'attachment',
             content: buffer,
-            contentType: attachment_type || 'application/octet-stream'
           }];
         }
 
-        const mailOptions = {
-          from: `"Chalchitra IIT Jammu" <${process.env.EMAIL_USER}>`,
-          to: user.email,
-          subject: subject,
-          attachments,
-          html: `
+        const emailHtml = `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <div style="background: white; border: 1px solid #e9ecef; padding: 30px; text-align: center; border-radius: 15px 15px 0 0;">
                 <h1 style="color: black; margin: 0; font-size: 24px;">Chalchitra Series</h1>
@@ -903,17 +856,23 @@ router.post('/email/single', requireAdmin, async (req, res) => {
                 </p>
               </div>
             </div>
-          `
-        };
+          `;
 
         // Respond immediately to avoid Render's 30s request timeout
         res.json({ message: 'Email queued for delivery!' });
 
-        // Send email in background
+        // Send email in background via Resend (HTTP-based, no SMTP)
         setImmediate(async () => {
           try {
-            await transporter.sendMail(mailOptions);
-            console.log('[Email] ✅ Single email sent to', user.email);
+            const { data, error } = await resend.emails.send({
+              from: getFromEmail(),
+              to: [user.email],
+              subject: subject,
+              html: emailHtml,
+              attachments,
+            });
+            if (error) throw new Error(error.message || JSON.stringify(error));
+            console.log('[Email] ✅ Single email sent to', user.email, '— id:', data?.id);
             db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
                     VALUES (?, ?, ?, ?, ?, ?, ?)`,
               ['single', user.email, user.name, subject, message, req.user?.id || 1, 'sent']);
@@ -945,9 +904,6 @@ router.post('/email/bulk', requireAdmin, async (req, res) => {
   }
 
   try {
-    // Validate transporter first before responding
-    const transporter = await createEmailTransporter();
-    
     // Get user details for all selected users
     const placeholders = user_ids.map(() => '?').join(',');
     db.all(`SELECT id, name, email FROM users WHERE id IN (${placeholders})`, user_ids, (err, users) => {
@@ -955,8 +911,6 @@ router.post('/email/bulk', requireAdmin, async (req, res) => {
       if (!users || users.length === 0) return res.status(404).json({ error: 'No valid users found' });
 
       const adminId = req.user?.id || 1;
-      const senderName = process.env.SENDER_NAME || 'Chalchitra IIT Jammu';
-      const fromEmail = process.env.EMAIL_USER;
 
       // Respond immediately - emails will be sent in background
       res.json({
@@ -967,18 +921,14 @@ router.post('/email/bulk', requireAdmin, async (req, res) => {
         results: users.map(u => ({ user: u.name, email: u.email, status: 'queued' }))
       });
 
-      // Process emails in background after response is sent
+      // Process emails in background via Resend (HTTP-based, no SMTP)
       setImmediate(async () => {
         console.log(`[Bulk Email] Starting background send to ${users.length} users`);
         
         for (let i = 0; i < users.length; i++) {
           const user = users[i];
           
-          const mailOptions = {
-            from: `"${senderName}" <${fromEmail}>`,
-            to: user.email,
-            subject: subject,
-            html: `
+          const emailHtml = `
               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                 <div style="background: white; border: 1px solid #e9ecef; padding: 30px; text-align: center; border-radius: 15px 15px 0 0;">
                   <h1 style="color: black; margin: 0; font-size: 24px;">Chalchitra Series</h1>
@@ -995,13 +945,18 @@ router.post('/email/bulk', requireAdmin, async (req, res) => {
                   </p>
                 </div>
               </div>
-            `
-          };
+            `;
 
           try {
             console.log(`[Bulk Email] Sending to: ${user.email} (${i + 1}/${users.length})`);
-            await transporter.sendMail(mailOptions);
-            console.log(`[Bulk Email] ✅ Sent to: ${user.email}`);
+            const { data, error } = await resend.emails.send({
+              from: getFromEmail(),
+              to: [user.email],
+              subject: subject,
+              html: emailHtml,
+            });
+            if (error) throw new Error(error.message || JSON.stringify(error));
+            console.log(`[Bulk Email] ✅ Sent to: ${user.email} — id: ${data?.id}`);
 
             // Log successful email
             db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
@@ -1040,8 +995,6 @@ router.post('/email/custom', requireAdmin, async (req, res) => {
   }
 
   try {
-    const transporter = await createEmailTransporter();
-
     let attachments = [];
     if (attachment_base64) {
       const buffer = Buffer.from(attachment_base64, 'base64');
@@ -1051,16 +1004,10 @@ router.post('/email/custom', requireAdmin, async (req, res) => {
       attachments = [{
         filename: attachment_name || 'attachment',
         content: buffer,
-        contentType: attachment_type || 'application/octet-stream'
       }];
     }
 
-    const mailOptions = {
-      from: `"Chalchitra IIT Jammu" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: subject,
-      attachments,
-      html: `
+    const emailHtml = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <div style="background: white; border: 1px solid #e9ecef; padding: 30px; text-align: center; border-radius: 15px 15px 0 0;">
                 <h1 style="color: black; margin: 0; font-size: 24px;">Chalchitra Series</h1>
@@ -1077,17 +1024,23 @@ router.post('/email/custom', requireAdmin, async (req, res) => {
             </p>
           </div>
         </div>
-      `
-    };
+      `;
 
     // Respond immediately to avoid Render's 30s request timeout
     res.json({ message: 'Email queued for delivery!' });
 
-    // Send email in background
+    // Send email in background via Resend (HTTP-based, no SMTP)
     setImmediate(async () => {
       try {
-        await transporter.sendMail(mailOptions);
-        console.log('[Email] ✅ Custom email sent to:', email);
+        const { data, error } = await resend.emails.send({
+          from: getFromEmail(),
+          to: [email],
+          subject: subject,
+          html: emailHtml,
+          attachments,
+        });
+        if (error) throw new Error(error.message || JSON.stringify(error));
+        console.log('[Email] ✅ Custom email sent to:', email, '— id:', data?.id);
         db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
                 VALUES (?, ?, ?, ?, ?, ?, ?)`,
           ['custom', email, recipient_name || 'Valued Guest', subject, message, req.user?.id || 1, 'sent']);
@@ -1155,23 +1108,17 @@ router.post('/email/feedback-request', requireAdmin, async (req, res) => {
         movie_title: selectedMovie?.title || null
       });
 
-      // Process emails in background
+      // Process emails in background via Resend (HTTP-based, no SMTP)
       setImmediate(async () => {
         let sentCount = 0;
         let failedCount = 0;
 
         try {
-          const transporter = await createEmailTransporter();
-
           for (let i = 0; i < users.length; i++) {
             const user = users[i];
             
             try {
-              const mailOptions = {
-                from: `"Chalchitra IIT Jammu" <${process.env.EMAIL_USER}>`,
-                to: user.email,
-                subject: subject,
-                html: `
+              const emailHtml = `
                   <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                     <div style="background: white; border: 1px solid #e9ecef; padding: 30px; text-align: center; border-radius: 15px 15px 0 0;">
                       <h1 style="color: black; margin: 0; font-size: 24px;">Chalchitra Series</h1>
@@ -1210,12 +1157,17 @@ router.post('/email/feedback-request', requireAdmin, async (req, res) => {
                       </p>
                     </div>
                   </div>
-                `
-              };
+                `;
 
               console.log(`[Feedback Email] Sending to: ${user.email} (${i + 1}/${users.length})`);
-              await transporter.sendMail(mailOptions);
-              console.log(`[Feedback Email] ✅ Sent to: ${user.email}`);
+              const { data, error } = await resend.emails.send({
+                from: getFromEmail(),
+                to: [user.email],
+                subject: subject,
+                html: emailHtml,
+              });
+              if (error) throw new Error(error.message || JSON.stringify(error));
+              console.log(`[Feedback Email] ✅ Sent to: ${user.email} — id: ${data?.id}`);
               sentCount++;
 
               // Log successful email
@@ -1237,8 +1189,8 @@ router.post('/email/feedback-request', requireAdmin, async (req, res) => {
               await new Promise(resolve => setTimeout(resolve, 500));
             }
           }
-        } catch (transportError) {
-          console.error('[Feedback Email] Transporter creation failed:', transportError.message);
+        } catch (loopError) {
+          console.error('[Feedback Email] Error during send loop:', loopError.message);
         }
 
         console.log(`[Feedback Email] Background processing complete: ${sentCount} sent, ${failedCount} failed`);
@@ -1557,77 +1509,67 @@ router.post('/coupon-winners/send', requireAdmin, (req, res) => {
                       console.log('✅ Created coupon winner for:', user.email, 'Code:', couponCode);
                       results.push({ user: user.name, email: user.email, coupon_code: couponCode, status: 'recorded' });
 
-                      // Send email to user
-                      console.log('📧 About to create email transporter...');
-                      createEmailTransporter().then(transporter => {
-                        // Create the email HTML content
-                        const emailHtml = `
-                          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                            <div style="background: white; border: 1px solid #e9ecef; padding: 30px; text-align: center; border-radius: 15px 15px 0 0;">
-                              <h1 style="color: black; margin: 0; font-size: 24px;">Chalchitra Series</h1>
-                              <p style="color: #6c757d; margin: 10px 0 0 0;">Indian Institute of Technology Jammu</p>
-                            </div>
-                            <div style="background: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                              <h2 style="color: #333; margin-top: 0;">Congratulations ${user.name}!</h2>
-                              <p style="color: #555; font-size: 16px; margin: 20px 0;">${winner_message}</p>
+                      // Send email to user via Resend
+                      console.log('📧 Sending coupon email via Resend...');
 
-                              <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0; text-align: center;">
-                                <h3 style="color: #28a745; margin: 0; font-size: 18px;">Your Exclusive Coupon Code</h3>
-                                <div style="font-size: 24px; font-weight: bold; color: #007bff; margin: 10px 0; letter-spacing: 2px;">${couponCode}</div>
-                                <p style="color: #666; margin: 10px 0 0 0;">
-                                  <strong>Discount:</strong> ${discount_type === 'percentage' ? discount_amount + '% off' : '₹' + discount_amount + ' off'}<br>
-                                  <strong>Valid until:</strong> ${expiryDate.toLocaleDateString('en-IN')}
-                                </p>
-                              </div>
-
-                              <p style="color: #555; line-height: 1.6;">
-                                Use this coupon code during movie ticket booking on our website to avail your discount.
-                                This code is unique to you and cannot be shared.
-                              </p>
-
-                              <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-                              <p style="color: #666; font-size: 14px; margin: 0;">
-                                Best regards,<br>
-                                <strong>Chalchitra Team</strong><br>
-                                Indian Institute of Technology Jammu
-                              </p>
-                            </div>
+                      const emailHtml = `
+                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                          <div style="background: white; border: 1px solid #e9ecef; padding: 30px; text-align: center; border-radius: 15px 15px 0 0;">
+                            <h1 style="color: black; margin: 0; font-size: 24px;">Chalchitra Series</h1>
+                            <p style="color: #6c757d; margin: 10px 0 0 0;">Indian Institute of Technology Jammu</p>
                           </div>
-                        `;
+                          <div style="background: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            <h2 style="color: #333; margin-top: 0;">Congratulations ${user.name}!</h2>
+                            <p style="color: #555; font-size: 16px; margin: 20px 0;">${winner_message}</p>
 
-                        const mailOptions = {
-                          from: `"Chalchitra IIT Jammu" <${process.env.EMAIL_USER}>`,
-                          to: user.email,
-                          subject: 'Your Exclusive Chalchitra Coupon Code!',
-                          html: emailHtml
-                        };
+                            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0; text-align: center;">
+                              <h3 style="color: #28a745; margin: 0; font-size: 18px;">Your Exclusive Coupon Code</h3>
+                              <div style="font-size: 24px; font-weight: bold; color: #007bff; margin: 10px 0; letter-spacing: 2px;">${couponCode}</div>
+                              <p style="color: #666; margin: 10px 0 0 0;">
+                                <strong>Discount:</strong> ${discount_type === 'percentage' ? discount_amount + '% off' : '₹' + discount_amount + ' off'}<br>
+                                <strong>Valid until:</strong> ${expiryDate.toLocaleDateString('en-IN')}
+                              </p>
+                            </div>
 
-                        console.log('🔄 Attempting to send email to:', user.email, 'with coupon code:', couponCode);
-                        console.log('📧 Email configuration - User:', process.env.EMAIL_USER, 'Pass length:', process.env.EMAIL_PASS?.length);
+                            <p style="color: #555; line-height: 1.6;">
+                              Use this coupon code during movie ticket booking on our website to avail your discount.
+                              This code is unique to you and cannot be shared.
+                            </p>
 
-                        transporter.sendMail(mailOptions, (emailErr, info) => {
-                          if (emailErr) {
-                            console.error('❌ FAILED to send coupon email to', user.email, ':', emailErr.message);
-                            console.error('📧 Email error code:', emailErr.code);
-                            console.error('📧 Email error response:', emailErr.response);
-                            results.push({ user: user.name, email: user.email, coupon_code: couponCode, status: 'email_failed', email_error: emailErr.message });
+                            <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+                            <p style="color: #666; font-size: 14px; margin: 0;">
+                              Best regards,<br>
+                              <strong>Chalchitra Team</strong><br>
+                              Indian Institute of Technology Jammu
+                            </p>
+                          </div>
+                        </div>
+                      `;
 
-                            // Delete the coupon and winner record since email failed
-                            db.run('DELETE FROM coupons WHERE id = ?', [couponId], (deleteCouponErr) => {
-                              if (deleteCouponErr) console.error('Error deleting failed coupon:', deleteCouponErr);
-                            });
-                            db.run('DELETE FROM coupon_winners WHERE user_id = ? AND coupon_code = ?', [user.id, couponCode], (deleteWinnerErr) => {
-                              if (deleteWinnerErr) console.error('Error deleting failed winner:', deleteWinnerErr);
-                            });
-                          } else {
-                            console.log('✅ Email sent successfully to:', user.email, 'Message ID:', info.messageId);
-                            console.log('📧 Email accepted by server:', info.accepted);
-                            results.push({ user: user.name, email: user.email, coupon_code: couponCode, status: 'sent' });
-                          }
-                          processUser(userIndex + 1);
-                        });
+                      resend.emails.send({
+                        from: getFromEmail(),
+                        to: [user.email],
+                        subject: 'Your Exclusive Chalchitra Coupon Code!',
+                        html: emailHtml
+                      }).then(({ data, error: sendError }) => {
+                        if (sendError) {
+                          console.error('❌ FAILED to send coupon email to', user.email, ':', sendError.message || JSON.stringify(sendError));
+                          results.push({ user: user.name, email: user.email, coupon_code: couponCode, status: 'email_failed', email_error: sendError.message || JSON.stringify(sendError) });
+
+                          // Delete the coupon and winner record since email failed
+                          db.run('DELETE FROM coupons WHERE id = ?', [couponId], (deleteCouponErr) => {
+                            if (deleteCouponErr) console.error('Error deleting failed coupon:', deleteCouponErr);
+                          });
+                          db.run('DELETE FROM coupon_winners WHERE user_id = ? AND coupon_code = ?', [user.id, couponCode], (deleteWinnerErr) => {
+                            if (deleteWinnerErr) console.error('Error deleting failed winner:', deleteWinnerErr);
+                          });
+                        } else {
+                          console.log('✅ Email sent successfully to:', user.email, 'ID:', data?.id);
+                          results.push({ user: user.name, email: user.email, coupon_code: couponCode, status: 'sent' });
+                        }
+                        processUser(userIndex + 1);
                       }).catch(emailSetupErr => {
-                        console.error('❌ Error setting up email transporter:', emailSetupErr);
+                        console.error('❌ Error sending coupon email:', emailSetupErr);
                         results.push({ user: user.name, email: user.email, coupon_code: couponCode, status: 'email_failed', email_error: emailSetupErr.message });
                         processUser(userIndex + 1);
                       });
@@ -2329,25 +2271,10 @@ router.post('/mail-settings/test', requireAdmin, async (req, res) => {
     }
 
     try {
-      const nodemailer = require('nodemailer');
-      
-      const transporter = nodemailer.createTransport({
-        host: email_host,
-        port: 587,//parseInt(email_port),
-        secure: false,//email_port === 465, // true for 465, false for other ports
-        auth: {
-          user: email_user,
-          pass: email_pass
-        }
-      });
-
-      // Test connection
-      await transporter.verify();
-      
-      // Send test email
-      const info = await transporter.sendMail({
-        from: `"${sender_name}" <${email_user}>`,
-        to: email_user, // Send to self for testing
+      // Send test email via Resend (HTTP-based — SMTP is blocked on Render)
+      const { data, error: sendError } = await resend.emails.send({
+        from: getFromEmail(sender_name),
+        to: [email_user],
         subject: 'Chalchitra - Mail Configuration Test',
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -2355,29 +2282,137 @@ router.post('/mail-settings/test', requireAdmin, async (req, res) => {
               <h1 style="color: #28a745;">✓ Mail Configuration Successful!</h1>
               <p>This is a test email to confirm your mail settings are working correctly.</p>
               <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                <p style="margin: 5px 0;"><strong>SMTP Host:</strong> ${email_host}</p>
-                <p style="margin: 5px 0;"><strong>Port:</strong> ${email_port}</p>
+                <p style="margin: 5px 0;"><strong>Service:</strong> Resend (HTTP API)</p>
+                <p style="margin: 5px 0;"><strong>From:</strong> ${getFromEmail(sender_name)}</p>
                 <p style="margin: 5px 0;"><strong>Sender:</strong> ${sender_name}</p>
               </div>
-              <p style="color: #666;">If you received this email, your mail configuration is working correctly!</p>
+              <p style="color: #666;">If you received this email, your Resend configuration is working correctly!</p>
             </div>
           </div>
         `
       });
 
-      console.log('Test email sent successfully:', info.messageId);
+      if (sendError) throw new Error(sendError.message || JSON.stringify(sendError));
+
+      console.log('Test email sent successfully:', data?.id);
       res.json({ 
         message: 'Test email sent successfully!',
-        message_id: info.messageId
+        message_id: data?.id
       });
     } catch (error) {
       console.error('Mail test failed:', error);
       res.status(500).json({ 
         error: 'Failed to send test email',
         details: error.message,
-        hint: 'Make sure your App Password is correct. For Gmail, you need to use an App Password, not your regular password.'
+        hint: 'Make sure your RESEND_API_KEY is correct and your domain is verified in Resend.'
       });
     }
+  });
+});
+
+// ===== RAZORPAY SETTINGS =====
+
+// Get Razorpay settings
+router.get('/razorpay-settings', requireAdmin, (req, res) => {
+  // First check if this is the super admin
+  db.get('SELECT email FROM users WHERE id = ?', [req.user?.id || req.session?.adminUser?.id], (err, user) => {
+    if (err) return res.status(500).json({ error: err.message });
+    
+    // Only super admin can access razorpay settings
+    if (!user || user.email !== '2025uee0154@iitjammu.ac.in') {
+      return res.status(403).json({ error: 'Access denied. Super admin only.' });
+    }
+
+    // Create table if not exists
+    db.run(`CREATE TABLE IF NOT EXISTS razorpay_settings (
+      id INTEGER PRIMARY KEY,
+      key_id TEXT,
+      key_secret TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`, (tableErr) => {
+      if (tableErr) return res.status(500).json({ error: tableErr.message });
+
+      db.get('SELECT * FROM razorpay_settings WHERE id = 1', (getErr, settings) => {
+        if (getErr) return res.status(500).json({ error: getErr.message });
+        
+        if (!settings) {
+          // Return environment variables as default or fallback values
+          return res.json({
+            id: 1,
+            key_id: process.env.RAZORPAY_KEY_ID || '',
+            key_secret: process.env.RAZORPAY_KEY_SECRET ? '••••••••' : '',
+            has_secret: !!process.env.RAZORPAY_KEY_SECRET
+          });
+        }
+        
+        // Don't return the actual secret for security - mask it
+        res.json({
+          id: settings.id,
+          key_id: settings.key_id || '',
+          key_secret: settings.key_secret ? '••••••••' : '',
+          has_secret: !!settings.key_secret
+        });
+      });
+    });
+  });
+});
+
+// Update Razorpay settings
+router.put('/razorpay-settings', requireAdmin, (req, res) => {
+  // First check if this is the super admin
+  db.get('SELECT email FROM users WHERE id = ?', [req.user?.id || req.session?.adminUser?.id], (err, user) => {
+    if (err) return res.status(500).json({ error: err.message });
+    
+    // Only super admin can update razorpay settings
+    if (!user || user.email !== '2025uee0154@iitjammu.ac.in') {
+      return res.status(403).json({ error: 'Access denied. Super admin only.' });
+    }
+
+    const { key_id, key_secret } = req.body;
+
+    // Create table if not exists
+    db.run(`CREATE TABLE IF NOT EXISTS razorpay_settings (
+      id INTEGER PRIMARY KEY,
+      key_id TEXT,
+      key_secret TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`, (tableErr) => {
+      if (tableErr) return res.status(500).json({ error: tableErr.message });
+
+      db.get('SELECT id, key_secret FROM razorpay_settings WHERE id = 1', (checkErr, existing) => {
+        if (checkErr) return res.status(500).json({ error: checkErr.message });
+
+        if (existing) {
+          // Update existing settings
+          // Only update secret if it's not the masked value
+          let query = 'UPDATE razorpay_settings SET key_id = ?, updated_at = CURRENT_TIMESTAMP';
+          let params = [key_id];
+          
+          if (key_secret && key_secret !== '••••••••') {
+            query = 'UPDATE razorpay_settings SET key_id = ?, key_secret = ?, updated_at = CURRENT_TIMESTAMP WHERE id = 1';
+            params = [key_id, key_secret];
+          } else {
+            query += ' WHERE id = 1';
+          }
+          
+          db.run(query, params, function(updateErr) {
+            if (updateErr) return res.status(500).json({ error: updateErr.message });
+            res.json({ message: 'Razorpay settings updated successfully', changes: this.changes });
+          });
+        } else {
+          db.run(`INSERT INTO razorpay_settings (id, key_id, key_secret)
+                  VALUES (1, ?, ?)`,
+            [key_id, key_secret !== '••••••••' ? key_secret : ''],
+            function(insertErr) {
+              if (insertErr) return res.status(500).json({ error: insertErr.message });
+              res.json({ message: 'Razorpay settings created successfully', id: this.lastID });
+            }
+          );
+        }
+      });
+    });
   });
 });
 

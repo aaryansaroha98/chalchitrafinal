@@ -5,63 +5,35 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 const jsPDF = require('jspdf');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
 const router = express.Router();
 
-const createEmailTransporter = () => new Promise((resolve, reject) => {
-  db.get('SELECT * FROM mail_settings WHERE id = 1', (err, dbSettings) => {
-    if (err) {
-      console.error('Error fetching mail settings from database:', err);
-      console.log('Falling back to environment variables for email config');
-    }
+// Initialize Resend email client (HTTP-based — works on Render unlike SMTP)
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-    const emailUser = (dbSettings?.email_user) || process.env.EMAIL_USER;
-    // Skip db password if it looks masked (admin panel sends '••••••••' placeholder)
-    const dbPass = dbSettings?.email_pass;
-    const emailPass = (dbPass && dbPass !== '••••••••' && dbPass.length > 0) ? dbPass : process.env.EMAIL_PASS;
+// Get the "from" email address for sending
+// Use RESEND_FROM_EMAIL once your domain is verified in Resend, otherwise uses onboarding@resend.dev
+function getFromEmail(senderName) {
+  const name = senderName || 'Chalchitra IIT Jammu';
+  const email = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
+  return `${name} <${email}>`;
+}
 
-    console.log(`[Email Config] user=${emailUser ? emailUser.substring(0,4) + '***' : 'NOT SET'}, pass=${emailPass ? '***SET***' : 'NOT SET'}, source=${dbSettings ? 'db+env' : 'env-only'}`);
-
-    if (!emailUser || !emailPass) {
-      return reject(new Error(`Email credentials not configured (user=${!!emailUser}, pass=${!!emailPass})`));
-    }
-
-    // Use service:'gmail' — works for @gmail.com AND Google Workspace domains
-    // Uses port 465 SSL by default, which is more reliable on Render than 587 STARTTLS
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: emailUser,
-        pass: emailPass
-      },
-      // Generous timeouts for Render free tier cold starts
-      connectionTimeout: 120000,
-      greetingTimeout: 60000,
-      socketTimeout: 120000,
-      pool: false,
-      tls: {
-        rejectUnauthorized: false
-      }
-    });
-
-    resolve({ transporter, settings: dbSettings || {} });
-  });
-});
-
-// Helper: send email with retry
-async function sendMailWithRetry(transporter, mailOptions, maxRetries = 2) {
+// Helper: send email via Resend with retry
+async function sendEmailWithRetry(emailOptions, maxRetries = 2) {
   let lastError;
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       console.log(`[Email] Attempt ${attempt}/${maxRetries}...`);
-      const result = await transporter.sendMail(mailOptions);
-      return result;
+      const { data, error } = await resend.emails.send(emailOptions);
+      if (error) throw new Error(error.message || JSON.stringify(error));
+      console.log(`[Email] Sent successfully — id: ${data?.id}`);
+      return data;
     } catch (err) {
       lastError = err;
-      console.error(`[Email] Attempt ${attempt} failed: ${err.message} (code: ${err.code})`);
+      console.error(`[Email] Attempt ${attempt} failed: ${err.message}`);
       if (attempt < maxRetries) {
-        // Wait 2 seconds before retry
         await new Promise(r => setTimeout(r, 2000));
       }
     }
@@ -1165,77 +1137,58 @@ router.post('/send-ticket-email', async (req, res) => {
           </html>
         `;
 
-        // Try to get a configured transporter; if not configured, skip gracefully
-        let transporter, settings;
-        try {
-          ({ transporter, settings } = await createEmailTransporter());
-        } catch (transporterErr) {
-          console.warn('Email not configured or verification failed, skipping ticket email:', transporterErr?.message || transporterErr);
-          // Log skipped email for traceability
+        // Check if Resend is configured
+        if (!process.env.RESEND_API_KEY) {
+          console.warn('Email not configured (RESEND_API_KEY not set), skipping ticket email');
           db.run(
             `INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status, error_message)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-            [
-              'ticket',
-              customerEmail,
-              customerName,
-              `🎫 Your Movie Ticket - ${booking.movie_title}`,
-              'Ticket email skipped (email not configured)',
-              booking.user_id || 1,
-              'skipped',
-              transporterErr?.message || 'Email not configured'
-            ],
+            ['ticket', customerEmail, customerName, `🎫 Your Movie Ticket - ${booking.movie_title}`,
+             'Ticket email skipped (email not configured)', booking.user_id || 1, 'skipped', 'RESEND_API_KEY not set'],
             (logErr) => { if (logErr) console.error('Error logging skipped ticket email:', logErr); }
           );
-
-          return res.json({ message: 'Email not configured', status: 'skipped', error: transporterErr?.message });
+          return res.json({ message: 'Email not configured', status: 'skipped', error: 'RESEND_API_KEY not set' });
         }
-
-        const senderName = settings?.sender_name || 'Chalchitra IIT Jammu';
-        const emailUser = settings?.email_user || process.env.EMAIL_USER;
 
         const cleanMovieName = (booking.movie_title || 'Movie').replace(/[^a-zA-Z0-9]/g, '_');
         const filename = `${cleanMovieName}_${booking.booking_code || booking.id}.pdf`;
-
-        const mailOptions = {
-          from: `"${senderName}" <${emailUser}>`,
-          to: customerEmail,
-          subject: `🎫 Your Movie Ticket - ${booking.movie_title}`,
-          html: emailHtml,
-          attachments: [
-            {
-              filename,
-              content: Buffer.from(pdf_base64, 'base64'),
-              contentType: 'application/pdf'
-            }
-          ]
-        };
+        const emailSubject = `🎫 Your Movie Ticket - ${booking.movie_title}`;
 
         // Respond immediately to avoid Render's 30s request timeout
         // Email sends in background — check email_history for actual status
         res.json({ message: 'Ticket email queued for delivery', status: 'sent' });
 
-        // Send email in background with retry
+        // Send email in background with retry via Resend (HTTP-based, no SMTP)
         setImmediate(async () => {
           try {
             console.log(`[Email] Sending ticket to ${customerEmail} for movie "${booking.movie_title}"...`);
-            const sendResult = await sendMailWithRetry(transporter, mailOptions, 3);
-            console.log(`[Email] ✅ Ticket sent to ${customerEmail} — messageId: ${sendResult.messageId}`);
+            const result = await sendEmailWithRetry({
+              from: getFromEmail(),
+              to: [customerEmail],
+              subject: emailSubject,
+              html: emailHtml,
+              attachments: [
+                {
+                  filename,
+                  content: Buffer.from(pdf_base64, 'base64'),
+                }
+              ]
+            }, 3);
+            console.log(`[Email] ✅ Ticket sent to ${customerEmail} — id: ${result?.id}`);
             
             db.run(
               `INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
                VALUES (?, ?, ?, ?, ?, ?, ?)`,
-              ['ticket', customerEmail, customerName, mailOptions.subject, 'Ticket PDF sent', booking.user_id || 1, 'sent'],
+              ['ticket', customerEmail, customerName, emailSubject, 'Ticket PDF sent', booking.user_id || 1, 'sent'],
               (logErr) => { if (logErr) console.error('Error logging ticket email history:', logErr); }
             );
           } catch (sendErr) {
             console.error(`[Email] ❌ Failed to send to ${customerEmail}:`, sendErr.message);
-            console.error(`[Email] Error details — code: ${sendErr.code}, command: ${sendErr.command}, response: ${sendErr.response}`);
             
             db.run(
               `INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status, error_message)
                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-              ['ticket', customerEmail, customerName, mailOptions.subject, 'Ticket email failed', booking.user_id || 1, 'failed', sendErr?.message || String(sendErr)],
+              ['ticket', customerEmail, customerName, emailSubject, 'Ticket email failed', booking.user_id || 1, 'failed', sendErr?.message || String(sendErr)],
               (logErr) => { if (logErr) console.error('Error logging failed ticket email:', logErr); }
             );
           }
@@ -1308,13 +1261,13 @@ router.get('/check/:movieId', (req, res) => {
 // Diagnostic: Check email configuration (no auth required - returns sanitized info only)
 router.get('/email-config-check', async (req, res) => {
   try {
-    const { transporter, settings } = await createEmailTransporter();
-    const emailUser = settings?.email_user || process.env.EMAIL_USER;
+    const apiKey = process.env.RESEND_API_KEY;
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
     res.json({
-      configured: true,
-      service: 'gmail (port 465 SSL)',
-      user: emailUser ? emailUser.substring(0, 4) + '***' : 'NOT SET',
-      source: settings?.email_user ? 'database' : 'env-vars'
+      configured: !!apiKey,
+      service: 'Resend (HTTP API)',
+      from: fromEmail,
+      source: 'env-vars'
     });
   } catch (err) {
     res.json({ configured: false, error: err.message });
