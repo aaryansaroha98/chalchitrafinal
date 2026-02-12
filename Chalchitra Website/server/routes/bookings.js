@@ -13,16 +13,22 @@ const createEmailTransporter = () => new Promise((resolve, reject) => {
   db.get('SELECT * FROM mail_settings WHERE id = 1', (err, dbSettings) => {
     if (err) {
       console.error('Error fetching mail settings from database:', err);
-      return reject(err);
+      // Don't reject on table error — fall back to env vars
+      console.log('Falling back to environment variables for email config');
     }
 
-    const emailHost = dbSettings?.email_host || process.env.EMAIL_HOST || 'smtp.gmail.com';
-    const emailPort = dbSettings?.email_port || parseInt(process.env.EMAIL_PORT) || 587;
-    const emailUser = dbSettings?.email_user || process.env.EMAIL_USER;
-    const emailPass = dbSettings?.email_pass || process.env.EMAIL_PASS;
+    // Env vars always available as fallback; db settings override only if non-empty
+    const emailHost = (dbSettings?.email_host) || process.env.EMAIL_HOST || 'smtp.gmail.com';
+    const emailPort = (dbSettings?.email_port) || parseInt(process.env.EMAIL_PORT) || 587;
+    const emailUser = (dbSettings?.email_user) || process.env.EMAIL_USER;
+    // Skip db password if it looks masked (admin panel sends '••••••••' placeholder)
+    const dbPass = dbSettings?.email_pass;
+    const emailPass = (dbPass && dbPass !== '••••••••' && dbPass.length > 0) ? dbPass : process.env.EMAIL_PASS;
+
+    console.log(`[Email Config] host=${emailHost}, port=${emailPort}, user=${emailUser ? emailUser.substring(0,4) + '***' : 'NOT SET'}, pass=${emailPass ? '***SET***' : 'NOT SET'}, source=${dbSettings ? 'db+env' : 'env-only'}`);
 
     if (!emailUser || !emailPass) {
-      return reject(new Error('Email credentials not configured'));
+      return reject(new Error(`Email credentials not configured (user=${!!emailUser}, pass=${!!emailPass})`));
     }
 
     const transporter = nodemailer.createTransport({
@@ -44,7 +50,7 @@ const createEmailTransporter = () => new Promise((resolve, reject) => {
 
     // Skip verify() - it creates an extra SMTP connection that times out on Render
     // If credentials are wrong, sendMail will fail with a clear error
-    resolve({ transporter, settings: dbSettings });
+    resolve({ transporter, settings: dbSettings || {} });
   });
 });
 
@@ -1168,7 +1174,7 @@ router.post('/send-ticket-email', async (req, res) => {
             (logErr) => { if (logErr) console.error('Error logging skipped ticket email:', logErr); }
           );
 
-          return res.json({ message: 'Email disabled or not configured; skipped sending ticket email.' });
+          return res.json({ message: 'Email not configured', status: 'skipped', error: transporterErr?.message });
         }
 
         const senderName = settings?.sender_name || 'Chalchitra IIT Jammu';
@@ -1191,29 +1197,33 @@ router.post('/send-ticket-email', async (req, res) => {
           ]
         };
 
-        // Respond immediately to avoid client timeouts; send email asynchronously
-        res.json({ message: 'Ticket email queued' });
+        // Send email synchronously so we can return the actual result to the frontend
+        try {
+          console.log(`[Email] Sending ticket to ${customerEmail} for movie "${booking.movie_title}"...`);
+          const sendResult = await transporter.sendMail(mailOptions);
+          console.log(`[Email] ✅ Ticket sent to ${customerEmail} — messageId: ${sendResult.messageId}`);
+          
+          db.run(
+            `INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
+             VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            ['ticket', customerEmail, customerName, mailOptions.subject, 'Ticket PDF sent', booking.user_id || 1, 'sent'],
+            (logErr) => { if (logErr) console.error('Error logging ticket email history:', logErr); }
+          );
 
-        setImmediate(async () => {
-          try {
-            await transporter.sendMail(mailOptions);
-            db.run(
-              `INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
-               VALUES (?, ?, ?, ?, ?, ?, ?)`,
-              ['ticket', customerEmail, customerName, mailOptions.subject, 'Ticket PDF sent', booking.user_id || 1, 'sent'],
-              (logErr) => { if (logErr) console.error('Error logging ticket email history:', logErr); }
-            );
-            console.log('Ticket email sent successfully to', customerEmail);
-          } catch (sendErr) {
-            console.error('Ticket email send failed:', sendErr);
-            db.run(
-              `INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status, error_message)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-              ['ticket', customerEmail, customerName, mailOptions.subject, 'Ticket email failed', booking.user_id || 1, 'failed', sendErr?.message || String(sendErr)],
-              (logErr) => { if (logErr) console.error('Error logging failed ticket email:', logErr); }
-            );
-          }
-        });
+          return res.json({ message: 'Ticket email sent successfully', status: 'sent', messageId: sendResult.messageId });
+        } catch (sendErr) {
+          console.error(`[Email] ❌ Failed to send to ${customerEmail}:`, sendErr.message);
+          console.error(`[Email] Error details — code: ${sendErr.code}, command: ${sendErr.command}, response: ${sendErr.response}`);
+          
+          db.run(
+            `INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status, error_message)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+            ['ticket', customerEmail, customerName, mailOptions.subject, 'Ticket email failed', booking.user_id || 1, 'failed', sendErr?.message || String(sendErr)],
+            (logErr) => { if (logErr) console.error('Error logging failed ticket email:', logErr); }
+          );
+
+          return res.json({ message: 'Email sending failed', status: 'failed', error: sendErr.message });
+        }
       }
     );
   } catch (error) {

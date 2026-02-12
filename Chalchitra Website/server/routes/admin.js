@@ -788,7 +788,9 @@ function createEmailTransporter() {
       const emailHost = dbSettings?.email_host || process.env.EMAIL_HOST || 'smtp.gmail.com';
       const emailPort = dbSettings?.email_port || parseInt(process.env.EMAIL_PORT) || 587;
       const emailUser = dbSettings?.email_user || process.env.EMAIL_USER;
-      const emailPass = dbSettings?.email_pass || process.env.EMAIL_PASS;
+      // Skip db password if it looks masked
+      const dbPass = dbSettings?.email_pass;
+      const emailPass = (dbPass && dbPass !== '••••••••' && dbPass.length > 0) ? dbPass : process.env.EMAIL_PASS;
       
       if (!emailUser || !emailPass) {
         console.warn('Email credentials not configured.');

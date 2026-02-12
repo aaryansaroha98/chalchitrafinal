@@ -194,9 +194,23 @@ const PaymentSuccess = () => {
           payment_amount: payment?.amount,
           payment_method: payment?.method,
           payment_id: payment?.transaction_id
+        }).then(response => {
+          const data = response.data;
+          if (data.status === 'sent') {
+            setEmailStatus('sent');
+          } else if (data.status === 'skipped') {
+            console.warn('Email skipped:', data.error || data.message);
+            setEmailStatus('failed');
+            setEmailError('Email service not configured. Please contact admin.');
+          } else if (data.status === 'failed') {
+            console.error('Email send failed:', data.error || data.message);
+            setEmailStatus('failed');
+            setEmailError(data.error || 'Failed to send email');
+          } else {
+            // Legacy fallback
+            setEmailStatus('sent');
+          }
         });
-
-        setEmailStatus('sent');
       } catch (err) {
         console.error('Failed to send ticket email:', err);
         setEmailStatus('failed');
