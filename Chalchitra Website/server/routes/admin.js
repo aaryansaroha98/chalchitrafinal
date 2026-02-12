@@ -906,23 +906,27 @@ router.post('/email/single', requireAdmin, async (req, res) => {
           `
         };
 
-        await transporter.sendMail(mailOptions);
+        // Respond immediately to avoid Render's 30s request timeout
+        res.json({ message: 'Email queued for delivery!' });
 
-        // Log email history
-        db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?)`,
-          ['single', user.email, user.name, subject, message, req.user?.id || 1, 'sent']);
-
-        res.json({ message: 'Email sent successfully!' });
-      } catch (emailError) {
-        console.error('Email sending error:', emailError);
-
-        // Log failed email
-        db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?)`,
-          ['single', user.email, user.name, subject, message, req.user?.id || 1, 'failed']);
-
-        res.status(500).json({ error: 'Failed to send email: ' + (emailError.message || String(emailError)) });
+        // Send email in background
+        setImmediate(async () => {
+          try {
+            await transporter.sendMail(mailOptions);
+            console.log('[Email] ✅ Single email sent to', user.email);
+            db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)`,
+              ['single', user.email, user.name, subject, message, req.user?.id || 1, 'sent']);
+          } catch (emailError) {
+            console.error('[Email] ❌ Single email failed to', user.email, ':', emailError.message);
+            db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status, error_message)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+              ['single', user.email, user.name, subject, message, req.user?.id || 1, 'failed', emailError.message]);
+          }
+        });
+      } catch (setupError) {
+        console.error('Email setup error:', setupError);
+        // Response already sent above, just log
       }
     });
   } catch (error) {
@@ -1076,33 +1080,27 @@ router.post('/email/custom', requireAdmin, async (req, res) => {
       `
     };
 
-    await transporter.sendMail(mailOptions);
+    // Respond immediately to avoid Render's 30s request timeout
+    res.json({ message: 'Email queued for delivery!' });
 
-    // Log email history
-    db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      ['custom', email, recipient_name || 'Valued Guest', subject, message, req.user?.id || 1, 'sent'],
-      function(err) {
-        if (err) {
-          console.error('Error logging custom email history:', err);
-        } else {
-          console.log('Custom email sent successfully to:', email);
-        }
-      });
-
-    res.json({ message: 'Email sent successfully!' });
+    // Send email in background
+    setImmediate(async () => {
+      try {
+        await transporter.sendMail(mailOptions);
+        console.log('[Email] ✅ Custom email sent to:', email);
+        db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          ['custom', email, recipient_name || 'Valued Guest', subject, message, req.user?.id || 1, 'sent']);
+      } catch (sendErr) {
+        console.error('[Email] ❌ Custom email failed to', email, ':', sendErr.message);
+        db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status, error_message)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          ['custom', email, recipient_name || 'Valued Guest', subject, message, req.user?.id || 1, 'failed', sendErr.message]);
+      }
+    });
   } catch (error) {
-    console.error('Custom email sending error:', error);
-
-    // Log failed email
-    db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      ['custom', email, recipient_name || 'Valued Guest', subject, message, req.user?.id || 1, 'failed'],
-      function(err) {
-        if (err) console.error('Error logging failed custom email:', err);
-      });
-
-    res.status(500).json({ error: 'Failed to send email. Please try again later.' });
+    console.error('Custom email setup error:', error);
+    res.status(500).json({ error: 'Email service not available: ' + (error.message || String(error)) });
   }
 });
 

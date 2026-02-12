@@ -1210,33 +1210,35 @@ router.post('/send-ticket-email', async (req, res) => {
           ]
         };
 
-        // Send email synchronously so we can return the actual result to the frontend
-        try {
-          console.log(`[Email] Sending ticket to ${customerEmail} for movie "${booking.movie_title}"...`);
-          const sendResult = await sendMailWithRetry(transporter, mailOptions, 3);
-          console.log(`[Email] ✅ Ticket sent to ${customerEmail} — messageId: ${sendResult.messageId}`);
-          
-          db.run(
-            `INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
-             VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            ['ticket', customerEmail, customerName, mailOptions.subject, 'Ticket PDF sent', booking.user_id || 1, 'sent'],
-            (logErr) => { if (logErr) console.error('Error logging ticket email history:', logErr); }
-          );
+        // Respond immediately to avoid Render's 30s request timeout
+        // Email sends in background — check email_history for actual status
+        res.json({ message: 'Ticket email queued for delivery', status: 'sent' });
 
-          return res.json({ message: 'Ticket email sent successfully', status: 'sent', messageId: sendResult.messageId });
-        } catch (sendErr) {
-          console.error(`[Email] ❌ Failed to send to ${customerEmail}:`, sendErr.message);
-          console.error(`[Email] Error details — code: ${sendErr.code}, command: ${sendErr.command}, response: ${sendErr.response}`);
-          
-          db.run(
-            `INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status, error_message)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-            ['ticket', customerEmail, customerName, mailOptions.subject, 'Ticket email failed', booking.user_id || 1, 'failed', sendErr?.message || String(sendErr)],
-            (logErr) => { if (logErr) console.error('Error logging failed ticket email:', logErr); }
-          );
-
-          return res.json({ message: 'Email sending failed', status: 'failed', error: sendErr.message });
-        }
+        // Send email in background with retry
+        setImmediate(async () => {
+          try {
+            console.log(`[Email] Sending ticket to ${customerEmail} for movie "${booking.movie_title}"...`);
+            const sendResult = await sendMailWithRetry(transporter, mailOptions, 3);
+            console.log(`[Email] ✅ Ticket sent to ${customerEmail} — messageId: ${sendResult.messageId}`);
+            
+            db.run(
+              `INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
+               VALUES (?, ?, ?, ?, ?, ?, ?)`,
+              ['ticket', customerEmail, customerName, mailOptions.subject, 'Ticket PDF sent', booking.user_id || 1, 'sent'],
+              (logErr) => { if (logErr) console.error('Error logging ticket email history:', logErr); }
+            );
+          } catch (sendErr) {
+            console.error(`[Email] ❌ Failed to send to ${customerEmail}:`, sendErr.message);
+            console.error(`[Email] Error details — code: ${sendErr.code}, command: ${sendErr.command}, response: ${sendErr.response}`);
+            
+            db.run(
+              `INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status, error_message)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+              ['ticket', customerEmail, customerName, mailOptions.subject, 'Ticket email failed', booking.user_id || 1, 'failed', sendErr?.message || String(sendErr)],
+              (logErr) => { if (logErr) console.error('Error logging failed ticket email:', logErr); }
+            );
+          }
+        });
       }
     );
   } catch (error) {
