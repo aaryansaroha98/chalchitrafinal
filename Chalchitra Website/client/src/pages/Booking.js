@@ -370,40 +370,6 @@ const Booking = () => {
       </div>
 
       <div className="booking-page" style={{ position: 'relative' }}>
-        {/* Close/Cancel Button - Top Right */}
-        <button
-          onClick={() => navigate(-1)}
-          style={{
-            position: 'absolute',
-            top: '10px',
-            right: '15px',
-            background: 'rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            borderRadius: '50%',
-            width: '40px',
-            height: '40px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            zIndex: 100
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
-            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
-            e.currentTarget.style.transform = 'scale(1.05)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-            e.currentTarget.style.transform = 'scale(1)';
-          }}
-        >
-          <i className="fas fa-times" style={{ color: '#ffffff', fontSize: '18px' }}></i>
-        </button>
-
         {/* Page Title */}
         <div className="booking-title-wrap" style={{textAlign: 'center', marginBottom: '48px', marginTop: '-10px'}}>
           <h1 className="booking-title" style={{
