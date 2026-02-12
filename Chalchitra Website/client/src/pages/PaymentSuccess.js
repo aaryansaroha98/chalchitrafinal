@@ -287,7 +287,13 @@ const PaymentSuccess = () => {
                   }} />
                 )}
                 {emailStatus === 'sent' && (
-                  <div style={{ color: '#7CFC00', fontWeight: '600' }}>Ticket email sent successfully!</div>
+                  <div>
+                    <div style={{ color: '#7CFC00', fontWeight: '600' }}>Ticket email sent successfully!</div>
+                    <div style={{ color: '#adb5bd', fontSize: '0.85rem', marginTop: '4px' }}>
+                      <i className="fas fa-exclamation-circle me-1"></i>
+                      Please check your spam/junk folder if you don't see it in your inbox, and mark it as "Not Spam".
+                    </div>
+                  </div>
                 )}
                 {emailStatus === 'failed' && (
                   <div style={{ color: '#ff6b6b', fontWeight: '600' }}>
