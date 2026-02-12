@@ -774,15 +774,40 @@ router.delete('/team/:id', requireAdmin, (req, res) => {
   });
 });
 
-// Email functionality for admin - ENABLED (via Resend HTTP API)
-const { Resend } = require('resend');
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Email functionality for admin - ENABLED (via Brevo HTTP API)
+const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
 
-// Get the "from" email address for sending
-function getFromEmail(senderName) {
-  const name = senderName || 'Chalchitra IIT Jammu';
-  const email = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
-  return `${name} <${email}>`;
+// Get sender info for Brevo
+function getBrevoSender(senderName) {
+  return {
+    name: senderName || 'Chalchitra IIT Jammu',
+    email: process.env.BREVO_FROM_EMAIL || 'chalchitra@iitjammu.ac.in'
+  };
+}
+
+// Helper: send one email via Brevo
+async function sendBrevoEmail(options) {
+  const body = {
+    sender: options.sender || getBrevoSender(),
+    to: options.to,
+    subject: options.subject,
+    htmlContent: options.htmlContent || options.html,
+  };
+  if (options.attachment && options.attachment.length > 0) {
+    body.attachment = options.attachment;
+  }
+  const resp = await fetch(BREVO_API_URL, {
+    method: 'POST',
+    headers: {
+      'accept': 'application/json',
+      'api-key': process.env.BREVO_API_KEY,
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+  const data = await resp.json();
+  if (!resp.ok) throw new Error(data.message || JSON.stringify(data));
+  return data;
 }
 
 // Get all users for email sending
@@ -861,18 +886,17 @@ router.post('/email/single', requireAdmin, async (req, res) => {
         // Respond immediately to avoid Render's 30s request timeout
         res.json({ message: 'Email queued for delivery!' });
 
-        // Send email in background via Resend (HTTP-based, no SMTP)
+        // Send email in background via Brevo (HTTP API, no SMTP)
         setImmediate(async () => {
           try {
-            const { data, error } = await resend.emails.send({
-              from: getFromEmail(),
-              to: [user.email],
+            const data = await sendBrevoEmail({
+              sender: getBrevoSender(),
+              to: [{ email: user.email, name: user.name }],
               subject: subject,
-              html: emailHtml,
-              attachments,
+              htmlContent: emailHtml,
+              attachment: attachments.length > 0 ? attachments.map(a => ({ name: a.filename, content: a.content.toString('base64') })) : undefined,
             });
-            if (error) throw new Error(error.message || JSON.stringify(error));
-            console.log('[Email] ✅ Single email sent to', user.email, '— id:', data?.id);
+            console.log('[Email] ✅ Single email sent to', user.email, '— messageId:', data?.messageId);
             db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
                     VALUES (?, ?, ?, ?, ?, ?, ?)`,
               ['single', user.email, user.name, subject, message, req.user?.id || 1, 'sent']);
@@ -921,7 +945,7 @@ router.post('/email/bulk', requireAdmin, async (req, res) => {
         results: users.map(u => ({ user: u.name, email: u.email, status: 'queued' }))
       });
 
-      // Process emails in background via Resend (HTTP-based, no SMTP)
+      // Process emails in background via Brevo (HTTP API, no SMTP)
       setImmediate(async () => {
         console.log(`[Bulk Email] Starting background send to ${users.length} users`);
         
@@ -949,14 +973,13 @@ router.post('/email/bulk', requireAdmin, async (req, res) => {
 
           try {
             console.log(`[Bulk Email] Sending to: ${user.email} (${i + 1}/${users.length})`);
-            const { data, error } = await resend.emails.send({
-              from: getFromEmail(),
-              to: [user.email],
+            const data = await sendBrevoEmail({
+              sender: getBrevoSender(),
+              to: [{ email: user.email, name: user.name }],
               subject: subject,
-              html: emailHtml,
+              htmlContent: emailHtml,
             });
-            if (error) throw new Error(error.message || JSON.stringify(error));
-            console.log(`[Bulk Email] ✅ Sent to: ${user.email} — id: ${data?.id}`);
+            console.log(`[Bulk Email] ✅ Sent to: ${user.email} — messageId: ${data?.messageId}`);
 
             // Log successful email
             db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
@@ -1029,18 +1052,17 @@ router.post('/email/custom', requireAdmin, async (req, res) => {
     // Respond immediately to avoid Render's 30s request timeout
     res.json({ message: 'Email queued for delivery!' });
 
-    // Send email in background via Resend (HTTP-based, no SMTP)
+    // Send email in background via Brevo (HTTP API, no SMTP)
     setImmediate(async () => {
       try {
-        const { data, error } = await resend.emails.send({
-          from: getFromEmail(),
-          to: [email],
+        const data = await sendBrevoEmail({
+          sender: getBrevoSender(),
+          to: [{ email: email, name: recipient_name || 'Valued Guest' }],
           subject: subject,
-          html: emailHtml,
-          attachments,
+          htmlContent: emailHtml,
+          attachment: attachments.length > 0 ? attachments.map(a => ({ name: a.filename, content: a.content.toString('base64') })) : undefined,
         });
-        if (error) throw new Error(error.message || JSON.stringify(error));
-        console.log('[Email] ✅ Custom email sent to:', email, '— id:', data?.id);
+        console.log('[Email] ✅ Custom email sent to:', email, '— messageId:', data?.messageId);
         db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
                 VALUES (?, ?, ?, ?, ?, ?, ?)`,
           ['custom', email, recipient_name || 'Valued Guest', subject, message, req.user?.id || 1, 'sent']);
@@ -1108,7 +1130,7 @@ router.post('/email/feedback-request', requireAdmin, async (req, res) => {
         movie_title: selectedMovie?.title || null
       });
 
-      // Process emails in background via Resend (HTTP-based, no SMTP)
+      // Process emails in background via Brevo (HTTP API, no SMTP)
       setImmediate(async () => {
         let sentCount = 0;
         let failedCount = 0;
@@ -1160,14 +1182,13 @@ router.post('/email/feedback-request', requireAdmin, async (req, res) => {
                 `;
 
               console.log(`[Feedback Email] Sending to: ${user.email} (${i + 1}/${users.length})`);
-              const { data, error } = await resend.emails.send({
-                from: getFromEmail(),
-                to: [user.email],
+              const data = await sendBrevoEmail({
+                sender: getBrevoSender(),
+                to: [{ email: user.email, name: user.name }],
                 subject: subject,
-                html: emailHtml,
+                htmlContent: emailHtml,
               });
-              if (error) throw new Error(error.message || JSON.stringify(error));
-              console.log(`[Feedback Email] ✅ Sent to: ${user.email} — id: ${data?.id}`);
+              console.log(`[Feedback Email] ✅ Sent to: ${user.email} — messageId: ${data?.messageId}`);
               sentCount++;
 
               // Log successful email
@@ -1509,8 +1530,8 @@ router.post('/coupon-winners/send', requireAdmin, (req, res) => {
                       console.log('✅ Created coupon winner for:', user.email, 'Code:', couponCode);
                       results.push({ user: user.name, email: user.email, coupon_code: couponCode, status: 'recorded' });
 
-                      // Send email to user via Resend
-                      console.log('📧 Sending coupon email via Resend...');
+                      // Send email to user via Brevo
+                      console.log('📧 Sending coupon email via Brevo...');
 
                       const emailHtml = `
                         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -1546,31 +1567,26 @@ router.post('/coupon-winners/send', requireAdmin, (req, res) => {
                         </div>
                       `;
 
-                      resend.emails.send({
-                        from: getFromEmail(),
-                        to: [user.email],
+                      sendBrevoEmail({
+                        sender: getBrevoSender(),
+                        to: [{ email: user.email, name: user.name }],
                         subject: 'Your Exclusive Chalchitra Coupon Code!',
-                        html: emailHtml
-                      }).then(({ data, error: sendError }) => {
-                        if (sendError) {
-                          console.error('❌ FAILED to send coupon email to', user.email, ':', sendError.message || JSON.stringify(sendError));
-                          results.push({ user: user.name, email: user.email, coupon_code: couponCode, status: 'email_failed', email_error: sendError.message || JSON.stringify(sendError) });
-
-                          // Delete the coupon and winner record since email failed
-                          db.run('DELETE FROM coupons WHERE id = ?', [couponId], (deleteCouponErr) => {
-                            if (deleteCouponErr) console.error('Error deleting failed coupon:', deleteCouponErr);
-                          });
-                          db.run('DELETE FROM coupon_winners WHERE user_id = ? AND coupon_code = ?', [user.id, couponCode], (deleteWinnerErr) => {
-                            if (deleteWinnerErr) console.error('Error deleting failed winner:', deleteWinnerErr);
-                          });
-                        } else {
-                          console.log('✅ Email sent successfully to:', user.email, 'ID:', data?.id);
-                          results.push({ user: user.name, email: user.email, coupon_code: couponCode, status: 'sent' });
-                        }
+                        htmlContent: emailHtml
+                      }).then((data) => {
+                        console.log('✅ Email sent successfully to:', user.email, 'messageId:', data?.messageId);
+                        results.push({ user: user.name, email: user.email, coupon_code: couponCode, status: 'sent' });
                         processUser(userIndex + 1);
-                      }).catch(emailSetupErr => {
-                        console.error('❌ Error sending coupon email:', emailSetupErr);
-                        results.push({ user: user.name, email: user.email, coupon_code: couponCode, status: 'email_failed', email_error: emailSetupErr.message });
+                      }).catch(sendError => {
+                        console.error('❌ FAILED to send coupon email to', user.email, ':', sendError.message);
+                        results.push({ user: user.name, email: user.email, coupon_code: couponCode, status: 'email_failed', email_error: sendError.message });
+
+                        // Delete the coupon and winner record since email failed
+                        db.run('DELETE FROM coupons WHERE id = ?', [couponId], (deleteCouponErr) => {
+                          if (deleteCouponErr) console.error('Error deleting failed coupon:', deleteCouponErr);
+                        });
+                        db.run('DELETE FROM coupon_winners WHERE user_id = ? AND coupon_code = ?', [user.id, couponCode], (deleteWinnerErr) => {
+                          if (deleteWinnerErr) console.error('Error deleting failed winner:', deleteWinnerErr);
+                        });
                         processUser(userIndex + 1);
                       });
                     }
@@ -2271,40 +2287,38 @@ router.post('/mail-settings/test', requireAdmin, async (req, res) => {
     }
 
     try {
-      // Send test email via Resend (HTTP-based — SMTP is blocked on Render)
-      const { data, error: sendError } = await resend.emails.send({
-        from: getFromEmail(sender_name),
-        to: [email_user],
+      // Send test email via Brevo (HTTP API — SMTP is blocked on Render)
+      const data = await sendBrevoEmail({
+        sender: getBrevoSender(sender_name),
+        to: [{ email: email_user }],
         subject: 'Chalchitra - Mail Configuration Test',
-        html: `
+        htmlContent: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="text-align: center; padding: 20px;">
               <h1 style="color: #28a745;">✓ Mail Configuration Successful!</h1>
               <p>This is a test email to confirm your mail settings are working correctly.</p>
               <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                <p style="margin: 5px 0;"><strong>Service:</strong> Resend (HTTP API)</p>
-                <p style="margin: 5px 0;"><strong>From:</strong> ${getFromEmail(sender_name)}</p>
+                <p style="margin: 5px 0;"><strong>Service:</strong> Brevo (HTTP API)</p>
+                <p style="margin: 5px 0;"><strong>From:</strong> ${getBrevoSender(sender_name).email}</p>
                 <p style="margin: 5px 0;"><strong>Sender:</strong> ${sender_name}</p>
               </div>
-              <p style="color: #666;">If you received this email, your Resend configuration is working correctly!</p>
+              <p style="color: #666;">If you received this email, your Brevo configuration is working correctly!</p>
             </div>
           </div>
         `
       });
 
-      if (sendError) throw new Error(sendError.message || JSON.stringify(sendError));
-
-      console.log('Test email sent successfully:', data?.id);
+      console.log('Test email sent successfully:', data?.messageId);
       res.json({ 
         message: 'Test email sent successfully!',
-        message_id: data?.id
+        message_id: data?.messageId
       });
     } catch (error) {
       console.error('Mail test failed:', error);
       res.status(500).json({ 
         error: 'Failed to send test email',
         details: error.message,
-        hint: 'Make sure your RESEND_API_KEY is correct and your domain is verified in Resend.'
+        hint: 'Make sure your BREVO_API_KEY is correct and your sender email is verified in Brevo.'
       });
     }
   });

@@ -51,7 +51,7 @@ services:
         sync: false
       - key: BACKEND_URL
         sync: false
-      - key: RESEND_API_KEY
+      - key: BREVO_API_KEY
         sync: false
-      - key: RESEND_FROM_EMAIL
+      - key: BREVO_FROM_EMAIL
         sync: false

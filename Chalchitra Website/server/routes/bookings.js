@@ -5,30 +5,51 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 const jsPDF = require('jspdf');
-const { Resend } = require('resend');
 
 const router = express.Router();
 
-// Initialize Resend email client (HTTP-based — works on Render unlike SMTP)
-const resend = new Resend(process.env.RESEND_API_KEY);
+// ===== BREVO (Sendinblue) EMAIL via HTTP API =====
+// No SMTP needed — works on Render free tier (which blocks SMTP ports)
+const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
 
-// Get the "from" email address for sending
-// Use RESEND_FROM_EMAIL once your domain is verified in Resend, otherwise uses onboarding@resend.dev
-function getFromEmail(senderName) {
-  const name = senderName || 'Chalchitra IIT Jammu';
-  const email = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
-  return `${name} <${email}>`;
+// Get sender info for Brevo
+function getBrevoSender(senderName) {
+  return {
+    name: senderName || 'Chalchitra IIT Jammu',
+    email: process.env.BREVO_FROM_EMAIL || 'chalchitra@iitjammu.ac.in'
+  };
 }
 
-// Helper: send email via Resend with retry
+// Helper: send email via Brevo HTTP API with retry
 async function sendEmailWithRetry(emailOptions, maxRetries = 2) {
   let lastError;
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       console.log(`[Email] Attempt ${attempt}/${maxRetries}...`);
-      const { data, error } = await resend.emails.send(emailOptions);
-      if (error) throw new Error(error.message || JSON.stringify(error));
-      console.log(`[Email] Sent successfully — id: ${data?.id}`);
+
+      const body = {
+        sender: emailOptions.sender || getBrevoSender(),
+        to: emailOptions.to,
+        subject: emailOptions.subject,
+        htmlContent: emailOptions.htmlContent || emailOptions.html,
+      };
+      if (emailOptions.attachment && emailOptions.attachment.length > 0) {
+        body.attachment = emailOptions.attachment;
+      }
+
+      const resp = await fetch(BREVO_API_URL, {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'api-key': process.env.BREVO_API_KEY,
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      });
+
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.message || JSON.stringify(data));
+      console.log(`[Email] Sent successfully — messageId: ${data.messageId}`);
       return data;
     } catch (err) {
       lastError = err;
@@ -1137,17 +1158,17 @@ router.post('/send-ticket-email', async (req, res) => {
           </html>
         `;
 
-        // Check if Resend is configured
-        if (!process.env.RESEND_API_KEY) {
-          console.warn('Email not configured (RESEND_API_KEY not set), skipping ticket email');
+        // Check if Brevo is configured
+        if (!process.env.BREVO_API_KEY) {
+          console.warn('Email not configured (BREVO_API_KEY not set), skipping ticket email');
           db.run(
             `INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status, error_message)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
             ['ticket', customerEmail, customerName, `🎫 Your Movie Ticket - ${booking.movie_title}`,
-             'Ticket email skipped (email not configured)', booking.user_id || 1, 'skipped', 'RESEND_API_KEY not set'],
+             'Ticket email skipped (email not configured)', booking.user_id || 1, 'skipped', 'BREVO_API_KEY not set'],
             (logErr) => { if (logErr) console.error('Error logging skipped ticket email:', logErr); }
           );
-          return res.json({ message: 'Email not configured', status: 'skipped', error: 'RESEND_API_KEY not set' });
+          return res.json({ message: 'Email not configured', status: 'skipped', error: 'BREVO_API_KEY not set' });
         }
 
         const cleanMovieName = (booking.movie_title || 'Movie').replace(/[^a-zA-Z0-9]/g, '_');
@@ -1158,23 +1179,23 @@ router.post('/send-ticket-email', async (req, res) => {
         // Email sends in background — check email_history for actual status
         res.json({ message: 'Ticket email queued for delivery', status: 'sent' });
 
-        // Send email in background with retry via Resend (HTTP-based, no SMTP)
+        // Send email in background with retry via Brevo (HTTP API, no SMTP)
         setImmediate(async () => {
           try {
             console.log(`[Email] Sending ticket to ${customerEmail} for movie "${booking.movie_title}"...`);
             const result = await sendEmailWithRetry({
-              from: getFromEmail(),
-              to: [customerEmail],
+              sender: getBrevoSender(),
+              to: [{ email: customerEmail, name: customerName }],
               subject: emailSubject,
-              html: emailHtml,
-              attachments: [
+              htmlContent: emailHtml,
+              attachment: [
                 {
-                  filename,
-                  content: Buffer.from(pdf_base64, 'base64'),
+                  name: filename,
+                  content: pdf_base64,
                 }
               ]
             }, 3);
-            console.log(`[Email] ✅ Ticket sent to ${customerEmail} — id: ${result?.id}`);
+            console.log(`[Email] ✅ Ticket sent to ${customerEmail} — messageId: ${result?.messageId}`);
             
             db.run(
               `INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
@@ -1261,11 +1282,11 @@ router.get('/check/:movieId', (req, res) => {
 // Diagnostic: Check email configuration (no auth required - returns sanitized info only)
 router.get('/email-config-check', async (req, res) => {
   try {
-    const apiKey = process.env.RESEND_API_KEY;
-    const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
+    const apiKey = process.env.BREVO_API_KEY;
+    const fromEmail = process.env.BREVO_FROM_EMAIL || 'chalchitra@iitjammu.ac.in';
     res.json({
       configured: !!apiKey,
-      service: 'Resend (HTTP API)',
+      service: 'Brevo (HTTP API)',
       from: fromEmail,
       source: 'env-vars'
     });
