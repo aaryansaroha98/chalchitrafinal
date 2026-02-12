@@ -883,33 +883,30 @@ router.post('/email/single', requireAdmin, async (req, res) => {
             </div>
           `;
 
-        // Respond immediately to avoid Render's 30s request timeout
-        res.json({ message: 'Email queued for delivery!' });
-
-        // Send email in background via Brevo (HTTP API, no SMTP)
-        setImmediate(async () => {
-          try {
-            const data = await sendBrevoEmail({
-              sender: getBrevoSender(),
-              to: [{ email: user.email, name: user.name }],
-              subject: subject,
-              htmlContent: emailHtml,
-              attachment: attachments.length > 0 ? attachments.map(a => ({ name: a.filename, content: a.content.toString('base64') })) : undefined,
-            });
-            console.log('[Email] ✅ Single email sent to', user.email, '— messageId:', data?.messageId);
-            db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)`,
-              ['single', user.email, user.name, subject, message, req.user?.id || 1, 'sent']);
-          } catch (emailError) {
-            console.error('[Email] ❌ Single email failed to', user.email, ':', emailError.message);
-            db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status, error_message)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-              ['single', user.email, user.name, subject, message, req.user?.id || 1, 'failed', emailError.message]);
-          }
-        });
+        // Send email via Brevo (HTTP API, fast ~1s)
+        try {
+          const data = await sendBrevoEmail({
+            sender: getBrevoSender(),
+            to: [{ email: user.email, name: user.name }],
+            subject: subject,
+            htmlContent: emailHtml,
+            attachment: attachments.length > 0 ? attachments.map(a => ({ name: a.filename, content: a.content.toString('base64') })) : undefined,
+          });
+          console.log('[Email] ✅ Single email sent to', user.email, '— messageId:', data?.messageId);
+          db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
+                  VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            ['single', user.email, user.name, subject, message, req.user?.id || 1, 'sent']);
+          res.json({ message: 'Email sent successfully!', messageId: data?.messageId });
+        } catch (emailError) {
+          console.error('[Email] ❌ Single email failed to', user.email, ':', emailError.message);
+          db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status, error_message)
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+            ['single', user.email, user.name, subject, message, req.user?.id || 1, 'failed', emailError.message]);
+          res.status(500).json({ error: 'Failed to send email: ' + emailError.message });
+        }
       } catch (setupError) {
         console.error('Email setup error:', setupError);
-        // Response already sent above, just log
+        res.status(500).json({ error: 'Email setup error: ' + setupError.message });
       }
     });
   } catch (error) {
@@ -1049,30 +1046,27 @@ router.post('/email/custom', requireAdmin, async (req, res) => {
         </div>
       `;
 
-    // Respond immediately to avoid Render's 30s request timeout
-    res.json({ message: 'Email queued for delivery!' });
-
-    // Send email in background via Brevo (HTTP API, no SMTP)
-    setImmediate(async () => {
-      try {
-        const data = await sendBrevoEmail({
-          sender: getBrevoSender(),
-          to: [{ email: email, name: recipient_name || 'Valued Guest' }],
-          subject: subject,
-          htmlContent: emailHtml,
-          attachment: attachments.length > 0 ? attachments.map(a => ({ name: a.filename, content: a.content.toString('base64') })) : undefined,
-        });
-        console.log('[Email] ✅ Custom email sent to:', email, '— messageId:', data?.messageId);
-        db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?)`,
-          ['custom', email, recipient_name || 'Valued Guest', subject, message, req.user?.id || 1, 'sent']);
-      } catch (sendErr) {
-        console.error('[Email] ❌ Custom email failed to', email, ':', sendErr.message);
-        db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status, error_message)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-          ['custom', email, recipient_name || 'Valued Guest', subject, message, req.user?.id || 1, 'failed', sendErr.message]);
-      }
-    });
+    // Send email via Brevo (HTTP API, fast ~1s)
+    try {
+      const data = await sendBrevoEmail({
+        sender: getBrevoSender(),
+        to: [{ email: email, name: recipient_name || 'Valued Guest' }],
+        subject: subject,
+        htmlContent: emailHtml,
+        attachment: attachments.length > 0 ? attachments.map(a => ({ name: a.filename, content: a.content.toString('base64') })) : undefined,
+      });
+      console.log('[Email] ✅ Custom email sent to:', email, '— messageId:', data?.messageId);
+      db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
+              VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        ['custom', email, recipient_name || 'Valued Guest', subject, message, req.user?.id || 1, 'sent']);
+      res.json({ message: 'Email sent successfully!', messageId: data?.messageId });
+    } catch (sendErr) {
+      console.error('[Email] ❌ Custom email failed to', email, ':', sendErr.message);
+      db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status, error_message)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        ['custom', email, recipient_name || 'Valued Guest', subject, message, req.user?.id || 1, 'failed', sendErr.message]);
+      res.status(500).json({ error: 'Failed to send email: ' + sendErr.message });
+    }
   } catch (error) {
     console.error('Custom email setup error:', error);
     res.status(500).json({ error: 'Email service not available: ' + (error.message || String(error)) });
