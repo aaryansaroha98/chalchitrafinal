@@ -100,8 +100,15 @@ if (usePostgres) {
     // Replace REAL with DOUBLE PRECISION
     pgSql = pgSql.replace(/\bREAL\b/gi, 'DOUBLE PRECISION');
     
+    // Convert INSERT OR IGNORE to INSERT ... ON CONFLICT DO NOTHING
+    if (/INSERT\s+OR\s+IGNORE/i.test(pgSql)) {
+      pgSql = pgSql.replace(/INSERT\s+OR\s+IGNORE\s+INTO/gi, 'INSERT INTO');
+      // Remove any trailing semicolons/whitespace, then append ON CONFLICT DO NOTHING
+      pgSql = pgSql.replace(/\s*;?\s*$/, ' ON CONFLICT DO NOTHING');
+    }
+
     // Add RETURNING id to INSERT statements so this.lastID works
-    if (/^\s*INSERT\s+INTO/i.test(pgSql) && !/RETURNING/i.test(pgSql)) {
+    if (/^\s*INSERT\s+INTO/i.test(pgSql) && !/RETURNING/i.test(pgSql) && !/ON CONFLICT DO NOTHING/i.test(pgSql)) {
       pgSql = pgSql.replace(/\s*;?\s*$/, ' RETURNING id');
     }
     
@@ -251,8 +258,11 @@ if (usePostgres) {
         id SERIAL PRIMARY KEY,
         movie_id INTEGER NOT NULL,
         food_id INTEGER NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(movie_id, food_id)
       )`,
+      // Ensure unique constraint exists on movie_foods for ON CONFLICT DO NOTHING
+      `CREATE UNIQUE INDEX IF NOT EXISTS movie_foods_movie_id_food_id_key ON movie_foods (movie_id, food_id)`,
       `CREATE TABLE IF NOT EXISTS booking_foods (
         id SERIAL PRIMARY KEY,
         booking_id INTEGER NOT NULL,
@@ -266,8 +276,11 @@ if (usePostgres) {
         food_id INTEGER NOT NULL,
         quantity_given INTEGER NOT NULL DEFAULT 0,
         given_at TIMESTAMP,
-        given_by INTEGER
+        given_by INTEGER,
+        UNIQUE(booking_id, food_id)
       )`,
+      // Ensure unique constraint exists on booking_food_status for ON CONFLICT DO NOTHING
+      `CREATE UNIQUE INDEX IF NOT EXISTS booking_food_status_booking_id_food_id_key ON booking_food_status (booking_id, food_id)`,
       `CREATE TABLE IF NOT EXISTS admin_permissions (
         id SERIAL PRIMARY KEY,
         admin_user_id INTEGER NOT NULL UNIQUE,
@@ -298,10 +311,15 @@ if (usePostgres) {
     for (const sql of tables) {
       try {
         await pool.query(sql);
-        const tableName = sql.match(/CREATE TABLE IF NOT EXISTS (\w+)/)[1];
-        console.log(`✅ ${tableName} table ready`);
+        const tableMatch = sql.match(/CREATE TABLE IF NOT EXISTS (\w+)/);
+        const indexMatch = sql.match(/CREATE UNIQUE INDEX IF NOT EXISTS (\w+)/);
+        if (tableMatch) {
+          console.log(`✅ ${tableMatch[1]} table ready`);
+        } else if (indexMatch) {
+          console.log(`✅ ${indexMatch[1]} index ready`);
+        }
       } catch (err) {
-        console.error('Table creation error:', err.message);
+        console.error('Schema creation error:', err.message);
       }
     }
 
