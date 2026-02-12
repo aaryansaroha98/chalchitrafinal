@@ -13,46 +13,59 @@ const createEmailTransporter = () => new Promise((resolve, reject) => {
   db.get('SELECT * FROM mail_settings WHERE id = 1', (err, dbSettings) => {
     if (err) {
       console.error('Error fetching mail settings from database:', err);
-      // Don't reject on table error — fall back to env vars
       console.log('Falling back to environment variables for email config');
     }
 
-    // Env vars always available as fallback; db settings override only if non-empty
-    const emailHost = (dbSettings?.email_host) || process.env.EMAIL_HOST || 'smtp.gmail.com';
-    const emailPort = (dbSettings?.email_port) || parseInt(process.env.EMAIL_PORT) || 587;
     const emailUser = (dbSettings?.email_user) || process.env.EMAIL_USER;
     // Skip db password if it looks masked (admin panel sends '••••••••' placeholder)
     const dbPass = dbSettings?.email_pass;
     const emailPass = (dbPass && dbPass !== '••••••••' && dbPass.length > 0) ? dbPass : process.env.EMAIL_PASS;
 
-    console.log(`[Email Config] host=${emailHost}, port=${emailPort}, user=${emailUser ? emailUser.substring(0,4) + '***' : 'NOT SET'}, pass=${emailPass ? '***SET***' : 'NOT SET'}, source=${dbSettings ? 'db+env' : 'env-only'}`);
+    console.log(`[Email Config] user=${emailUser ? emailUser.substring(0,4) + '***' : 'NOT SET'}, pass=${emailPass ? '***SET***' : 'NOT SET'}, source=${dbSettings ? 'db+env' : 'env-only'}`);
 
     if (!emailUser || !emailPass) {
       return reject(new Error(`Email credentials not configured (user=${!!emailUser}, pass=${!!emailPass})`));
     }
 
+    // Use service:'gmail' — works for @gmail.com AND Google Workspace domains
+    // Uses port 465 SSL by default, which is more reliable on Render than 587 STARTTLS
     const transporter = nodemailer.createTransport({
-      host: emailHost,
-      port: emailPort,
-      secure: emailPort === 465,
+      service: 'gmail',
       auth: {
         user: emailUser,
         pass: emailPass
       },
-      // Generous timeouts for Render free tier
-      connectionTimeout: 60000,
-      greetingTimeout: 30000,
+      connectionTimeout: 120000,
+      greetingTimeout: 60000,
       socketTimeout: 120000,
+      pool: false,
       tls: {
         rejectUnauthorized: false
       }
     });
 
-    // Skip verify() - it creates an extra SMTP connection that times out on Render
-    // If credentials are wrong, sendMail will fail with a clear error
     resolve({ transporter, settings: dbSettings || {} });
   });
 });
+
+// Helper: send email with retry
+async function sendMailWithRetry(transporter, mailOptions, maxRetries = 2) {
+  let lastError;
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`[Email] Attempt ${attempt}/${maxRetries}...`);
+      const result = await transporter.sendMail(mailOptions);
+      return result;
+    } catch (err) {
+      lastError = err;
+      console.error(`[Email] Attempt ${attempt} failed: ${err.message} (code: ${err.code})`);
+      if (attempt < maxRetries) {
+        await new Promise(r => setTimeout(r, 2000));
+      }
+    }
+  }
+  throw lastError;
+}
 
 // Generate 8-character alphanumeric booking ID with flow
 function generateBookingId() {
@@ -1200,7 +1213,7 @@ router.post('/send-ticket-email', async (req, res) => {
         // Send email synchronously so we can return the actual result to the frontend
         try {
           console.log(`[Email] Sending ticket to ${customerEmail} for movie "${booking.movie_title}"...`);
-          const sendResult = await transporter.sendMail(mailOptions);
+          const sendResult = await sendMailWithRetry(transporter, mailOptions, 3);
           console.log(`[Email] ✅ Ticket sent to ${customerEmail} — messageId: ${sendResult.messageId}`);
           
           db.run(

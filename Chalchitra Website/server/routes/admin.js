@@ -785,8 +785,6 @@ function createEmailTransporter() {
         // Continue with env vars - don't fail
       }
       
-      const emailHost = dbSettings?.email_host || process.env.EMAIL_HOST || 'smtp.gmail.com';
-      const emailPort = dbSettings?.email_port || parseInt(process.env.EMAIL_PORT) || 587;
       const emailUser = dbSettings?.email_user || process.env.EMAIL_USER;
       // Skip db password if it looks masked
       const dbPass = dbSettings?.email_pass;
@@ -797,23 +795,20 @@ function createEmailTransporter() {
         return reject(new Error('Email credentials not configured. Set EMAIL_USER and EMAIL_PASS environment variables.'));
       }
       
-      console.log('Creating email transporter with host:', emailHost, 'port:', emailPort, 'user:', emailUser.substring(0, 3) + '***');
+      console.log('Creating email transporter — service: gmail, user:', emailUser.substring(0, 3) + '***');
       
+      // Use service:'gmail' — works for @gmail.com AND Google Workspace domains
+      // Uses port 465 SSL by default, which is more reliable on Render than 587 STARTTLS
       const transporter = nodemailer.createTransport({
-        host: emailHost,
-        port: emailPort,
-        secure: emailPort === 465,
+        service: 'gmail',
         auth: {
           user: emailUser,
           pass: emailPass
         },
-        // Disable pool mode - causes issues on Render free tier
         pool: false,
-        // Generous timeouts for Render free tier cold starts
-        connectionTimeout: 60000,
-        greetingTimeout: 30000,
+        connectionTimeout: 120000,
+        greetingTimeout: 60000,
         socketTimeout: 120000,
-        // TLS options for compatibility
         tls: {
           rejectUnauthorized: false
         }
