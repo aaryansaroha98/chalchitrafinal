@@ -26,6 +26,7 @@ const Scanner = () => {
   const [lastScanResult, setLastScanResult] = useState(null);
   const [foodStatus, setFoodStatus] = useState([]);
   const [pendingFood, setPendingFood] = useState([]);
+  const [foodStatusLoaded, setFoodStatusLoaded] = useState(false);
   const [currentBookingFood, setCurrentBookingFood] = useState(null);
   const scannerRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -722,25 +723,23 @@ const Scanner = () => {
   const loadFoodStatus = async (bookingId) => {
     try {
       console.log('🔄 Loading complete food status for booking:', bookingId);
+      setFoodStatusLoaded(false);
       const response = await api.get(`/api/foods/status/${bookingId}`);
       console.log('📋 API Response for food status:', response.data);
-      console.log('📋 Response data type:', typeof response.data);
-      console.log('📋 Response data length:', response.data.length);
 
       setFoodStatus(response.data);
-      console.log('📋 Set food status state:', response.data);
 
       // Also set pending food for backward compatibility with the component
       const pending = response.data.filter(food => food.quantity_given < food.ordered_quantity);
       setPendingFood(pending);
-      console.log('📋 Pending food items:', pending);
+      setFoodStatusLoaded(true);
 
       return response.data;
     } catch (error) {
       console.error('❌ Error loading food status:', error);
-      console.error('❌ Error response:', error.response);
       setFoodStatus([]);
       setPendingFood([]);
+      setFoodStatusLoaded(true);
       return [];
     }
   };
@@ -790,18 +789,6 @@ const Scanner = () => {
   // Food Marking Component
   const FoodMarkingComponent = ({ bookingId, foodStatus, onFoodMarked }) => {
     const [loadingFood, setLoadingFood] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
-
-    // Load food status on mount if not provided
-    useEffect(() => {
-      if (bookingId && (!foodStatus || foodStatus.length === 0)) {
-        console.log('🔄 Loading food status in component for booking:', bookingId);
-        setIsLoading(true);
-        loadFoodStatus(bookingId).finally(() => {
-          setIsLoading(false);
-        });
-      }
-    }, [bookingId, foodStatus]);
 
     const handleMarkGiven = async (foodId, quantity) => {
       setLoadingFood(foodId);
@@ -815,22 +802,8 @@ const Scanner = () => {
       }
     };
 
-    if (isLoading) {
-      return (
-        <div className="text-center py-3">
-          <Spinner animation="border" variant="warning" className="mb-2" />
-          <p className="text-muted mb-0">Loading food orders...</p>
-        </div>
-      );
-    }
-
     if (!foodStatus || foodStatus.length === 0) {
-      return (
-        <div className="text-center py-3">
-          <i className="fas fa-box-open text-muted fa-2x mb-2"></i>
-          <p className="text-muted mb-0">No food orders found for this booking</p>
-        </div>
-      );
+      return null;
     }
 
     const pendingCount = foodStatus.filter(food => food.quantity_given < food.ordered_quantity).length;
@@ -1472,7 +1445,7 @@ const Scanner = () => {
                       </Row>
 
                       {/* Food Marking Component - Interactive food serving */}
-                      {scanResult && scanResult.data && foodStatus && foodStatus.length > 0 && (
+                      {scanResult && scanResult.data && foodStatusLoaded && foodStatus && foodStatus.length > 0 && (
                         <Row className="mb-3">
                           <Col xs={12}>
                             <FoodMarkingComponent
@@ -1961,7 +1934,7 @@ const Scanner = () => {
 
 
                       {/* Food Status + Mark Given */}
-                      {lastScanResult?.booking_id && (
+                      {lastScanResult?.booking_id && foodStatusLoaded && foodStatus && foodStatus.length > 0 && (
                         <Row className="mb-2">
                           <Col xs={12}>
                             <FoodMarkingComponent
@@ -1973,6 +1946,16 @@ const Scanner = () => {
                                 }
                               }}
                             />
+                          </Col>
+                        </Row>
+                      )}
+                      {lastScanResult?.booking_id && foodStatusLoaded && (!foodStatus || foodStatus.length === 0) && (
+                        <Row className="mb-2">
+                          <Col xs={12} className="text-center">
+                            <Badge bg="secondary" className="px-3 py-2">
+                              <i className="fas fa-utensils me-2"></i>
+                              No food order for this ticket
+                            </Badge>
                           </Col>
                         </Row>
                       )}
@@ -2075,7 +2058,7 @@ const Scanner = () => {
               </Card>
 
               {/* Food Status + Mark Given */}
-              {lastScanResult?.booking_id && (
+              {lastScanResult?.booking_id && foodStatusLoaded && foodStatus && foodStatus.length > 0 && (
                 <Row className="mb-2">
                   <Col xs={12}>
                     <FoodMarkingComponent
@@ -2087,6 +2070,16 @@ const Scanner = () => {
                         }
                       }}
                     />
+                  </Col>
+                </Row>
+              )}
+              {lastScanResult?.booking_id && foodStatusLoaded && (!foodStatus || foodStatus.length === 0) && (
+                <Row className="mb-2">
+                  <Col xs={12} className="text-center">
+                    <Badge bg="secondary" className="px-3 py-2">
+                      <i className="fas fa-utensils me-2"></i>
+                      No food order for this ticket
+                    </Badge>
                   </Col>
                 </Row>
               )}
