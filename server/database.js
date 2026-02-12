@@ -99,6 +99,12 @@ if (usePostgres) {
     pgSql = pgSql.replace(/\bDATETIME\b(?!\s*\()/gi, 'TIMESTAMP');
     // Replace REAL with DOUBLE PRECISION
     pgSql = pgSql.replace(/\bREAL\b/gi, 'DOUBLE PRECISION');
+    
+    // Add RETURNING id to INSERT statements so this.lastID works
+    if (/^\s*INSERT\s+INTO/i.test(pgSql) && !/RETURNING/i.test(pgSql)) {
+      pgSql = pgSql.replace(/\s*;?\s*$/, ' RETURNING id');
+    }
+    
     return pgSql;
   }
 
@@ -320,6 +326,31 @@ if (usePostgres) {
     }
 
     console.log('🗄️  PostgreSQL initialization complete!');
+    
+    // Regenerate QR codes for bookings that are missing them (fixes previous lastID bug)
+    try {
+      const QRCode = require('qrcode');
+      const missingQR = await pool.query('SELECT id, booking_code FROM bookings WHERE qr_code IS NULL');
+      if (missingQR.rows.length > 0) {
+        console.log(`🔧 Found ${missingQR.rows.length} bookings without QR codes, regenerating...`);
+        for (const booking of missingQR.rows) {
+          const qrData = {
+            booking_id: booking.booking_code || String(booking.id),
+            ticket_type: 'FREE_ENTRY_IITJAMMU',
+            issued_by: 'Chalchitra IIT Jammu'
+          };
+          try {
+            const qrDataURL = await QRCode.toDataURL(JSON.stringify(qrData));
+            await pool.query('UPDATE bookings SET qr_code = $1 WHERE id = $2', [qrDataURL, booking.id]);
+            console.log(`  ✅ Regenerated QR for booking ${booking.booking_code || booking.id}`);
+          } catch (qrErr) {
+            console.error(`  ❌ Failed to regenerate QR for booking ${booking.id}:`, qrErr.message);
+          }
+        }
+      }
+    } catch (err) {
+      console.log('QR regeneration check skipped:', err.message);
+    }
   };
 
   initPostgres().catch(console.error);
