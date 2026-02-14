@@ -33,6 +33,7 @@ const Scanner = () => {
   const canvasRef = useRef(null);
   const videoRef = useRef(null);
   const scanIntervalRef = useRef(null);
+  const currentFoodLoadingRef = useRef(null); // Track current food loading request
 
   useEffect(() => {
     // Load scan history from localStorage
@@ -54,9 +55,23 @@ const Scanner = () => {
 
   // Load food status when scan result changes
   useEffect(() => {
-    if (scanResult && scanResult.data && scanResult.data.booking_id && scanResult.status !== 'processing') {
+    // Only load food status if:
+    // 1. scanResult exists and has data
+    // 2. scanResult has a booking_id
+    // 3. scanResult status is not 'processing' (not currently loading)
+    // 4. scanResult has a valid status (not null/error)
+    if (scanResult && 
+        scanResult.data && 
+        scanResult.data.booking_id && 
+        scanResult.status !== 'processing' &&
+        scanResult.status !== null) {
       console.log('🔄 Loading food status for scan result:', scanResult.data.booking_id);
       loadFoodStatus(scanResult.data.booking_id);
+    } else if (scanResult === null) {
+      // Clear food status when scan result is cleared
+      // This prevents unnecessary API calls and flickering
+      setFoodStatus([]);
+      setPendingFood([]);
     }
   }, [scanResult]);
 
@@ -64,7 +79,15 @@ const Scanner = () => {
   useEffect(() => {
     if (partialAdmissionData && partialAdmissionData.booking_id) {
       console.log('🔄 Loading food status for partial admission:', partialAdmissionData.booking_id);
-      loadFoodStatus(partialAdmissionData.booking_id);
+      // Check if we need to load for a different booking
+      if (currentFoodLoadingRef.current !== partialAdmissionData.booking_id) {
+        loadFoodStatus(partialAdmissionData.booking_id);
+      }
+    } else if (!partialAdmissionData) {
+      // Clear food status when modal closes
+      setFoodStatus([]);
+      setPendingFood([]);
+      currentFoodLoadingRef.current = null;
     }
   }, [partialAdmissionData]);
 
@@ -384,8 +407,13 @@ const Scanner = () => {
       // Don't clear the result card immediately if there are pending food items
       // Let the user mark food items first
       if (!result.food_orders || Object.keys(result.food_orders).length === 0) {
-        // Clear the result card after 1 second only if no food orders
-        setTimeout(() => setScanResult(null), 1000);
+        // Clear the result card after 1.5 seconds only if no food orders
+        // Also clear food status to prevent flickering
+        setTimeout(() => {
+          setScanResult(null);
+          setFoodStatus([]);
+          setPendingFood([]);
+        }, 1500);
       } else {
         // Keep the result card visible for food marking
         console.log('🍽️ Keeping scan result visible for food marking');
@@ -721,25 +749,50 @@ const Scanner = () => {
 
   // Food marking functions
   const loadFoodStatus = async (bookingId) => {
+    // Guard: Don't load food status if no booking ID
+    if (!bookingId) {
+      console.log('⚠️ No booking ID provided for food status');
+      setFoodStatus([]);
+      setPendingFood([]);
+      setFoodStatusLoaded(true);
+      return [];
+    }
+
+    // Guard: Don't make duplicate API call if already loading for the same booking
+    // This prevents flickering and duplicate requests
+    if (currentFoodLoadingRef.current === bookingId && !foodStatusLoaded) {
+      console.log('⏳ Food status already loading for booking:', bookingId);
+      return [];
+    }
+
     try {
       console.log('🔄 Loading complete food status for booking:', bookingId);
+      currentFoodLoadingRef.current = bookingId;
       setFoodStatusLoaded(false);
       const response = await api.get(`/api/foods/status/${bookingId}`);
       console.log('📋 API Response for food status:', response.data);
 
-      setFoodStatus(response.data);
+      // Only update state if this is still the current request
+      if (currentFoodLoadingRef.current === bookingId) {
+        setFoodStatus(response.data);
 
-      // Also set pending food for backward compatibility with the component
-      const pending = response.data.filter(food => food.quantity_given < food.ordered_quantity);
-      setPendingFood(pending);
-      setFoodStatusLoaded(true);
+        // Also set pending food for backward compatibility with the component
+        const pending = response.data.filter(food => food.quantity_given < food.ordered_quantity);
+        setPendingFood(pending);
+        setFoodStatusLoaded(true);
+        currentFoodLoadingRef.current = null;
+      }
 
       return response.data;
     } catch (error) {
       console.error('❌ Error loading food status:', error);
-      setFoodStatus([]);
-      setPendingFood([]);
-      setFoodStatusLoaded(true);
+      // Only reset state if this is still the current request
+      if (currentFoodLoadingRef.current === bookingId) {
+        setFoodStatus([]);
+        setPendingFood([]);
+        setFoodStatusLoaded(true);
+        currentFoodLoadingRef.current = null;
+      }
       return [];
     }
   };
@@ -784,6 +837,7 @@ const Scanner = () => {
     setScanResult(null);
     setFoodStatus([]);
     setPendingFood([]);
+    currentFoodLoadingRef.current = null;
   };
 
   // Food Marking Component
