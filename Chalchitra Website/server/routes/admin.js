@@ -660,18 +660,24 @@ router.post('/gallery', requireAdmin, uploadGallery.single('image'), (req, res) 
   console.log('Body:', req.body);
 
   try {
-    const { event_name } = req.body;
+    const { event_name, event_date } = req.body;
     const image_url = getUploadUrl(req.file, '/gallery') || req.body.image_url;
+    const normalizedEventDate = (event_date || '').trim();
 
     console.log('Image URL:', image_url);
     console.log('Event name:', event_name);
+    console.log('Event date:', normalizedEventDate || '(not provided)');
 
     if (!image_url) {
       console.log('No image file provided');
       return res.status(400).json({ error: 'Image file is required' });
     }
 
-    db.run('INSERT INTO gallery (image_url, event_name) VALUES (?, ?)', [image_url, event_name || 'General Event'], function(err) {
+    if (normalizedEventDate && !/^\d{4}-\d{2}-\d{2}$/.test(normalizedEventDate)) {
+      return res.status(400).json({ error: 'Event date must be in YYYY-MM-DD format' });
+    }
+
+    db.run('INSERT INTO gallery (image_url, event_name, event_date) VALUES (?, ?, ?)', [image_url, event_name || 'General Event', normalizedEventDate || null], function(err) {
       if (err) {
         console.error('Database error:', err);
         return res.status(500).json({ error: err.message });

@@ -9,6 +9,17 @@ const Gallery = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
 
+  const formatGalleryDate = (eventDate, uploadedAt, longFormat = false) => {
+    const dateValue = eventDate || uploadedAt;
+    if (!dateValue) return 'Date not available';
+    const date = new Date(dateValue);
+    if (Number.isNaN(date.getTime())) return 'Date not available';
+    return date.toLocaleDateString('en-IN', longFormat
+      ? { year: 'numeric', month: 'long', day: 'numeric' }
+      : { year: 'numeric', month: 'short', day: 'numeric' }
+    );
+  };
+
   // Helper function to get the full image URL
   const getGalleryImageUrl = (url) => {
     if (!url) return null;
@@ -366,11 +377,7 @@ const Gallery = () => {
                       fontWeight: '500'
                     }}>
                       <i className="fas fa-calendar me-1"></i>
-                      {new Date(image.uploaded_at).toLocaleDateString('en-IN', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                      })}
+                      {formatGalleryDate(image.event_date, image.uploaded_at)}
                     </p>
                   </div>
                 </div>
@@ -423,11 +430,7 @@ const Gallery = () => {
                   fontSize: '1.1rem'
                 }}>
                   <i className="fas fa-calendar me-2"></i>
-                  {new Date(selectedImage.uploaded_at).toLocaleDateString('en-IN', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
+                  {formatGalleryDate(selectedImage.event_date, selectedImage.uploaded_at, true)}
                 </p>
               </div>
             </>

@@ -43,6 +43,18 @@ const formatExactJoinDateTime = (value) => {
   });
 };
 
+const formatGalleryDisplayDate = (eventDate, fallbackDate) => {
+  const dateValue = eventDate || fallbackDate;
+  if (!dateValue) return 'Date not available';
+  const date = new Date(dateValue);
+  if (Number.isNaN(date.getTime())) return 'Date not available';
+  return date.toLocaleDateString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  });
+};
+
 const AdminPanel = () => {
   console.log('🔧 AdminPanel component starting...');
 
@@ -125,6 +137,7 @@ const AdminPanel = () => {
   const [showGalleryModal, setShowGalleryModal] = useState(false);
   const [galleryForm, setGalleryForm] = useState({
     event_name: '',
+    event_date: '',
     image: null
   });
   const [settingsForm, setSettingsForm] = useState({
@@ -772,6 +785,7 @@ const AdminPanel = () => {
     try {
       const formData = new FormData();
       formData.append('event_name', galleryForm.event_name || '');
+      formData.append('event_date', galleryForm.event_date || '');
       formData.append('image', galleryForm.image);
 
       await api.post('/api/admin/gallery', formData, {
@@ -779,7 +793,7 @@ const AdminPanel = () => {
       });
 
       setShowGalleryModal(false);
-      setGalleryForm({ event_name: '', image: null });
+      setGalleryForm({ event_name: '', event_date: '', image: null });
       fetchAllData();
     } catch (err) {
       console.error('Error uploading gallery image:', err);
@@ -2693,7 +2707,7 @@ const AdminPanel = () => {
                     <Card.Body>
                     <Card.Title className="text-truncate" style={{color: 'black'}}>{image.event_name || 'Gallery Image'}</Card.Title>
                     <small style={{color: 'black'}}>
-                      {new Date(image.uploaded_at).toLocaleDateString()}
+                      {formatGalleryDisplayDate(image.event_date, image.uploaded_at)}
                     </small>
                       <br/>
                       <Button
@@ -6299,7 +6313,7 @@ const AdminPanel = () => {
           show={showGalleryModal}
           onHide={() => {
             setShowGalleryModal(false);
-            setGalleryForm({ event_name: '', image: null });
+            setGalleryForm({ event_name: '', event_date: '', image: null });
           }}
         >
           <Modal.Header closeButton>
@@ -6314,6 +6328,14 @@ const AdminPanel = () => {
                   value={galleryForm.event_name}
                   onChange={(e) => setGalleryForm({ ...galleryForm, event_name: e.target.value })}
                   placeholder="e.g., Freshers Night 2025"
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Event Date (Optional)</Form.Label>
+                <Form.Control
+                  type="date"
+                  value={galleryForm.event_date}
+                  onChange={(e) => setGalleryForm({ ...galleryForm, event_date: e.target.value })}
                 />
               </Form.Group>
               <Form.Group className="mb-3">
@@ -6334,7 +6356,7 @@ const AdminPanel = () => {
                 variant="secondary"
                 onClick={() => {
                   setShowGalleryModal(false);
-                  setGalleryForm({ event_name: '', image: null });
+                  setGalleryForm({ event_name: '', event_date: '', image: null });
                 }}
               >
                 Cancel
