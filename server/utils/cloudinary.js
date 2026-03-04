@@ -7,42 +7,6 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-const projectRoot = path.join(__dirname, '..', '..');
-const allowedLocalRoots = [
-  path.join(projectRoot, 'public'),
-  path.join(projectRoot, 'uploads')
-];
-
-function resolveLocalFilePath(fileUrl) {
-  if (!fileUrl || typeof fileUrl !== 'string') return null;
-  if (/^https?:\/\//i.test(fileUrl)) return null;
-
-  const cleaned = fileUrl.split('?')[0].split('#')[0];
-  const relativePath = cleaned.startsWith('/') ? cleaned.slice(1) : cleaned;
-  const absolutePath = path.normalize(path.join(projectRoot, relativePath));
-
-  const withinAllowedRoot = allowedLocalRoots.some(root =>
-    absolutePath === root || absolutePath.startsWith(root + path.sep)
-  );
-  if (!withinAllowedRoot) return null;
-
-  return absolutePath;
-}
-
-function deleteLocalFile(fileUrl) {
-  const absolutePath = resolveLocalFilePath(fileUrl);
-  if (!absolutePath) return;
-
-  try {
-    if (fs.existsSync(absolutePath)) {
-      fs.unlinkSync(absolutePath);
-      console.log(`🧹 Deleted local file: ${absolutePath}`);
-    }
-  } catch (err) {
-    console.error(`Failed deleting local file ${absolutePath}:`, err.message);
-  }
-}
-
 // Check if Cloudinary is configured
 const isCloudinaryConfigured = !!(
   process.env.CLOUDINARY_CLOUD_NAME &&
@@ -149,18 +113,10 @@ async function deleteImage(imageUrl) {
   }
 }
 
-function cleanupStoredFile(fileUrl) {
-  if (!fileUrl) return;
-  deleteImage(fileUrl).catch(() => {});
-  deleteLocalFile(fileUrl);
-}
-
 module.exports = {
   cloudinary,
   isCloudinaryConfigured,
   getUpload,
   getUploadUrl,
   deleteImage,
-  deleteLocalFile,
-  cleanupStoredFile,
 };
