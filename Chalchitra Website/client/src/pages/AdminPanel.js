@@ -27,6 +27,22 @@ const getGalleryImageUrl = (url) => {
   return `${window.location.origin}/gallery/${url}`;
 };
 
+const formatExactJoinDateTime = (value) => {
+  if (!value) return 'Not available';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return 'Not available';
+
+  return date.toLocaleString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  });
+};
+
 const AdminPanel = () => {
   console.log('🔧 AdminPanel component starting...');
 
@@ -2490,7 +2506,7 @@ const AdminPanel = () => {
                         {user.is_admin ? 'Admin' : 'User'}
                       </Badge>
                     </td>
-                    <td>{new Date(user.created_at || Date.now()).toLocaleDateString()}</td>
+                    <td>{formatExactJoinDateTime(user.created_at)}</td>
                   </tr>
                 )) : (
                   <tr>
@@ -3666,7 +3682,7 @@ const AdminPanel = () => {
                   <tr key={user.id} style={{ borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
                     <td style={{ color: 'black', border: '1px solid rgba(0,0,0,0.1)', padding: '12px' }}>{user.name}</td>
                     <td style={{ color: 'black', border: '1px solid rgba(0,0,0,0.1)', padding: '12px' }}>{user.email}</td>
-                    <td style={{ color: 'black', border: '1px solid rgba(0,0,0,0.1)', padding: '12px' }}>{new Date(user.created_at || Date.now()).toLocaleDateString()}</td>
+                    <td style={{ color: 'black', border: '1px solid rgba(0,0,0,0.1)', padding: '12px' }}>{formatExactJoinDateTime(user.created_at)}</td>
                     <td style={{ border: '1px solid rgba(0,0,0,0.1)', padding: '12px', textAlign: 'center' }}>
                       <Button
                         variant="primary"

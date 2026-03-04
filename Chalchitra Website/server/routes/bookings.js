@@ -16,12 +16,17 @@ const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
 function getBrevoSender(senderName) {
   return {
     name: senderName || 'Chalchitra IIT Jammu',
-    email: process.env.BREVO_FROM_EMAIL || 'chalchitra@iitjammu.ac.in'
+    email: process.env.BREVO_FROM_EMAIL || process.env.EMAIL_USER || 'chalchitra@iitjammu.ac.in'
   };
 }
 
 // Helper: send email via Brevo HTTP API with retry
 async function sendEmailWithRetry(emailOptions, maxRetries = 2) {
+  const apiKey = process.env.BREVO_API_KEY;
+  if (!apiKey) {
+    throw new Error('BREVO_API_KEY is not configured on backend environment');
+  }
+
   let lastError;
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
@@ -41,7 +46,7 @@ async function sendEmailWithRetry(emailOptions, maxRetries = 2) {
         method: 'POST',
         headers: {
           'accept': 'application/json',
-          'api-key': process.env.BREVO_API_KEY,
+          'api-key': apiKey,
           'content-type': 'application/json',
         },
         body: JSON.stringify(body),
