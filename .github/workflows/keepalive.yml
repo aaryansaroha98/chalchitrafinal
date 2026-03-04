@@ -1,15 +1,52 @@
-name: Keepalive Ping
+name: Render Keepalive
 
 on:
   schedule:
-    - cron: "*/10 * * * *"   # every 10 minutes
+    - cron: "*/10 * * * *"
   workflow_dispatch:
 
+concurrency:
+  group: render-keepalive
+  cancel-in-progress: true
+
 jobs:
-  ping:
+  ping-backend:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      KEEPALIVE_URL: ${{ secrets.KEEPALIVE_URL }}
 
     steps:
-      - name: Ping health endpoint
+      - name: Validate keepalive URL secret
         run: |
-          curl -L -s -o /dev/null -w "%{http_code}" ${{ secrets.KEEPALIVE_URL }}
+          if [ -z "$KEEPALIVE_URL" ]; then
+            echo "Missing repository secret KEEPALIVE_URL"
+            echo "Set it to your backend health URL, e.g. https://your-backend.onrender.com/health"
+            exit 1
+          fi
+
+      - name: Ping backend health endpoint
+        run: |
+          echo "Pinging: $KEEPALIVE_URL"
+
+          # Retry to survive brief network hiccups or cold starts.
+          HTTP_CODE=$(curl \
+            --location \
+            --silent \
+            --show-error \
+            --output /dev/null \
+            --write-out "%{http_code}" \
+            --max-time 30 \
+            --retry 3 \
+            --retry-delay 5 \
+            --retry-all-errors \
+            "$KEEPALIVE_URL")
+
+          echo "HTTP status: $HTTP_CODE"
+
+          if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 400 ]; then
+            echo "Keepalive ping failed with status $HTTP_CODE"
+            exit 1
+          fi
+
+          echo "Keepalive ping successful."
