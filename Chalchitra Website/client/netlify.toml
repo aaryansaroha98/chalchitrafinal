@@ -1,0 +1,14 @@
+[build]
+  base = "Chalchitra Website/client"
+  command = "npm install && npm run build"
+  publish = "build"
+
+[build.environment]
+  NODE_VERSION = "18"
+  DISABLE_ESLINT_PLUGIN = "true"
+
+# Redirect all routes to index.html for SPA
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
