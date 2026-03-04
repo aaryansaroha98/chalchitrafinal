@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../database');
-const multer = require('multer');
-const path = require('path');
-const { getUpload, getUploadUrl } = require('../utils/cloudinary');
+const { getUpload, getUploadUrl, cleanupStoredFile } = require('../utils/cloudinary');
 
 // Use Cloudinary in production, local disk in development
 const upload = getUpload('foods', 'uploads');
@@ -115,15 +113,27 @@ router.put('/:id', requireAdmin, upload.single('image'), (req, res) => {
     params = [name, description, price, category, is_available, id];
   }
 
-  db.run(query, params, function(err) {
-    if (err) {
-      console.error('Error updating food:', err);
+  db.get('SELECT image_url FROM foods WHERE id = ?', [id], (getErr, existingFood) => {
+    if (getErr) {
+      console.error('Error fetching existing food:', getErr);
       return res.status(500).json({ error: 'Failed to update food item' });
     }
-    if (this.changes === 0) {
-      return res.status(404).json({ error: 'Food item not found' });
-    }
-    res.json({ message: 'Food item updated successfully' });
+
+    db.run(query, params, function(err) {
+      if (err) {
+        console.error('Error updating food:', err);
+        return res.status(500).json({ error: 'Failed to update food item' });
+      }
+      if (this.changes === 0) {
+        return res.status(404).json({ error: 'Food item not found' });
+      }
+
+      if (image_url && existingFood?.image_url && existingFood.image_url !== image_url) {
+        cleanupStoredFile(existingFood.image_url);
+      }
+
+      res.json({ message: 'Food item updated successfully' });
+    });
   });
 });
 
@@ -144,16 +154,28 @@ router.delete('/:id', requireAdmin, (req, res) => {
       });
     }
 
-    // Delete the food item
-    db.run('DELETE FROM foods WHERE id = ?', [id], function(err) {
-      if (err) {
-        console.error('Error deleting food:', err);
+    db.get('SELECT image_url FROM foods WHERE id = ?', [id], (getErr, existingFood) => {
+      if (getErr) {
+        console.error('Error fetching food before delete:', getErr);
         return res.status(500).json({ error: 'Failed to delete food item' });
       }
-      if (this.changes === 0) {
-        return res.status(404).json({ error: 'Food item not found' });
-      }
-      res.json({ message: 'Food item deleted successfully' });
+
+      // Delete the food item
+      db.run('DELETE FROM foods WHERE id = ?', [id], function(err) {
+        if (err) {
+          console.error('Error deleting food:', err);
+          return res.status(500).json({ error: 'Failed to delete food item' });
+        }
+        if (this.changes === 0) {
+          return res.status(404).json({ error: 'Food item not found' });
+        }
+
+        if (existingFood?.image_url) {
+          cleanupStoredFile(existingFood.image_url);
+        }
+
+        res.json({ message: 'Food item deleted successfully' });
+      });
     });
   });
 });
@@ -235,27 +257,39 @@ router.get('/:id/movies', requireAdmin, (req, res) => {
 router.delete('/:id/force', requireAdmin, (req, res) => {
   const { id } = req.params;
 
-  // First remove food from all movies
-  db.run('DELETE FROM movie_foods WHERE food_id = ?', [id], function(err) {
-    if (err) {
-      console.error('Error removing food from movies:', err);
-      return res.status(500).json({ error: 'Failed to remove food from movies' });
+  db.get('SELECT image_url FROM foods WHERE id = ?', [id], (getErr, existingFood) => {
+    if (getErr) {
+      console.error('Error fetching food before force delete:', getErr);
+      return res.status(500).json({ error: 'Failed to delete food item after removing from movies' });
     }
 
-    console.log(`Removed food ${id} from ${this.changes} movies`);
-
-    // Now delete the food item
-    db.run('DELETE FROM foods WHERE id = ?', [id], function(err) {
+    // First remove food from all movies
+    db.run('DELETE FROM movie_foods WHERE food_id = ?', [id], function(err) {
       if (err) {
-        console.error('Error deleting food:', err);
-        return res.status(500).json({ error: 'Failed to delete food item after removing from movies' });
+        console.error('Error removing food from movies:', err);
+        return res.status(500).json({ error: 'Failed to remove food from movies' });
       }
-      if (this.changes === 0) {
-        return res.status(404).json({ error: 'Food item not found' });
-      }
-      res.json({
-        message: 'Food item deleted successfully',
-        movies_removed_from: this.changes
+
+      console.log(`Removed food ${id} from ${this.changes} movies`);
+
+      // Now delete the food item
+      db.run('DELETE FROM foods WHERE id = ?', [id], function(err) {
+        if (err) {
+          console.error('Error deleting food:', err);
+          return res.status(500).json({ error: 'Failed to delete food item after removing from movies' });
+        }
+        if (this.changes === 0) {
+          return res.status(404).json({ error: 'Food item not found' });
+        }
+
+        if (existingFood?.image_url) {
+          cleanupStoredFile(existingFood.image_url);
+        }
+
+        res.json({
+          message: 'Food item deleted successfully',
+          movies_removed_from: this.changes
+        });
       });
     });
   });

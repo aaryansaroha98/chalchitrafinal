@@ -2,7 +2,7 @@ const express = require('express');
 const db = require('../database');
 const multer = require('multer');
 const path = require('path');
-const { isCloudinaryConfigured, getUpload, getUploadUrl, deleteImage } = require('../utils/cloudinary');
+const { isCloudinaryConfigured, getUpload, getUploadUrl, cleanupStoredFile } = require('../utils/cloudinary');
 
 const router = express.Router();
 
@@ -687,9 +687,16 @@ router.post('/gallery', requireAdmin, uploadGallery.single('image'), (req, res) 
 
 // Delete gallery image
 router.delete('/gallery/:id', requireAdmin, (req, res) => {
-  db.run('DELETE FROM gallery WHERE id = ?', [req.params.id], function(err) {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ changes: this.changes });
+  db.get('SELECT image_url FROM gallery WHERE id = ?', [req.params.id], (getErr, row) => {
+    if (getErr) return res.status(500).json({ error: getErr.message });
+
+    db.run('DELETE FROM gallery WHERE id = ?', [req.params.id], function(err) {
+      if (err) return res.status(500).json({ error: err.message });
+      if (this.changes > 0 && row?.image_url) {
+        cleanupStoredFile(row.image_url);
+      }
+      res.json({ changes: this.changes });
+    });
   });
 });
 
@@ -726,15 +733,35 @@ router.put('/settings', requireAdmin, uploadFields, (req, res) => {
     tagline, hero_background, hero_background_image, hero_background_video, about_text, about_image
   });
 
-  db.run('UPDATE settings SET tagline = ?, hero_background = ?, hero_background_image = ?, hero_background_video = ?, about_text = ?, about_image = ? WHERE id = 1',
-    [tagline, hero_background, hero_background_image, hero_background_video, about_text, about_image], function(err) {
-      if (err) {
-        console.error('Database error:', err);
-        return res.status(500).json({ error: err.message });
-      }
-      console.log('Settings updated successfully, changes:', this.changes);
-      res.json({ changes: this.changes });
-    });
+  db.get('SELECT about_image, hero_background_image, hero_background_video FROM settings WHERE id = 1', [], (getErr, currentSettings) => {
+    if (getErr) {
+      console.error('Error fetching existing settings:', getErr);
+      return res.status(500).json({ error: getErr.message });
+    }
+
+    db.run('UPDATE settings SET tagline = ?, hero_background = ?, hero_background_image = ?, hero_background_video = ?, about_text = ?, about_image = ? WHERE id = 1',
+      [tagline, hero_background, hero_background_image, hero_background_video, about_text, about_image], function(err) {
+        if (err) {
+          console.error('Database error:', err);
+          return res.status(500).json({ error: err.message });
+        }
+
+        if (this.changes > 0 && currentSettings) {
+          if (currentSettings.about_image && currentSettings.about_image !== about_image) {
+            cleanupStoredFile(currentSettings.about_image);
+          }
+          if (currentSettings.hero_background_image && currentSettings.hero_background_image !== hero_background_image) {
+            cleanupStoredFile(currentSettings.hero_background_image);
+          }
+          if (currentSettings.hero_background_video && currentSettings.hero_background_video !== hero_background_video) {
+            cleanupStoredFile(currentSettings.hero_background_video);
+          }
+        }
+
+        console.log('Settings updated successfully, changes:', this.changes);
+        res.json({ changes: this.changes });
+      });
+  });
 });
 
 // Get team members (public - for team page)
@@ -759,18 +786,36 @@ router.post('/team', requireAdmin, uploadTeam.single('photo'), (req, res) => {
 router.put('/team/:id', requireAdmin, uploadTeam.single('photo'), (req, res) => {
   const { name, student_id, role, section } = req.body;
   const photo_url = getUploadUrl(req.file, '/team') || req.body.photo_url;
-  db.run('UPDATE team SET name = ?, student_id = ?, photo_url = ?, role = ?, section = ? WHERE id = ?',
-    [name, student_id, photo_url, role, section, req.params.id], function(err) {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json({ changes: this.changes });
+  db.get('SELECT photo_url FROM team WHERE id = ?', [req.params.id], (getErr, existingTeam) => {
+    if (getErr) return res.status(500).json({ error: getErr.message });
+
+    db.run('UPDATE team SET name = ?, student_id = ?, photo_url = ?, role = ?, section = ? WHERE id = ?',
+      [name, student_id, photo_url, role, section, req.params.id], function(err) {
+        if (err) return res.status(500).json({ error: err.message });
+
+        if (this.changes > 0 && existingTeam?.photo_url && existingTeam.photo_url !== photo_url) {
+          cleanupStoredFile(existingTeam.photo_url);
+        }
+
+        res.json({ changes: this.changes });
+      });
     });
 });
 
 // Delete team member
 router.delete('/team/:id', requireAdmin, (req, res) => {
-  db.run('DELETE FROM team WHERE id = ?', [req.params.id], function(err) {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ changes: this.changes });
+  db.get('SELECT photo_url FROM team WHERE id = ?', [req.params.id], (getErr, existingTeam) => {
+    if (getErr) return res.status(500).json({ error: getErr.message });
+
+    db.run('DELETE FROM team WHERE id = ?', [req.params.id], function(err) {
+      if (err) return res.status(500).json({ error: err.message });
+
+      if (this.changes > 0 && existingTeam?.photo_url) {
+        cleanupStoredFile(existingTeam.photo_url);
+      }
+
+      res.json({ changes: this.changes });
+    });
   });
 });
 
