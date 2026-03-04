@@ -191,6 +191,7 @@ if (usePostgres) {
         id SERIAL PRIMARY KEY,
         image_url TEXT,
         event_name TEXT,
+        event_date DATE,
         uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`,
       `CREATE TABLE IF NOT EXISTS settings (
@@ -341,6 +342,15 @@ if (usePostgres) {
       console.log('users.created_at ensure warning:', err.message);
     }
 
+    // Ensure gallery.event_date exists for older databases
+    try {
+      await pool.query('ALTER TABLE gallery ADD COLUMN IF NOT EXISTS event_date DATE');
+      await pool.query('UPDATE gallery SET event_date = uploaded_at::date WHERE event_date IS NULL AND uploaded_at IS NOT NULL');
+      console.log('✅ gallery.event_date column ensured');
+    } catch (err) {
+      console.log('gallery.event_date ensure warning:', err.message);
+    }
+
     // Create default admin user
     try {
       const result = await pool.query('SELECT * FROM users WHERE email = $1', ['2025uee0154@iitjammu.ac.in']);
@@ -479,6 +489,7 @@ if (usePostgres) {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         image_url TEXT,
         event_name TEXT,
+        event_date DATE,
         uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )`,
       `CREATE TABLE IF NOT EXISTS settings (
@@ -605,6 +616,7 @@ if (usePostgres) {
           console.log('🗄️  SQLite initialization complete!');
           createIndices();
           ensureUserCreatedAtColumn();
+          ensureGalleryEventDateColumn();
           createDefaultData();
         }
       });
@@ -646,6 +658,29 @@ if (usePostgres) {
         });
       } else {
         db.run('UPDATE users SET created_at = CURRENT_TIMESTAMP WHERE created_at IS NULL');
+      }
+    });
+  }
+
+  function ensureGalleryEventDateColumn() {
+    db.all('PRAGMA table_info(gallery)', [], (err, columns) => {
+      if (err) {
+        console.log('⚠️  Could not inspect gallery table columns:', err.message);
+        return;
+      }
+
+      const hasEventDate = Array.isArray(columns) && columns.some((col) => col.name === 'event_date');
+      if (!hasEventDate) {
+        db.run('ALTER TABLE gallery ADD COLUMN event_date DATE', (alterErr) => {
+          if (alterErr) {
+            console.log('⚠️  Could not add gallery.event_date:', alterErr.message);
+            return;
+          }
+          db.run('UPDATE gallery SET event_date = date(uploaded_at) WHERE event_date IS NULL AND uploaded_at IS NOT NULL');
+          console.log('✅ gallery.event_date column added');
+        });
+      } else {
+        db.run('UPDATE gallery SET event_date = date(uploaded_at) WHERE event_date IS NULL AND uploaded_at IS NOT NULL');
       }
     });
   }
