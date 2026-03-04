@@ -39,4 +39,3 @@ database.db
 
 # DO NOT ignore public folder - it contains essential images
 # public/ - REMOVED to include images in repo
-.env
