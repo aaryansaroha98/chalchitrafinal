@@ -127,7 +127,8 @@ if (usePostgres) {
         name TEXT,
         is_admin INTEGER DEFAULT 0,
         code_scanner INTEGER DEFAULT 0,
-        admin_tag TEXT
+        admin_tag TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`,
       `CREATE TABLE IF NOT EXISTS movies (
         id SERIAL PRIMARY KEY,
@@ -331,6 +332,15 @@ if (usePostgres) {
       // Index might already exist
     }
 
+    // Ensure users.created_at exists for older databases
+    try {
+      await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+      await pool.query('UPDATE users SET created_at = CURRENT_TIMESTAMP WHERE created_at IS NULL');
+      console.log('✅ users.created_at column ensured');
+    } catch (err) {
+      console.log('users.created_at ensure warning:', err.message);
+    }
+
     // Create default admin user
     try {
       const result = await pool.query('SELECT * FROM users WHERE email = $1', ['2025uee0154@iitjammu.ac.in']);
@@ -405,7 +415,8 @@ if (usePostgres) {
         name TEXT,
         is_admin INTEGER DEFAULT 0,
         code_scanner INTEGER DEFAULT 0,
-        admin_tag TEXT
+        admin_tag TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )`,
       `CREATE TABLE IF NOT EXISTS movies (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -593,6 +604,7 @@ if (usePostgres) {
         if (completed === tables.length) {
           console.log('🗄️  SQLite initialization complete!');
           createIndices();
+          ensureUserCreatedAtColumn();
           createDefaultData();
         }
       });
@@ -612,6 +624,29 @@ if (usePostgres) {
           console.log('✅ Index ensured');
         }
       });
+    });
+  }
+
+  function ensureUserCreatedAtColumn() {
+    db.all('PRAGMA table_info(users)', [], (err, columns) => {
+      if (err) {
+        console.log('⚠️  Could not inspect users table columns:', err.message);
+        return;
+      }
+
+      const hasCreatedAt = Array.isArray(columns) && columns.some((col) => col.name === 'created_at');
+      if (!hasCreatedAt) {
+        db.run('ALTER TABLE users ADD COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP', (alterErr) => {
+          if (alterErr) {
+            console.log('⚠️  Could not add users.created_at:', alterErr.message);
+            return;
+          }
+          db.run('UPDATE users SET created_at = CURRENT_TIMESTAMP WHERE created_at IS NULL');
+          console.log('✅ users.created_at column added');
+        });
+      } else {
+        db.run('UPDATE users SET created_at = CURRENT_TIMESTAMP WHERE created_at IS NULL');
+      }
     });
   }
 
@@ -637,4 +672,3 @@ if (usePostgres) {
 
 // Export database object
 module.exports = db;
-

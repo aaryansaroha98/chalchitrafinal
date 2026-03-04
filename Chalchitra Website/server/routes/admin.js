@@ -405,7 +405,7 @@ router.put('/team/:id/remove_scanner', requireAdmin, (req, res) => {
 
 // Get all users
 router.get('/users', requireAdmin, (req, res) => {
-  db.all('SELECT id, name, email, is_admin, code_scanner FROM users ORDER BY name', [], (err, users) => {
+  db.all('SELECT id, name, email, is_admin, code_scanner, created_at FROM users ORDER BY name', [], (err, users) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(users);
   });
@@ -776,17 +776,44 @@ router.delete('/team/:id', requireAdmin, (req, res) => {
 
 // Email functionality for admin - ENABLED (via Brevo HTTP API)
 const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
+const DEFAULT_FRONTEND_URL = 'https://chalchitrafinal.vercel.app';
+
+function normalizeBaseUrl(url, fallbackUrl) {
+  const raw = (url || fallbackUrl || '').trim();
+  if (!raw) return '';
+  const withProtocol = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+  return withProtocol.replace(/\/+$/, '');
+}
+
+function getFrontendBaseUrl() {
+  return normalizeBaseUrl(
+    process.env.FRONTEND_URL || process.env.PUBLIC_APP_URL || process.env.WEBSITE_URL,
+    DEFAULT_FRONTEND_URL
+  );
+}
+
+function buildFrontendUrl(routePath = '') {
+  const safePath = routePath
+    ? (routePath.startsWith('/') ? routePath : `/${routePath}`)
+    : '';
+  return `${getFrontendBaseUrl()}${safePath}`;
+}
 
 // Get sender info for Brevo
 function getBrevoSender(senderName) {
   return {
     name: senderName || 'Chalchitra IIT Jammu',
-    email: process.env.BREVO_FROM_EMAIL || 'chalchitra@iitjammu.ac.in'
+    email: process.env.BREVO_FROM_EMAIL || process.env.EMAIL_USER || 'chalchitra@iitjammu.ac.in'
   };
 }
 
 // Helper: send one email via Brevo
 async function sendBrevoEmail(options) {
+  const brevoApiKey = process.env.BREVO_API_KEY;
+  if (!brevoApiKey) {
+    throw new Error('BREVO_API_KEY is not configured on backend environment');
+  }
+
   const body = {
     sender: options.sender || getBrevoSender(),
     to: options.to,
@@ -800,7 +827,7 @@ async function sendBrevoEmail(options) {
     method: 'POST',
     headers: {
       'accept': 'application/json',
-      'api-key': process.env.BREVO_API_KEY,
+      'api-key': brevoApiKey,
       'content-type': 'application/json',
     },
     body: JSON.stringify(body),
@@ -1154,7 +1181,7 @@ router.post('/email/feedback-request', requireAdmin, async (req, res) => {
                       </p>
 
                       <div style="text-align: center; margin: 30px 0;">
-                        <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/my-bookings?user_id=${user.id}&feedback=true"
+                        <a href="${buildFrontendUrl('/my-bookings')}?user_id=${encodeURIComponent(String(user.id))}&feedback=true"
                            style="background: linear-gradient(145deg, #007bff, #0056b3); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block; box-shadow: 0 4px 8px rgba(0,123,255,0.3);">
                           Give Feedback
                         </a>
