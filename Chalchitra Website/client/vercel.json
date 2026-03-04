@@ -1,0 +1,14 @@
+{
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://chalchitra-backend.onrender.com/api/:path*" },
+    { "source": "/uploads/:path*", "destination": "https://chalchitra-backend.onrender.com/uploads/:path*" },
+    { "source": "/hero/:path*", "destination": "https://chalchitra-backend.onrender.com/hero/:path*" },
+    { "source": "/about/:path*", "destination": "https://chalchitra-backend.onrender.com/about/:path*" },
+    { "source": "/gallery/:path*", "destination": "https://chalchitra-backend.onrender.com/gallery/:path*" },
+    { "source": "/team/:path*", "destination": "https://chalchitra-backend.onrender.com/team/:path*" },
+    { "source": "/logos/:path*", "destination": "https://chalchitra-backend.onrender.com/logos/:path*" },
+    { "source": "/misc/:path*", "destination": "https://chalchitra-backend.onrender.com/misc/:path*" },
+    { "source": "/favicons/:path*", "destination": "https://chalchitra-backend.onrender.com/favicons/:path*" },
+    { "source": "/health", "destination": "https://chalchitra-backend.onrender.com/health" }
+  ]
+}

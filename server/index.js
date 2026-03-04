@@ -102,9 +102,11 @@ if (!fs.existsSync(uploadsDir)) {
 }
 app.use('/uploads', express.static(uploadsDir));
 
-// Check if client build exists before serving it
+// Check if client build exists before serving it - check multiple possible locations
 const possibleBuildPaths = [
-  path.join(__dirname, '..', 'client', 'build', 'index.html')
+  path.join(__dirname, '..', 'client', 'build', 'index.html'), // Original location
+  path.join(__dirname, '..', 'Chalchitra Website', 'client', 'build', 'index.html'), // Nested location
+  path.join(__dirname, '..', '..', 'Chalchitra Website', 'client', 'build', 'index.html') // Alternative nested location
 ];
 
 let clientBuildPath = possibleBuildPaths.find(p => fs.existsSync(p));
