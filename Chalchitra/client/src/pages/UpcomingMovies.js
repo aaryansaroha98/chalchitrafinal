@@ -531,20 +531,18 @@ const UpcomingMovies = () => {
             {upcomingMovies.map((movie) => (
               <Col xl={4} lg={4} md={4} sm={4} xs={4} key={movie.id} style={{ alignSelf: 'flex-start' }}>
                 <div className="upcoming-card" style={{
-                  background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
-                  backdropFilter: 'blur(25px) saturate(180%)',
-                  border: '1px solid rgba(255, 255, 255, 0.18)',
-                  borderRadius: '16px',
+                  background: '#f7f5f1',
+                  border: '1px solid rgba(0, 0, 0, 0.08)',
+                  borderRadius: '18px',
                   overflow: 'hidden',
-                  boxShadow: `
-                    0 8px 32px rgba(0, 0, 0, 0.12),
-                    0 2px 8px rgba(0, 0, 0, 0.08),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                    0 0 0 1px rgba(255, 255, 255, 0.05)
-                  `,
-                  transition: 'all 0.5s cubic-bezier(0.23, 1, 0.32, 1)',
+                  boxShadow: '0 12px 30px rgba(0, 0, 0, 0.08)',
+                  padding: '1rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.8rem',
+                  transition: 'transform 0.35s ease, box-shadow 0.35s ease, background 0.35s ease, border-color 0.35s ease',
                   position: 'relative',
-                  transform: 'perspective(1000px) rotateX(0deg)',
+                  transform: 'translateY(0)',
                   willChange: 'transform',
                   cursor: 'pointer'
                 }}
@@ -556,189 +554,79 @@ const UpcomingMovies = () => {
                   }
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'perspective(1000px) rotateX(-2deg) translateY(-8px) scale(1.02)';
-                  e.currentTarget.style.boxShadow = `
-                    0 20px 60px rgba(0, 0, 0, 0.2),
-                    0 8px 32px rgba(0, 255, 255, 0.15),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.15),
-                    0 0 0 1px rgba(255, 255, 255, 0.1)
-                  `;
-                  e.currentTarget.style.background = 'linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06))';
-                  e.currentTarget.style.borderColor = 'rgba(0, 255, 255, 0.3)';
+                  e.currentTarget.style.transform = 'translateY(-6px)';
+                  e.currentTarget.style.boxShadow = '0 18px 45px rgba(0, 0, 0, 0.12)';
+                  e.currentTarget.style.background = '#fbfaf7';
+                  e.currentTarget.style.borderColor = 'rgba(0, 0, 0, 0.12)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'perspective(1000px) rotateX(0deg) translateY(0) scale(1)';
-                  e.currentTarget.style.boxShadow = `
-                    0 8px 32px rgba(0, 0, 0, 0.12),
-                    0 2px 8px rgba(0, 0, 0, 0.08),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                    0 0 0 1px rgba(255, 255, 255, 0.05)
-                  `;
-                  e.currentTarget.style.background = 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))';
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.18)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 12px 30px rgba(0, 0, 0, 0.08)';
+                  e.currentTarget.style.background = '#f7f5f1';
+                  e.currentTarget.style.borderColor = 'rgba(0, 0, 0, 0.08)';
                 }}
                 >
                   {/* Movie Poster */}
                   <div style={{
                     position: 'relative',
-                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+                    backgroundColor: '#f1efe9',
+                    borderRadius: '14px',
+                    padding: '1.1rem',
+                    aspectRatio: '2 / 3',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    overflow: 'hidden'
                   }}>
                   {movie.poster_url ? (
                     <img
                       src={movie.poster_url.startsWith('http') ? movie.poster_url : `${window.location.origin}${movie.poster_url}`}
                       alt={movie.title}
                       style={{
+                        maxWidth: '100%',
+                        maxHeight: '100%',
                         width: '100%',
-                        height: 'auto',
+                        height: '100%',
+                        objectFit: 'contain',
                         display: 'block'
                       }}
                     />
                   ) : (
                       <div style={{
-                        backgroundColor: '#e9ecef',
+                        backgroundColor: '#e9e6df',
                         width: '100%',
-                        aspectRatio: '2 / 3',
+                        height: '100%',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center'
                       }}>
                         <i className="fas fa-film" style={{
                           fontSize: '3rem',
-                          color: '#adb5bd'
+                          color: '#b8b2a8'
                         }}></i>
                       </div>
                     )}
-
-                    {/* Date Badge */}
-                    <div className="upcoming-badge" style={{
-                      position: 'absolute',
-                      top: '12px',
-                      left: '12px',
-                      backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                      color: 'white',
-                      padding: '4px 8px',
-                      borderRadius: '6px',
-                      fontSize: '0.75rem',
-                      fontWeight: '600'
-                    }}>
-                      <i className="fas fa-calendar" style={{marginRight: '0.25rem'}}></i>
-                      {new Date(movie.date).toLocaleDateString('en-IN', {
-                        month: 'short',
-                        day: 'numeric'
-                      })}
-                    </div>
                   </div>
 
-                  {/* Movie Info */}
                   <div className="upcoming-info" style={{
-                    padding: '0.55rem',
-                    flex: 1,
-                    display: 'flex',
-                    flexDirection: 'column'
+                    textAlign: 'center',
+                    padding: '0 0.4rem 0.3rem'
                   }}>
-                  <h4 className="upcoming-title" style={{
-                    fontSize: '0.95rem',
+                  <div className="upcoming-title" style={{
+                    fontSize: '0.65rem',
+                    letterSpacing: '0.28em',
+                    textTransform: 'uppercase',
                     fontWeight: '600',
-                    marginBottom: '0.25rem',
-                    color: 'white',
-
-
-
-
-                    lineHeight: '1.2',
+                    color: '#1f1d1a',
+                    lineHeight: '1.4',
+                    minHeight: '2.2rem',
                     display: '-webkit-box',
-                    WebkitLineClamp: 1,
+                    WebkitLineClamp: 2,
                     WebkitBoxOrient: 'vertical',
                     overflow: 'hidden'
                   }}>
                     {movie.title}
-                  </h4>
-
-                    {/* Description */}
-                    <p className="upcoming-desc" style={{
-                      color: 'var(--gray-600)',
-                      fontSize: '0.65rem',
-                      marginBottom: '0.4rem',
-                      lineHeight: '1.3',
-                      display: '-webkit-box',
-                      WebkitLineClamp: 1,
-                      WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden',
-                      flex: 1
-                    }}>
-                      {movie.description}
-                    </p>
-
-                    {/* Details */}
-                    <div className="upcoming-meta" style={{marginBottom: '0.4rem'}}>
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        position: 'relative'
-                      }}>
-                        <div style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          marginLeft: '0px'
-                        }}>
-                          <i className="fas fa-map-marker-alt" style={{
-                            color: 'var(--gray-500)',
-                            fontSize: '0.7rem',
-                            marginRight: '0.5rem',
-                            minWidth: '14px'
-                          }}></i>
-                        <div>
-                          <div style={{
-                            fontSize: '0.55rem',
-                            color: 'white',
-                            fontWeight: '500',
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.5px',
-                            marginBottom: '0.1rem'
-                          }}>Venue</div>
-                          <div style={{
-                            fontSize: '0.75rem',
-                            color: 'white',
-                            fontWeight: '500'
-                          }}>{movie.venue}</div>
-                        </div>
-                        </div>
-
-                        <div style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          position: 'absolute',
-                          right: '0'
-                        }}>
-                          <i className="fas fa-clock" style={{
-                            color: 'var(--gray-500)',
-                            fontSize: '0.7rem',
-                            marginRight: '0.5rem',
-                            minWidth: '14px'
-                          }}></i>
-                          <div>
-                            <div style={{
-                              fontSize: '0.55rem',
-                              color: 'white',
-                              fontWeight: '500',
-                              textTransform: 'uppercase',
-                              letterSpacing: '0.5px',
-                              marginBottom: '0.1rem'
-                            }}>Show Time</div>
-                            <div style={{
-                              fontSize: '0.75rem',
-                              color: 'white',
-                              fontWeight: '500'
-                            }}>{new Date(movie.date).toLocaleTimeString('en-IN', {
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
+                  </div>
                   </div>
                 </div>
               </Col>
