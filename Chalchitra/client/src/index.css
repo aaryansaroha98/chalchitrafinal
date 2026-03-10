@@ -2251,6 +2251,48 @@ a:hover {
   }
 }
 
+/* Global: remove tap highlight and focus outlines on all devices */
+.navbar a,
+.navbar button,
+.navbar .navbar-brand,
+.navbar .nav-link,
+.navbar .nav button,
+.offcanvas a,
+.offcanvas button,
+.offcanvas .nav-link {
+  -webkit-tap-highlight-color: transparent;
+  outline: none !important;
+}
+
+.navbar a:focus,
+.navbar a:focus-visible,
+.navbar a:active,
+.navbar button:focus,
+.navbar button:focus-visible,
+.navbar button:active,
+.navbar .navbar-brand:focus,
+.navbar .navbar-brand:focus-visible,
+.navbar .navbar-brand:active,
+.navbar .nav-link:focus,
+.navbar .nav-link:focus-visible,
+.navbar .nav-link:active,
+.navbar .nav button:focus,
+.navbar .nav button:focus-visible,
+.navbar .nav button:active,
+.offcanvas a:focus,
+.offcanvas a:focus-visible,
+.offcanvas a:active,
+.offcanvas button:focus,
+.offcanvas button:focus-visible,
+.offcanvas button:active,
+.offcanvas .nav-link:focus,
+.offcanvas .nav-link:focus-visible,
+.offcanvas .nav-link:active {
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
 .nav-login-icon {
   display: none;
 }
