@@ -739,51 +739,6 @@ const UpcomingMovies = () => {
                       </div>
                     </div>
 
-                    {/* Book Tickets Button - Glass Style */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (!isAuthenticated) {
-                          setShowLoginModal(true);
-                        } else {
-                          navigate(`/booking/${movie.id}`);
-                        }
-                      }}
-                      className="upcoming-btn"
-                      style={{
-                        display: 'block',
-                        width: '100%',
-                        padding: '0.6rem 0.85rem',
-                        borderRadius: '12px',
-                        background: 'rgba(255, 255, 255, 0.1)',
-                        backdropFilter: 'blur(10px)',
-                        border: '1px solid rgba(255, 255, 255, 0.3)',
-                        color: 'white',
-                        textDecoration: 'none',
-                        textAlign: 'center',
-                        fontWeight: '500',
-                        fontSize: '0.75rem',
-                        boxShadow: '0 4px 15px rgba(0, 255, 255, 0.2)',
-                        transition: 'all 0.3s ease',
-                        textShadow: '0 1px 2px rgba(0,0,0,0.5)',
-                        marginTop: 'auto',
-                        cursor: 'pointer',
-                        fontFamily: 'inherit'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.target.style.transform = 'translateY(-2px)';
-                        e.target.style.boxShadow = '0 6px 20px rgba(0, 255, 255, 0.4)';
-                        e.target.style.background = 'rgba(255, 255, 255, 0.2)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.transform = 'translateY(0)';
-                        e.target.style.boxShadow = '0 4px 15px rgba(0, 255, 255, 0.2)';
-                        e.target.style.background = 'rgba(255, 255, 255, 0.1)';
-                      }}
-                    >
-                      <i className="fas fa-ticket-alt" style={{marginRight: '0.5rem'}}></i>
-                      Book Tickets
-                    </button>
                   </div>
                 </div>
               </Col>
