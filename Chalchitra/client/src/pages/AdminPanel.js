@@ -1044,127 +1044,327 @@ const AdminPanel = () => {
       alert('Error deleting winners: ' + (err.response?.data?.error || err.message));
     }
   };
+  // Reset bookings (optionally filtered by selected movie)
+  const handleResetBookings = async () => {
+    const movieName = selectedMovie && movies ? movies.find(m => m.id == selectedMovie)?.title : null;
+    const target = movieName ? `all bookings for "${movieName}"` : 'ALL bookings';
+
+    if (!window.confirm(`Are you sure you want to reset ${target}? This action cannot be undone.`)) return;
+    if (!window.confirm(`⚠️ FINAL WARNING: This will permanently delete ${target}. Proceed?`)) return;
+
+    try {
+      await api.delete('/api/admin/bookings/reset', {
+        data: selectedMovie ? { movie_id: selectedMovie } : {}
+      });
+      alert(`Successfully reset ${target}.`);
+      fetchAllData();
+    } catch (err) {
+      console.error('Error resetting bookings:', err);
+      alert('Error resetting bookings: ' + (err.response?.data?.error || err.message));
+    }
+  };
 
   // Export bookings to PDF
   const exportBookingsToPDF = (bookingsToExport) => {
     try {
-      const doc = new jsPDF();
+      const doc = new jsPDF('landscape');
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const now = new Date();
 
-      // Add title
-      doc.setFontSize(20);
-      doc.text('Chalchitra Bookings Report', 20, 20);
+      // ── HEADER ──
+      doc.setFillColor(26, 26, 26);
+      doc.rect(0, 0, pageWidth, 32, 'F');
+      doc.setFillColor(0, 123, 255);
+      doc.rect(0, 32, pageWidth, 1.5, 'F');
 
-      // Add date
-      doc.setFontSize(12);
-      doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 35);
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(22);
+      doc.setFont('helvetica', 'bold');
+      doc.text('CHALCHITRA', 15, 16);
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Indian Institute of Technology Jammu', 15, 24);
 
-      // Calculate food order summary
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Report Date: ${now.toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}`, pageWidth - 15, 16, { align: 'right' });
+      doc.text(`Total Bookings: ${bookingsToExport.length}`, pageWidth - 15, 24, { align: 'right' });
+
+      doc.setTextColor(0, 0, 0);
+
+      // ── REPORT TITLE ──
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Bookings Report', 15, 44);
+
+      // Movie filter info
+      const movieName = selectedMovie && movies ? movies.find(m => m.id == selectedMovie)?.title : null;
+      if (movieName) {
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Filtered by: ${movieName}`, 15, 51);
+        doc.setTextColor(0, 0, 0);
+      }
+
+      // ── BOOKINGS TABLE ──
       const foodOrderSummary = {};
+      let totalRevenue = 0;
+      let totalFoodRevenue = 0;
+      let usedCount = 0;
+      let activeCount = 0;
+      let totalSeats = 0;
 
-      bookingsToExport.forEach(booking => {
+      const tableData = bookingsToExport.map(booking => {
+        const foodOrders = booking.foodOrders && booking.foodOrders.length > 0
+          ? booking.foodOrders.map(f => `${f.name} x${f.quantity}`).join(', ')
+          : '—';
+        const foodCost = booking.foodCost || 0;
+        const ticketPrice = parseFloat(booking.total_price || booking.price || 0);
+        const grandTotal = ticketPrice + foodCost;
+
+        totalRevenue += grandTotal;
+        totalFoodRevenue += foodCost;
+        if (booking.is_used) usedCount++; else activeCount++;
+
+        // Parse seats
+        const seats = booking.selected_seats || booking.num_people || '—';
+        if (typeof seats === 'string' && seats.includes(',')) {
+          totalSeats += seats.split(',').length;
+        } else if (typeof seats === 'number') {
+          totalSeats += seats;
+        } else if (seats !== '—') {
+          totalSeats += 1;
+        }
+
+        // Build food summary
         if (booking.foodOrders && booking.foodOrders.length > 0) {
           booking.foodOrders.forEach(food => {
+            const qty = parseInt(food.quantity) || 0;
+            const price = parseFloat(food.price) || 0;
             if (foodOrderSummary[food.name]) {
-              foodOrderSummary[food.name].quantity += parseInt(food.quantity) || 0;
-              foodOrderSummary[food.name].total += (parseFloat(food.price) || 0) * (parseInt(food.quantity) || 0);
+              foodOrderSummary[food.name].quantity += qty;
+              foodOrderSummary[food.name].total += price * qty;
             } else {
               foodOrderSummary[food.name] = {
                 name: food.name,
-                price: parseFloat(food.price) || 0,
-                quantity: parseInt(food.quantity) || 0,
-                total: (parseFloat(food.price) || 0) * (parseInt(food.quantity) || 0)
+                price,
+                quantity: qty,
+                total: price * qty
               };
             }
           });
         }
-      });
-
-      // Prepare main bookings table data with food orders
-      const tableData = bookingsToExport.map(booking => {
-        const foodOrders = booking.foodOrders && booking.foodOrders.length > 0
-          ? booking.foodOrders.map(f => `${f.name} x${f.quantity}`).join(', ')
-          : 'None';
-        const foodCost = booking.foodCost || 0;
 
         return [
           booking.id.toString(),
           booking.name || 'N/A',
           booking.title || booking.movie_title || 'N/A',
-          booking.selected_seats || booking.num_people || 'N/A',
+          seats,
           foodOrders,
-          `₹${(parseFloat(booking.total_price || booking.price) + foodCost).toFixed(2)}`,
+          `Rs. ${ticketPrice.toFixed(0)}`,
+          `Rs. ${foodCost.toFixed(0)}`,
+          `Rs. ${grandTotal.toFixed(0)}`,
           booking.is_used ? 'Used' : 'Active',
-          new Date(booking.created_at).toLocaleDateString()
+          new Date(booking.created_at).toLocaleDateString('en-IN')
         ];
       });
 
-      // Add main bookings table
-      doc.setFontSize(14);
-      doc.text('Bookings Detail', 20, 50);
-
       autoTable(doc, {
-        head: [['ID', 'User', 'Movie', 'Seats', 'Food Orders', 'Total Price', 'Status', 'Date']],
+        head: [['#', 'User', 'Movie', 'Seats', 'Food Orders', 'Ticket', 'Food', 'Total', 'Status', 'Date']],
         body: tableData,
-        startY: 55,
+        startY: movieName ? 56 : 50,
         styles: {
           fontSize: 7,
-          cellPadding: 2,
-          overflow: 'linebreak'
+          cellPadding: 2.5,
+          overflow: 'linebreak',
+          lineColor: [220, 220, 220],
+          lineWidth: 0.25
         },
         headStyles: {
-          fillColor: [0, 123, 255],
-          textColor: 255
+          fillColor: [26, 26, 26],
+          textColor: [255, 255, 255],
+          fontStyle: 'bold',
+          fontSize: 7.5,
+          halign: 'center'
         },
         alternateRowStyles: {
-          fillColor: [245, 245, 245]
+          fillColor: [248, 249, 250]
         },
         columnStyles: {
-          0: { cellWidth: 15 },
-          1: { cellWidth: 25 },
-          2: { cellWidth: 30 },
-          3: { cellWidth: 20 },
-          4: { cellWidth: 35 },
-          5: { cellWidth: 22 },
-          6: { cellWidth: 18 },
-          7: { cellWidth: 20 }
-        }
+          0: { cellWidth: 12, halign: 'center' },
+          1: { cellWidth: 30 },
+          2: { cellWidth: 35 },
+          3: { cellWidth: 22, halign: 'center' },
+          4: { cellWidth: 50 },
+          5: { cellWidth: 22, halign: 'right' },
+          6: { cellWidth: 22, halign: 'right' },
+          7: { cellWidth: 22, halign: 'right', fontStyle: 'bold' },
+          8: { cellWidth: 20, halign: 'center' },
+          9: { cellWidth: 25, halign: 'center' }
+        },
+        didParseCell: function (data) {
+          if (data.section === 'body' && data.column.index === 8) {
+            if (data.cell.raw === 'Used') {
+              data.cell.styles.textColor = [40, 167, 69];
+              data.cell.styles.fontStyle = 'bold';
+            } else {
+              data.cell.styles.textColor = [0, 123, 255];
+              data.cell.styles.fontStyle = 'bold';
+            }
+          }
+        },
+        margin: { left: 10, right: 10 }
       });
 
-      // Add Food Orders Details table
-      const foodSummaryData = Object.values(foodOrderSummary).map(food => [
-        food.name,
-        `₹${food.price.toFixed(2)}`,
-        food.quantity,
-        `₹${food.total.toFixed(2)}`
-      ]);
+      let currentY = doc.lastAutoTable.finalY + 12;
 
-      if (foodSummaryData.length > 0) {
-        const finalY = doc.lastAutoTable.finalY + 15;
+      // ── Check if we need a new page ──
+      const checkPageBreak = (needed) => {
+        if (currentY + needed > pageHeight - 20) {
+          doc.addPage();
+          currentY = 20;
+        }
+      };
 
-        doc.setFontSize(14);
-        doc.text('Food Orders Details', 20, finalY);
+      // ── BOOKING SUMMARY ──
+      checkPageBreak(50);
+
+      doc.setFillColor(26, 26, 26);
+      doc.rect(10, currentY, pageWidth - 20, 8, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      doc.text('BOOKING SUMMARY', 15, currentY + 5.5);
+      doc.setTextColor(0, 0, 0);
+      currentY += 12;
+
+      const avgPrice = bookingsToExport.length > 0 ? totalRevenue / bookingsToExport.length : 0;
+
+      const summaryData = [
+        ['Total Bookings', bookingsToExport.length.toString()],
+        ['Total Seats Booked', totalSeats.toString()],
+        ['Used Tickets', usedCount.toString()],
+        ['Active Tickets', activeCount.toString()],
+        ['Total Ticket Revenue', `Rs. ${(totalRevenue - totalFoodRevenue).toFixed(2)}`],
+        ['Total Food Revenue', `Rs. ${totalFoodRevenue.toFixed(2)}`],
+        ['Grand Total Revenue', `Rs. ${totalRevenue.toFixed(2)}`],
+        ['Average Booking Value', `Rs. ${avgPrice.toFixed(2)}`]
+      ];
+
+      autoTable(doc, {
+        body: summaryData,
+        startY: currentY,
+        theme: 'plain',
+        styles: {
+          fontSize: 9,
+          cellPadding: 3
+        },
+        columnStyles: {
+          0: { cellWidth: 60, fontStyle: 'bold', textColor: [80, 80, 80] },
+          1: { cellWidth: 60, halign: 'left', fontStyle: 'bold' }
+        },
+        didParseCell: function (data) {
+          if (data.section === 'body') {
+            if (data.row.index === summaryData.length - 3 || data.row.index === summaryData.length - 2) {
+              data.cell.styles.fillColor = [248, 249, 250];
+            }
+            if (data.row.index === summaryData.length - 2) {
+              data.cell.styles.fillColor = [232, 245, 233];
+              data.cell.styles.fontStyle = 'bold';
+              data.cell.styles.fontSize = 10;
+            }
+          }
+        },
+        margin: { left: 15, right: 15 }
+      });
+
+      currentY = doc.lastAutoTable.finalY + 12;
+
+      // ── FOOD ORDERS SUMMARY ──
+      const foodSummaryEntries = Object.values(foodOrderSummary);
+      if (foodSummaryEntries.length > 0) {
+        checkPageBreak(40);
+
+        doc.setFillColor(40, 167, 69);
+        doc.rect(10, currentY, pageWidth - 20, 8, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.text('FOOD ORDERS SUMMARY', 15, currentY + 5.5);
+        doc.setTextColor(0, 0, 0);
+        currentY += 12;
+
+        const foodTableData = foodSummaryEntries.map((food, i) => [
+          (i + 1).toString(),
+          food.name,
+          `Rs. ${food.price.toFixed(2)}`,
+          food.quantity.toString(),
+          `Rs. ${food.total.toFixed(2)}`
+        ]);
+
+        const foodGrandTotal = foodSummaryEntries.reduce((sum, f) => sum + f.total, 0);
+        const foodTotalQty = foodSummaryEntries.reduce((sum, f) => sum + f.quantity, 0);
+
+        foodTableData.push([
+          '', 'GRAND TOTAL', '', foodTotalQty.toString(), `Rs. ${foodGrandTotal.toFixed(2)}`
+        ]);
 
         autoTable(doc, {
-          head: [['Food Name', 'Price', 'Total Quantity', 'Total']],
-          body: foodSummaryData,
-          startY: finalY + 5,
+          head: [['#', 'Food Item', 'Unit Price', 'Quantity', 'Total']],
+          body: foodTableData,
+          startY: currentY,
           styles: {
             fontSize: 9,
-            cellPadding: 3
+            cellPadding: 3,
+            lineColor: [220, 220, 220],
+            lineWidth: 0.25
           },
           headStyles: {
             fillColor: [40, 167, 69],
-            textColor: 255
+            textColor: [255, 255, 255],
+            fontStyle: 'bold',
+            halign: 'center'
           },
           alternateRowStyles: {
-            fillColor: [245, 245, 245]
-          }
+            fillColor: [248, 249, 250]
+          },
+          columnStyles: {
+            0: { cellWidth: 12, halign: 'center' },
+            1: { cellWidth: 70 },
+            2: { cellWidth: 35, halign: 'right' },
+            3: { cellWidth: 30, halign: 'center' },
+            4: { cellWidth: 40, halign: 'right' }
+          },
+          didParseCell: function (data) {
+            if (data.section === 'body' && data.row.index === foodTableData.length - 1) {
+              data.cell.styles.fillColor = [232, 245, 233];
+              data.cell.styles.fontStyle = 'bold';
+              data.cell.styles.fontSize = 10;
+            }
+          },
+          margin: { left: 15, right: 15 }
         });
+
+        currentY = doc.lastAutoTable.finalY + 10;
+      }
+
+      // ── FOOTER ──
+      const totalPages = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        doc.setFillColor(245, 245, 245);
+        doc.rect(0, pageHeight - 12, pageWidth, 12, 'F');
+        doc.setFontSize(7);
+        doc.setTextColor(130, 130, 130);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Chalchitra Series | IIT Jammu — Confidential Report', 15, pageHeight - 5);
+        doc.text(`Page ${i} of ${totalPages}`, pageWidth - 15, pageHeight - 5, { align: 'right' });
       }
 
       // Save the PDF
-      doc.save(`chalchitra-bookings-${new Date().toISOString().split('T')[0]}.pdf`);
-
+      doc.save(`chalchitra-bookings-${now.toISOString().split('T')[0]}.pdf`);
       alert('PDF exported successfully!');
     } catch (error) {
       console.error('Error exporting PDF:', error);
@@ -2450,11 +2650,11 @@ const AdminPanel = () => {
                   </Form.Select>
                 </Form.Group>
               </Col>
-              <Col md={6} className="d-flex align-items-end">
+              <Col md={6} className="d-flex align-items-end gap-2">
                 <Button
                   variant="success"
                   onClick={() => exportBookingsToPDF(filteredBookings)}
-                  className="w-100"
+                  className="flex-grow-1"
                   style={{
                     background: 'linear-gradient(145deg, rgba(40, 167, 69, 0.8), rgba(40, 167, 69, 0.6))',
                     border: '1px solid rgba(255, 255, 255, 0.2)',
@@ -2462,7 +2662,20 @@ const AdminPanel = () => {
                   }}
                 >
                   <i className="fas fa-file-pdf me-2"></i>
-                  Export to PDF ({filteredBookings.length} bookings)
+                  Export PDF ({filteredBookings.length})
+                </Button>
+                <Button
+                  variant="danger"
+                  onClick={handleResetBookings}
+                  style={{
+                    background: 'linear-gradient(145deg, rgba(220, 53, 69, 0.8), rgba(220, 53, 69, 0.6))',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    color: 'white',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  <i className="fas fa-trash-alt me-2"></i>
+                  Reset {selectedMovie ? 'Movie' : 'All'}
                 </Button>
               </Col>
             </Row>

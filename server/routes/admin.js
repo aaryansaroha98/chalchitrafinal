@@ -429,6 +429,48 @@ router.put('/bookings/:id', requireAdmin, (req, res) => {
   });
 });
 
+// Reset (delete) bookings - optionally filtered by movie_id
+router.delete('/bookings/reset', requireAdmin, (req, res) => {
+  const { movie_id } = req.body || {};
+
+  const where = movie_id ? 'WHERE movie_id = ?' : '';
+  const params = movie_id ? [movie_id] : [];
+
+  // First clean up related food tables
+  const bookingSelect = movie_id
+    ? `SELECT id FROM bookings WHERE movie_id = ?`
+    : `SELECT id FROM bookings`;
+
+  db.all(bookingSelect, params, (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    const ids = rows.map(r => r.id);
+
+    if (ids.length === 0) {
+      return res.json({ message: 'No bookings to reset', deleted: 0 });
+    }
+
+    const placeholders = ids.map(() => '?').join(',');
+
+    // Delete related booking_foods
+    db.run(`DELETE FROM booking_foods WHERE booking_id IN (${placeholders})`, ids, function (err1) {
+      if (err1) console.error('Error deleting booking_foods:', err1.message);
+
+      // Delete related booking_food_status
+      db.run(`DELETE FROM booking_food_status WHERE booking_id IN (${placeholders})`, ids, function (err2) {
+        if (err2) console.error('Error deleting booking_food_status:', err2.message);
+
+        // Delete bookings
+        db.run(`DELETE FROM bookings ${where}`, params, function (err3) {
+          if (err3) return res.status(500).json({ error: err3.message });
+          console.log(`Reset ${this.changes} bookings${movie_id ? ` for movie ${movie_id}` : ''}`);
+          res.json({ message: `${this.changes} booking(s) deleted successfully`, deleted: this.changes });
+        });
+      });
+    });
+  });
+});
+
 // Get feedback
 router.get('/feedback', requireAdmin, (req, res) => {
   db.all('SELECT f.*, u.name as user_name, u.email as user_email, m.title as movie_title FROM feedback f LEFT JOIN users u ON f.user_id = u.id LEFT JOIN movies m ON f.movie_id = m.id ORDER BY f.created_at DESC',
