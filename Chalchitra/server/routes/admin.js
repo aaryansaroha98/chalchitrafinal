@@ -664,11 +664,30 @@ const normalizeGalleryEventDate = (value) => {
   const trimmed = String(value).trim();
   if (!trimmed) return null;
 
-  const dateMatch = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if (!dateMatch) return null;
+  const isoMatch = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (isoMatch) {
+    return `${isoMatch[1]}-${isoMatch[2]}-${isoMatch[3]}`;
+  }
 
-  const [, year, month, day] = dateMatch;
-  return `${year}-${month}-${day}`;
+  const altMatch = trimmed.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+  if (altMatch) {
+    const part1 = Number(altMatch[1]);
+    const part2 = Number(altMatch[2]);
+    const year = altMatch[3];
+    let day = part1;
+    let month = part2;
+
+    if (part1 <= 12 && part2 > 12) {
+      day = part2;
+      month = part1;
+    }
+
+    const monthSafe = String(Math.max(1, Math.min(12, month))).padStart(2, '0');
+    const daySafe = String(Math.max(1, Math.min(31, day))).padStart(2, '0');
+    return `${year}-${monthSafe}-${daySafe}`;
+  }
+
+  return null;
 };
 
 // Add gallery image

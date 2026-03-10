@@ -43,6 +43,44 @@ const formatExactJoinDateTime = (value) => {
   });
 };
 
+const normalizeGalleryEventDate = (value) => {
+  if (!value) return '';
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    const year = value.getUTCFullYear();
+    const month = String(value.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(value.getUTCDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  const trimmed = String(value).trim();
+  if (!trimmed) return '';
+
+  const isoMatch = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (isoMatch) {
+    return `${isoMatch[1]}-${isoMatch[2]}-${isoMatch[3]}`;
+  }
+
+  const slashMatch = trimmed.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+  if (slashMatch) {
+    const part1 = Number(slashMatch[1]);
+    const part2 = Number(slashMatch[2]);
+    const year = slashMatch[3];
+    let day = part1;
+    let month = part2;
+
+    if (part1 <= 12 && part2 > 12) {
+      day = part2;
+      month = part1;
+    }
+
+    const monthSafe = String(Math.max(1, Math.min(12, month))).padStart(2, '0');
+    const daySafe = String(Math.max(1, Math.min(31, day))).padStart(2, '0');
+    return `${year}-${monthSafe}-${daySafe}`;
+  }
+
+  return '';
+};
+
 const parseGalleryDate = (value) => {
   if (!value) return null;
   if (value instanceof Date && !Number.isNaN(value.getTime())) {
@@ -813,9 +851,10 @@ const AdminPanel = () => {
     }
 
     try {
+      const normalizedEventDate = normalizeGalleryEventDate(galleryForm.event_date);
       const formData = new FormData();
       formData.append('event_name', galleryForm.event_name || '');
-      formData.append('event_date', galleryForm.event_date || '');
+      formData.append('event_date', normalizedEventDate);
       formData.append('image', galleryForm.image);
 
       await api.post('/api/admin/gallery', formData, {
