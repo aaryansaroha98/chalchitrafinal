@@ -43,16 +43,46 @@ const formatExactJoinDateTime = (value) => {
   });
 };
 
+const parseGalleryDate = (value) => {
+  if (!value) return null;
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    return { date: value, forceUTC: false };
+  }
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    const dateOnlyMatch = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (dateOnlyMatch) {
+      const [, year, month, day] = dateOnlyMatch;
+      return {
+        date: new Date(Date.UTC(Number(year), Number(month) - 1, Number(day))),
+        forceUTC: true
+      };
+    }
+    const normalized = trimmed.replace(' ', 'T');
+    const parsed = new Date(normalized);
+    if (Number.isNaN(parsed.getTime())) return null;
+    return { date: parsed, forceUTC: false };
+  }
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return { date: parsed, forceUTC: false };
+};
+
 const formatGalleryDisplayDate = (eventDate, fallbackDate) => {
   const dateValue = eventDate || fallbackDate;
-  if (!dateValue) return 'Date not available';
-  const date = new Date(dateValue);
-  if (Number.isNaN(date.getTime())) return 'Date not available';
-  return date.toLocaleDateString('en-IN', {
+  const parsed = parseGalleryDate(dateValue);
+  if (!parsed) return 'Date not available';
+  const { date, forceUTC } = parsed;
+  const options = {
     day: '2-digit',
     month: 'short',
     year: 'numeric'
-  });
+  };
+  if (forceUTC) {
+    options.timeZone = 'UTC';
+  }
+  return date.toLocaleDateString('en-IN', options);
 };
 
 const AdminPanel = () => {
