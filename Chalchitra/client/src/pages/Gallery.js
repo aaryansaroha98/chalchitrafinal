@@ -11,14 +11,14 @@ const Gallery = () => {
 
   const parseGalleryDate = (value) => {
     if (!value) return null;
-    if (value instanceof Date) return value;
+    if (value instanceof Date && !Number.isNaN(value.getTime())) return value;
     if (typeof value === 'string') {
       const trimmed = value.trim();
       if (!trimmed) return null;
-      const dateOnlyMatch = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      const dateOnlyMatch = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})/);
       if (dateOnlyMatch) {
         const [, year, month, day] = dateOnlyMatch;
-        return new Date(Number(year), Number(month) - 1, Number(day));
+        return new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
       }
       const normalized = trimmed.replace(' ', 'T');
       const parsed = new Date(normalized);
@@ -32,8 +32,8 @@ const Gallery = () => {
     const date = parseGalleryDate(eventDate);
     if (!date) return 'Date not available';
     return date.toLocaleDateString('en-IN', longFormat
-      ? { year: 'numeric', month: 'long', day: 'numeric' }
-      : { year: 'numeric', month: 'short', day: 'numeric' }
+      ? { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' }
+      : { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' }
     );
   };
 

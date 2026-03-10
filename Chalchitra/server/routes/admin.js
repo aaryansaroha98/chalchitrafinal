@@ -652,6 +652,25 @@ router.get('/gallery', (req, res) => {
   });
 });
 
+const normalizeGalleryEventDate = (value) => {
+  if (!value) return null;
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    const year = value.getUTCFullYear();
+    const month = String(value.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(value.getUTCDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  const trimmed = String(value).trim();
+  if (!trimmed) return null;
+
+  const dateMatch = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!dateMatch) return null;
+
+  const [, year, month, day] = dateMatch;
+  return `${year}-${month}-${day}`;
+};
+
 // Add gallery image
 router.post('/gallery', requireAdmin, uploadGallery.single('image'), (req, res) => {
   console.log('Gallery upload request received');
@@ -660,9 +679,9 @@ router.post('/gallery', requireAdmin, uploadGallery.single('image'), (req, res) 
   console.log('Body:', req.body);
 
   try {
-    const { event_name, event_date } = req.body;
+    const { event_name, event_date, eventDate } = req.body;
     const image_url = getUploadUrl(req.file, '/gallery') || req.body.image_url;
-    const normalizedEventDate = (event_date || '').trim();
+    const normalizedEventDate = normalizeGalleryEventDate(event_date || eventDate);
 
     console.log('Image URL:', image_url);
     console.log('Event name:', event_name);
@@ -673,7 +692,7 @@ router.post('/gallery', requireAdmin, uploadGallery.single('image'), (req, res) 
       return res.status(400).json({ error: 'Image file is required' });
     }
 
-    if (normalizedEventDate && !/^\d{4}-\d{2}-\d{2}$/.test(normalizedEventDate)) {
+    if ((event_date || eventDate) && !normalizedEventDate) {
       return res.status(400).json({ error: 'Event date must be in YYYY-MM-DD format' });
     }
 
