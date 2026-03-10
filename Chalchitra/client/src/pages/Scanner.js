@@ -343,6 +343,24 @@ const Scanner = () => {
       // Check if this is a partial admission request
       if (result.needs_selection) {
         console.log('🎫 Partial admission required for group ticket');
+        let bookingId = result.booking_id;
+        if (!bookingId) {
+          try {
+            const qrData = JSON.parse(qrCode);
+            bookingId = qrData.booking_id;
+          } catch (e) {
+            console.error('Could not extract booking ID for partial admission food loading');
+          }
+        }
+
+        if (bookingId) {
+          await loadFoodStatus(bookingId);
+        } else {
+          setFoodStatus([]);
+          setPendingFood([]);
+          setFoodStatusLoaded(true);
+        }
+
         setPartialAdmissionData(result);
         setSelectedPeopleCount(1); // Default to 1
         setShowPartialAdmission(true);
@@ -1827,7 +1845,7 @@ const Scanner = () => {
               </div>
 
               {/* Food Orders with Give Button */}
-              {(partialAdmissionData.food_orders && Object.keys(partialAdmissionData.food_orders).length > 0) && (
+              {partialAdmissionData.booking_id && (
                 <Row className="mb-3">
                   <Col xs={12}>
                     {!foodStatusLoaded ? (
@@ -1835,7 +1853,7 @@ const Scanner = () => {
                         <Spinner animation="border" size="sm" className="me-2" />
                         Loading food orders...
                       </Alert>
-                    ) : (
+                    ) : (foodStatus && foodStatus.length > 0 ? (
                       <FoodMarkingComponent
                         bookingId={partialAdmissionData.booking_id}
                         foodStatus={foodStatus}
@@ -1845,7 +1863,12 @@ const Scanner = () => {
                           }
                         }}
                       />
-                    )}
+                    ) : (
+                      <Alert variant="secondary" className="py-3 text-center">
+                        <i className="fas fa-utensils me-2"></i>
+                        No food order for this ticket
+                      </Alert>
+                    ))}
                   </Col>
                 </Row>
               )}

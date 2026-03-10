@@ -19,6 +19,43 @@ const requireAdmin = (req, res, next) => {
   next();
 };
 
+const resolveBookingId = (bookingId, callback) => {
+  if (!bookingId) {
+    callback(null, null);
+    return;
+  }
+
+  // Prefer booking_code lookup first to avoid numeric booking codes being misidentified.
+  db.get('SELECT id FROM bookings WHERE booking_code = ?', [bookingId], (codeErr, bookingByCode) => {
+    if (codeErr) {
+      console.error('Error finding booking by code:', codeErr);
+      callback(codeErr);
+      return;
+    }
+
+    if (bookingByCode) {
+      callback(null, bookingByCode.id);
+      return;
+    }
+
+    const numericId = parseInt(bookingId, 10);
+    if (Number.isNaN(numericId)) {
+      callback(null, null);
+      return;
+    }
+
+    db.get('SELECT id FROM bookings WHERE id = ?', [numericId], (idErr, bookingById) => {
+      if (idErr) {
+        console.error('Error finding booking by id:', idErr);
+        callback(idErr);
+        return;
+      }
+
+      callback(null, bookingById ? bookingById.id : null);
+    });
+  });
+};
+
 // Get all foods
 router.get('/', (req, res) => {
   db.all('SELECT * FROM foods ORDER BY created_at DESC', (err, rows) => {
@@ -315,33 +352,15 @@ router.get('/booking/:bookingId', (req, res) => {
 router.get('/status/:bookingId', (req, res) => {
   const { bookingId } = req.params;
 
-  // Determine if bookingId is numeric (database ID) or alphanumeric (booking code)
-  const isNumeric = !isNaN(parseInt(bookingId));
-
-  let bookingQuery, bookingParams;
-
-  if (isNumeric) {
-    // It's a database ID
-    bookingQuery = 'SELECT id FROM bookings WHERE id = ?';
-    bookingParams = [parseInt(bookingId)];
-  } else {
-    // It's a booking code
-    bookingQuery = 'SELECT id FROM bookings WHERE booking_code = ?';
-    bookingParams = [bookingId];
-  }
-
-  // First get the actual database ID
-  db.get(bookingQuery, bookingParams, (err, booking) => {
+  resolveBookingId(bookingId, (err, actualBookingId) => {
     if (err) {
       console.error('Error finding booking:', err);
       return res.status(500).json({ error: 'Failed to find booking' });
     }
 
-    if (!booking) {
+    if (!actualBookingId) {
       return res.json([]); // Return empty array instead of error for better UX
     }
-
-    const actualBookingId = booking.id;
 
     const query = `
       SELECT
@@ -375,33 +394,15 @@ router.post('/mark-given/:bookingId/:foodId', (req, res) => {
   const { bookingId, foodId } = req.params;
   const { quantity = 1, given_by } = req.body;
 
-  // Determine if bookingId is numeric (database ID) or alphanumeric (booking code)
-  const isNumeric = !isNaN(parseInt(bookingId));
-
-  let bookingQuery, bookingParams;
-
-  if (isNumeric) {
-    // It's a database ID
-    bookingQuery = 'SELECT id FROM bookings WHERE id = ?';
-    bookingParams = [parseInt(bookingId)];
-  } else {
-    // It's a booking code
-    bookingQuery = 'SELECT id FROM bookings WHERE booking_code = ?';
-    bookingParams = [bookingId];
-  }
-
-  // First get the actual database ID
-  db.get(bookingQuery, bookingParams, (err, booking) => {
+  resolveBookingId(bookingId, (err, actualBookingId) => {
     if (err) {
       console.error('Error finding booking for food marking:', err);
       return res.status(500).json({ error: 'Failed to find booking' });
     }
 
-    if (!booking) {
+    if (!actualBookingId) {
       return res.status(404).json({ error: 'Booking not found' });
     }
-
-    const actualBookingId = booking.id;
 
     // First check if the food item exists in the booking
     const checkQuery = `
