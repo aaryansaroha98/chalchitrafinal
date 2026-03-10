@@ -364,7 +364,7 @@ const Home = () => {
         {/* Featured Movies Section */}
         <div className="row g-4 home-featured-row">
           {upcomingMovies.slice(0, 3).map((movie) => (
-            <Col xl={4} lg={4} md={4} sm={4} xs={4} key={movie.id} style={{ alignSelf: 'flex-start' }} className="home-featured-col">
+            <Col xl={4} lg={4} md={4} sm={6} xs={6} key={movie.id} style={{ alignSelf: 'flex-start' }} className="home-featured-col">
               <div className="home-featured-card" style={{
                 background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
                 backdropFilter: 'blur(25px) saturate(180%)',
