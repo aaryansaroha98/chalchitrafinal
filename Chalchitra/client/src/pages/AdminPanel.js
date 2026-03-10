@@ -874,9 +874,19 @@ const AdminPanel = () => {
       formData.append('event_date', normalizedEventDate);
       formData.append('image', galleryForm.image);
 
-      await api.post('/api/admin/gallery', formData, {
+      const createRes = await api.post('/api/admin/gallery', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
+
+      if (createRes?.data?.id && normalizedEventDate) {
+        try {
+          await api.put(`/api/admin/gallery/${createRes.data.id}`, {
+            event_date: normalizedEventDate
+          });
+        } catch (updateErr) {
+          console.warn('Gallery date update after upload failed:', updateErr);
+        }
+      }
 
       setShowGalleryModal(false);
       setGalleryForm({ event_name: '', event_date: '', image: null });
