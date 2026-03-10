@@ -5590,8 +5590,8 @@ const AdminPanel = () => {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{ fontSize: '1.8rem' }}>📱</div>
                     <div>
-                      <div style={{ color: 'white', fontWeight: '600', fontSize: '1rem' }}>Scanner Access</div>
-                      <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.85rem' }}>
+                      <div style={{ color: '#222', fontWeight: '600', fontSize: '1rem' }}>Scanner Access</div>
+                      <div style={{ color: 'rgba(0,0,0,0.55)', fontSize: '0.85rem' }}>
                         Allow this admin to scan tickets
                       </div>
                     </div>
@@ -5642,7 +5642,7 @@ const AdminPanel = () => {
                       }}
                     >
                       <div style={{ fontSize: '1.5rem', marginBottom: '4px' }}>{tab.icon}</div>
-                      <div style={{ color: 'white', fontWeight: '500', fontSize: '0.9rem' }}>{tab.name}</div>
+                      <div style={{ color: '#222', fontWeight: '500', fontSize: '0.9rem' }}>{tab.name}</div>
                       <div style={{
                         position: 'absolute',
                         top: '8px',

@@ -127,7 +127,8 @@ if (usePostgres) {
         name TEXT,
         is_admin INTEGER DEFAULT 0,
         code_scanner INTEGER DEFAULT 0,
-        admin_tag TEXT
+        admin_tag TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`,
       `CREATE TABLE IF NOT EXISTS movies (
         id SERIAL PRIMARY KEY,
@@ -340,6 +341,25 @@ if (usePostgres) {
       console.log('gallery.event_date ensure warning:', err.message);
     }
 
+    // Ensure users.created_at column exists for older databases
+    try {
+      await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+      console.log('✅ users.created_at column ensured');
+    } catch (err) {
+      console.log('users.created_at ensure warning:', err.message);
+    }
+
+    // Set AARYAN's join date and clean up other non-admin users
+    try {
+      await pool.query(`UPDATE users SET created_at = '2026-01-08T00:00:00.000Z' WHERE email = $1`, ['2025uee0154@iitjammu.ac.in']);
+      console.log('✅ AARYAN join date set to 8 Jan 2026');
+      // Delete non-essential users (keep only AARYAN and other admins)
+      const deleteResult = await pool.query(`DELETE FROM users WHERE email != $1 AND email != 'chalchitra@iitjammu.ac.in' AND is_admin = 0`, ['2025uee0154@iitjammu.ac.in']);
+      console.log(`✅ Cleaned up ${deleteResult.rowCount} non-admin users`);
+    } catch (err) {
+      console.log('User cleanup warning:', err.message);
+    }
+
     // Create default admin user
     try {
       const result = await pool.query('SELECT * FROM users WHERE email = $1', ['2025uee0154@iitjammu.ac.in']);
@@ -414,7 +434,8 @@ if (usePostgres) {
         name TEXT,
         is_admin INTEGER DEFAULT 0,
         code_scanner INTEGER DEFAULT 0,
-        admin_tag TEXT
+        admin_tag TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )`,
       `CREATE TABLE IF NOT EXISTS movies (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

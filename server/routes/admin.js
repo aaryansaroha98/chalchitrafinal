@@ -405,7 +405,7 @@ router.put('/team/:id/remove_scanner', requireAdmin, (req, res) => {
 
 // Get all users
 router.get('/users', requireAdmin, (req, res) => {
-  db.all('SELECT id, name, email, is_admin, code_scanner FROM users ORDER BY name', [], (err, users) => {
+  db.all('SELECT id, name, email, is_admin, code_scanner, created_at FROM users ORDER BY name', [], (err, users) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(users);
   });
