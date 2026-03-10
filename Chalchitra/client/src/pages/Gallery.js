@@ -9,10 +9,9 @@ const Gallery = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
 
-  const formatGalleryDate = (eventDate, uploadedAt, longFormat = false) => {
-    const dateValue = eventDate || uploadedAt;
-    if (!dateValue) return 'Date not available';
-    const date = new Date(dateValue);
+  const formatGalleryAddedDate = (uploadedAt, longFormat = false) => {
+    if (!uploadedAt) return 'Date not available';
+    const date = new Date(uploadedAt);
     if (Number.isNaN(date.getTime())) return 'Date not available';
     return date.toLocaleDateString('en-IN', longFormat
       ? { year: 'numeric', month: 'long', day: 'numeric' }
@@ -377,7 +376,7 @@ const Gallery = () => {
                       fontWeight: '500'
                     }}>
                       <i className="fas fa-calendar me-1"></i>
-                      {formatGalleryDate(image.event_date, image.uploaded_at)}
+                      Added on {formatGalleryAddedDate(image.uploaded_at)}
                     </p>
                   </div>
                 </div>
@@ -430,7 +429,7 @@ const Gallery = () => {
                   fontSize: '1.1rem'
                 }}>
                   <i className="fas fa-calendar me-2"></i>
-                  {formatGalleryDate(selectedImage.event_date, selectedImage.uploaded_at, true)}
+                  Added on {formatGalleryAddedDate(selectedImage.uploaded_at, true)}
                 </p>
               </div>
             </>
