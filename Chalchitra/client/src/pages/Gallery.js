@@ -9,10 +9,28 @@ const Gallery = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
 
+  const parseGalleryDate = (value) => {
+    if (!value) return null;
+    if (value instanceof Date) return value;
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      if (!trimmed) return null;
+      const dateOnlyMatch = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (dateOnlyMatch) {
+        const [, year, month, day] = dateOnlyMatch;
+        return new Date(Number(year), Number(month) - 1, Number(day));
+      }
+      const normalized = trimmed.replace(' ', 'T');
+      const parsed = new Date(normalized);
+      return Number.isNaN(parsed.getTime()) ? null : parsed;
+    }
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  };
+
   const formatGalleryEventDate = (eventDate, longFormat = false) => {
-    if (!eventDate) return 'Date not available';
-    const date = new Date(eventDate);
-    if (Number.isNaN(date.getTime())) return 'Date not available';
+    const date = parseGalleryDate(eventDate);
+    if (!date) return 'Date not available';
     return date.toLocaleDateString('en-IN', longFormat
       ? { year: 'numeric', month: 'long', day: 'numeric' }
       : { year: 'numeric', month: 'short', day: 'numeric' }
@@ -376,7 +394,7 @@ const Gallery = () => {
                       fontWeight: '500'
                     }}>
                       <i className="fas fa-calendar me-1"></i>
-                      Event on {formatGalleryEventDate(image.event_date)}
+                      Event on {formatGalleryEventDate(image.event_date || image.eventDate || image.uploaded_at)}
                     </p>
                   </div>
                 </div>
@@ -429,7 +447,7 @@ const Gallery = () => {
                   fontSize: '1.1rem'
                 }}>
                   <i className="fas fa-calendar me-2"></i>
-                  Event on {formatGalleryEventDate(selectedImage.event_date, true)}
+                  Event on {formatGalleryEventDate(selectedImage.event_date || selectedImage.eventDate || selectedImage.uploaded_at, true)}
                 </p>
               </div>
             </>

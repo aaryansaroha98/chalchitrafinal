@@ -1826,25 +1826,26 @@ const Scanner = () => {
                 <p className="text-muted">How many people would you like to admit?</p>
               </div>
 
-              {/* Simple Food Orders Display */}
-              {partialAdmissionData.food_orders && Object.keys(partialAdmissionData.food_orders).length > 0 && (
+              {/* Food Orders with Give Button */}
+              {(partialAdmissionData.food_orders && Object.keys(partialAdmissionData.food_orders).length > 0) && (
                 <Row className="mb-3">
-                  <Col xs={12} className="text-center">
-                    <Alert variant="warning" className="py-3">
-                      <div className="d-flex align-items-center justify-content-center mb-2">
-                        <i className="fas fa-utensils fa-2x text-warning me-2"></i>
-                        <strong>Food Orders</strong>
-                      </div>
-                      <div className="text-center">
-                        {Object.entries(partialAdmissionData.food_orders).map(([foodId, foodData]) => (
-                          <div key={foodId} className="mb-1">
-                            <Badge bg="light" text="dark" className="mx-1">
-                              {foodData.name || `Food ${foodId}`}: {foodData.quantity} ordered
-                            </Badge>
-                          </div>
-                        ))}
-                      </div>
-                    </Alert>
+                  <Col xs={12}>
+                    {!foodStatusLoaded ? (
+                      <Alert variant="warning" className="py-3 text-center">
+                        <Spinner animation="border" size="sm" className="me-2" />
+                        Loading food orders...
+                      </Alert>
+                    ) : (
+                      <FoodMarkingComponent
+                        bookingId={partialAdmissionData.booking_id}
+                        foodStatus={foodStatus}
+                        onFoodMarked={() => {
+                          if (partialAdmissionData.booking_id) {
+                            loadFoodStatus(partialAdmissionData.booking_id);
+                          }
+                        }}
+                      />
+                    )}
                   </Col>
                 </Row>
               )}
