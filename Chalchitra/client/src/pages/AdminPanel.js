@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Alert, Tab, Tabs, Table, Modal, Form, Badge } from 'react-bootstrap';
 import api from '../api/axios';
-import jsPDF from 'jspdf'; 
+import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import autoTable from 'jspdf-autotable';
 import { getMovieStatus } from '../utils/movieStatus';
@@ -261,16 +261,16 @@ const AdminPanel = () => {
   const normalizedSingleEmailSearch = singleEmailSearch.trim().toLowerCase();
   const filteredEmailUsers = normalizedSingleEmailSearch
     ? (users || []).filter((user) => {
-        const haystack = `${user.name || ''} ${user.email || ''}`.toLowerCase();
-        return haystack.includes(normalizedSingleEmailSearch);
-      })
+      const haystack = `${user.name || ''} ${user.email || ''}`.toLowerCase();
+      return haystack.includes(normalizedSingleEmailSearch);
+    })
     : (users || []);
   const normalizedBulkEmailSearch = bulkEmailSearch.trim().toLowerCase();
   const filteredBulkEmailUsers = normalizedBulkEmailSearch
     ? (users || []).filter((user) => {
-        const haystack = `${user.name || ''} ${user.email || ''}`.toLowerCase();
-        return haystack.includes(normalizedBulkEmailSearch);
-      })
+      const haystack = `${user.name || ''} ${user.email || ''}`.toLowerCase();
+      return haystack.includes(normalizedBulkEmailSearch);
+    })
     : (users || []);
   const feedbackMovieOptions = (movies || [])
     .slice()
@@ -280,10 +280,10 @@ const AdminPanel = () => {
     : null;
   const scannedTicketsForSelectedMovie = selectedFeedbackMovie
     ? (bookings || []).filter((booking) => {
-        const sameMovie = String(booking.movie_id) === String(selectedFeedbackMovie.id);
-        const isScanned = booking.is_used === 1 || booking.is_used === true || Number(booking.admitted_people) > 0;
-        return sameMovie && isScanned;
-      }).length
+      const sameMovie = String(booking.movie_id) === String(selectedFeedbackMovie.id);
+      const isScanned = booking.is_used === 1 || booking.is_used === true || Number(booking.admitted_people) > 0;
+      return sameMovie && isScanned;
+    }).length
     : 0;
 
   // Permission management state
@@ -295,12 +295,12 @@ const AdminPanel = () => {
   const [selectedAdminTabs, setSelectedAdminTabs] = useState([]);
   const [selectedAdminScanner, setSelectedAdminScanner] = useState(false);
   const [permissionLoading, setPermissionLoading] = useState(false);
-  
+
   // Search user for making admin state
   const [showMakeAdminModal, setShowMakeAdminModal] = useState(false);
   const [searchedUsers, setSearchedUsers] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
-  
+
   // Store current user for permission checks
   const [currentUser, setCurrentUser] = useState(null);
 
@@ -375,11 +375,11 @@ const AdminPanel = () => {
         const permRes = await api.get('/api/admin/my-permissions');
         setMyPermissions(permRes.data);
         console.log('User permissions loaded:', permRes.data);
-        
+
         // Fetch available tabs for permission management
         const tabsRes = await api.get('/api/admin/available-tabs');
         setAvailableTabs(tabsRes.data);
-        
+
         // If super admin, fetch all admin users for permission management
         if (isSuperAdmin) {
           const adminsRes = await api.get('/api/admin/permission-admins');
@@ -878,16 +878,6 @@ const AdminPanel = () => {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      if (createRes?.data?.id && normalizedEventDate) {
-        try {
-          await api.put(`/api/admin/gallery/${createRes.data.id}`, {
-            event_date: normalizedEventDate
-          });
-        } catch (updateErr) {
-          console.warn('Gallery date update after upload failed:', updateErr);
-        }
-      }
-
       setShowGalleryModal(false);
       setGalleryForm({ event_name: '', event_date: '', image: null });
       fetchAllData();
@@ -1070,7 +1060,7 @@ const AdminPanel = () => {
 
       // Calculate food order summary
       const foodOrderSummary = {};
-      
+
       bookingsToExport.forEach(booking => {
         if (booking.foodOrders && booking.foodOrders.length > 0) {
           booking.foodOrders.forEach(food => {
@@ -1095,7 +1085,7 @@ const AdminPanel = () => {
           ? booking.foodOrders.map(f => `${f.name} x${f.quantity}`).join(', ')
           : 'None';
         const foodCost = booking.foodCost || 0;
-        
+
         return [
           booking.id.toString(),
           booking.name || 'N/A',
@@ -1150,7 +1140,7 @@ const AdminPanel = () => {
 
       if (foodSummaryData.length > 0) {
         const finalY = doc.lastAutoTable.finalY + 15;
-        
+
         doc.setFontSize(14);
         doc.text('Food Orders Details', 20, finalY);
 
@@ -1281,9 +1271,9 @@ const AdminPanel = () => {
             justify-content: center;
           ">
             ${booking.qr_code && booking.qr_code.trim() !== ''
-              ? '<img src="' + booking.qr_code + '" style="width: 98px; height: 98px; object-fit: contain; display: block;" alt="QR Code" crossorigin="anonymous" />'
-              : '<div style="width: 98px; height: 98px; background: transparent; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #666; font-weight: 400;">QR NOT FOUND</div>'
-            }
+          ? '<img src="' + booking.qr_code + '" style="width: 98px; height: 98px; object-fit: contain; display: block;" alt="QR Code" crossorigin="anonymous" />'
+          : '<div style="width: 98px; height: 98px; background: transparent; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #666; font-weight: 400;">QR NOT FOUND</div>'
+        }
           </div>
         </div>
       `;
@@ -1365,7 +1355,7 @@ const AdminPanel = () => {
       console.error('Error fetching admin permissions:', err);
       // Set default tabs if fetch fails
       setSelectedAdminTabs([
-        'dashboard', 'movies', 'foods', 'bookings', 'users', 
+        'dashboard', 'movies', 'foods', 'bookings', 'users',
         'team', 'gallery', 'coupons', 'coupon-winners', 'feedback', 'mail', 'settings'
       ]);
       setSelectedAdminScanner(admin.code_scanner === 1 || admin.code_scanner === true);
@@ -1446,9 +1436,9 @@ const AdminPanel = () => {
     setSearchLoading(true);
     try {
       // Search users by name or email (including admins)
-      const filteredUsers = users.filter(user => 
-        (user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-         user.email.toLowerCase().includes(searchTerm.toLowerCase()))
+      const filteredUsers = users.filter(user =>
+      (user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase()))
       );
       setSearchedUsers(filteredUsers);
     } catch (err) {
@@ -1464,14 +1454,14 @@ const AdminPanel = () => {
     try {
       await api.put(`/api/admin/users/${userId}/make_admin`);
       alert('User promoted to admin successfully!');
-      
+
       // Refresh users and admin lists
       const usersRes = await api.get('/api/admin/users');
       setUsers(usersRes.data);
-      
+
       const adminsRes = await api.get('/api/admin/permission-admins');
       setAdminUsers(adminsRes.data);
-      
+
       setShowMakeAdminModal(false);
       setUserSearchTerm('');
       setSearchedUsers([]);
@@ -1486,18 +1476,18 @@ const AdminPanel = () => {
     if (!window.confirm(`Are you sure you want to remove admin privileges from ${userName}? They will no longer be able to access the admin panel.`)) {
       return;
     }
-    
+
     try {
       await api.put(`/api/admin/users/${userId}/remove_admin`);
       alert('Admin privileges removed successfully!');
-      
+
       // Refresh users and admin lists
       const usersRes = await api.get('/api/admin/users');
       setUsers(usersRes.data);
-      
+
       const adminsRes = await api.get('/api/admin/permission-admins');
       setAdminUsers(adminsRes.data);
-      
+
       // Refresh search results if modal is open
       if (showMakeAdminModal) {
         searchUsers(userSearchTerm);
@@ -1511,29 +1501,29 @@ const AdminPanel = () => {
   // Update admin tag
   const updateAdminTag = async (adminId, currentTag) => {
     const newTag = prompt('Enter a tag name for this admin (e.g., "Head Admin", "Movie Manager"):', currentTag || '');
-    
+
     if (newTag === null) return; // Cancelled
-    
+
     try {
       console.log('🔄 Updating admin tag for user:', adminId, 'to:', newTag);
-      
+
       // Make the API call to update the tag
       const response = await api.put(`/api/admin/users/${adminId}/make_scanner`, { admin_tag: newTag });
       console.log('✅ Admin tag update response:', response.data);
-      
+
       alert('Admin tag updated successfully!');
-      
+
       // Force refresh admin list with a fresh fetch
       console.log('🔄 Fetching fresh admin list...');
       const adminsRes = await api.get('/api/admin/permission-admins');
       console.log('✅ Fresh admin data:', adminsRes.data);
-      
+
       // Update the state with fresh data
       setAdminUsers(adminsRes.data);
-      
+
       // Force a re-render by updating a trigger state
       setMyPermissions(prev => ({ ...prev }));
-      
+
       // If updating own tag, refresh auth data to update navbar
       if (adminId === currentUser?.id) {
         const authRes = await api.get('/api/auth/current_user');
@@ -1549,27 +1539,27 @@ const AdminPanel = () => {
   // Update my own admin tag
   const updateMyTag = async () => {
     const newTag = prompt('Enter your tag name (e.g., "Head Admin", "Event Manager"):', currentUser?.admin_tag || '');
-    
+
     if (newTag === null) return; // Cancelled
-    
+
     try {
       console.log('🔄 Updating my tag to:', newTag);
-      
+
       // Make the API call to update the tag
       const response = await api.put(`/api/admin/users/${currentUser.id}/make_scanner`, { admin_tag: newTag });
       console.log('✅ Tag update response:', response.data);
-      
+
       alert('Your tag name updated successfully!');
-      
+
       // Refresh current user data from server
       const authRes = await api.get('/api/auth/current_user');
       setCurrentUser(authRes.data);
       console.log('✅ Updated current user:', authRes.data);
-      
+
       // Also refresh the admin list in the Config tab to update the table
       const adminsRes = await api.get('/api/admin/permission-admins');
       setAdminUsers(adminsRes.data);
-      
+
       // Force re-render
       setMyPermissions(prev => ({ ...prev }));
     } catch (err) {
@@ -1604,9 +1594,9 @@ const AdminPanel = () => {
   // Super admin always gets all tabs, others get only their allowed tabs
   const visibleTabs = (
     !currentUser || // Show all until user data loads
-    currentUser?.email === SUPER_ADMIN_EMAIL || 
+    currentUser?.email === SUPER_ADMIN_EMAIL ||
     myPermissions.is_super_admin
-  ) ? allTabsConfig 
+  ) ? allTabsConfig
     : allTabsConfig.filter(tab => myPermissions.allowed_tabs.includes(tab.id));
 
   // ==================== END PERMISSION MANAGEMENT ====================
@@ -1618,7 +1608,7 @@ const AdminPanel = () => {
       position: 'relative',
       padding: '2rem 0'
     }}>
-      <Container className="py-5" style={{position: 'relative', zIndex: 1}}>
+      <Container className="py-5" style={{ position: 'relative', zIndex: 1 }}>
         <div style={{
           background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
           backdropFilter: 'blur(30px)',
@@ -1675,13 +1665,13 @@ const AdminPanel = () => {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 style={{
-                  background: activeTab === tab.id 
-                    ? tab.id === 'config' 
+                  background: activeTab === tab.id
+                    ? tab.id === 'config'
                       ? 'linear-gradient(145deg, rgba(255, 215, 0, 0.3), rgba(255, 215, 0, 0.2))'
                       : 'linear-gradient(145deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.15))'
                     : 'transparent',
                   backdropFilter: activeTab === tab.id ? 'blur(15px)' : 'none',
-                  border: activeTab === tab.id 
+                  border: activeTab === tab.id
                     ? tab.id === 'config'
                       ? '1px solid rgba(255, 215, 0, 0.6)'
                       : '1px solid rgba(255, 255, 255, 0.4)'
@@ -1697,7 +1687,7 @@ const AdminPanel = () => {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
-                  boxShadow: activeTab === tab.id 
+                  boxShadow: activeTab === tab.id
                     ? tab.id === 'config'
                       ? '0 2px 8px rgba(255, 215, 0, 0.3)'
                       : '0 2px 8px rgba(0,0,0,0.15)'
@@ -1706,7 +1696,7 @@ const AdminPanel = () => {
                   justifyContent: 'center'
                 }}
               >
-                <span style={{fontSize: '0.9rem'}}>{tab.icon}</span>
+                <span style={{ fontSize: '0.9rem' }}>{tab.icon}</span>
                 <span>{tab.name}</span>
               </button>
             ))}
@@ -1816,7 +1806,7 @@ const AdminPanel = () => {
                     background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.05) 100%)',
                     pointerEvents: 'none'
                   }}></div>
-<Card.Body className="text-center" style={{ position: 'relative', zIndex: 1 }}>
+                  <Card.Body className="text-center" style={{ position: 'relative', zIndex: 1 }}>
                     <Card.Title className="display-4 mb-3 fw-bold text-white" style={{
                       textShadow: '0 2px 6px rgba(0,0,0,0.5)',
                       fontWeight: '700'
@@ -2005,14 +1995,14 @@ const AdminPanel = () => {
                                 onClick={() => {
                                   if (window.confirm(`Move "${movie.title}" to past movies? This will mark it as completed.`)) {
                                     api.put(`/api/movies/${movie.id}/move_to_past`)
-                                    .then(() => {
-                                      alert('Movie moved to past successfully!');
-                                      fetchAllData();
-                                    })
-                                    .catch(err => {
-                                      console.error('Error updating movie:', err);
-                                      alert('Error updating movie: ' + (err.response?.data?.error || err.message));
-                                    });
+                                      .then(() => {
+                                        alert('Movie moved to past successfully!');
+                                        fetchAllData();
+                                      })
+                                      .catch(err => {
+                                        console.error('Error updating movie:', err);
+                                        alert('Error updating movie: ' + (err.response?.data?.error || err.message));
+                                      });
                                   }
                                 }}
                                 style={{
@@ -2076,12 +2066,12 @@ const AdminPanel = () => {
 
         {activeTab === 'dashboard' && (
           <div className="text-center py-5">
-            <h2 className="text-white mb-4" style={{fontSize: '2rem', fontWeight: '600'}}>
+            <h2 className="text-white mb-4" style={{ fontSize: '2rem', fontWeight: '600' }}>
               <i className="fas fa-tachometer-alt me-2"></i>
               Admin Dashboard
             </h2>
-            <p className="text-white-50 mb-5" style={{fontSize: '1.1rem'}}>Overview of your movie screening platform</p>
-            
+            <p className="text-white-50 mb-5" style={{ fontSize: '1.1rem' }}>Overview of your movie screening platform</p>
+
             <Row className="mt-4">
               <Col md={3} className="mb-4">
                 <Card style={{
@@ -2116,7 +2106,7 @@ const AdminPanel = () => {
                   </Card.Body>
                 </Card>
               </Col>
-              
+
               <Col md={3} className="mb-4">
                 <Card style={{
                   background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06))',
@@ -2150,7 +2140,7 @@ const AdminPanel = () => {
                   </Card.Body>
                 </Card>
               </Col>
-              
+
               <Col md={3} className="mb-4">
                 <Card style={{
                   background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06))',
@@ -2184,7 +2174,7 @@ const AdminPanel = () => {
                   </Card.Body>
                 </Card>
               </Col>
-              
+
               <Col md={3} className="mb-4">
                 <Card style={{
                   background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06))',
@@ -2497,7 +2487,7 @@ const AdminPanel = () => {
                     <td>#{booking.id}</td>
                     <td>
                       <div>
-                        <strong>{booking.name || 'N/A'}</strong><br/>
+                        <strong>{booking.name || 'N/A'}</strong><br />
                         <small className="text-muted">{booking.email || booking.user_email}</small>
                       </div>
                     </td>
@@ -2812,7 +2802,7 @@ const AdminPanel = () => {
               {gallery && gallery.length > 0 ? gallery.map((image, index) => (
                 <Col key={image.id || index} md={3} className="mb-4">
                   <Card className="bg-glass border-glass text-white">
-                  <Card.Img
+                    <Card.Img
                       variant="top"
                       src={getGalleryImageUrl(image.image_url)}
                       style={{
@@ -2825,35 +2815,17 @@ const AdminPanel = () => {
                       }}
                     />
                     <Card.Body>
-                    <Card.Title className="text-truncate" style={{color: 'black'}}>{image.event_name || 'Gallery Image'}</Card.Title>
-                    <div style={{ marginBottom: '0.5rem' }}>
-                      <small style={{ color: 'black' }}>
-                        {formatGalleryDisplayDate(image.event_date)}
-                      </small>
-                    </div>
-                    <div className="d-flex align-items-center gap-2">
-                      <Form.Control
-                        type="date"
-                        size="sm"
-                        value={getGalleryDateInputValue(image, galleryDateEdits)}
-                        onChange={(e) => setGalleryDateEdits((prev) => ({
-                          ...prev,
-                          [image.id]: e.target.value
-                        }))}
-                      />
-                      <Button
-                        variant="outline-primary"
-                        size="sm"
-                        onClick={() => handleGalleryDateUpdate(image.id)}
-                      >
-                        Update
-                      </Button>
-                    </div>
-                      <br/>
+                      <Card.Title className="text-truncate" style={{ color: 'black' }}>{image.event_name || 'Gallery Image'}</Card.Title>
+                      <div style={{ marginBottom: '1rem' }}>
+                        <small style={{ color: 'var(--gray-600)', fontWeight: '500' }}>
+                          <i className="fas fa-calendar me-1"></i>
+                          {formatGalleryDisplayDate(image.event_date || image.uploaded_at)}
+                        </small>
+                      </div>
                       <Button
                         variant="outline-danger"
                         size="sm"
-                        className="mt-2"
+                        className="mt-2 text-danger border-danger hover-bg-danger hover-text-white"
                         onClick={() => {
                           if (window.confirm('Are you sure you want to delete this image?')) {
                             api.delete(`/api/admin/gallery/${image.id}`)
@@ -2962,12 +2934,12 @@ const AdminPanel = () => {
             <Table striped bordered hover className="mt-4">
               <thead>
                 <tr>
-                  <th style={{width: '50px'}}>
+                  <th style={{ width: '50px' }}>
                     <Form.Check
                       type="checkbox"
                       checked={selectAllCoupons}
                       onChange={(e) => handleSelectAllCoupons(e.target.checked)}
-                      style={{margin: 0}}
+                      style={{ margin: 0 }}
                     />
                   </th>
                   <th>Code</th>
@@ -2977,7 +2949,7 @@ const AdminPanel = () => {
                   <th>Usage</th>
                   <th>Status</th>
                   <th>Expiry</th>
-                  <th style={{width: '200px'}}>Actions</th>
+                  <th style={{ width: '200px' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -2988,7 +2960,7 @@ const AdminPanel = () => {
                         type="checkbox"
                         checked={selectedCoupons.includes(coupon.id)}
                         onChange={(e) => handleSelectCoupon(coupon.id, e.target.checked)}
-                        style={{margin: 0}}
+                        style={{ margin: 0 }}
                       />
                     </td>
                     <td><strong>{coupon.code}</strong></td>
@@ -3006,12 +2978,12 @@ const AdminPanel = () => {
                         </div>
                         {coupon.usage_limit > 0 && (
                           <div className="progress" style={{ height: '6px', borderRadius: '3px' }}>
-                            <div 
-                              className="progress-bar" 
-                              style={{ 
+                            <div
+                              className="progress-bar"
+                              style={{
                                 width: `${coupon.usage_percentage || 0}%`,
-                                background: coupon.status === 'Expired' ? '#dc3545' : 
-                                          coupon.status === 'Low Usage' ? '#ffc107' : '#28a745'
+                                background: coupon.status === 'Expired' ? '#dc3545' :
+                                  coupon.status === 'Low Usage' ? '#ffc107' : '#28a745'
                               }}
                             ></div>
                           </div>
@@ -3019,20 +2991,20 @@ const AdminPanel = () => {
                       </div>
                     </td>
                     <td>
-                      <Badge 
-                        bg={coupon.status === 'Expired' ? 'danger' : 
-                            coupon.status === 'Used' ? 'secondary' : 
-                            coupon.status === 'Low Usage' ? 'warning' : 
-                            'success'}
+                      <Badge
+                        bg={coupon.status === 'Expired' ? 'danger' :
+                          coupon.status === 'Used' ? 'secondary' :
+                            coupon.status === 'Low Usage' ? 'warning' :
+                              'success'}
                         style={{ fontSize: '0.8rem', padding: '4px 8px' }}
                       >
-                        {coupon.status === 'Used' ? 'Used' : 
-                         coupon.status === 'Expired' ? 'Expired' : 
-                         'Valid'}
+                        {coupon.status === 'Used' ? 'Used' :
+                          coupon.status === 'Expired' ? 'Expired' :
+                            'Valid'}
                       </Badge>
                     </td>
                     <td>{new Date(coupon.expiry_date).toLocaleDateString()}</td>
-                    <td style={{textAlign: 'center'}}>
+                    <td style={{ textAlign: 'center' }}>
                       <div className="d-flex gap-2 justify-content-center">
                         <Button
                           variant="outline-primary"
@@ -3211,7 +3183,7 @@ const AdminPanel = () => {
                   />
                 </div>
               )}
-              
+
               <Table striped bordered hover responsive style={{ marginBottom: 0 }}>
                 <thead style={{ borderBottom: '2px solid rgba(255,255,255,0.2)' }}>
                   <tr>
@@ -3316,21 +3288,21 @@ const AdminPanel = () => {
                                   api.delete('/api/admin/coupon-winners', {
                                     data: { ids: [winner.id] }
                                   })
-                                  .then(() => {
-                                    alert(`Winner record deleted successfully!`);
-                                    // Refresh the winners list
-                                    api.get('/api/admin/coupon-winners')
-                                      .then(res => {
-                                        setCouponWinners(res.data);
-                                      })
-                                      .catch(err => {
-                                        console.error('Error refreshing winners:', err);
-                                      });
-                                  })
-                                  .catch(err => {
-                                    console.error('Error deleting winner:', err);
-                                    alert('Error deleting winner: ' + (err.response?.data?.error || err.message));
-                                  });
+                                    .then(() => {
+                                      alert(`Winner record deleted successfully!`);
+                                      // Refresh the winners list
+                                      api.get('/api/admin/coupon-winners')
+                                        .then(res => {
+                                          setCouponWinners(res.data);
+                                        })
+                                        .catch(err => {
+                                          console.error('Error refreshing winners:', err);
+                                        });
+                                    })
+                                    .catch(err => {
+                                      console.error('Error deleting winner:', err);
+                                      alert('Error deleting winner: ' + (err.response?.data?.error || err.message));
+                                    });
                                 }
                               }}
                             >
@@ -3362,7 +3334,7 @@ const AdminPanel = () => {
         {activeTab === 'feedback' && (
           <div className="text-white py-4">
             <h2 className="text-center mb-4">Feedback Analytics</h2>
-            
+
             {/* Overall Stats Cards */}
             <Row className="mb-4">
               <Col md={3}>
@@ -3376,7 +3348,7 @@ const AdminPanel = () => {
                   <Card.Body className="text-center">
                     <i className="fas fa-star fa-2x mb-2" style={{ color: '#ffd700' }}></i>
                     <h3 style={{ fontSize: '2rem', fontWeight: '700', color: '#ffffff' }}>
-                      {feedback && feedback.length > 0 
+                      {feedback && feedback.length > 0
                         ? (feedback.reduce((sum, f) => sum + (f.rating || 0), 0) / feedback.length).toFixed(1)
                         : '0.0'}
                     </h3>
@@ -3445,8 +3417,8 @@ const AdminPanel = () => {
               borderRadius: '16px',
               marginBottom: '1.5rem'
             }}>
-              <Card.Header style={{ 
-                background: 'rgba(255, 255, 255, 0.05)', 
+              <Card.Header style={{
+                background: 'rgba(255, 255, 255, 0.05)',
                 borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
                 color: 'white',
                 fontWeight: '600',
@@ -3478,7 +3450,7 @@ const AdminPanel = () => {
                       return Object.entries(movieFeedback).map(([movieId, data]) => {
                         const avgRating = data.ratings.reduce((a, b) => a + b, 0) / data.ratings.length;
                         const totalResponses = data.ratings.length;
-                        const ratingDistribution = [1, 2, 3, 4, 5].map(r => 
+                        const ratingDistribution = [1, 2, 3, 4, 5].map(r =>
                           data.ratings.filter(rating => rating === r).length
                         );
 
@@ -3491,26 +3463,26 @@ const AdminPanel = () => {
                               padding: '1rem',
                               height: '100%'
                             }}>
-                              <h5 style={{ 
-                                color: 'white', 
+                              <h5 style={{
+                                color: 'white',
                                 marginBottom: '0.75rem',
                                 fontSize: '1rem',
                                 fontWeight: '600'
                               }}>
                                 {data.title}
                               </h5>
-                              
+
                               {/* Average Rating */}
-                              <div style={{ 
-                                display: 'flex', 
-                                alignItems: 'center', 
+                              <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
                                 marginBottom: '0.75rem',
                                 gap: '0.5rem'
                               }}>
-                                <span style={{ 
-                                  fontSize: '1.75rem', 
-                                  fontWeight: '700', 
-                                  color: '#ffd700' 
+                                <span style={{
+                                  fontSize: '1.75rem',
+                                  fontWeight: '700',
+                                  color: '#ffd700'
                                 }}>
                                   {avgRating.toFixed(1)}
                                 </span>
@@ -3523,9 +3495,9 @@ const AdminPanel = () => {
                                       }}>★</span>
                                     ))}
                                   </div>
-                                  <span style={{ 
-                                    fontSize: '0.75rem', 
-                                    color: 'rgba(255, 255, 255, 0.6)' 
+                                  <span style={{
+                                    fontSize: '0.75rem',
+                                    color: 'rgba(255, 255, 255, 0.6)'
                                   }}>
                                     {totalResponses} review{totalResponses !== 1 ? 's' : ''}
                                   </span>
@@ -3538,14 +3510,14 @@ const AdminPanel = () => {
                                   const count = ratingDistribution[star - 1];
                                   const percentage = totalResponses > 0 ? (count / totalResponses) * 100 : 0;
                                   return (
-                                    <div key={star} style={{ 
-                                      display: 'flex', 
-                                      alignItems: 'center', 
+                                    <div key={star} style={{
+                                      display: 'flex',
+                                      alignItems: 'center',
                                       gap: '0.5rem',
                                       marginBottom: '4px'
                                     }}>
-                                      <span style={{ 
-                                        fontSize: '0.7rem', 
+                                      <span style={{
+                                        fontSize: '0.7rem',
                                         color: 'rgba(255, 255, 255, 0.6)',
                                         width: '15px'
                                       }}>
@@ -3566,8 +3538,8 @@ const AdminPanel = () => {
                                           transition: 'width 0.3s ease'
                                         }}></div>
                                       </div>
-                                      <span style={{ 
-                                        fontSize: '0.7rem', 
+                                      <span style={{
+                                        fontSize: '0.7rem',
                                         color: 'rgba(255, 255, 255, 0.5)',
                                         width: '20px',
                                         textAlign: 'right'
@@ -3600,8 +3572,8 @@ const AdminPanel = () => {
               border: '1px solid rgba(0, 0, 0, 0.1)',
               borderRadius: '16px'
             }}>
-              <Card.Header style={{ 
-                background: 'rgba(255, 255, 255, 0.9)', 
+              <Card.Header style={{
+                background: 'rgba(255, 255, 255, 0.9)',
                 borderBottom: '1px solid rgba(0, 0, 0, 0.1)',
                 color: '#000000',
                 fontWeight: '600',
@@ -3640,8 +3612,8 @@ const AdminPanel = () => {
                                 ★
                               </span>
                             ))}
-                            <span style={{ 
-                              marginLeft: '8px', 
+                            <span style={{
+                              marginLeft: '8px',
                               color: '#333333',
                               fontSize: '0.85rem'
                             }}>
@@ -3649,8 +3621,8 @@ const AdminPanel = () => {
                             </span>
                           </div>
                         </td>
-                        <td style={{ 
-                          color: '#444444', 
+                        <td style={{
+                          color: '#444444',
                           borderColor: 'rgba(0, 0, 0, 0.08)',
                           maxWidth: '250px',
                           overflow: 'hidden',
@@ -3773,12 +3745,12 @@ const AdminPanel = () => {
                     <Card.Title style={{ color: 'black', fontWeight: '600' }}>Send Feedback Request</Card.Title>
                     <Card.Text style={{ color: 'black', opacity: 0.8 }}>Send feedback email to users who scanned tickets</Card.Text>
                     <Form.Group className="mb-3" style={{ textAlign: 'left' }}>
-                    <Form.Label style={{ fontWeight: '600', color: 'black' }}>Choose Movie</Form.Label>
-                    <Form.Select
-                      size="sm"
-                      value={feedbackMovieId}
-                      onChange={(e) => setFeedbackMovieId(e.target.value)}
-                    >
+                      <Form.Label style={{ fontWeight: '600', color: 'black' }}>Choose Movie</Form.Label>
+                      <Form.Select
+                        size="sm"
+                        value={feedbackMovieId}
+                        onChange={(e) => setFeedbackMovieId(e.target.value)}
+                      >
                         <option value="" disabled>Select a movie</option>
                         {feedbackMovieOptions.map((movie) => (
                           <option key={movie.id} value={movie.id}>
@@ -3949,7 +3921,7 @@ const AdminPanel = () => {
                 <Form.Control
                   type="text"
                   value={settingsForm.tagline}
-                  onChange={(e) => setSettingsForm({...settingsForm, tagline: e.target.value})}
+                  onChange={(e) => setSettingsForm({ ...settingsForm, tagline: e.target.value })}
                   placeholder="Enter website tagline"
                   required
                 />
@@ -3960,7 +3932,7 @@ const AdminPanel = () => {
                 <Form.Control
                   type="color"
                   value={settingsForm.hero_background}
-                  onChange={(e) => setSettingsForm({...settingsForm, hero_background: e.target.value})}
+                  onChange={(e) => setSettingsForm({ ...settingsForm, hero_background: e.target.value })}
                 />
               </Form.Group>
 
@@ -3968,7 +3940,7 @@ const AdminPanel = () => {
                 <Form.Label>Hero Background Image</Form.Label>
                 <Form.Control
                   type="file"
-                  onChange={(e) => setSettingsForm({...settingsForm, hero_background_image: e.target.files[0]})}
+                  onChange={(e) => setSettingsForm({ ...settingsForm, hero_background_image: e.target.files[0] })}
                   accept="image/*"
                 />
                 <Form.Text className="text-muted">
@@ -3980,7 +3952,7 @@ const AdminPanel = () => {
                 <Form.Label>Hero Background Video</Form.Label>
                 <Form.Control
                   type="file"
-                  onChange={(e) => setSettingsForm({...settingsForm, hero_background_video: e.target.files[0]})}
+                  onChange={(e) => setSettingsForm({ ...settingsForm, hero_background_video: e.target.files[0] })}
                   accept="video/*"
                 />
                 <Form.Text className="text-muted">
@@ -3994,7 +3966,7 @@ const AdminPanel = () => {
                   as="textarea"
                   rows={4}
                   value={settingsForm.about_text}
-                  onChange={(e) => setSettingsForm({...settingsForm, about_text: e.target.value})}
+                  onChange={(e) => setSettingsForm({ ...settingsForm, about_text: e.target.value })}
                   placeholder="Enter about section text"
                   required
                 />
@@ -4004,7 +3976,7 @@ const AdminPanel = () => {
                 <Form.Label>About Section Image</Form.Label>
                 <Form.Control
                   type="file"
-                  onChange={(e) => setSettingsForm({...settingsForm, about_image: e.target.files[0]})}
+                  onChange={(e) => setSettingsForm({ ...settingsForm, about_image: e.target.files[0] })}
                   accept="image/*"
                 />
                 <Form.Text className="text-muted">
@@ -4256,7 +4228,7 @@ const AdminPanel = () => {
                     You have full access to system configuration. Please be careful when making changes
                     as they may affect the entire system. Only authorized personnel should access this area.
                   </p>
-              </Alert>
+                </Alert>
               </>
             )}
           </div>
@@ -4802,7 +4774,7 @@ const AdminPanel = () => {
                         <Form.Control
                           type="text"
                           value={mailSettings.email_host}
-                          onChange={(e) => setMailSettings({...mailSettings, email_host: e.target.value})}
+                          onChange={(e) => setMailSettings({ ...mailSettings, email_host: e.target.value })}
                           placeholder="e.g., smtp.gmail.com"
                           style={{
                             background: 'rgba(255, 255, 255, 0.1)',
@@ -4823,7 +4795,7 @@ const AdminPanel = () => {
                         <Form.Control
                           type="number"
                           value={mailSettings.email_port}
-                          onChange={(e) => setMailSettings({...mailSettings, email_port: parseInt(e.target.value)})}
+                          onChange={(e) => setMailSettings({ ...mailSettings, email_port: parseInt(e.target.value) })}
                           placeholder="e.g., 587"
                           style={{
                             background: 'rgba(255, 255, 255, 0.1)',
@@ -4847,7 +4819,7 @@ const AdminPanel = () => {
                         <Form.Control
                           type="email"
                           value={mailSettings.email_user}
-                          onChange={(e) => setMailSettings({...mailSettings, email_user: e.target.value})}
+                          onChange={(e) => setMailSettings({ ...mailSettings, email_user: e.target.value })}
                           placeholder="e.g., your-email@gmail.com"
                           style={{
                             background: 'rgba(255, 255, 255, 0.1)',
@@ -4873,7 +4845,7 @@ const AdminPanel = () => {
                         <Form.Control
                           type="password"
                           value={mailSettings.email_pass}
-                          onChange={(e) => setMailSettings({...mailSettings, email_pass: e.target.value})}
+                          onChange={(e) => setMailSettings({ ...mailSettings, email_pass: e.target.value })}
                           placeholder="Enter app password"
                           style={{
                             background: 'rgba(255, 255, 255, 0.1)',
@@ -4895,7 +4867,7 @@ const AdminPanel = () => {
                     <Form.Control
                       type="text"
                       value={mailSettings.sender_name}
-                      onChange={(e) => setMailSettings({...mailSettings, sender_name: e.target.value})}
+                      onChange={(e) => setMailSettings({ ...mailSettings, sender_name: e.target.value })}
                       placeholder="e.g., Chalchitra IIT Jammu"
                       style={{
                         background: 'rgba(255, 255, 255, 0.1)',
@@ -5054,7 +5026,7 @@ const AdminPanel = () => {
                         <Form.Control
                           type="text"
                           value={razorpaySettings.key_id}
-                          onChange={(e) => setRazorpaySettings({...razorpaySettings, key_id: e.target.value})}
+                          onChange={(e) => setRazorpaySettings({ ...razorpaySettings, key_id: e.target.value })}
                           placeholder="e.g., rzp_live_xxxxxxxxxx or rzp_test_xxxxxxxxxx"
                           style={{
                             background: 'rgba(255, 255, 255, 0.1)',
@@ -5083,7 +5055,7 @@ const AdminPanel = () => {
                         <Form.Control
                           type="password"
                           value={razorpaySettings.key_secret}
-                          onChange={(e) => setRazorpaySettings({...razorpaySettings, key_secret: e.target.value})}
+                          onChange={(e) => setRazorpaySettings({ ...razorpaySettings, key_secret: e.target.value })}
                           placeholder="Enter Razorpay Key Secret"
                           style={{
                             background: 'rgba(255, 255, 255, 0.1)',
@@ -5309,8 +5281,8 @@ const AdminPanel = () => {
                             admin.allowed_tabs.map(tabId => {
                               const tabInfo = allTabsConfig.find(t => t.id === tabId);
                               return (
-                                <Badge 
-                                  key={tabId} 
+                                <Badge
+                                  key={tabId}
                                   bg={tabId === 'config' ? 'warning' : 'secondary'}
                                   style={{ fontSize: '0.75rem', padding: '4px 8px' }}
                                 >
@@ -5328,32 +5300,32 @@ const AdminPanel = () => {
                       </td>
                       <td style={{ border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'center' }}>
                         <div className="d-flex gap-2 justify-content-center flex-wrap">
-                              <>
-                                <Button
-                                  variant="outline-primary"
-                                  size="sm"
-                                  onClick={() => openPermissionModal(admin)}
-                                >
-                                  <i className="fas fa-edit me-1"></i>
-                                  Edit
-                                </Button>
-                        <Button
-                          variant="outline-dark"
-                          size="sm"
-                          onClick={() => updateAdminTag(admin.id, admin.admin_tag)}
-                        >
-                          <i className="fas fa-tag me-1"></i>
-                          Tag
-                        </Button>
-                                <Button
-                                  variant="outline-warning"
-                                  size="sm"
-                                  onClick={() => resetAdminPermissions(admin.id)}
-                                >
-                                  <i className="fas fa-undo me-1"></i>
-                                  Reset
-                                </Button>
-                              </>
+                          <>
+                            <Button
+                              variant="outline-primary"
+                              size="sm"
+                              onClick={() => openPermissionModal(admin)}
+                            >
+                              <i className="fas fa-edit me-1"></i>
+                              Edit
+                            </Button>
+                            <Button
+                              variant="outline-dark"
+                              size="sm"
+                              onClick={() => updateAdminTag(admin.id, admin.admin_tag)}
+                            >
+                              <i className="fas fa-tag me-1"></i>
+                              Tag
+                            </Button>
+                            <Button
+                              variant="outline-warning"
+                              size="sm"
+                              onClick={() => resetAdminPermissions(admin.id)}
+                            >
+                              <i className="fas fa-undo me-1"></i>
+                              Reset
+                            </Button>
+                          </>
                         </div>
                       </td>
                     </tr>
@@ -5433,7 +5405,7 @@ const AdminPanel = () => {
                   justifyContent: 'space-between',
                   cursor: 'pointer'
                 }}
-                onClick={() => setSelectedAdminScanner(!selectedAdminScanner)}
+                  onClick={() => setSelectedAdminScanner(!selectedAdminScanner)}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{ fontSize: '1.8rem' }}>📱</div>
@@ -5562,7 +5534,7 @@ const AdminPanel = () => {
                 <Form.Control
                   type="text"
                   value={movieForm.title}
-                  onChange={(e) => setMovieForm({...movieForm, title: e.target.value})}
+                  onChange={(e) => setMovieForm({ ...movieForm, title: e.target.value })}
                   required
                 />
               </Form.Group>
@@ -5571,7 +5543,7 @@ const AdminPanel = () => {
                 <Form.Control
                   as="textarea"
                   value={movieForm.description}
-                  onChange={(e) => setMovieForm({...movieForm, description: e.target.value})}
+                  onChange={(e) => setMovieForm({ ...movieForm, description: e.target.value })}
                   placeholder="Add a short synopsis (optional)"
                 />
               </Form.Group>
@@ -5582,7 +5554,7 @@ const AdminPanel = () => {
                     <Form.Control
                       type="datetime-local"
                       value={movieForm.date}
-                      onChange={(e) => setMovieForm({...movieForm, date: e.target.value})}
+                      onChange={(e) => setMovieForm({ ...movieForm, date: e.target.value })}
                       required
                     />
                   </Form.Group>
@@ -5592,7 +5564,7 @@ const AdminPanel = () => {
                     <Form.Label>Venue</Form.Label>
                     <Form.Select
                       value={movieForm.venue}
-                      onChange={(e) => setMovieForm({...movieForm, venue: e.target.value})}
+                      onChange={(e) => setMovieForm({ ...movieForm, venue: e.target.value })}
                       required
                     >
                       <option value="">Select Venue</option>
@@ -5610,7 +5582,7 @@ const AdminPanel = () => {
                     <Form.Control
                       type="number"
                       value={movieForm.price}
-                      onChange={(e) => setMovieForm({...movieForm, price: e.target.value})}
+                      onChange={(e) => setMovieForm({ ...movieForm, price: e.target.value })}
                       placeholder="Enter ticket price"
                       min="0"
                       step="1"
@@ -5623,7 +5595,7 @@ const AdminPanel = () => {
                     <Form.Label>Movie Poster</Form.Label>
                     <Form.Control
                       type="file"
-                      onChange={(e) => setMovieForm({...movieForm, poster: e.target.files[0]})}
+                      onChange={(e) => setMovieForm({ ...movieForm, poster: e.target.files[0] })}
                       accept="image/*"
                     />
                   </Form.Group>
@@ -5636,7 +5608,7 @@ const AdminPanel = () => {
                     <Form.Control
                       type="text"
                       value={movieForm.category}
-                      onChange={(e) => setMovieForm({...movieForm, category: e.target.value})}
+                      onChange={(e) => setMovieForm({ ...movieForm, category: e.target.value })}
                       placeholder="Action, Drama, Comedy..."
                     />
                   </Form.Group>
@@ -5647,7 +5619,7 @@ const AdminPanel = () => {
                     <Form.Control
                       type="text"
                       value={movieForm.duration}
-                      onChange={(e) => setMovieForm({...movieForm, duration: e.target.value})}
+                      onChange={(e) => setMovieForm({ ...movieForm, duration: e.target.value })}
                       placeholder="2h 15m"
                     />
                   </Form.Group>
@@ -5660,7 +5632,7 @@ const AdminPanel = () => {
                     <Form.Control
                       type="text"
                       value={movieForm.imdb_rating}
-                      onChange={(e) => setMovieForm({...movieForm, imdb_rating: e.target.value})}
+                      onChange={(e) => setMovieForm({ ...movieForm, imdb_rating: e.target.value })}
                       placeholder="English subtitles"
                     />
                   </Form.Group>
@@ -5671,7 +5643,7 @@ const AdminPanel = () => {
                     <Form.Control
                       type="text"
                       value={movieForm.language}
-                      onChange={(e) => setMovieForm({...movieForm, language: e.target.value})}
+                      onChange={(e) => setMovieForm({ ...movieForm, language: e.target.value })}
                       placeholder="Hindi, English..."
                     />
                   </Form.Group>
@@ -5717,7 +5689,7 @@ const AdminPanel = () => {
               <Button variant="secondary" onClick={() => {
                 setShowMovieModal(false);
                 setEditingMovie(null);
-            setMovieForm({ title: '', description: '', date: '', venue: '', price: '', category: '', duration: '', imdb_rating: '', language: '', poster: null });
+                setMovieForm({ title: '', description: '', date: '', venue: '', price: '', category: '', duration: '', imdb_rating: '', language: '', poster: null });
                 setSelectedFoodsForMovie([]);
               }}>
                 Cancel
@@ -5775,7 +5747,7 @@ const AdminPanel = () => {
                 <Form.Control
                   type="text"
                   value={foodForm.name}
-                  onChange={(e) => setFoodForm({...foodForm, name: e.target.value})}
+                  onChange={(e) => setFoodForm({ ...foodForm, name: e.target.value })}
                   required
                 />
               </Form.Group>
@@ -5784,7 +5756,7 @@ const AdminPanel = () => {
                 <Form.Control
                   as="textarea"
                   value={foodForm.description}
-                  onChange={(e) => setFoodForm({...foodForm, description: e.target.value})}
+                  onChange={(e) => setFoodForm({ ...foodForm, description: e.target.value })}
                 />
               </Form.Group>
               <Form.Group className="mb-3">
@@ -5792,7 +5764,7 @@ const AdminPanel = () => {
                 <Form.Control
                   type="number"
                   value={foodForm.price}
-                  onChange={(e) => setFoodForm({...foodForm, price: e.target.value})}
+                  onChange={(e) => setFoodForm({ ...foodForm, price: e.target.value })}
                   min="0"
                   step="1"
                   required
@@ -5802,7 +5774,7 @@ const AdminPanel = () => {
                 <Form.Label>Image</Form.Label>
                 <Form.Control
                   type="file"
-                  onChange={(e) => setFoodForm({...foodForm, image: e.target.files[0]})}
+                  onChange={(e) => setFoodForm({ ...foodForm, image: e.target.files[0] })}
                   accept="image/*"
                 />
               </Form.Group>
@@ -5811,7 +5783,7 @@ const AdminPanel = () => {
                   type="checkbox"
                   label="Available for ordering"
                   checked={foodForm.is_available}
-                  onChange={(e) => setFoodForm({...foodForm, is_available: e.target.checked})}
+                  onChange={(e) => setFoodForm({ ...foodForm, is_available: e.target.checked })}
                 />
               </Form.Group>
             </Modal.Body>
@@ -5971,7 +5943,7 @@ const AdminPanel = () => {
                 <Form.Control
                   type="text"
                   value={emailForm.subject}
-                  onChange={(e) => setEmailForm({...emailForm, subject: e.target.value})}
+                  onChange={(e) => setEmailForm({ ...emailForm, subject: e.target.value })}
                   placeholder="Email subject"
                   required
                 />
@@ -5983,7 +5955,7 @@ const AdminPanel = () => {
                   as="textarea"
                   rows={6}
                   value={emailForm.message}
-                  onChange={(e) => setEmailForm({...emailForm, message: e.target.value})}
+                  onChange={(e) => setEmailForm({ ...emailForm, message: e.target.value })}
                   placeholder="Email message content..."
                   required
                 />
@@ -6135,7 +6107,7 @@ const AdminPanel = () => {
                     <Form.Control
                       type="text"
                       value={bulkEmailForm.subject}
-                      onChange={(e) => setBulkEmailForm({...bulkEmailForm, subject: e.target.value})}
+                      onChange={(e) => setBulkEmailForm({ ...bulkEmailForm, subject: e.target.value })}
                       placeholder="Email subject"
                       required
                     />
@@ -6147,7 +6119,7 @@ const AdminPanel = () => {
                       as="textarea"
                       rows={12}
                       value={bulkEmailForm.message}
-                      onChange={(e) => setBulkEmailForm({...bulkEmailForm, message: e.target.value})}
+                      onChange={(e) => setBulkEmailForm({ ...bulkEmailForm, message: e.target.value })}
                       placeholder="Email message content..."
                       required
                     />
@@ -6232,7 +6204,7 @@ const AdminPanel = () => {
                     <Form.Control
                       type="text"
                       value={couponForm.code}
-                      onChange={(e) => setCouponForm({...couponForm, code: e.target.value.toUpperCase()})}
+                      onChange={(e) => setCouponForm({ ...couponForm, code: e.target.value.toUpperCase() })}
                       placeholder="e.g., SAVE10"
                       required
                     />
@@ -6246,7 +6218,7 @@ const AdminPanel = () => {
                     <Form.Label>Discount Type</Form.Label>
                     <Form.Select
                       value={couponForm.discount_type}
-                      onChange={(e) => setCouponForm({...couponForm, discount_type: e.target.value})}
+                      onChange={(e) => setCouponForm({ ...couponForm, discount_type: e.target.value })}
                       required
                     >
                       <option value="percentage">Percentage (%)</option>
@@ -6263,7 +6235,7 @@ const AdminPanel = () => {
                     <Form.Control
                       type="number"
                       value={couponForm.discount_value}
-                      onChange={(e) => setCouponForm({...couponForm, discount_value: e.target.value})}
+                      onChange={(e) => setCouponForm({ ...couponForm, discount_value: e.target.value })}
                       placeholder={couponForm.discount_type === 'percentage' ? 'e.g., 10' : 'e.g., 50'}
                       min="0"
                       step="0.01"
@@ -6280,7 +6252,7 @@ const AdminPanel = () => {
                     <Form.Control
                       type="number"
                       value={couponForm.min_purchase}
-                      onChange={(e) => setCouponForm({...couponForm, min_purchase: e.target.value})}
+                      onChange={(e) => setCouponForm({ ...couponForm, min_purchase: e.target.value })}
                       placeholder="e.g., 100"
                       min="0"
                       step="1"
@@ -6296,7 +6268,7 @@ const AdminPanel = () => {
                     <Form.Control
                       type="number"
                       value={couponForm.max_discount}
-                      onChange={(e) => setCouponForm({...couponForm, max_discount: e.target.value})}
+                      onChange={(e) => setCouponForm({ ...couponForm, max_discount: e.target.value })}
                       placeholder="e.g., 200"
                       min="0"
                       step="1"
@@ -6312,7 +6284,7 @@ const AdminPanel = () => {
                     <Form.Control
                       type="number"
                       value={couponForm.usage_limit}
-                      onChange={(e) => setCouponForm({...couponForm, usage_limit: e.target.value})}
+                      onChange={(e) => setCouponForm({ ...couponForm, usage_limit: e.target.value })}
                       placeholder="e.g., 100"
                       min="1"
                     />
@@ -6328,7 +6300,7 @@ const AdminPanel = () => {
                 <Form.Control
                   type="datetime-local"
                   value={couponForm.expiry_date}
-                  onChange={(e) => setCouponForm({...couponForm, expiry_date: e.target.value})}
+                  onChange={(e) => setCouponForm({ ...couponForm, expiry_date: e.target.value })}
                   required
                 />
               </Form.Group>
@@ -6339,7 +6311,7 @@ const AdminPanel = () => {
                   as="textarea"
                   rows={3}
                   value={couponForm.description}
-                  onChange={(e) => setCouponForm({...couponForm, description: e.target.value})}
+                  onChange={(e) => setCouponForm({ ...couponForm, description: e.target.value })}
                   placeholder="Brief description of the coupon"
                   required
                 />
@@ -6385,7 +6357,7 @@ const AdminPanel = () => {
                 <Form.Control
                   type="text"
                   value={teamForm.name}
-                  onChange={(e) => setTeamForm({...teamForm, name: e.target.value})}
+                  onChange={(e) => setTeamForm({ ...teamForm, name: e.target.value })}
                   required
                 />
               </Form.Group>
@@ -6394,7 +6366,7 @@ const AdminPanel = () => {
                 <Form.Control
                   type="text"
                   value={teamForm.student_id}
-                  onChange={(e) => setTeamForm({...teamForm, student_id: e.target.value})}
+                  onChange={(e) => setTeamForm({ ...teamForm, student_id: e.target.value })}
                   placeholder="e.g., 2021XYZ123 (optional)"
                 />
               </Form.Group>
@@ -6403,7 +6375,7 @@ const AdminPanel = () => {
                 <Form.Control
                   type="text"
                   value={teamForm.role}
-                  onChange={(e) => setTeamForm({...teamForm, role: e.target.value})}
+                  onChange={(e) => setTeamForm({ ...teamForm, role: e.target.value })}
                   placeholder="e.g., Team Lead, Developer, Designer"
                   required
                 />
@@ -6413,7 +6385,7 @@ const AdminPanel = () => {
                 <Form.Label>Section</Form.Label>
                 <Form.Select
                   value={teamForm.section}
-                  onChange={(e) => setTeamForm({...teamForm, section: e.target.value})}
+                  onChange={(e) => setTeamForm({ ...teamForm, section: e.target.value })}
                   required
                 >
                   <option value="foundation_team">Foundation Team</option>
@@ -6425,7 +6397,7 @@ const AdminPanel = () => {
                 <Form.Label>Photo</Form.Label>
                 <Form.Control
                   type="file"
-                  onChange={(e) => setTeamForm({...teamForm, photo: e.target.files[0]})}
+                  onChange={(e) => setTeamForm({ ...teamForm, photo: e.target.files[0] })}
                   accept="image/*"
                 />
                 <Form.Text className="text-muted">
@@ -6655,7 +6627,7 @@ const AdminPanel = () => {
                       <Form.Control
                         type="number"
                         value={winnerForm.winner_limit}
-                        onChange={(e) => setWinnerForm({...winnerForm, winner_limit: parseInt(e.target.value) || 1})}
+                        onChange={(e) => setWinnerForm({ ...winnerForm, winner_limit: parseInt(e.target.value) || 1 })}
                         min="1"
                         max="50"
                       />
@@ -6665,7 +6637,7 @@ const AdminPanel = () => {
                       <Form.Label>Discount Type</Form.Label>
                       <Form.Select
                         value={winnerForm.discount_type}
-                        onChange={(e) => setWinnerForm({...winnerForm, discount_type: e.target.value})}
+                        onChange={(e) => setWinnerForm({ ...winnerForm, discount_type: e.target.value })}
                       >
                         <option value="fixed">Fixed Amount (₹)</option>
                         <option value="percentage">Percentage (%)</option>
@@ -6677,7 +6649,7 @@ const AdminPanel = () => {
                       <Form.Control
                         type="number"
                         value={winnerForm.discount_amount}
-                        onChange={(e) => setWinnerForm({...winnerForm, discount_amount: e.target.value})}
+                        onChange={(e) => setWinnerForm({ ...winnerForm, discount_amount: e.target.value })}
                         placeholder={winnerForm.discount_type === 'fixed' ? 'e.g., 50' : 'e.g., 20'}
                         min="0"
                         step="1"
@@ -6691,7 +6663,7 @@ const AdminPanel = () => {
                         <Form.Control
                           type="number"
                           value={winnerForm.max_discount}
-                          onChange={(e) => setWinnerForm({...winnerForm, max_discount: e.target.value})}
+                          onChange={(e) => setWinnerForm({ ...winnerForm, max_discount: e.target.value })}
                           placeholder="e.g., 200"
                           min="0"
                           step="1"
@@ -6704,7 +6676,7 @@ const AdminPanel = () => {
                       <Form.Control
                         type="number"
                         value={winnerForm.expiry_days}
-                        onChange={(e) => setWinnerForm({...winnerForm, expiry_days: parseInt(e.target.value) || 30})}
+                        onChange={(e) => setWinnerForm({ ...winnerForm, expiry_days: parseInt(e.target.value) || 30 })}
                         min="1"
                         max="365"
                       />
@@ -6715,7 +6687,7 @@ const AdminPanel = () => {
                       <Form.Control
                         type="text"
                         value={winnerForm.winner_message}
-                        onChange={(e) => setWinnerForm({...winnerForm, winner_message: e.target.value})}
+                        onChange={(e) => setWinnerForm({ ...winnerForm, winner_message: e.target.value })}
                         placeholder="e.g., Best Student, Lucky Draw Winner, etc."
                         maxLength="100"
                       />
