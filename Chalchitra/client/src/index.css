@@ -2292,6 +2292,25 @@ a:hover {
     transition: color 0.2s ease, text-shadow 0.2s ease, transform 0.2s ease !important;
   }
 
+  .navbar a,
+  .navbar button {
+    -webkit-tap-highlight-color: transparent;
+    outline: none !important;
+  }
+
+  .navbar .navbar-brand:focus,
+  .navbar .navbar-brand:focus-visible,
+  .navbar .navbar-brand:active,
+  .navbar .nav-link:focus,
+  .navbar .nav-link:focus-visible,
+  .navbar .nav-link:active,
+  .navbar .nav button:focus,
+  .navbar .nav button:focus-visible,
+  .navbar .nav button:active {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
   .navbar .nav-link:hover,
   .navbar .nav button:hover {
     background: transparent !important;
