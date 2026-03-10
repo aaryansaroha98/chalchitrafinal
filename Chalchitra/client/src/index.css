@@ -20,6 +20,14 @@ body {
   background-color: #000000;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+img,
+video,
+svg {
+  max-width: 100%;
+  height: auto;
 }
 
 /* Ultra Modern Glassmorphism Design System */
@@ -2467,5 +2475,27 @@ a:hover {
   .home-featured-value,
   .upcoming-value {
     font-size: 0.95rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-featured-meta > div,
+  .upcoming-meta > div {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.35rem !important;
+  }
+
+  .home-featured-meta > div > div:last-child,
+  .upcoming-meta > div > div:last-child {
+    position: static !important;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .home-featured-card,
+  .upcoming-card {
+    transform: none !important;
+    box-shadow: var(--glass-shadow) !important;
   }
 }
