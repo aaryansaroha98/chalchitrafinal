@@ -559,10 +559,14 @@ router.post('/scan', (req, res) => {
         return; // Exit early since we're handling this asynchronously
       }
 
+      const remainingPeople = booking.remaining_people !== null && booking.remaining_people !== undefined
+        ? booking.remaining_people
+        : booking.num_people;
+
       // Check if this is a multi-person ticket that needs partial admission
-      if (booking.num_people > 1 && booking.remaining_people > 1) {
+      if (booking.num_people > 1 && remainingPeople > 0) {
         // Multi-person ticket - return options for partial admission
-        console.log('Multi-person ticket detected:', booking.num_people, 'people,', booking.remaining_people, 'remaining');
+        console.log('Multi-person ticket detected:', booking.num_people, 'people,', remainingPeople, 'remaining');
 
         // Get food orders for this booking even for group tickets
         const foodQuery = `
@@ -613,7 +617,7 @@ router.post('/scan', (req, res) => {
           console.log('🍽️ Group ticket food orders:', foodOrders);
 
           const availableOptions = [];
-          for (let i = 1; i <= booking.remaining_people; i++) {
+          for (let i = 1; i <= remainingPeople; i++) {
             availableOptions.push(i);
           }
 
@@ -628,7 +632,7 @@ router.post('/scan', (req, res) => {
             selected_seats: JSON.parse(booking.selected_seats || '[]'),
             total_people: booking.num_people,
             admitted_people: booking.admitted_people || 0,
-            remaining_people: booking.remaining_people || booking.num_people,
+            remaining_people: remainingPeople,
             available_options: availableOptions,
             booking_id: qrData.booking_id,
             validity_status: 'WAITING - SELECT NUMBER',
