@@ -137,7 +137,7 @@ const Gallery = () => {
   }
 
   return (
-    <div className="bg-void" style={{minHeight: '100vh', position: 'relative', overflow: 'hidden'}}>
+    <div className="bg-void" style={{ minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
       {/* Classic Simple Animated Background */}
       <div style={{
         position: 'fixed',
@@ -250,11 +250,11 @@ const Gallery = () => {
 
 
 
-      <Container className="gallery-container" style={{padding: '6rem 2rem 4rem', position: 'relative', zIndex: 2}}>
+      <Container className="gallery-container" style={{ padding: '6rem 2rem 4rem', position: 'relative', zIndex: 2 }}>
         {/* Professional Header */}
         <div className="gallery-header">
           <h1 className="gallery-title">
-            <i className="fas fa-images me-3 gallery-title-icon" style={{fontSize: '2.5rem'}}></i>
+            <i className="fas fa-images me-3 gallery-title-icon" style={{ fontSize: '2.5rem' }}></i>
             Event Gallery
           </h1>
           <p className="gallery-subtitle">
@@ -279,8 +279,8 @@ const Gallery = () => {
               marginBottom: '1rem',
               display: 'block'
             }}></i>
-            <h4 style={{color: '#dc3545', marginBottom: '0.5rem'}}>Unable to Load Gallery</h4>
-            <p style={{color: 'var(--gray-600)', margin: 0}}>{error}</p>
+            <h4 style={{ color: '#dc3545', marginBottom: '0.5rem' }}>Unable to Load Gallery</h4>
+            <p style={{ color: 'var(--gray-600)', margin: 0 }}>{error}</p>
           </div>
         )}
 
@@ -300,7 +300,7 @@ const Gallery = () => {
               marginBottom: '1.5rem',
               display: 'block'
             }}></i>
-            <h3 style={{color: 'var(--gray-700)', marginBottom: '1rem', fontWeight: '600'}}>
+            <h3 style={{ color: 'var(--gray-700)', marginBottom: '1rem', fontWeight: '600' }}>
               Gallery Coming Soon
             </h3>
             <p style={{
@@ -334,31 +334,31 @@ const Gallery = () => {
                   transform: 'perspective(1000px) rotateX(0deg)',
                   willChange: 'transform'
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'perspective(1000px) rotateX(-2deg) translateY(-8px) scale(1.02)';
-                  e.currentTarget.style.boxShadow = `
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'perspective(1000px) rotateX(-2deg) translateY(-8px) scale(1.02)';
+                    e.currentTarget.style.boxShadow = `
                     0 20px 60px rgba(0, 0, 0, 0.2),
                     0 8px 32px rgba(0, 255, 255, 0.15),
                     inset 0 1px 0 rgba(255, 255, 255, 0.15),
                     0 0 0 1px rgba(255, 255, 255, 0.1)
                   `;
-                  e.currentTarget.style.background = 'linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06))';
-                  e.currentTarget.style.borderColor = 'rgba(0, 255, 255, 0.3)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'perspective(1000px) rotateX(0deg) translateY(0) scale(1)';
-                  e.currentTarget.style.boxShadow = `
+                    e.currentTarget.style.background = 'linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06))';
+                    e.currentTarget.style.borderColor = 'rgba(0, 255, 255, 0.3)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'perspective(1000px) rotateX(0deg) translateY(0) scale(1)';
+                    e.currentTarget.style.boxShadow = `
                     0 8px 32px rgba(0, 0, 0, 0.12),
                     0 2px 8px rgba(0, 0, 0, 0.08),
                     inset 0 1px 0 rgba(255, 255, 255, 0.1),
                     0 0 0 1px rgba(255, 255, 255, 0.05)
                   `;
-                  e.currentTarget.style.background = 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))';
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.18)';
-                }}
+                    e.currentTarget.style.background = 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))';
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.18)';
+                  }}
                 >
                   {/* Gallery Image */}
-                <div style={{position: 'relative', flexShrink: 0}}>
+                  <div style={{ position: 'relative', flexShrink: 0 }}>
                     <img
                       src={getGalleryImageUrl(image.image_url)}
                       alt={image.event_name || 'Gallery Image'}
@@ -377,7 +377,7 @@ const Gallery = () => {
                   </div>
 
                   {/* Image Info */}
-                  <div className="gallery-card-info" style={{padding: '0.5rem', textAlign: 'center'}}>
+                  <div className="gallery-card-info" style={{ padding: '0.5rem', textAlign: 'center' }}>
                     <h5 className="gallery-card-title" style={{
                       fontSize: '1rem',
                       fontWeight: '700',
@@ -394,7 +394,7 @@ const Gallery = () => {
                       fontWeight: '500'
                     }}>
                       <i className="fas fa-calendar me-1"></i>
-                      {formatGalleryEventDate(image.event_date || image.eventDate)}
+                      {formatGalleryEventDate(image.event_date || image.eventDate || image.uploaded_at)}
                     </p>
                   </div>
                 </div>
@@ -410,7 +410,7 @@ const Gallery = () => {
         onHide={() => setShowModal(false)}
         centered
         size="xl"
-        style={{zIndex: 9999}}
+        style={{ zIndex: 9999 }}
       >
         <Modal.Body style={{
           background: 'linear-gradient(135deg, var(--gray-900), var(--gray-800))',
@@ -432,7 +432,7 @@ const Gallery = () => {
                   border: '2px solid rgba(0, 255, 255, 0.2)'
                 }}
               />
-              <div style={{marginTop: '2rem'}}>
+              <div style={{ marginTop: '2rem' }}>
                 <h3 style={{
                   color: 'var(--gray-100)',
                   marginBottom: '0.5rem',
@@ -447,7 +447,7 @@ const Gallery = () => {
                   fontSize: '1.1rem'
                 }}>
                   <i className="fas fa-calendar me-2"></i>
-                  {formatGalleryEventDate(selectedImage.event_date || selectedImage.eventDate, true)}
+                  {formatGalleryEventDate(selectedImage.event_date || selectedImage.eventDate || selectedImage.uploaded_at, true)}
                 </p>
               </div>
             </>

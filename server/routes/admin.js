@@ -138,7 +138,7 @@ router.get('/revenue-stats', requireAdmin, (req, res) => {
   // First check if this is the super admin
   db.get('SELECT email FROM users WHERE id = ?', [req.user?.id || req.session?.adminUser?.id], (err, user) => {
     if (err) return res.status(500).json({ error: err.message });
-    
+
     // Only super admin can access revenue stats
     if (!user || user.email !== '2025uee0154@iitjammu.ac.in') {
       return res.status(403).json({ error: 'Access denied. Super admin only.' });
@@ -251,7 +251,7 @@ router.get('/top-users', requireAdmin, (req, res) => {
     ORDER BY total_bookings DESC
     LIMIT 10
   `;
-  
+
   db.all(query, [], (err, users) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(users || []);
@@ -263,7 +263,7 @@ router.get('/visitors/stats', requireAdmin, (req, res) => {
   // First check if visitor_stats table exists
   db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='visitor_stats'", (err, table) => {
     if (err) return res.status(500).json({ error: err.message });
-    
+
     if (!table) {
       // Create the table
       db.run(`CREATE TABLE IF NOT EXISTS visitor_stats (
@@ -274,7 +274,7 @@ router.get('/visitors/stats', requireAdmin, (req, res) => {
         UNIQUE(visit_date, page_name)
       )`, (createErr) => {
         if (createErr) return res.status(500).json({ error: createErr.message });
-        
+
         // Return empty stats since table was just created
         return res.json({
           total_visitors: 0,
@@ -306,11 +306,11 @@ router.get('/visitors/stats', requireAdmin, (req, res) => {
 // Track a page visit (can be called from frontend)
 router.post('/track-visit', (req, res) => {
   const { page_name } = req.body;
-  
+
   if (!page_name) {
     return res.status(400).json({ error: 'Page name is required' });
   }
-  
+
   // Create table if not exists
   db.run(`CREATE TABLE IF NOT EXISTS visitor_stats (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -320,7 +320,7 @@ router.post('/track-visit', (req, res) => {
     UNIQUE(visit_date, page_name)
   )`, (err) => {
     if (err) return res.status(500).json({ error: err.message });
-    
+
     // Try to insert, or update if exists
     db.run(`INSERT INTO visitor_stats (visit_date, page_name, visitor_count) 
             VALUES (date("now"), ?, 1)
@@ -334,7 +334,7 @@ router.post('/track-visit', (req, res) => {
 
 // Manage users (make admin)
 router.put('/users/:id/make_admin', requireAdmin, (req, res) => {
-  db.run('UPDATE users SET is_admin = 1 WHERE id = ?', [req.params.id], function(err) {
+  db.run('UPDATE users SET is_admin = 1 WHERE id = ?', [req.params.id], function (err) {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ changes: this.changes });
   });
@@ -342,7 +342,7 @@ router.put('/users/:id/make_admin', requireAdmin, (req, res) => {
 
 // Remove admin privileges
 router.put('/users/:id/remove_admin', requireAdmin, (req, res) => {
-  db.run('UPDATE users SET is_admin = 0 WHERE id = ?', [req.params.id], function(err) {
+  db.run('UPDATE users SET is_admin = 0 WHERE id = ?', [req.params.id], function (err) {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ changes: this.changes });
   });
@@ -351,7 +351,7 @@ router.put('/users/:id/remove_admin', requireAdmin, (req, res) => {
 // Update admin tag/name
 router.put('/users/:id/admin_tag', requireAdmin, (req, res) => {
   const { admin_tag } = req.body;
-  db.run('UPDATE users SET admin_tag = ? WHERE id = ?', [admin_tag, req.params.id], function(err) {
+  db.run('UPDATE users SET admin_tag = ? WHERE id = ?', [admin_tag, req.params.id], function (err) {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ changes: this.changes, admin_tag });
   });
@@ -360,19 +360,19 @@ router.put('/users/:id/admin_tag', requireAdmin, (req, res) => {
 // Make user code scanner
 router.put('/users/:id/make_scanner', requireAdmin, (req, res) => {
   const admin_tag = req.body && req.body.admin_tag;
-  
+
   // Check if this is specifically a scanner permission request
   // If admin_tag is explicitly provided, treat as admin tag update
   // If admin_tag is not provided or is null/undefined, treat as scanner permission update
   if (admin_tag !== undefined && admin_tag !== null && admin_tag !== '') {
     // This is an admin tag update request
-    db.run('UPDATE users SET admin_tag = ? WHERE id = ?', [admin_tag, req.params.id], function(err) {
+    db.run('UPDATE users SET admin_tag = ? WHERE id = ?', [admin_tag, req.params.id], function (err) {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ changes: this.changes, admin_tag });
     });
   } else {
     // This is the original make scanner request (no admin_tag in body)
-    db.run('UPDATE users SET code_scanner = 1 WHERE id = ?', [req.params.id], function(err) {
+    db.run('UPDATE users SET code_scanner = 1 WHERE id = ?', [req.params.id], function (err) {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ changes: this.changes });
     });
@@ -381,7 +381,7 @@ router.put('/users/:id/make_scanner', requireAdmin, (req, res) => {
 
 // Remove user code scanner access
 router.put('/users/:id/remove_scanner', requireAdmin, (req, res) => {
-  db.run('UPDATE users SET code_scanner = 0 WHERE id = ?', [req.params.id], function(err) {
+  db.run('UPDATE users SET code_scanner = 0 WHERE id = ?', [req.params.id], function (err) {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ changes: this.changes });
   });
@@ -389,7 +389,7 @@ router.put('/users/:id/remove_scanner', requireAdmin, (req, res) => {
 
 // Grant scanner access to team member
 router.put('/team/:id/grant_scanner', requireAdmin, (req, res) => {
-  db.run('UPDATE team SET scanner_access = 1 WHERE id = ?', [req.params.id], function(err) {
+  db.run('UPDATE team SET scanner_access = 1 WHERE id = ?', [req.params.id], function (err) {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ changes: this.changes });
   });
@@ -397,7 +397,7 @@ router.put('/team/:id/grant_scanner', requireAdmin, (req, res) => {
 
 // Remove scanner access from team member
 router.put('/team/:id/remove_scanner', requireAdmin, (req, res) => {
-  db.run('UPDATE team SET scanner_access = 0 WHERE id = ?', [req.params.id], function(err) {
+  db.run('UPDATE team SET scanner_access = 0 WHERE id = ?', [req.params.id], function (err) {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ changes: this.changes });
   });
@@ -423,7 +423,7 @@ router.get('/bookings', requireAdmin, (req, res) => {
 // Update booking (admin)
 router.put('/bookings/:id', requireAdmin, (req, res) => {
   const { is_used } = req.body;
-  db.run('UPDATE bookings SET is_used = ? WHERE id = ?', [is_used, req.params.id], function(err) {
+  db.run('UPDATE bookings SET is_used = ? WHERE id = ?', [is_used, req.params.id], function (err) {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ changes: this.changes });
   });
@@ -442,15 +442,15 @@ router.get('/feedback', requireAdmin, (req, res) => {
 router.get('/coupons', requireAdmin, (req, res) => {
   db.all('SELECT * FROM coupons ORDER BY created_at DESC', [], (err, coupons) => {
     if (err) return res.status(500).json({ error: err.message });
-    
+
     // Add usage percentage and status to each coupon
     const couponsWithUsage = coupons.map(coupon => {
       let usagePercentage = 0;
       let status = 'Active';
-      
+
       if (coupon.usage_limit > 0) {
         usagePercentage = Math.round((coupon.used_count / coupon.usage_limit) * 100);
-        
+
         if (coupon.used_count >= coupon.usage_limit) {
           status = 'Expired';
         } else if (usagePercentage >= 80) {
@@ -460,14 +460,14 @@ router.get('/coupons', requireAdmin, (req, res) => {
         usagePercentage = 0;
         status = 'Unlimited';
       }
-      
+
       return {
         ...coupon,
         usage_percentage: usagePercentage,
         status: status
       };
     });
-    
+
     res.json(couponsWithUsage);
   });
 });
@@ -504,7 +504,7 @@ router.post('/coupons', requireAdmin, (req, res) => {
     db.run(`INSERT INTO coupons (code, description, discount_type, discount_value, min_purchase, max_discount, usage_limit, expiry_date)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [code.toUpperCase(), description, discount_type, discount_value, finalMinPurchase, finalMaxDiscount, finalUsageLimit, expiry_date],
-      function(err) {
+      function (err) {
         if (err) return res.status(500).json({ error: err.message });
         res.json({ id: this.lastID, message: 'Coupon created successfully' });
       });
@@ -515,7 +515,7 @@ router.post('/coupons', requireAdmin, (req, res) => {
 
 // Delete coupon
 router.delete('/coupons/:id', requireAdmin, (req, res) => {
-  db.run('DELETE FROM coupons WHERE id = ?', [req.params.id], function(err) {
+  db.run('DELETE FROM coupons WHERE id = ?', [req.params.id], function (err) {
     if (err) return res.status(500).json({ error: err.message });
     if (this.changes === 0) return res.status(404).json({ error: 'Coupon not found' });
     res.json({ message: 'Coupon deleted successfully' });
@@ -553,7 +553,7 @@ router.put('/coupons/:id', requireAdmin, (req, res) => {
 
     db.run(`UPDATE coupons SET code = ?, description = ?, discount_type = ?, discount_value = ?, min_purchase = ?, max_discount = ?, usage_limit = ?, expiry_date = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
       [code.toUpperCase(), description, discount_type, discount_value, finalMinPurchase, finalMaxDiscount, finalUsageLimit, expiry_date, req.params.id],
-      function(err) {
+      function (err) {
         if (err) return res.status(500).json({ error: err.message });
         if (this.changes === 0) return res.status(404).json({ error: 'Coupon not found' });
         res.json({ message: 'Coupon updated successfully' });
@@ -570,7 +570,7 @@ router.delete('/coupons', requireAdmin, (req, res) => {
   }
 
   const placeholders = ids.map(() => '?').join(',');
-  db.run(`DELETE FROM coupons WHERE id IN (${placeholders})`, ids, function(err) {
+  db.run(`DELETE FROM coupons WHERE id IN (${placeholders})`, ids, function (err) {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ message: `${this.changes} coupon(s) deleted successfully` });
   });
@@ -620,7 +620,7 @@ router.post('/coupons/validate', (req, res) => {
       discount = Math.min(discount, total_amount);
 
       // Increment usage count when coupon is validated for use
-      db.run('UPDATE coupons SET used_count = used_count + 1 WHERE id = ?', [coupon.id], function(updateErr) {
+      db.run('UPDATE coupons SET used_count = used_count + 1 WHERE id = ?', [coupon.id], function (updateErr) {
         if (updateErr) {
           console.error('Error updating coupon usage count:', updateErr);
           return res.status(500).json({ error: 'Failed to update coupon usage' });
@@ -652,6 +652,44 @@ router.get('/gallery', (req, res) => {
   });
 });
 
+const normalizeGalleryEventDate = (value) => {
+  if (!value) return null;
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    const year = value.getUTCFullYear();
+    const month = String(value.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(value.getUTCDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  const trimmed = String(value).trim();
+  if (!trimmed) return null;
+
+  const isoMatch = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (isoMatch) {
+    return `${isoMatch[1]}-${isoMatch[2]}-${isoMatch[3]}`;
+  }
+
+  const altMatch = trimmed.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+  if (altMatch) {
+    const part1 = Number(altMatch[1]);
+    const part2 = Number(altMatch[2]);
+    const year = altMatch[3];
+    let day = part1;
+    let month = part2;
+
+    if (part1 <= 12 && part2 > 12) {
+      day = part2;
+      month = part1;
+    }
+
+    const monthSafe = String(Math.max(1, Math.min(12, month))).padStart(2, '0');
+    const daySafe = String(Math.max(1, Math.min(31, day))).padStart(2, '0');
+    return `${year}-${monthSafe}-${daySafe}`;
+  }
+
+  return null;
+};
+
 // Add gallery image
 router.post('/gallery', requireAdmin, uploadGallery.single('image'), (req, res) => {
   console.log('Gallery upload request received');
@@ -660,18 +698,28 @@ router.post('/gallery', requireAdmin, uploadGallery.single('image'), (req, res) 
   console.log('Body:', req.body);
 
   try {
-    const { event_name } = req.body;
+    const { event_name, event_date, eventDate } = req.body;
     const image_url = getUploadUrl(req.file, '/gallery') || req.body.image_url;
+    const normalizedEventDate = normalizeGalleryEventDate(event_date || eventDate);
 
     console.log('Image URL:', image_url);
     console.log('Event name:', event_name);
+    console.log('Event date:', normalizedEventDate || '(not provided)');
 
     if (!image_url) {
       console.log('No image file provided');
       return res.status(400).json({ error: 'Image file is required' });
     }
 
-    db.run('INSERT INTO gallery (image_url, event_name) VALUES (?, ?)', [image_url, event_name || 'General Event'], function(err) {
+    if (!normalizedEventDate) {
+      return res.status(400).json({ error: 'Event date is required' });
+    }
+
+    if ((event_date || eventDate) && !normalizedEventDate) {
+      return res.status(400).json({ error: 'Event date must be in YYYY-MM-DD format' });
+    }
+
+    db.run('INSERT INTO gallery (image_url, event_name, event_date) VALUES (?, ?, ?)', [image_url, event_name || 'General Event', normalizedEventDate || null], function (err) {
       if (err) {
         console.error('Database error:', err);
         return res.status(500).json({ error: err.message });
@@ -685,9 +733,24 @@ router.post('/gallery', requireAdmin, uploadGallery.single('image'), (req, res) 
   }
 });
 
+// Update gallery event date
+router.put('/gallery/:id', requireAdmin, (req, res) => {
+  const { event_date, eventDate } = req.body;
+  const normalizedEventDate = normalizeGalleryEventDate(event_date || eventDate);
+
+  if (!normalizedEventDate) {
+    return res.status(400).json({ error: 'Event date is required' });
+  }
+
+  db.run('UPDATE gallery SET event_date = ? WHERE id = ?', [normalizedEventDate, req.params.id], function (err) {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ changes: this.changes });
+  });
+});
+
 // Delete gallery image
 router.delete('/gallery/:id', requireAdmin, (req, res) => {
-  db.run('DELETE FROM gallery WHERE id = ?', [req.params.id], function(err) {
+  db.run('DELETE FROM gallery WHERE id = ?', [req.params.id], function (err) {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ changes: this.changes });
   });
@@ -701,10 +764,10 @@ router.get('/settings', (req, res) => {
       // Create default settings
       const defaultAboutText = 'Chalchitra Series is a student-led initiative at IIT Jammu dedicated to bringing quality movie screenings to our campus community. We organize regular movie screenings featuring a diverse range of films, from classics to contemporary hits.\n\nOur mission is to create a vibrant cultural atmosphere on campus while providing students with affordable entertainment options.';
       db.run('INSERT INTO settings (id, tagline, hero_background, about_text, about_image) VALUES (1, ?, ?, ?, ?)',
-        ['Student-led movie screening initiative at IIT Jammu', '#007bff', defaultAboutText, '/about-image.jpg'], function(err) {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json({ id: 1, tagline: 'Student-led movie screening initiative at IIT Jammu', hero_background: '#007bff', about_text: defaultAboutText, about_image: '/about-image.jpg' });
-      });
+        ['Student-led movie screening initiative at IIT Jammu', '#007bff', defaultAboutText, '/about-image.jpg'], function (err) {
+          if (err) return res.status(500).json({ error: err.message });
+          res.json({ id: 1, tagline: 'Student-led movie screening initiative at IIT Jammu', hero_background: '#007bff', about_text: defaultAboutText, about_image: '/about-image.jpg' });
+        });
     } else {
       res.json(settings);
     }
@@ -727,7 +790,7 @@ router.put('/settings', requireAdmin, uploadFields, (req, res) => {
   });
 
   db.run('UPDATE settings SET tagline = ?, hero_background = ?, hero_background_image = ?, hero_background_video = ?, about_text = ?, about_image = ? WHERE id = 1',
-    [tagline, hero_background, hero_background_image, hero_background_video, about_text, about_image], function(err) {
+    [tagline, hero_background, hero_background_image, hero_background_video, about_text, about_image], function (err) {
       if (err) {
         console.error('Database error:', err);
         return res.status(500).json({ error: err.message });
@@ -749,7 +812,7 @@ router.get('/team', (req, res) => {
 router.post('/team', requireAdmin, uploadTeam.single('photo'), (req, res) => {
   const { name, student_id, role, section } = req.body;
   const photo_url = getUploadUrl(req.file, '/team') || req.body.photo_url;
-  db.run('INSERT INTO team (name, student_id, photo_url, role, section) VALUES (?, ?, ?, ?, ?)', [name, student_id, photo_url, role, section || 'foundation_team'], function(err) {
+  db.run('INSERT INTO team (name, student_id, photo_url, role, section) VALUES (?, ?, ?, ?, ?)', [name, student_id, photo_url, role, section || 'foundation_team'], function (err) {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ id: this.lastID });
   });
@@ -760,7 +823,7 @@ router.put('/team/:id', requireAdmin, uploadTeam.single('photo'), (req, res) => 
   const { name, student_id, role, section } = req.body;
   const photo_url = getUploadUrl(req.file, '/team') || req.body.photo_url;
   db.run('UPDATE team SET name = ?, student_id = ?, photo_url = ?, role = ?, section = ? WHERE id = ?',
-    [name, student_id, photo_url, role, section, req.params.id], function(err) {
+    [name, student_id, photo_url, role, section, req.params.id], function (err) {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ changes: this.changes });
     });
@@ -768,7 +831,7 @@ router.put('/team/:id', requireAdmin, uploadTeam.single('photo'), (req, res) => 
 
 // Delete team member
 router.delete('/team/:id', requireAdmin, (req, res) => {
-  db.run('DELETE FROM team WHERE id = ?', [req.params.id], function(err) {
+  db.run('DELETE FROM team WHERE id = ?', [req.params.id], function (err) {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ changes: this.changes });
   });
@@ -822,7 +885,7 @@ router.get('/email/users', requireAdmin, (req, res) => {
 router.get('/movies-with-status', requireAdmin, (req, res) => {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  
+
   db.all('SELECT *, CASE WHEN date >= ? THEN "upcoming" ELSE "past" END as status FROM movies ORDER BY date DESC', [today.toISOString()], (err, movies) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(movies);
@@ -945,10 +1008,10 @@ router.post('/email/bulk', requireAdmin, async (req, res) => {
       // Process emails in background via Brevo (HTTP API, no SMTP)
       setImmediate(async () => {
         console.log(`[Bulk Email] Starting background send to ${users.length} users`);
-        
+
         for (let i = 0; i < users.length; i++) {
           const user = users[i];
-          
+
           const emailHtml = `
               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                 <div style="background: white; border: 1px solid #e9ecef; padding: 30px; text-align: center; border-radius: 15px 15px 0 0;">
@@ -996,7 +1059,7 @@ router.post('/email/bulk', requireAdmin, async (req, res) => {
             await new Promise(resolve => setTimeout(resolve, 500));
           }
         }
-        
+
         console.log(`[Bulk Email] Background processing complete for ${users.length} users`);
       });
     });
@@ -1132,7 +1195,7 @@ router.post('/email/feedback-request', requireAdmin, async (req, res) => {
         try {
           for (let i = 0; i < users.length; i++) {
             const user = users[i];
-            
+
             try {
               const emailHtml = `
                   <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -1498,7 +1561,7 @@ router.post('/coupon-winners/send', requireAdmin, (req, res) => {
             db.run(`INSERT INTO coupons (code, description, discount_type, discount_value, min_purchase, max_discount, usage_limit, expiry_date)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
               [couponCode, couponDescription, discount_type, discount_amount, 0, max_discount, 1, expiryDate.toISOString()],
-              function(couponErr) {
+              function (couponErr) {
                 if (couponErr) {
                   console.error('Error creating coupon:', couponErr);
                   results.push({ user: user.name, email: user.email, status: 'failed', error: 'Database error' });
@@ -1514,7 +1577,7 @@ router.post('/coupon-winners/send', requireAdmin, (req, res) => {
                 db.run(`INSERT INTO coupon_winners (user_id, coupon_code, discount_amount, discount_type, max_discount, expiry_date, sent_by, shared_coupon_id)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
                   [user.id, couponCode, discount_amount, discount_type, max_discount, expiryDate.toISOString(), adminId, couponId],
-                  function(winnerErr) {
+                  function (winnerErr) {
                     console.log('🏆 Winner record callback executed for:', user.email);
                     if (winnerErr) {
                       console.error('❌ Error creating winner record:', winnerErr);
@@ -1893,7 +1956,7 @@ Generated on: ${new Date().toLocaleString('en-IN')}
 // Get all admin users (for permission management)
 router.get('/permission-admins', requireAdmin, (req, res) => {
   console.log('🔍 Fetching admin users for permission management...');
-  
+
   // Get all admin users with their permissions
   db.all(`
     SELECT u.id, u.name, u.email, u.is_admin, u.code_scanner, u.admin_tag,
@@ -1909,18 +1972,18 @@ router.get('/permission-admins', requireAdmin, (req, res) => {
       console.error('❌ Error fetching admin users:', err);
       return res.status(500).json({ error: err.message });
     }
-    
+
     console.log('✅ Found', admins?.length || 0, 'admin users');
     console.log('📋 Raw admin data:', JSON.stringify(admins, null, 2));
-    
+
     // Parse allowed_tabs JSON for each admin
     const result = admins.map(admin => ({
       ...admin,
       allowed_tabs: admin.allowed_tabs ? JSON.parse(admin.allowed_tabs) : []
     }));
-    
+
     console.log('📋 Admin users with parsed tabs:', result.map(a => ({ id: a.id, name: a.name, email: a.email, admin_tag: a.admin_tag })));
-    
+
     res.json(result);
   });
 });
@@ -1928,7 +1991,7 @@ router.get('/permission-admins', requireAdmin, (req, res) => {
 // Get permissions for a specific admin
 router.get('/permissions/:adminId', requireAdmin, (req, res) => {
   const adminId = req.params.adminId;
-  
+
   db.get(`
     SELECT ap.*, u.name, u.email,
            creator.name as created_by_name
@@ -1938,11 +2001,11 @@ router.get('/permissions/:adminId', requireAdmin, (req, res) => {
     WHERE ap.admin_user_id = ?
   `, [adminId], (err, permissions) => {
     if (err) return res.status(500).json({ error: err.message });
-    
+
     if (!permissions) {
       // Return default permissions (all tabs except config)
       const defaultTabs = [
-        'dashboard', 'movies', 'foods', 'bookings', 'users', 
+        'dashboard', 'movies', 'foods', 'bookings', 'users',
         'team', 'gallery', 'coupons', 'coupon-winners', 'feedback', 'mail', 'settings'
       ];
       return res.json({
@@ -1951,7 +2014,7 @@ router.get('/permissions/:adminId', requireAdmin, (req, res) => {
         is_default: true
       });
     }
-    
+
     res.json({
       ...permissions,
       allowed_tabs: permissions.allowed_tabs ? JSON.parse(permissions.allowed_tabs) : []
@@ -1963,36 +2026,36 @@ router.get('/permissions/:adminId', requireAdmin, (req, res) => {
 router.put('/permissions/:adminId', requireAdmin, (req, res) => {
   const adminId = req.params.adminId;
   const { allowed_tabs } = req.body;
-  
+
   if (!Array.isArray(allowed_tabs)) {
     return res.status(400).json({ error: 'allowed_tabs must be an array' });
   }
-  
+
   // Validate all tabs are valid
   const validTabs = ['dashboard', 'movies', 'foods', 'bookings', 'users', 'team', 'gallery', 'coupons', 'coupon-winners', 'feedback', 'mail', 'settings', 'config'];
   const invalidTabs = allowed_tabs.filter(tab => !validTabs.includes(tab));
-  
+
   if (invalidTabs.length > 0) {
     return res.status(400).json({ error: `Invalid tabs: ${invalidTabs.join(', ')}` });
   }
-  
+
   const currentUserId = req.user?.id || req.session?.adminUser?.id;
-  
+
   // Check if permissions record exists
   db.get('SELECT id FROM admin_permissions WHERE admin_user_id = ?', [adminId], (err, existing) => {
     if (err) return res.status(500).json({ error: err.message });
-    
+
     const tabsJson = JSON.stringify(allowed_tabs);
-    
+
     if (existing) {
       // Update existing permissions
       db.run(`
         UPDATE admin_permissions 
         SET allowed_tabs = ?, updated_at = CURRENT_TIMESTAMP, created_by = ?
         WHERE admin_user_id = ?
-      `, [tabsJson, currentUserId, adminId], function(err) {
+      `, [tabsJson, currentUserId, adminId], function (err) {
         if (err) return res.status(500).json({ error: err.message });
-        
+
         // Update scanner permission based on config tab access
         const hasConfigAccess = allowed_tabs.includes('config');
         db.run('UPDATE users SET code_scanner = ? WHERE id = ?', [hasConfigAccess ? 1 : 0, adminId], (scannerErr) => {
@@ -2001,10 +2064,10 @@ router.put('/permissions/:adminId', requireAdmin, (req, res) => {
             // Don't fail the entire request, just log the error
           }
         });
-        
-        res.json({ 
+
+        res.json({
           message: 'Permissions updated successfully',
-          changes: this.changes 
+          changes: this.changes
         });
       });
     } else {
@@ -2012,9 +2075,9 @@ router.put('/permissions/:adminId', requireAdmin, (req, res) => {
       db.run(`
         INSERT INTO admin_permissions (admin_user_id, allowed_tabs, created_by)
         VALUES (?, ?, ?)
-      `, [adminId, tabsJson, currentUserId], function(err) {
+      `, [adminId, tabsJson, currentUserId], function (err) {
         if (err) return res.status(500).json({ error: err.message });
-        
+
         // Update scanner permission based on config tab access
         const hasConfigAccess = allowed_tabs.includes('config');
         db.run('UPDATE users SET code_scanner = ? WHERE id = ?', [hasConfigAccess ? 1 : 0, adminId], (scannerErr) => {
@@ -2023,10 +2086,10 @@ router.put('/permissions/:adminId', requireAdmin, (req, res) => {
             // Don't fail the entire request, just log the error
           }
         });
-        
-        res.json({ 
+
+        res.json({
           message: 'Permissions created successfully',
-          id: this.lastID 
+          id: this.lastID
         });
       });
     }
@@ -2036,19 +2099,19 @@ router.put('/permissions/:adminId', requireAdmin, (req, res) => {
 // Get current user's permissions (for frontend access control)
 router.get('/my-permissions', requireAdmin, (req, res) => {
   const userId = req.user?.id || req.session?.adminUser?.id;
-  
+
   if (!userId) {
     return res.status(401).json({ error: 'User not authenticated' });
   }
-  
+
   // First check if this is the super admin (config access)
   db.get('SELECT email, code_scanner FROM users WHERE id = ?', [userId], (err, user) => {
     if (err) return res.status(500).json({ error: err.message });
-    
+
     // Super admin always has full access
     if (user.email === '2025uee0154@iitjammu.ac.in') {
       const allTabs = [
-        'dashboard', 'movies', 'foods', 'bookings', 'users', 
+        'dashboard', 'movies', 'foods', 'bookings', 'users',
         'team', 'gallery', 'coupons', 'coupon-winners', 'feedback', 'mail', 'settings', 'config'
       ];
       return res.json({
@@ -2057,15 +2120,15 @@ router.get('/my-permissions', requireAdmin, (req, res) => {
         can_manage_permissions: true
       });
     }
-    
+
     // Check custom permissions
     db.get('SELECT allowed_tabs FROM admin_permissions WHERE admin_user_id = ?', [userId], (permErr, permissions) => {
       if (permErr) return res.status(500).json({ error: permErr.message });
-      
+
       if (!permissions) {
         // No custom permissions, give default access (all tabs except config)
         const defaultTabs = [
-          'dashboard', 'movies', 'foods', 'bookings', 'users', 
+          'dashboard', 'movies', 'foods', 'bookings', 'users',
           'team', 'gallery', 'coupons', 'coupon-winners', 'feedback', 'mail', 'settings'
         ];
         return res.json({
@@ -2074,7 +2137,7 @@ router.get('/my-permissions', requireAdmin, (req, res) => {
           can_manage_permissions: false
         });
       }
-      
+
       res.json({
         is_super_admin: false,
         allowed_tabs: JSON.parse(permissions.allowed_tabs),
@@ -2101,7 +2164,7 @@ router.get('/available-tabs', requireAdmin, (req, res) => {
     { id: 'settings', name: 'Settings', icon: '⚙️', description: 'Website settings' },
     { id: 'config', name: 'Config', icon: '🔧', description: 'System configuration (Super Admin only)' }
   ];
-  
+
   res.json(tabs);
 });
 
@@ -2115,7 +2178,7 @@ router.delete('/coupon-winners', requireAdmin, (req, res) => {
 
   // Don't allow deleting super admin's winners
   const placeholders = ids.map(() => '?').join(',');
-  db.run(`DELETE FROM coupon_winners WHERE id IN (${placeholders})`, ids, function(err) {
+  db.run(`DELETE FROM coupon_winners WHERE id IN (${placeholders})`, ids, function (err) {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ message: `${this.changes} winner(s) deleted successfully` });
   });
@@ -2124,21 +2187,21 @@ router.delete('/coupon-winners', requireAdmin, (req, res) => {
 // Reset permissions to default for an admin
 router.delete('/permissions/:adminId', requireAdmin, (req, res) => {
   const adminId = req.params.adminId;
-  
+
   // Don't allow removing super admin's permissions
   db.get('SELECT email FROM users WHERE id = ?', [adminId], (err, user) => {
     if (err) return res.status(500).json({ error: err.message });
-    
+
     if (user.email === '2025uee0154@iitjammu.ac.in') {
       return res.status(400).json({ error: 'Cannot reset permissions for super admin' });
     }
-    
-    db.run('DELETE FROM admin_permissions WHERE admin_user_id = ?', [adminId], function(err) {
+
+    db.run('DELETE FROM admin_permissions WHERE admin_user_id = ?', [adminId], function (err) {
       if (err) return res.status(500).json({ error: err.message });
-      
-      res.json({ 
+
+      res.json({
         message: 'Permissions reset to default',
-        changes: this.changes 
+        changes: this.changes
       });
     });
   });
@@ -2151,7 +2214,7 @@ router.get('/mail-settings', requireAdmin, (req, res) => {
   // First check if this is the super admin
   db.get('SELECT email FROM users WHERE id = ?', [req.user?.id || req.session?.adminUser?.id], (err, user) => {
     if (err) return res.status(500).json({ error: err.message });
-    
+
     // Only super admin can access mail settings
     if (!user || user.email !== '2025uee0154@iitjammu.ac.in') {
       return res.status(403).json({ error: 'Access denied. Super admin only.' });
@@ -2172,7 +2235,7 @@ router.get('/mail-settings', requireAdmin, (req, res) => {
 
       db.get('SELECT * FROM mail_settings WHERE id = 1', (getErr, settings) => {
         if (getErr) return res.status(500).json({ error: getErr.message });
-        
+
         if (!settings) {
           // Return environment variables as default or fallback values
           return res.json({
@@ -2184,7 +2247,7 @@ router.get('/mail-settings', requireAdmin, (req, res) => {
             sender_name: process.env.SENDER_NAME || 'Chalchitra IIT Jammu'
           });
         }
-        
+
         // Don't return the actual password for security
         res.json({
           ...settings,
@@ -2198,11 +2261,11 @@ router.get('/mail-settings', requireAdmin, (req, res) => {
 // Update mail settings
 router.put('/mail-settings', requireAdmin, (req, res) => {
   const { email_host, email_port, email_user, email_pass, sender_name } = req.body;
-  
+
   // First check if this is the super admin
   db.get('SELECT email FROM users WHERE id = ?', [req.user?.id || req.session?.adminUser?.id], (err, user) => {
     if (err) return res.status(500).json({ error: err.message });
-    
+
     // Only super admin can update mail settings
     if (!user || user.email !== '2025uee0154@iitjammu.ac.in') {
       return res.status(403).json({ error: 'Access denied. Super admin only.' });
@@ -2236,15 +2299,15 @@ router.put('/mail-settings', requireAdmin, (req, res) => {
           // Update existing settings
           let query = 'UPDATE mail_settings SET email_host = ?, email_port = ?, email_user = ?, sender_name = ?, updated_at = CURRENT_TIMESTAMP';
           let params = [email_host, email_port, email_user, sender_name];
-          
+
           if (passwordValue !== null) {
             query += ', email_pass = ?';
             params.push(passwordValue);
           }
-          
+
           query += ' WHERE id = 1';
-          
-          db.run(query, params, function(updateErr) {
+
+          db.run(query, params, function (updateErr) {
             if (updateErr) return res.status(500).json({ error: updateErr.message });
             res.json({ message: 'Mail settings updated successfully', changes: this.changes });
           });
@@ -2253,7 +2316,7 @@ router.put('/mail-settings', requireAdmin, (req, res) => {
           db.run(`INSERT INTO mail_settings (id, email_host, email_port, email_user, email_pass, sender_name)
                   VALUES (1, ?, ?, ?, ?, ?)`,
             [email_host, email_port, email_user, passwordValue || '', sender_name],
-            function(insertErr) {
+            function (insertErr) {
               if (insertErr) return res.status(500).json({ error: insertErr.message });
               res.json({ message: 'Mail settings created successfully', id: this.lastID });
             });
@@ -2266,11 +2329,11 @@ router.put('/mail-settings', requireAdmin, (req, res) => {
 // Test email configuration
 router.post('/mail-settings/test', requireAdmin, async (req, res) => {
   const { email_host, email_port, email_user, email_pass, sender_name } = req.body;
-  
+
   // First check if this is the super admin
   db.get('SELECT email FROM users WHERE id = ?', [req.user?.id || req.session?.adminUser?.id], async (err, user) => {
     if (err) return res.status(500).json({ error: err.message });
-    
+
     // Only super admin can test mail settings
     if (!user || user.email !== '2025uee0154@iitjammu.ac.in') {
       return res.status(403).json({ error: 'Access denied. Super admin only.' });
@@ -2303,13 +2366,13 @@ router.post('/mail-settings/test', requireAdmin, async (req, res) => {
       });
 
       console.log('Test email sent successfully:', data?.messageId);
-      res.json({ 
+      res.json({
         message: 'Test email sent successfully!',
         message_id: data?.messageId
       });
     } catch (error) {
       console.error('Mail test failed:', error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: 'Failed to send test email',
         details: error.message,
         hint: 'Make sure your BREVO_API_KEY is correct and your sender email is verified in Brevo.'
@@ -2325,7 +2388,7 @@ router.get('/razorpay-settings', requireAdmin, (req, res) => {
   // First check if this is the super admin
   db.get('SELECT email FROM users WHERE id = ?', [req.user?.id || req.session?.adminUser?.id], (err, user) => {
     if (err) return res.status(500).json({ error: err.message });
-    
+
     // Only super admin can access razorpay settings
     if (!user || user.email !== '2025uee0154@iitjammu.ac.in') {
       return res.status(403).json({ error: 'Access denied. Super admin only.' });
@@ -2343,7 +2406,7 @@ router.get('/razorpay-settings', requireAdmin, (req, res) => {
 
       db.get('SELECT * FROM razorpay_settings WHERE id = 1', (getErr, settings) => {
         if (getErr) return res.status(500).json({ error: getErr.message });
-        
+
         if (!settings) {
           // Return environment variables as default or fallback values
           return res.json({
@@ -2353,7 +2416,7 @@ router.get('/razorpay-settings', requireAdmin, (req, res) => {
             has_secret: !!process.env.RAZORPAY_KEY_SECRET
           });
         }
-        
+
         // Don't return the actual secret for security - mask it
         res.json({
           id: settings.id,
@@ -2371,7 +2434,7 @@ router.put('/razorpay-settings', requireAdmin, (req, res) => {
   // First check if this is the super admin
   db.get('SELECT email FROM users WHERE id = ?', [req.user?.id || req.session?.adminUser?.id], (err, user) => {
     if (err) return res.status(500).json({ error: err.message });
-    
+
     // Only super admin can update razorpay settings
     if (!user || user.email !== '2025uee0154@iitjammu.ac.in') {
       return res.status(403).json({ error: 'Access denied. Super admin only.' });
@@ -2397,15 +2460,15 @@ router.put('/razorpay-settings', requireAdmin, (req, res) => {
           // Only update secret if it's not the masked value
           let query = 'UPDATE razorpay_settings SET key_id = ?, updated_at = CURRENT_TIMESTAMP';
           let params = [key_id];
-          
+
           if (key_secret && key_secret !== '••••••••') {
             query = 'UPDATE razorpay_settings SET key_id = ?, key_secret = ?, updated_at = CURRENT_TIMESTAMP WHERE id = 1';
             params = [key_id, key_secret];
           } else {
             query += ' WHERE id = 1';
           }
-          
-          db.run(query, params, function(updateErr) {
+
+          db.run(query, params, function (updateErr) {
             if (updateErr) return res.status(500).json({ error: updateErr.message });
             res.json({ message: 'Razorpay settings updated successfully', changes: this.changes });
           });
@@ -2413,7 +2476,7 @@ router.put('/razorpay-settings', requireAdmin, (req, res) => {
           db.run(`INSERT INTO razorpay_settings (id, key_id, key_secret)
                   VALUES (1, ?, ?)`,
             [key_id, key_secret !== '••••••••' ? key_secret : ''],
-            function(insertErr) {
+            function (insertErr) {
               if (insertErr) return res.status(500).json({ error: insertErr.message });
               res.json({ message: 'Razorpay settings created successfully', id: this.lastID });
             }
