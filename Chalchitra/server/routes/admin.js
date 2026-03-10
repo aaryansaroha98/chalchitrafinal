@@ -733,6 +733,21 @@ router.post('/gallery', requireAdmin, uploadGallery.single('image'), (req, res) 
   }
 });
 
+// Update gallery event date
+router.put('/gallery/:id', requireAdmin, (req, res) => {
+  const { event_date, eventDate } = req.body;
+  const normalizedEventDate = normalizeGalleryEventDate(event_date || eventDate);
+
+  if (!normalizedEventDate) {
+    return res.status(400).json({ error: 'Event date is required' });
+  }
+
+  db.run('UPDATE gallery SET event_date = ? WHERE id = ?', [normalizedEventDate, req.params.id], function(err) {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ changes: this.changes });
+  });
+});
+
 // Delete gallery image
 router.delete('/gallery/:id', requireAdmin, (req, res) => {
   db.run('DELETE FROM gallery WHERE id = ?', [req.params.id], function(err) {

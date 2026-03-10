@@ -81,6 +81,14 @@ const normalizeGalleryEventDate = (value) => {
   return '';
 };
 
+const getGalleryDateInputValue = (image, overrides) => {
+  if (!image?.id) return '';
+  if (overrides && Object.prototype.hasOwnProperty.call(overrides, image.id)) {
+    return overrides[image.id] || '';
+  }
+  return normalizeGalleryEventDate(image.event_date) || '';
+};
+
 const parseGalleryDate = (value) => {
   if (!value) return null;
   if (value instanceof Date && !Number.isNaN(value.getTime())) {
@@ -207,6 +215,7 @@ const AdminPanel = () => {
     event_date: '',
     image: null
   });
+  const [galleryDateEdits, setGalleryDateEdits] = useState({});
   const [settingsForm, setSettingsForm] = useState({
     tagline: 'Student-led movie screening initiative at IIT Jammu',
     hero_background: '#007bff',
@@ -875,6 +884,30 @@ const AdminPanel = () => {
     } catch (err) {
       console.error('Error uploading gallery image:', err);
       alert('Error uploading image: ' + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const handleGalleryDateUpdate = async (imageId) => {
+    const rawDate = galleryDateEdits[imageId];
+    const normalizedEventDate = normalizeGalleryEventDate(rawDate);
+    if (!normalizedEventDate) {
+      alert('Please select a valid event date.');
+      return;
+    }
+
+    try {
+      await api.put(`/api/admin/gallery/${imageId}`, {
+        event_date: normalizedEventDate
+      });
+      setGalleryDateEdits((prev) => {
+        const next = { ...prev };
+        delete next[imageId];
+        return next;
+      });
+      fetchAllData();
+    } catch (err) {
+      console.error('Error updating gallery date:', err);
+      alert('Error updating date: ' + (err.response?.data?.error || err.message));
     }
   };
 
@@ -2783,9 +2816,29 @@ const AdminPanel = () => {
                     />
                     <Card.Body>
                     <Card.Title className="text-truncate" style={{color: 'black'}}>{image.event_name || 'Gallery Image'}</Card.Title>
-                    <small style={{color: 'black'}}>
-                      {formatGalleryDisplayDate(image.event_date)}
-                    </small>
+                    <div style={{ marginBottom: '0.5rem' }}>
+                      <small style={{ color: 'black' }}>
+                        {formatGalleryDisplayDate(image.event_date)}
+                      </small>
+                    </div>
+                    <div className="d-flex align-items-center gap-2">
+                      <Form.Control
+                        type="date"
+                        size="sm"
+                        value={getGalleryDateInputValue(image, galleryDateEdits)}
+                        onChange={(e) => setGalleryDateEdits((prev) => ({
+                          ...prev,
+                          [image.id]: e.target.value
+                        }))}
+                      />
+                      <Button
+                        variant="outline-primary"
+                        size="sm"
+                        onClick={() => handleGalleryDateUpdate(image.id)}
+                      >
+                        Update
+                      </Button>
+                    </div>
                       <br/>
                       <Button
                         variant="outline-danger"
