@@ -394,7 +394,7 @@ const Gallery = () => {
                       fontWeight: '500'
                     }}>
                       <i className="fas fa-calendar me-1"></i>
-                      {formatGalleryEventDate(image.event_date || image.eventDate || image.uploaded_at)}
+                      {formatGalleryEventDate(image.event_date || image.eventDate)}
                     </p>
                   </div>
                 </div>
@@ -447,7 +447,7 @@ const Gallery = () => {
                   fontSize: '1.1rem'
                 }}>
                   <i className="fas fa-calendar me-2"></i>
-                  {formatGalleryEventDate(selectedImage.event_date || selectedImage.eventDate || selectedImage.uploaded_at, true)}
+                  {formatGalleryEventDate(selectedImage.event_date || selectedImage.eventDate, true)}
                 </p>
               </div>
             </>

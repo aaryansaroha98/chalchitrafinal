@@ -345,7 +345,6 @@ if (usePostgres) {
     // Ensure gallery.event_date exists for older databases
     try {
       await pool.query('ALTER TABLE gallery ADD COLUMN IF NOT EXISTS event_date DATE');
-      await pool.query('UPDATE gallery SET event_date = uploaded_at::date WHERE event_date IS NULL AND uploaded_at IS NOT NULL');
       console.log('✅ gallery.event_date column ensured');
     } catch (err) {
       console.log('gallery.event_date ensure warning:', err.message);
@@ -676,11 +675,8 @@ if (usePostgres) {
             console.log('⚠️  Could not add gallery.event_date:', alterErr.message);
             return;
           }
-          db.run('UPDATE gallery SET event_date = date(uploaded_at) WHERE event_date IS NULL AND uploaded_at IS NOT NULL');
           console.log('✅ gallery.event_date column added');
         });
-      } else {
-        db.run('UPDATE gallery SET event_date = date(uploaded_at) WHERE event_date IS NULL AND uploaded_at IS NOT NULL');
       }
     });
   }

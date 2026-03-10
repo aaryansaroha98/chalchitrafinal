@@ -107,9 +107,8 @@ const parseGalleryDate = (value) => {
   return { date: parsed, forceUTC: false };
 };
 
-const formatGalleryDisplayDate = (eventDate, fallbackDate) => {
-  const dateValue = eventDate || fallbackDate;
-  const parsed = parseGalleryDate(dateValue);
+const formatGalleryDisplayDate = (eventDate) => {
+  const parsed = parseGalleryDate(eventDate);
   if (!parsed) return 'Date not available';
   const { date, forceUTC } = parsed;
   const options = {
@@ -2785,7 +2784,7 @@ const AdminPanel = () => {
                     <Card.Body>
                     <Card.Title className="text-truncate" style={{color: 'black'}}>{image.event_name || 'Gallery Image'}</Card.Title>
                     <small style={{color: 'black'}}>
-                      {formatGalleryDisplayDate(image.event_date, image.uploaded_at)}
+                      {formatGalleryDisplayDate(image.event_date)}
                     </small>
                       <br/>
                       <Button
