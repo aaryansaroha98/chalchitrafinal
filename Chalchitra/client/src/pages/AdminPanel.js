@@ -1229,122 +1229,89 @@ const AdminPanel = () => {
       };
 
       // ── BOOKING SUMMARY ──
-      checkPageBreak(50);
+      checkPageBreak(30);
 
-      doc.setFillColor(26, 26, 26);
-      doc.rect(10, currentY, pageWidth - 20, 8, 'F');
-      doc.setTextColor(255, 255, 255);
+      // Thin separator line
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.3);
+      doc.line(15, currentY, pageWidth - 15, currentY);
+      currentY += 6;
+
       doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
-      doc.text('BOOKING SUMMARY', 15, currentY + 5.5);
-      doc.setTextColor(0, 0, 0);
+      doc.setTextColor(40, 40, 40);
+      doc.text('Summary', 15, currentY);
+      currentY += 6;
+
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(80, 80, 80);
+      doc.text(`Total Bookings: ${bookingsToExport.length}`, 15, currentY);
+      doc.text(`Total Seats: ${totalSeats}`, 80, currentY);
+      doc.text(`Report Generated: ${now.toLocaleString('en-IN')}`, 145, currentY);
       currentY += 12;
-
-      const avgPrice = bookingsToExport.length > 0 ? totalRevenue / bookingsToExport.length : 0;
-
-      const summaryData = [
-        ['Total Bookings', bookingsToExport.length.toString()],
-        ['Total Seats Booked', totalSeats.toString()],
-        ['Used Tickets', usedCount.toString()],
-        ['Active Tickets', activeCount.toString()],
-        ['Total Ticket Revenue', `Rs. ${(totalRevenue - totalFoodRevenue).toFixed(2)}`],
-        ['Total Food Revenue', `Rs. ${totalFoodRevenue.toFixed(2)}`],
-        ['Grand Total Revenue', `Rs. ${totalRevenue.toFixed(2)}`],
-        ['Average Booking Value', `Rs. ${avgPrice.toFixed(2)}`]
-      ];
-
-      autoTable(doc, {
-        body: summaryData,
-        startY: currentY,
-        theme: 'plain',
-        styles: {
-          fontSize: 9,
-          cellPadding: 3
-        },
-        columnStyles: {
-          0: { cellWidth: 60, fontStyle: 'bold', textColor: [80, 80, 80] },
-          1: { cellWidth: 60, halign: 'left', fontStyle: 'bold' }
-        },
-        didParseCell: function (data) {
-          if (data.section === 'body') {
-            if (data.row.index === summaryData.length - 3 || data.row.index === summaryData.length - 2) {
-              data.cell.styles.fillColor = [248, 249, 250];
-            }
-            if (data.row.index === summaryData.length - 2) {
-              data.cell.styles.fillColor = [232, 245, 233];
-              data.cell.styles.fontStyle = 'bold';
-              data.cell.styles.fontSize = 10;
-            }
-          }
-        },
-        margin: { left: 15, right: 15 }
-      });
-
-      currentY = doc.lastAutoTable.finalY + 12;
 
       // ── FOOD ORDERS SUMMARY ──
       const foodSummaryEntries = Object.values(foodOrderSummary);
       if (foodSummaryEntries.length > 0) {
-        checkPageBreak(40);
+        checkPageBreak(30);
 
-        doc.setFillColor(40, 167, 69);
-        doc.rect(10, currentY, pageWidth - 20, 8, 'F');
-        doc.setTextColor(255, 255, 255);
+        // Thin separator line
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineWidth(0.3);
+        doc.line(15, currentY, pageWidth - 15, currentY);
+        currentY += 6;
+
         doc.setFontSize(11);
         doc.setFont('helvetica', 'bold');
-        doc.text('FOOD ORDERS SUMMARY', 15, currentY + 5.5);
-        doc.setTextColor(0, 0, 0);
-        currentY += 12;
+        doc.setTextColor(40, 40, 40);
+        doc.text('Food Orders Summary', 15, currentY);
+        currentY += 5;
+
+        const foodTotalQty = foodSummaryEntries.reduce((sum, f) => sum + f.quantity, 0);
 
         const foodTableData = foodSummaryEntries.map((food, i) => [
           (i + 1).toString(),
           food.name,
-          `Rs. ${food.price.toFixed(2)}`,
-          food.quantity.toString(),
-          `Rs. ${food.total.toFixed(2)}`
+          food.quantity.toString()
         ]);
 
-        const foodGrandTotal = foodSummaryEntries.reduce((sum, f) => sum + f.total, 0);
-        const foodTotalQty = foodSummaryEntries.reduce((sum, f) => sum + f.quantity, 0);
-
-        foodTableData.push([
-          '', 'GRAND TOTAL', '', foodTotalQty.toString(), `Rs. ${foodGrandTotal.toFixed(2)}`
-        ]);
+        foodTableData.push(['', 'Total', foodTotalQty.toString()]);
 
         autoTable(doc, {
-          head: [['#', 'Food Item', 'Unit Price', 'Quantity', 'Total']],
+          head: [['#', 'Food Item', 'Quantity']],
           body: foodTableData,
           startY: currentY,
           styles: {
             fontSize: 9,
             cellPadding: 3,
-            lineColor: [220, 220, 220],
-            lineWidth: 0.25
+            lineColor: [230, 230, 230],
+            lineWidth: 0.2,
+            textColor: [50, 50, 50]
           },
           headStyles: {
-            fillColor: [40, 167, 69],
+            fillColor: [50, 50, 50],
             textColor: [255, 255, 255],
             fontStyle: 'bold',
             halign: 'center'
           },
           alternateRowStyles: {
-            fillColor: [248, 249, 250]
+            fillColor: [250, 250, 250]
           },
           columnStyles: {
-            0: { cellWidth: 12, halign: 'center' },
-            1: { cellWidth: 70 },
-            2: { cellWidth: 35, halign: 'right' },
-            3: { cellWidth: 30, halign: 'center' },
-            4: { cellWidth: 40, halign: 'right' }
+            0: { cellWidth: 15, halign: 'center' },
+            1: { cellWidth: 80 },
+            2: { cellWidth: 30, halign: 'center', fontStyle: 'bold' }
           },
           didParseCell: function (data) {
             if (data.section === 'body' && data.row.index === foodTableData.length - 1) {
-              data.cell.styles.fillColor = [232, 245, 233];
+              data.cell.styles.fillColor = [240, 240, 240];
               data.cell.styles.fontStyle = 'bold';
               data.cell.styles.fontSize = 10;
             }
           },
-          margin: { left: 15, right: 15 }
+          margin: { left: 15, right: 15 },
+          tableWidth: 125
         });
 
         currentY = doc.lastAutoTable.finalY + 10;
