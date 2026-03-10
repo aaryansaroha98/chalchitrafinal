@@ -366,18 +366,20 @@ const Home = () => {
           {upcomingMovies.slice(0, 3).map((movie) => (
             <Col xl={4} lg={4} md={4} sm={4} xs={4} key={movie.id} style={{ alignSelf: 'flex-start' }} className="home-featured-col">
               <div className="home-featured-card" style={{
-                background: '#f7f5f1',
-                border: '1px solid rgba(0, 0, 0, 0.08)',
-                borderRadius: '18px',
+                background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
+                backdropFilter: 'blur(25px) saturate(180%)',
+                border: '1px solid rgba(255, 255, 255, 0.18)',
+                borderRadius: '16px',
                 overflow: 'hidden',
-                boxShadow: '0 12px 30px rgba(0, 0, 0, 0.08)',
-                padding: '1rem',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.8rem',
-                transition: 'transform 0.35s ease, box-shadow 0.35s ease, background 0.35s ease, border-color 0.35s ease',
+                boxShadow: `
+                  0 8px 32px rgba(0, 0, 0, 0.12),
+                  0 2px 8px rgba(0, 0, 0, 0.08),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                  0 0 0 1px rgba(255, 255, 255, 0.05)
+                `,
+                transition: 'all 0.5s cubic-bezier(0.23, 1, 0.32, 1)',
                 position: 'relative',
-                transform: 'translateY(0)',
+                transform: 'perspective(1000px) rotateX(0deg)',
                 willChange: 'transform',
                 cursor: 'pointer'
               }}
@@ -389,29 +391,33 @@ const Home = () => {
                 }
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-6px)';
-                e.currentTarget.style.boxShadow = '0 18px 45px rgba(0, 0, 0, 0.12)';
-                e.currentTarget.style.background = '#fbfaf7';
-                e.currentTarget.style.borderColor = 'rgba(0, 0, 0, 0.12)';
+                e.currentTarget.style.transform = 'perspective(1000px) rotateX(-2deg) translateY(-8px) scale(1.02)';
+                e.currentTarget.style.boxShadow = `
+                  0 20px 60px rgba(0, 0, 0, 0.2),
+                  0 8px 32px rgba(0, 255, 255, 0.15),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                  0 0 0 1px rgba(255, 255, 255, 0.1)
+                `;
+                e.currentTarget.style.background = 'linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06))';
+                e.currentTarget.style.borderColor = 'rgba(0, 255, 255, 0.3)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 12px 30px rgba(0, 0, 0, 0.08)';
-                e.currentTarget.style.background = '#f7f5f1';
-                e.currentTarget.style.borderColor = 'rgba(0, 0, 0, 0.08)';
+                e.currentTarget.style.transform = 'perspective(1000px) rotateX(0deg) translateY(0) scale(1)';
+                e.currentTarget.style.boxShadow = `
+                  0 8px 32px rgba(0, 0, 0, 0.12),
+                  0 2px 8px rgba(0, 0, 0, 0.08),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                  0 0 0 1px rgba(255, 255, 255, 0.05)
+                `;
+                e.currentTarget.style.background = 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.18)';
               }}
               >
                 {/* Movie Poster */}
                 <div style={{
                   position: 'relative',
-                  backgroundColor: '#f1efe9',
-                  borderRadius: '14px',
-                  padding: '1.1rem',
-                  aspectRatio: '2 / 3',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  overflow: 'hidden'
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
                 }}>
                   {movie.poster_url ? (
                     <img
@@ -419,50 +425,172 @@ const Home = () => {
                       alt={movie.title}
                       className="home-featured-poster"
                       style={{
-                        maxWidth: '100%',
-                        maxHeight: '100%',
                         width: '100%',
-                        height: '100%',
-                        objectFit: 'contain',
+                        height: 'auto',
                         display: 'block'
                       }}
                     />
                   ) : (
                     <div style={{
-                      backgroundColor: '#e9e6df',
+                      backgroundColor: '#e9ecef',
                       width: '100%',
-                      height: '100%',
+                      aspectRatio: '2 / 3',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center'
                     }}>
                       <i className="fas fa-film" style={{
                         fontSize: '3rem',
-                        color: '#b8b2a8'
+                        color: '#adb5bd'
                       }}></i>
                     </div>
                   )}
+
+                  {/* Date Badge */}
+                  <div className="home-featured-badge" style={{
+                    position: 'absolute',
+                    top: '12px',
+                    left: '12px',
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    color: 'white',
+                    padding: '4px 8px',
+                    borderRadius: '6px',
+                    fontSize: '0.75rem',
+                    fontWeight: '600'
+                  }}>
+                    <i className="fas fa-calendar" style={{marginRight: '0.25rem'}}></i>
+                    {new Date(movie.date).toLocaleDateString('en-IN', {
+                      month: 'short',
+                      day: 'numeric'
+                    })}
+                  </div>
                 </div>
 
+                {/* Movie Info */}
                 <div className="home-featured-info" style={{
-                  textAlign: 'center',
-                  padding: '0 0.4rem 0.3rem'
+                  padding: '0.55rem',
+                  flex: 1,
+                  display: 'flex',
+                  flexDirection: 'column'
                 }}>
-                  <div className="home-featured-title" style={{
-                    fontSize: '0.65rem',
-                    letterSpacing: '0.28em',
-                    textTransform: 'uppercase',
+                  <h4 className="home-featured-title" style={{
+                    fontSize: '0.95rem',
                     fontWeight: '600',
-                    color: '#1f1d1a',
-                    lineHeight: '1.4',
-                    minHeight: '2.2rem',
+                    marginBottom: '0.25rem',
+                    color: 'white',
+                    lineHeight: '1.2',
                     display: '-webkit-box',
-                    WebkitLineClamp: 2,
+                    WebkitLineClamp: 1,
                     WebkitBoxOrient: 'vertical',
                     overflow: 'hidden'
                   }}>
                     {movie.title}
+                  </h4>
+
+                  {/* Description */}
+                  <p className="home-featured-desc" style={{
+                    color: 'var(--gray-600)',
+                    fontSize: '0.65rem',
+                    marginBottom: '0.4rem',
+                    lineHeight: '1.3',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 1,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    flex: 1
+                  }}>
+                    {movie.description}
+                  </p>
+
+                  {/* Details */}
+                  <div className="home-featured-meta" style={{marginBottom: '0.4rem'}}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      position: 'relative'
+                    }}>
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        marginLeft: '0px'
+                      }}>
+                        <i className="fas fa-map-marker-alt" style={{
+                          color: 'var(--gray-500)',
+                          fontSize: '0.7rem',
+                          marginRight: '0.5rem',
+                          minWidth: '14px'
+                        }}></i>
+                        <div>
+                          <div
+                            className="home-featured-label"
+                            style={{
+                              fontSize: '0.55rem',
+                              color: 'white',
+                              fontWeight: '500',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.5px',
+                              marginBottom: '0.1rem'
+                            }}
+                          >
+                            Venue
+                          </div>
+                          <div
+                            className="home-featured-value"
+                            style={{
+                              fontSize: '0.75rem',
+                              color: 'white',
+                              fontWeight: '500'
+                            }}
+                          >
+                            {movie.venue}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        position: 'absolute',
+                        right: '0'
+                      }}>
+                        <i className="fas fa-clock" style={{
+                          color: 'var(--gray-500)',
+                          fontSize: '0.7rem',
+                          marginRight: '0.5rem',
+                          minWidth: '14px'
+                        }}></i>
+                        <div>
+                          <div
+                            className="home-featured-label"
+                            style={{
+                              fontSize: '0.55rem',
+                              color: 'white',
+                              fontWeight: '500',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.5px',
+                              marginBottom: '0.1rem'
+                            }}
+                          >
+                            Show Time
+                          </div>
+                          <div
+                            className="home-featured-value"
+                            style={{
+                              fontSize: '0.75rem',
+                              color: 'white',
+                              fontWeight: '500'
+                            }}
+                          >
+                            {new Date(movie.date).toLocaleTimeString('en-IN', {
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
+
                 </div>
               </div>
             </Col>
