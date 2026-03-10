@@ -474,7 +474,7 @@ const Home = () => {
                   flexDirection: 'column'
                 }}>
                   <h4 className="home-featured-title" style={{
-                    fontSize: '0.95rem',
+                    fontSize: '1.05rem',
                     fontWeight: '600',
                     marginBottom: '0.25rem',
                     color: 'white',
@@ -524,7 +524,7 @@ const Home = () => {
                           <div
                             className="home-featured-label"
                             style={{
-                              fontSize: '0.55rem',
+                              fontSize: '0.6rem',
                               color: 'white',
                               fontWeight: '500',
                               textTransform: 'uppercase',
@@ -537,7 +537,7 @@ const Home = () => {
                           <div
                             className="home-featured-value"
                             style={{
-                              fontSize: '0.75rem',
+                              fontSize: '0.85rem',
                               color: 'white',
                               fontWeight: '500'
                             }}
@@ -563,7 +563,7 @@ const Home = () => {
                           <div
                             className="home-featured-label"
                             style={{
-                              fontSize: '0.55rem',
+                              fontSize: '0.6rem',
                               color: 'white',
                               fontWeight: '500',
                               textTransform: 'uppercase',
@@ -576,7 +576,7 @@ const Home = () => {
                           <div
                             className="home-featured-value"
                             style={{
-                              fontSize: '0.75rem',
+                              fontSize: '0.85rem',
                               color: 'white',
                               fontWeight: '500'
                             }}

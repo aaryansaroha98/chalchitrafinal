@@ -638,7 +638,7 @@ const UpcomingMovies = () => {
                     flexDirection: 'column'
                   }}>
                   <h4 className="upcoming-title" style={{
-                    fontSize: '0.95rem',
+                    fontSize: '1.05rem',
                     fontWeight: '600',
                     marginBottom: '0.25rem',
                     color: 'white',
@@ -690,7 +690,7 @@ const UpcomingMovies = () => {
                           }}></i>
                         <div>
                           <div style={{
-                            fontSize: '0.55rem',
+                            fontSize: '0.6rem',
                             color: 'white',
                             fontWeight: '500',
                             textTransform: 'uppercase',
@@ -698,7 +698,7 @@ const UpcomingMovies = () => {
                             marginBottom: '0.1rem'
                           }}>Venue</div>
                           <div style={{
-                            fontSize: '0.75rem',
+                            fontSize: '0.85rem',
                             color: 'white',
                             fontWeight: '500'
                           }}>{movie.venue}</div>
@@ -719,7 +719,7 @@ const UpcomingMovies = () => {
                           }}></i>
                           <div>
                             <div style={{
-                              fontSize: '0.55rem',
+                              fontSize: '0.6rem',
                               color: 'white',
                               fontWeight: '500',
                               textTransform: 'uppercase',
@@ -727,7 +727,7 @@ const UpcomingMovies = () => {
                               marginBottom: '0.1rem'
                             }}>Show Time</div>
                             <div style={{
-                              fontSize: '0.75rem',
+                              fontSize: '0.85rem',
                               color: 'white',
                               fontWeight: '500'
                             }}>{new Date(movie.date).toLocaleTimeString('en-IN', {
