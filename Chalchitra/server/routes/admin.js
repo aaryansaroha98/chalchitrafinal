@@ -711,6 +711,10 @@ router.post('/gallery', requireAdmin, uploadGallery.single('image'), (req, res) 
       return res.status(400).json({ error: 'Image file is required' });
     }
 
+    if (!normalizedEventDate) {
+      return res.status(400).json({ error: 'Event date is required' });
+    }
+
     if ((event_date || eventDate) && !normalizedEventDate) {
       return res.status(400).json({ error: 'Event date must be in YYYY-MM-DD format' });
     }

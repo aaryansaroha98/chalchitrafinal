@@ -845,6 +845,11 @@ const AdminPanel = () => {
   const handleGallerySubmit = async (e) => {
     e.preventDefault();
 
+    if (!galleryForm.event_date) {
+      alert('Please select the event date.');
+      return;
+    }
+
     if (!galleryForm.image) {
       alert('Please select an image for the event.');
       return;
@@ -852,6 +857,10 @@ const AdminPanel = () => {
 
     try {
       const normalizedEventDate = normalizeGalleryEventDate(galleryForm.event_date);
+      if (!normalizedEventDate) {
+        alert('Please select a valid event date.');
+        return;
+      }
       const formData = new FormData();
       formData.append('event_name', galleryForm.event_name || '');
       formData.append('event_date', normalizedEventDate);
@@ -6400,11 +6409,12 @@ const AdminPanel = () => {
                 />
               </Form.Group>
               <Form.Group className="mb-3">
-                <Form.Label>Event Date (Optional)</Form.Label>
+                <Form.Label>Event Date</Form.Label>
                 <Form.Control
                   type="date"
                   value={galleryForm.event_date}
                   onChange={(e) => setGalleryForm({ ...galleryForm, event_date: e.target.value })}
+                  required
                 />
               </Form.Group>
               <Form.Group className="mb-3">
