@@ -19,12 +19,12 @@ if (usePostgres) {
 
   // Create a wrapper that mimics SQLite's callback API
   db = {
-    run: function(sql, params, callback) {
+    run: function (sql, params, callback) {
       // Convert SQLite syntax to PostgreSQL
       const pgSql = convertToPostgres(sql);
       const pgParams = Array.isArray(params) ? params : [];
       const cb = typeof params === 'function' ? params : callback;
-      
+
       pool.query(pgSql, pgParams)
         .then(result => {
           if (cb) cb.call({ lastID: result.rows[0]?.id, changes: result.rowCount }, null);
@@ -34,11 +34,11 @@ if (usePostgres) {
           if (cb) cb(err);
         });
     },
-    get: function(sql, params, callback) {
+    get: function (sql, params, callback) {
       const pgSql = convertToPostgres(sql);
       const pgParams = Array.isArray(params) ? params : [];
       const cb = typeof params === 'function' ? params : callback;
-      
+
       pool.query(pgSql, pgParams)
         .then(result => {
           if (cb) cb(null, result.rows[0]);
@@ -48,11 +48,11 @@ if (usePostgres) {
           if (cb) cb(err);
         });
     },
-    all: function(sql, params, callback) {
+    all: function (sql, params, callback) {
       const pgSql = convertToPostgres(sql);
       const pgParams = Array.isArray(params) ? params : [];
       const cb = typeof params === 'function' ? params : callback;
-      
+
       pool.query(pgSql, pgParams)
         .then(result => {
           if (cb) cb(null, result.rows);
@@ -62,10 +62,10 @@ if (usePostgres) {
           if (cb) cb(err);
         });
     },
-    serialize: function(callback) {
+    serialize: function (callback) {
       if (callback) callback();
     },
-    close: function(callback) {
+    close: function (callback) {
       pool.end().then(() => {
         if (callback) callback();
       });
@@ -75,20 +75,20 @@ if (usePostgres) {
   // Function to convert SQLite syntax to PostgreSQL
   function convertToPostgres(sql) {
     let pgSql = sql;
-    
+
     // Convert SQLite date functions BEFORE replacing ? placeholders
     // datetime("now", "-7 days") or datetime('now', '-7 days') → NOW() - INTERVAL '7 days'
-    pgSql = pgSql.replace(/datetime\s*\(\s*["']now["']\s*,\s*["']-(\d+)\s+(days?|months?|hours?|minutes?|years?)["']\s*\)/gi, 
+    pgSql = pgSql.replace(/datetime\s*\(\s*["']now["']\s*,\s*["']-(\d+)\s+(days?|months?|hours?|minutes?|years?)["']\s*\)/gi,
       (_, num, unit) => `(NOW() - INTERVAL '${num} ${unit}')`);
     // datetime("now") or datetime('now') → NOW()
     pgSql = pgSql.replace(/datetime\s*\(\s*["']now["']\s*\)/gi, 'NOW()');
     // strftime('%Y-%m', column) → TO_CHAR(column, 'YYYY-MM')
-    pgSql = pgSql.replace(/strftime\s*\(\s*['"]%Y-%m['"]\s*,\s*(\w+)\s*\)/gi, 
+    pgSql = pgSql.replace(/strftime\s*\(\s*['"]%Y-%m['"]\s*,\s*(\w+)\s*\)/gi,
       (_, col) => `TO_CHAR(${col}, 'YYYY-MM')`);
     // strftime('%Y-%m-%d', column) → TO_CHAR(column, 'YYYY-MM-DD')
-    pgSql = pgSql.replace(/strftime\s*\(\s*['"]%Y-%m-%d['"]\s*,\s*(\w+)\s*\)/gi, 
+    pgSql = pgSql.replace(/strftime\s*\(\s*['"]%Y-%m-%d['"]\s*,\s*(\w+)\s*\)/gi,
       (_, col) => `TO_CHAR(${col}, 'YYYY-MM-DD')`);
-    
+
     // Replace ? placeholders with $1, $2, etc.
     let paramIndex = 0;
     pgSql = pgSql.replace(/\?/g, () => `$${++paramIndex}`);
@@ -99,7 +99,7 @@ if (usePostgres) {
     pgSql = pgSql.replace(/\bDATETIME\b(?!\s*\()/gi, 'TIMESTAMP');
     // Replace REAL with DOUBLE PRECISION
     pgSql = pgSql.replace(/\bREAL\b/gi, 'DOUBLE PRECISION');
-    
+
     // Convert INSERT OR IGNORE to INSERT ... ON CONFLICT DO NOTHING
     if (/INSERT\s+OR\s+IGNORE/i.test(pgSql)) {
       pgSql = pgSql.replace(/INSERT\s+OR\s+IGNORE\s+INTO/gi, 'INSERT INTO');
@@ -111,14 +111,14 @@ if (usePostgres) {
     if (/^\s*INSERT\s+INTO/i.test(pgSql) && !/RETURNING/i.test(pgSql) && !/ON CONFLICT DO NOTHING/i.test(pgSql)) {
       pgSql = pgSql.replace(/\s*;?\s*$/, ' RETURNING id');
     }
-    
+
     return pgSql;
   }
 
   // Initialize PostgreSQL tables
   const initPostgres = async () => {
     console.log('🗄️  Initializing PostgreSQL schema...');
-    
+
     const tables = [
       `CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
@@ -190,6 +190,7 @@ if (usePostgres) {
         id SERIAL PRIMARY KEY,
         image_url TEXT,
         event_name TEXT,
+        event_date DATE,
         uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`,
       `CREATE TABLE IF NOT EXISTS settings (
@@ -331,6 +332,14 @@ if (usePostgres) {
       // Index might already exist
     }
 
+    // Ensure gallery.event_date column exists for older databases
+    try {
+      await pool.query('ALTER TABLE gallery ADD COLUMN IF NOT EXISTS event_date DATE');
+      console.log('✅ gallery.event_date column ensured');
+    } catch (err) {
+      console.log('gallery.event_date ensure warning:', err.message);
+    }
+
     // Create default admin user
     try {
       const result = await pool.query('SELECT * FROM users WHERE email = $1', ['2025uee0154@iitjammu.ac.in']);
@@ -344,7 +353,7 @@ if (usePostgres) {
     }
 
     console.log('🗄️  PostgreSQL initialization complete!');
-    
+
     // Regenerate QR codes for bookings that are missing them (fixes previous lastID bug)
     try {
       const QRCode = require('qrcode');
@@ -468,6 +477,7 @@ if (usePostgres) {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         image_url TEXT,
         event_name TEXT,
+        event_date DATE,
         uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )`,
       `CREATE TABLE IF NOT EXISTS settings (
@@ -583,7 +593,7 @@ if (usePostgres) {
     let completed = 0;
     tables.forEach(sql => {
       const tableName = sql.match(/CREATE TABLE IF NOT EXISTS (\w+)/)[1];
-      db.run(sql, function(err) {
+      db.run(sql, function (err) {
         if (err) {
           console.log(`⚠️  ${tableName} table error:`, err.message);
         } else {
@@ -605,7 +615,7 @@ if (usePostgres) {
       `CREATE UNIQUE INDEX IF NOT EXISTS idx_booking_food_status_unique ON booking_food_status (booking_id, food_id)`
     ];
     indices.forEach((sql) => {
-      db.run(sql, function(err) {
+      db.run(sql, function (err) {
         if (err) {
           console.log('⚠️  Index creation error:', err.message);
         } else {
@@ -621,7 +631,7 @@ if (usePostgres) {
         console.log(`⚠️  Error checking admin user:`, err.message);
       } else if (!user) {
         db.run('INSERT INTO users (email, name, is_admin, code_scanner) VALUES (?, ?, ?, ?)',
-          ['2025uee0154@iitjammu.ac.in', 'Admin User', 1, 1], function(err) {
+          ['2025uee0154@iitjammu.ac.in', 'Admin User', 1, 1], function (err) {
             if (err) {
               console.log(`⚠️  Admin user creation:`, err.message);
             } else {
