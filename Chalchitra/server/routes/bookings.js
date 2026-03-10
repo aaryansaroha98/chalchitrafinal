@@ -121,6 +121,33 @@ async function generateUniqueBookingId() {
   return bookingId;
 }
 
+const normalizePeopleCounts = (booking) => {
+  const totalPeople = Number.isFinite(Number(booking.num_people)) ? Number(booking.num_people) : 0;
+  const admittedPeople = Number.isFinite(Number(booking.admitted_people)) ? Number(booking.admitted_people) : 0;
+  const remainingDbNum = Number(booking.remaining_people);
+  const remainingDbValid = Number.isFinite(remainingDbNum);
+  const computedRemaining = Math.max(totalPeople - admittedPeople, 0);
+
+  let remainingPeople = remainingDbValid ? remainingDbNum : computedRemaining;
+
+  // Fix legacy rows or inconsistent state when remaining_people is missing or stale.
+  if (!remainingDbValid || booking.remaining_people === null || booking.remaining_people === undefined) {
+    remainingPeople = computedRemaining;
+  } else if (!booking.is_used && remainingPeople !== computedRemaining) {
+    remainingPeople = computedRemaining;
+  }
+
+  if (booking.is_used) {
+    return {
+      totalPeople,
+      admittedPeople: Math.max(admittedPeople, totalPeople),
+      remainingPeople: 0
+    };
+  }
+
+  return { totalPeople, admittedPeople, remainingPeople };
+};
+
 // Get occupied seats for a movie
 router.get('/occupied/:movieId', (req, res) => {
   const movieId = req.params.movieId;
@@ -369,7 +396,7 @@ router.post('/scan', (req, res) => {
 
     // Find the booking by booking_id (could be numeric database ID or custom alphanumeric code)
     // First try to find by custom booking_code, then fallback to numeric ID if bookingId is numeric
-    const query = 'SELECT b.*, u.name, u.email, m.title FROM bookings b LEFT JOIN users u ON b.user_id = u.id LEFT JOIN movies m ON b.movie_id = m.id WHERE b.booking_code = ?';
+    let query = 'SELECT b.*, u.name, u.email, m.title FROM bookings b LEFT JOIN users u ON b.user_id = u.id LEFT JOIN movies m ON b.movie_id = m.id WHERE b.booking_code = ?';
     const params = [bookingId];
 
     // If bookingId looks like a number, also try searching by numeric ID
@@ -392,17 +419,19 @@ router.post('/scan', (req, res) => {
         console.log('User name from join:', booking.name);
         console.log('Movie title from join:', booking.title);
 
+        const { totalPeople, admittedPeople, remainingPeople } = normalizePeopleCounts(booking);
+
         // Check if already fully used
-        if (booking.is_used || booking.remaining_people <= 0) {
+        if (booking.is_used || remainingPeople <= 0) {
           return res.json({
             message: 'TICKET ALREADY FULLY USED - ENTRY DENIED',
             used: true,
             student_name: booking.name || 'Unknown',
             student_email: booking.email || 'unknown@email.com',
             movie_name: booking.title || 'Unknown Movie',
-            total_people: booking.num_people,
-            admitted_people: booking.admitted_people || 0,
-            remaining_people: booking.remaining_people || 0,
+            total_people: totalPeople,
+            admitted_people: admittedPeople,
+            remaining_people: remainingPeople,
             booking_id: booking.id,
             validity_status: 'INVALID - ALREADY USED',
             allowed: false
@@ -410,15 +439,15 @@ router.post('/scan', (req, res) => {
         }
 
         // Validate people count
-        if (peopleToAdmit <= 0 || peopleToAdmit > booking.remaining_people) {
+        if (peopleToAdmit <= 0 || peopleToAdmit > remainingPeople) {
           return res.status(400).json({
-            error: `INVALID NUMBER - Only ${booking.remaining_people} people remaining`,
+            error: `INVALID NUMBER - Only ${remainingPeople} people remaining`,
             student_name: booking.name,
             student_email: booking.email,
             movie_name: booking.title,
-            total_people: booking.num_people,
-            admitted_people: booking.admitted_people || 0,
-            remaining_people: booking.remaining_people || 0,
+            total_people: totalPeople,
+            admitted_people: admittedPeople,
+            remaining_people: remainingPeople,
             booking_id: booking.id,
             validity_status: 'INVALID - WRONG NUMBER',
             allowed: false
@@ -426,8 +455,8 @@ router.post('/scan', (req, res) => {
         }
 
         // Process partial admission
-        const newAdmitted = (booking.admitted_people || 0) + peopleToAdmit;
-        const newRemaining = booking.num_people - newAdmitted;
+        const newAdmitted = admittedPeople + peopleToAdmit;
+        const newRemaining = Math.max(totalPeople - newAdmitted, 0);
         const isFullyUsed = newRemaining <= 0;
 
         console.log('Updating booking:', { newAdmitted, newRemaining, isFullyUsed });
@@ -448,7 +477,7 @@ router.post('/scan', (req, res) => {
               student_email: booking.email || 'unknown@email.com',
               movie_name: booking.title || 'Unknown Movie',
               ticket_type: 'GROUP_TICKET',
-              total_people: booking.num_people,
+              total_people: totalPeople,
               admitted_people: newAdmitted,
               remaining_people: newRemaining,
               people_admitted_now: peopleToAdmit,
@@ -485,7 +514,7 @@ router.post('/scan', (req, res) => {
 
     // Find booking by booking_id from QR data (could be numeric database ID or custom alphanumeric code)
     // First try to find by custom booking_code, then fallback to numeric ID if bookingId is numeric
-    const query = 'SELECT b.*, u.name, u.email, m.title FROM bookings b LEFT JOIN users u ON b.user_id = u.id LEFT JOIN movies m ON b.movie_id = m.id WHERE b.booking_code = ?';
+    let query = 'SELECT b.*, u.name, u.email, m.title FROM bookings b LEFT JOIN users u ON b.user_id = u.id LEFT JOIN movies m ON b.movie_id = m.id WHERE b.booking_code = ?';
     const params = [bookingId];
 
     // If bookingId looks like a number, also try searching by numeric ID
@@ -507,8 +536,10 @@ router.post('/scan', (req, res) => {
         allowed: false
       });
 
+      const { totalPeople, admittedPeople, remainingPeople } = normalizePeopleCounts(booking);
+
       // Check if booking is fully used (all people admitted)
-      if (booking.is_used || booking.remaining_people <= 0) {
+      if (booking.is_used || remainingPeople <= 0) {
         console.log('Booking is fully used:', booking);
 
         // Get food orders for invalid tickets (so they can still serve food)
@@ -546,9 +577,9 @@ router.post('/scan', (req, res) => {
             movie_name: booking.title || 'Unknown Movie',
             ticket_type: qrData.ticket_type,
             selected_seats: JSON.parse(booking.selected_seats || '[]'),
-            total_people: booking.num_people,
-            admitted_people: booking.admitted_people || 0,
-            remaining_people: booking.remaining_people || 0,
+            total_people: totalPeople,
+            admitted_people: admittedPeople,
+            remaining_people: remainingPeople,
             booking_id: qrData.booking_id,
             validity_status: 'INVALID - ALREADY USED',
             allowed: false,
@@ -559,14 +590,10 @@ router.post('/scan', (req, res) => {
         return; // Exit early since we're handling this asynchronously
       }
 
-      const remainingPeople = booking.remaining_people !== null && booking.remaining_people !== undefined
-        ? booking.remaining_people
-        : booking.num_people;
-
       // Check if this is a multi-person ticket that needs partial admission
-      if (booking.num_people > 1 && remainingPeople > 0) {
+      if (totalPeople > 1 && remainingPeople > 0) {
         // Multi-person ticket - return options for partial admission
-        console.log('Multi-person ticket detected:', booking.num_people, 'people,', remainingPeople, 'remaining');
+        console.log('Multi-person ticket detected:', totalPeople, 'people,', remainingPeople, 'remaining');
 
         // Get food orders for this booking even for group tickets
         const foodQuery = `
@@ -630,8 +657,8 @@ router.post('/scan', (req, res) => {
             movie_name: booking.title || 'Unknown Movie',
             ticket_type: qrData.ticket_type,
             selected_seats: JSON.parse(booking.selected_seats || '[]'),
-            total_people: booking.num_people,
-            admitted_people: booking.admitted_people || 0,
+            total_people: totalPeople,
+            admitted_people: admittedPeople,
             remaining_people: remainingPeople,
             available_options: availableOptions,
             booking_id: qrData.booking_id,
@@ -699,9 +726,9 @@ router.post('/scan', (req, res) => {
         console.log('🍽️ Food orders length:', Object.keys(foodOrders).length);
 
         // Update booking to mark as used
-        const newAdmitted = (booking.admitted_people || 0) + 1;
-        const newRemaining = booking.num_people - newAdmitted;
-        const isFullyUsed = newRemaining <= 0;
+      const newAdmitted = admittedPeople + 1;
+      const newRemaining = Math.max(totalPeople - newAdmitted, 0);
+      const isFullyUsed = newRemaining <= 0;
 
         db.run('UPDATE bookings SET admitted_people = ?, remaining_people = ?, is_used = ? WHERE id = ?',
           [newAdmitted, newRemaining, isFullyUsed ? 1 : 0, booking.id], function(updateErr) {
@@ -721,7 +748,7 @@ router.post('/scan', (req, res) => {
               movie_name: booking.title || 'Unknown Movie',
               ticket_type: qrData.ticket_type,
               selected_seats: JSON.parse(booking.selected_seats || '[]'),
-              total_people: booking.num_people,
+              total_people: totalPeople,
               admitted_people: newAdmitted,
               remaining_people: newRemaining,
               people_admitted_now: 1,

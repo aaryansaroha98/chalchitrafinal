@@ -1515,6 +1515,24 @@ const Scanner = () => {
                           {scanResult.data?.booking_id || 'N/A'}
                         </Col>
                       </Row>
+                      {(scanResult.data?.total_people !== undefined ||
+                        scanResult.data?.admitted_people !== undefined ||
+                        scanResult.data?.remaining_people !== undefined) && (
+                        <Row className="mb-3">
+                          <Col sm={4}>
+                            <strong>Total:</strong><br />
+                            {scanResult.data?.total_people ?? 'N/A'}
+                          </Col>
+                          <Col sm={4}>
+                            <strong>Admitted:</strong><br />
+                            {scanResult.data?.admitted_people ?? 'N/A'}
+                          </Col>
+                          <Col sm={4}>
+                            <strong>Remaining:</strong><br />
+                            {scanResult.data?.remaining_people ?? 'N/A'}
+                          </Col>
+                        </Row>
+                      )}
 
                       {/* Food Marking Component - Interactive food serving */}
                       {scanResult && scanResult.data && foodStatusLoaded && foodStatus && foodStatus.length > 0 && (
@@ -2008,6 +2026,30 @@ const Scanner = () => {
                           </Col>
                         </Row>
                       )}
+                      {(lastScanResult.total_people !== undefined ||
+                        lastScanResult.admitted_people !== undefined ||
+                        lastScanResult.remaining_people !== undefined) && (
+                        <>
+                          <Row className="mb-2">
+                            <Col xs={4} className="text-start fw-bold">Total:</Col>
+                            <Col xs={8} className="text-start">
+                              {lastScanResult.total_people ?? 'N/A'}
+                            </Col>
+                          </Row>
+                          <Row className="mb-2">
+                            <Col xs={4} className="text-start fw-bold">Admitted:</Col>
+                            <Col xs={8} className="text-start">
+                              {lastScanResult.admitted_people ?? 'N/A'}
+                            </Col>
+                          </Row>
+                          <Row className="mb-2">
+                            <Col xs={4} className="text-start fw-bold">Remaining:</Col>
+                            <Col xs={8} className="text-start">
+                              {lastScanResult.remaining_people ?? 'N/A'}
+                            </Col>
+                          </Row>
+                        </>
+                      )}
 
 
 
@@ -2124,6 +2166,30 @@ const Scanner = () => {
                       <Col xs={4} className="text-start fw-bold">Movie:</Col>
                       <Col xs={8} className="text-start">{lastScanResult.movie_name}</Col>
                     </Row>
+                  )}
+                  {(lastScanResult.total_people !== undefined ||
+                    lastScanResult.admitted_people !== undefined ||
+                    lastScanResult.remaining_people !== undefined) && (
+                    <>
+                      <Row className="mb-2">
+                        <Col xs={4} className="text-start fw-bold">Total:</Col>
+                        <Col xs={8} className="text-start">
+                          {lastScanResult.total_people ?? 'N/A'}
+                        </Col>
+                      </Row>
+                      <Row className="mb-2">
+                        <Col xs={4} className="text-start fw-bold">Admitted:</Col>
+                        <Col xs={8} className="text-start">
+                          {lastScanResult.admitted_people ?? 'N/A'}
+                        </Col>
+                      </Row>
+                      <Row className="mb-2">
+                        <Col xs={4} className="text-start fw-bold">Remaining:</Col>
+                        <Col xs={8} className="text-start">
+                          {lastScanResult.remaining_people ?? 'N/A'}
+                        </Col>
+                      </Row>
+                    </>
                   )}
                   {lastScanResult.message && (
                     <Row className="mb-0">
