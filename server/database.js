@@ -624,6 +624,8 @@ if (usePostgres) {
         if (completed === tables.length) {
           console.log('🗄️  SQLite initialization complete!');
           createIndices();
+          ensureUserCreatedAtColumn();
+          ensureGalleryEventDateColumn();
           createDefaultData();
         }
       });
@@ -643,6 +645,49 @@ if (usePostgres) {
           console.log('✅ Index ensured');
         }
       });
+    });
+  }
+
+  function ensureUserCreatedAtColumn() {
+    db.all('PRAGMA table_info(users)', [], (err, columns) => {
+      if (err) {
+        console.log('⚠️  Could not inspect users table columns:', err.message);
+        return;
+      }
+
+      const hasCreatedAt = Array.isArray(columns) && columns.some((col) => col.name === 'created_at');
+      if (!hasCreatedAt) {
+        db.run('ALTER TABLE users ADD COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP', (alterErr) => {
+          if (alterErr) {
+            console.log('⚠️  Could not add users.created_at:', alterErr.message);
+            return;
+          }
+          db.run('UPDATE users SET created_at = CURRENT_TIMESTAMP WHERE created_at IS NULL');
+          console.log('✅ users.created_at column added');
+        });
+      } else {
+        db.run('UPDATE users SET created_at = CURRENT_TIMESTAMP WHERE created_at IS NULL');
+      }
+    });
+  }
+
+  function ensureGalleryEventDateColumn() {
+    db.all('PRAGMA table_info(gallery)', [], (err, columns) => {
+      if (err) {
+        console.log('⚠️  Could not inspect gallery table columns:', err.message);
+        return;
+      }
+
+      const hasEventDate = Array.isArray(columns) && columns.some((col) => col.name === 'event_date');
+      if (!hasEventDate) {
+        db.run('ALTER TABLE gallery ADD COLUMN event_date DATE', (alterErr) => {
+          if (alterErr) {
+            console.log('⚠️  Could not add gallery.event_date:', alterErr.message);
+            return;
+          }
+          console.log('✅ gallery.event_date column added');
+        });
+      }
     });
   }
 
