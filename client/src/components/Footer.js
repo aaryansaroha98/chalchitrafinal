@@ -286,8 +286,8 @@ const Footer = () => {
                   src="/logos/instalogo.png"
                   alt="Instagram"
                   style={{
-                    width: '40px',
-                    height: '40px',
+                    width: '48px',
+                    height: '48px',
                     objectFit: 'contain'
                   }}
                 />
@@ -356,8 +356,8 @@ const Footer = () => {
                   src="/misc/adress.jpeg"
                   alt="Address"
                   style={{
-                    width: '25px',
-                    height: '25px',
+                    width: '32px',
+                    height: '32px',
                     objectFit: 'contain',
                     borderRadius: '50%'
                   }}
