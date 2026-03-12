@@ -8,7 +8,11 @@ const Scanner = () => {
   const [scanResult, setScanResult] = useState(null);
   const [scanHistory, setScanHistory] = useState([]);
   const [stats, setStats] = useState({ total: 0, valid: 0, invalid: 0 });
+  const [showManualInput, setShowManualInput] = useState(false);
   const [availableCameras, setAvailableCameras] = useState([]);
+  const [selectedCamera, setSelectedCamera] = useState('');
+  const [showCameraSelector, setShowCameraSelector] = useState(false);
+  const [showFileUpload, setShowFileUpload] = useState(false);
   const [showPartialAdmission, setShowPartialAdmission] = useState(false);
   const [partialAdmissionData, setPartialAdmissionData] = useState(null);
   const [selectedPeopleCount, setSelectedPeopleCount] = useState(1);
@@ -21,6 +25,7 @@ const Scanner = () => {
   const [foodStatusLoaded, setFoodStatusLoaded] = useState(false);
   const [currentBookingFood, setCurrentBookingFood] = useState(null);
   const scannerRef = useRef(null);
+  const fileInputRef = useRef(null);
   const canvasRef = useRef(null);
   const videoRef = useRef(null);
   const scanIntervalRef = useRef(null);
@@ -142,6 +147,38 @@ const Scanner = () => {
     }
   };
 
+  const scanQRFromImage = (imageData) => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        // Create canvas for image processing
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Set canvas size to image size
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        // Draw image to canvas
+        ctx.drawImage(img, 0, 0);
+
+        // Get image data
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+        // Scan for QR code
+        const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+        if (code) {
+          console.log('🎯 QR Code detected in image:', code.data);
+          resolve(code.data);
+        } else {
+          console.log('❌ No QR code found in image');
+          resolve(null);
+        }
+      };
+      img.src = imageData;
+    });
+  };
 
   const startScanner = async () => {
     try {
@@ -517,6 +554,156 @@ const Scanner = () => {
     localStorage.removeItem('scanner_history');
   };
 
+  const handleFileSelect = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    console.log('📁 File selected:', file.name, file.type);
+
+    // Create a preview of the uploaded image
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const imageUrl = e.target.result;
+
+      // Show processing modal
+      const modal = document.createElement('div');
+      modal.className = 'modal fade show';
+      modal.style.display = 'block';
+      modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+      modal.innerHTML = `
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">
+                <i className="fas fa-file-image me-2"></i>
+                Processing Image: ${file.name}
+              </h5>
+            </div>
+            <div class="modal-body text-center">
+              <div class="spinner-border text-primary mb-3" role="status">
+                <span class="visually-hidden">Processing...</span>
+              </div>
+              <img src="${imageUrl}" alt="Uploaded QR Code" style="max-width: 100%; max-height: 300px; border: 2px solid #dee2e6; border-radius: 8px; margin-bottom: 20px;">
+              <p class="mb-0">Scanning for QR code...</p>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(modal);
+
+      try {
+        // Automatically detect QR code in the image
+        const qrCode = await scanQRFromImage(imageUrl);
+
+        if (qrCode) {
+          // QR code found - process it
+          modal.innerHTML = `
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                  <h5 class="modal-title">
+                    <i class="fas fa-check-circle me-2"></i>
+                    QR Code Detected!
+                  </h5>
+                </div>
+                <div class="modal-body text-center">
+                  <i class="fas fa-qrcode fa-3x text-success mb-3"></i>
+                  <p class="mb-2">Successfully detected QR code in image</p>
+                  <code class="d-block bg-light p-2 rounded small text-break">${qrCode}</code>
+                  <p class="mt-3 mb-0">Processing ticket validation...</p>
+                </div>
+              </div>
+            </div>
+          `;
+
+          // Wait a moment then process
+          setTimeout(async () => {
+            modal.remove();
+            await handleScan(qrCode);
+          }, 1500);
+
+        } else {
+          // No QR code found - show manual input option
+          modal.innerHTML = `
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header bg-warning">
+                  <h5 class="modal-title">
+                    <i className="fas fa-exclamation-triangle me-2"></i>
+                    No QR Code Found
+                  </h5>
+                </div>
+                <div class="modal-body text-center">
+                  <img src="${imageUrl}" alt="Uploaded QR Code" style="max-width: 100%; max-height: 300px; border: 2px solid #dee2e6; border-radius: 8px; margin-bottom: 20px;">
+                  <p class="text-muted mb-3">
+                    Could not automatically detect a QR code in this image.
+                    If you can see a QR code, please enter the data manually below.
+                  </p>
+                  <div class="input-group mb-3">
+                    <span class="input-group-text">
+                      <i class="fas fa-qrcode"></i>
+                    </span>
+                    <input type="text" class="form-control" id="qrCodeInput" placeholder="Enter QR code data manually..." />
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
+                  <button type="button" class="btn btn-primary" id="scanFromImageBtn">
+                    <i class="fas fa-search me-1"></i>
+                    Scan Manually
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+
+          // Add manual input functionality
+          setTimeout(() => {
+            const scanBtn = document.getElementById('scanFromImageBtn');
+            const qrInput = document.getElementById('qrCodeInput');
+
+            scanBtn.onclick = async () => {
+              const qrCode = qrInput.value.trim();
+              if (qrCode) {
+                modal.remove();
+                await handleScan(qrCode);
+              } else {
+                alert('Please enter the QR code data from the image.');
+              }
+            };
+
+            qrInput.focus();
+          }, 100);
+        }
+
+      } catch (error) {
+        console.error('File processing error:', error);
+        modal.innerHTML = `
+          <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                  <i class="fas fa-exclamation-circle me-2"></i>
+                  Processing Error
+                </h5>
+                <button type="button" class="btn-close btn-close-white" onclick="this.closest('.modal').remove()"></button>
+              </div>
+              <div class="modal-body text-center">
+                <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+                <p class="mb-0">Failed to process the image. Please try again.</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">Close</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    };
+
+    reader.readAsDataURL(file);
+  };
 
   // Food marking functions
   async function loadFoodStatus(bookingId) {
@@ -1044,6 +1231,13 @@ const Scanner = () => {
                           <i className="fas fa-camera me-2"></i>
                           Camera ({availableCameras.length})
                         </Button>
+                        <Button
+                          variant="outline-info"
+                          onClick={() => fileInputRef.current?.click()}
+                        >
+                          <i className="fas fa-file-image me-2"></i>
+                          Upload Image
+                        </Button>
                       </div>
                       {selectedCamera && (
                         <div className="small text-muted">
@@ -1051,6 +1245,14 @@ const Scanner = () => {
                         </div>
                       )}
 
+                      {/* Hidden file input */}
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={handleFileSelect}
+                      />
                     </div>
                   </div>
                 ) : (
