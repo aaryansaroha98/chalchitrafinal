@@ -1637,14 +1637,14 @@ a:hover {
 }
 
 .booking-info-label {
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.7);
 }
 
 .booking-info-value {
-  font-size: 1rem;
+  font-size: 1.15rem;
   color: rgba(255, 255, 255, 0.95);
 }
 
@@ -1939,12 +1939,12 @@ a:hover {
   }
 
   .booking-info-label {
-    font-size: 0.7rem;
+    font-size: 0.85rem;
     letter-spacing: 0.06em;
   }
 
   .booking-info-value {
-    font-size: 0.85rem;
+    font-size: 1rem;
   }
 
   .booking-info-right {
