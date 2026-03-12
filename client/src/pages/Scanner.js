@@ -2013,11 +2013,17 @@ const FoodMarkingComponent = ({ bookingId, foodStatus, onFoodMarked, markFoodAsG
   const [loadingFood, setLoadingFood] = useState(null);
 
   const handleMarkGiven = async (foodId, quantity) => {
+    console.log('🍽️ handleMarkGiven called for:', foodId, 'Quantity:', quantity, 'Booking:', bookingId);
     setLoadingFood(foodId);
     try {
+      if (!markFoodAsGiven) {
+        console.error('❌ markFoodAsGiven function is missing in props!');
+        return;
+      }
       await markFoodAsGiven(bookingId, foodId, quantity);
       if (onFoodMarked) onFoodMarked();
     } catch (error) {
+      console.error('❌ Error in handleMarkGiven:', error);
       alert('Failed to mark food as given: ' + error.message);
     } finally {
       setLoadingFood(null);
@@ -2030,6 +2036,7 @@ const FoodMarkingComponent = ({ bookingId, foodStatus, onFoodMarked, markFoodAsG
   }
 
   const pendingCount = foodStatus.filter(food => (food.quantity_given || 0) < (food.ordered_quantity || 0)).length;
+  const completedCount = foodStatus.filter(food => (food.quantity_given || 0) >= (food.ordered_quantity || 0)).length;
 
   return (
     <div style={{
@@ -2047,7 +2054,9 @@ const FoodMarkingComponent = ({ bookingId, foodStatus, onFoodMarked, markFoodAsG
         right: 0,
         bottom: 0,
         background: 'linear-gradient(45deg, rgba(255, 193, 7, 0.05), rgba(255, 152, 0, 0.03))',
-        borderRadius: '12px'
+        borderRadius: '12px',
+        pointerEvents: 'none',
+        zIndex: 1
       }}></div>
 
       <div style={{
@@ -2066,7 +2075,9 @@ const FoodMarkingComponent = ({ bookingId, foodStatus, onFoodMarked, markFoodAsG
       <div style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: '0.75rem'
+        gap: '0.75rem',
+        position: 'relative',
+        zIndex: 2
       }}>
         {foodStatus.map((food, index) => {
           const isCompleted = (food.quantity_given || 0) >= (food.ordered_quantity || 0);
