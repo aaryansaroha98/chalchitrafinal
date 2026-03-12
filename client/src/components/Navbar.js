@@ -56,7 +56,7 @@ const NavigationBar = () => {
 
   if (loading) {
     return (
-      <Navbar style={{ backgroundColor: '#000000', transform: navHidden ? 'translateY(-100%)' : 'translateY(0)', transition: 'transform 0.25s ease' }} variant="dark" sticky="top">
+      <Navbar style={{ backgroundColor: '#1a1a1a', transform: navHidden ? 'translateY(-100%)' : 'translateY(0)', transition: 'transform 0.25s ease' }} variant="dark" sticky="top">
         <Container fluid style={{ display: 'flex', alignItems: 'center' }}>
           <Navbar.Brand as={Link} to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'white', textDecoration: 'none' }}>
             <img src="/logos/logo-removebg-preview.png" alt="Logo" style={{ height: '32px' }} />
@@ -69,7 +69,7 @@ const NavigationBar = () => {
   }
 
   return (
-    <Navbar style={{ backgroundColor: '#000000', transform: navHidden ? 'translateY(-100%)' : 'translateY(0)', transition: 'transform 0.25s ease', padding: '0', height: isMobile ? '45px' : '45px' }} variant="dark" sticky="top">
+    <Navbar style={{ backgroundColor: '#1a1a1a', transform: navHidden ? 'translateY(-100%)' : 'translateY(0)', transition: 'transform 0.25s ease', padding: '0', height: isMobile ? '45px' : '45px' }} variant="dark" sticky="top">
       <Container fluid style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
         {/* Logo - Left */}
         <Navbar.Brand as={Link} to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'white', textDecoration: 'none' }}>
@@ -116,7 +116,7 @@ const NavigationBar = () => {
         </div>
 
         {/* Mobile Offcanvas Menu */}
-        <Offcanvas show={menuOpen} onHide={() => setMenuOpen(false)} placement="end" style={{ backgroundColor: '#000000', display: 'flex', flexDirection: 'column', width: '70%' }}>
+        <Offcanvas show={menuOpen} onHide={() => setMenuOpen(false)} placement="end" style={{ backgroundColor: '#1a1a1a', display: 'flex', flexDirection: 'column', width: '70%' }}>
           <Offcanvas.Header closeButton closeVariant="white">
             <Offcanvas.Title style={{ color: 'white', fontWeight: '600', letterSpacing: '1px' }}>
               CHALCHITRA
