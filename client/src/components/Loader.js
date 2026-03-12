@@ -34,27 +34,8 @@ const Loader = ({ message = 'Loading...', subtitle = 'Please wait while we prepa
         animation: 'gridMove 20s linear infinite'
       }}></div>
 
-      <div style={{
-        background: 'rgba(255, 255, 255, 0.05)',
-        backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        borderRadius: '24px',
-        padding: '3.5rem',
-        textAlign: 'center',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-        zIndex: 2,
-        maxWidth: '400px',
-        width: '90%'
-      }}>
-        <div style={{
-          width: '64px',
-          height: '64px',
-          border: '4px solid rgba(0, 255, 255, 0.1)',
-          borderTop: '4px solid var(--primary-color)',
-          borderRadius: '50%',
-          animation: 'spin 1s linear infinite',
-          margin: '0 auto 2rem'
-        }}></div>
+      <div className="loader-glass-card">
+        <div className="loader-spinner"></div>
         <h3 style={{
           color: 'rgba(255, 255, 255, 0.95)',
           marginBottom: '1rem',

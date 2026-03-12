@@ -383,6 +383,19 @@ const MyBookings = () => {
         }}></div>
       </div>
 
+      <style>
+        {`
+          @media (max-width: 768px) {
+            .my-bookings-title {
+              font-size: 1.65rem !important;
+              font-weight: 500 !important;
+              margin-bottom: 1.1rem !important;
+              margin-top: 1rem !important;
+            }
+          }
+        `}
+      </style>
+
       <div style={{position: 'relative', zIndex: 2}}>
         <Container>
           <h1 className="my-bookings-title" style={{
