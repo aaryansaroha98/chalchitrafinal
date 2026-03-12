@@ -160,11 +160,12 @@ const UpcomingMovies = () => {
           }
 
           .home-featured-title {
-            font-size: clamp(0.62rem, 1vw, 0.82rem) !important;
-            line-height: 1.15 !important;
+            font-size: clamp(0.85rem, 1.2vw, 1.15rem) !important;
+            line-height: 1.25 !important;
             max-width: 100% !important;
             overflow-wrap: anywhere !important;
             word-break: break-word !important;
+            margin-bottom: 0.4rem !important;
           }
 
           .home-featured-desc {
@@ -188,10 +189,11 @@ const UpcomingMovies = () => {
           }
 
           .home-featured-badge {
-            font-size: clamp(0.36rem, 0.7vw, 0.54rem) !important;
-            padding: clamp(1px, 0.3vw, 2.2px) clamp(2.5px, 0.65vw, 5.5px) !important;
-            top: 6px !important;
-            left: 6px !important;
+            font-size: clamp(0.48rem, 0.8vw, 0.65rem) !important;
+            padding: clamp(2.5px, 0.4vw, 4px) clamp(5px, 0.8vw, 9px) !important;
+            top: 10px !important;
+            left: 10px !important;
+            z-index: 10;
           }
 
           .home-featured-btn {
@@ -248,8 +250,9 @@ const UpcomingMovies = () => {
             }
 
             .upcoming-title {
-              font-size: clamp(0.56rem, 2vw, 0.7rem) !important;
-              margin-bottom: 0.2rem !important;
+              font-size: clamp(0.9rem, 3.8vw, 1.1rem) !important;
+              margin-bottom: 0.35rem !important;
+              font-weight: 700 !important;
               -webkit-line-clamp: 2 !important;
             }
 
@@ -259,10 +262,13 @@ const UpcomingMovies = () => {
             }
 
             .upcoming-badge {
-              top: 4px !important;
-              left: 4px !important;
-              padding: clamp(1px, 0.7vw, 2.2px) clamp(2.2px, 1.1vw, 4px) !important;
-              font-size: clamp(0.34rem, 1.4vw, 0.48rem) !important;
+              top: 8px !important;
+              left: 8px !important;
+              padding: clamp(3px, 3vw, 8px) clamp(8px, 4.5vw, 12px) !important;
+              font-size: clamp(0.75rem, 3.5vw, 0.95rem) !important;
+              border-radius: 8px !important;
+              box-shadow: 0 4px 15px rgba(0,0,0,0.6) !important;
+              background-color: rgba(0, 0, 0, 0.85) !important;
             }
 
             .upcoming-btn {
@@ -291,8 +297,9 @@ const UpcomingMovies = () => {
             }
 
             .home-featured-title {
-              font-size: clamp(0.56rem, 2vw, 0.7rem) !important;
-              margin-bottom: 0.2rem !important;
+              font-size: clamp(0.9rem, 3.8vw, 1.1rem) !important;
+              margin-bottom: 0.35rem !important;
+              font-weight: 700 !important;
               -webkit-line-clamp: 2 !important;
             }
 
@@ -319,10 +326,13 @@ const UpcomingMovies = () => {
             }
 
             .home-featured-badge {
-              top: 4px !important;
-              left: 4px !important;
-              padding: clamp(1px, 0.7vw, 2.2px) clamp(2.2px, 1.1vw, 4px) !important;
-              font-size: clamp(0.34rem, 1.4vw, 0.48rem) !important;
+              top: 8px !important;
+              left: 8px !important;
+              padding: clamp(3px, 3vw, 8px) clamp(8px, 4.5vw, 12px) !important;
+              font-size: clamp(0.75rem, 3.5vw, 0.95rem) !important;
+              border-radius: 8px !important;
+              box-shadow: 0 4px 15px rgba(0,0,0,0.6) !important;
+              background-color: rgba(0, 0, 0, 0.85) !important;
             }
 
             .home-featured-btn {
