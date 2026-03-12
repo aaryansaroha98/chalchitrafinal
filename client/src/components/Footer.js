@@ -353,7 +353,7 @@ const Footer = () => {
                 e.target.style.transform = 'translateY(0)';
               }}>
                 <img
-                  src="/team/team-1768381715102.jpeg"
+                  src="/misc/adress.jpeg"
                   alt="Address"
                   style={{
                     width: '25px',

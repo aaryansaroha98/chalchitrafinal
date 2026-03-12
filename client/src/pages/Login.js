@@ -214,7 +214,7 @@ const Login = () => {
                         animation: 'gentleFloat 4s ease-in-out infinite'
                       }}>
                         <img
-                          src="/team/team-1768254574776.png"
+                          src="/logos/logo-removebg-preview.png"
                           alt="Chalchitra Logo"
                           style={{
                             width: '90px',
