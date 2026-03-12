@@ -237,18 +237,6 @@ const Scanner = () => {
       startContinuousScan();
 
       // Add a manual scan button as fallback
-      const scanButton = document.createElement('button');
-      scanButton.innerHTML = '📱 Manual Entry';
-      scanButton.className = 'btn btn-outline-light position-absolute bottom-0 start-50 translate-middle-x mb-3';
-      scanButton.style.zIndex = '10';
-      scanButton.onclick = async () => {
-        const qrCode = prompt('Enter QR Code data manually:');
-        if (qrCode && qrCode.trim()) {
-          await handleScan(qrCode.trim());
-        }
-      };
-
-      container.appendChild(scanButton);
 
     } catch (error) {
       console.error('❌ Camera error:', error);
@@ -559,57 +547,6 @@ const Scanner = () => {
     }
   };
 
-  const handleManualScan = async () => {
-    const qrCode = prompt('Enter QR Code data:');
-    if (!qrCode || !qrCode.trim()) return;
-
-    setScanResult({ status: 'processing' });
-
-    try {
-      const response = await api.post('/api/bookings/scan', {
-        qr_code: qrCode.trim()
-      });
-
-      const result = response.data;
-
-      const scanRecord = {
-        id: Date.now(),
-        timestamp: new Date().toLocaleString(),
-        data: result,
-        valid: result.allowed,
-        qrData: qrCode.trim()
-      };
-
-      const newHistory = [scanRecord, ...scanHistory.slice(0, 19)];
-      setScanHistory(newHistory);
-      saveScanHistory(newHistory);
-
-      setScanResult({
-        status: result.allowed ? 'valid' : 'invalid',
-        data: result
-      });
-
-    } catch (error) {
-      const errorResult = error.response?.data || { message: 'Scan failed', validity_status: 'ERROR' };
-
-      const scanRecord = {
-        id: Date.now(),
-        timestamp: new Date().toLocaleString(),
-        data: errorResult,
-        valid: false,
-        qrData: qrCode.trim()
-      };
-
-      const newHistory = [scanRecord, ...scanHistory.slice(0, 19)];
-      setScanHistory(newHistory);
-      saveScanHistory(newHistory);
-
-      setScanResult({
-        status: 'error',
-        data: errorResult
-      });
-    }
-  };
 
   const clearHistory = () => {
     setScanHistory([]);
@@ -1263,22 +1200,6 @@ const Scanner = () => {
                       >
                         <i className="fas fa-play me-2"></i>
                         Start Scanning
-                      </Button>
-                      <Button
-                        variant="outline-primary"
-                        size="lg"
-                        onClick={handleManualScan}
-                      >
-                        <i className="fas fa-keyboard me-2"></i>
-                        Manual Input
-                      </Button>
-                      <Button
-                        variant="outline-warning"
-                        size="lg"
-                        onClick={() => handleScan('{"booking_id":"1","student_name":"Test Student","student_email":"test@iitjammu.ac.in","movie_name":"Test Movie","movie_date":"2026-12-01","venue":"Test Venue","ticket_type":"FREE_ENTRY_IITJAMMU","selected_seats":[1],"total_seats":1,"booking_timestamp":"2026-12-01T02:52:40.000Z","valid_until":"2026-12-01","is_valid":true,"issued_by":"Chalchitra IIT Jammu"}')}
-                      >
-                        <i className="fas fa-flask me-2"></i>
-                        Test Scan
                       </Button>
                       <Button
                         variant="outline-info"
