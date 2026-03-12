@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 // Components
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import Loader from './components/Loader';
 
 // Pages
 import Home from './pages/Home';
@@ -44,31 +45,7 @@ const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div style={{
-        minHeight: '50vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)'
-      }}>
-        <div style={{
-          textAlign: 'center',
-          color: '#6c757d'
-        }}>
-          <div style={{
-            width: '60px',
-            height: '60px',
-            border: '4px solid #e9ecef',
-            borderTop: '4px solid #007bff',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-            margin: '0 auto 1rem'
-          }}></div>
-          <p style={{fontSize: '1.1rem', fontWeight: '500'}}>Loading...</p>
-        </div>
-      </div>
-    );
+    return <Loader message="Verifying access..." subtitle="Checking your credentials..." />;
   }
 
   if (!isAuthenticated) {

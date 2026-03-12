@@ -2,12 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Container, Row, Col, Card, Button, Alert, Modal, Badge, Spinner } from 'react-bootstrap';
 import api from '../api/axios';
 import jsQR from 'jsqr';
+import Loader from '../components/Loader';
 
 // Configure axios for the correct server URL - use relative URLs for proxy
 api.defaults.baseURL = '';
 api.defaults.headers.common['Content-Type'] = 'application/json';
 
 const Scanner = () => {
+  const [loading, setLoading] = useState(true);
   const [isScanning, setIsScanning] = useState(false);
   const [scanResult, setScanResult] = useState(null);
   const [scanHistory, setScanHistory] = useState([]);
@@ -36,6 +38,13 @@ const Scanner = () => {
   const currentFoodLoadingRef = useRef(null); // Track current food loading request
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 600);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
     // Load scan history from localStorage
     const saved = localStorage.getItem('scanner_history');
     if (saved) {
@@ -52,6 +61,10 @@ const Scanner = () => {
       stopScanner();
     };
   }, []);
+
+  if (loading) {
+    return <Loader message="Accessing Scanner" subtitle="Initializing camera and security modules..." />;
+  }
 
   // Load food status when scan result changes
   useEffect(() => {
@@ -325,6 +338,11 @@ const Scanner = () => {
     console.log('🎯 Processing QR code:', qrCode, 'People:', numPeople);
 
     setScanResult({ status: 'processing' });
+    
+    // We don't want to block the whole screen during a quick scan, 
+    // but the user asked for "this animation for all pages".
+    // However, Scanner has its own overlay logic. 
+    // Let's see if we should use Loader here.
 
     try {
       const requestData = { qr_code: qrCode };

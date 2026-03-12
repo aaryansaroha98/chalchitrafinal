@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../api/axios';
+import Loader from '../components/Loader';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
@@ -231,6 +232,10 @@ const PaymentSuccess = () => {
         </div>
       </div>
     );
+  }
+
+  if (emailStatus === 'sending') {
+    return <Loader message="Generating Ticket" subtitle="Finalizing your cinematic experience..." />;
   }
 
   return (

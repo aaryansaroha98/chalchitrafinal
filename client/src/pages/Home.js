@@ -5,11 +5,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api/axios';
 import { useAuth } from '../contexts/AuthContext';
 import { isUpcomingMovie, compareMovieDatesAsc } from '../utils/movieStatus';
+import Loader from '../components/Loader';
 
 const Home = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
   const [upcomingMovies, setUpcomingMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [settings, setSettings] = useState({
@@ -50,8 +52,14 @@ const Home = () => {
       setUpcomingMovies(upcoming);
     } catch (err) {
       console.error('Error fetching movies:', err);
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading) {
+    return <Loader message="Loading Chalchitra" subtitle="Preparing the best cinema for you..." />;
+  }
 
   return (
     <div className="bg-void" style={{minHeight: '100vh', position: 'relative', overflow: 'hidden'}}>

@@ -5,6 +5,7 @@ import api from '../api/axios';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { useAuth } from '../contexts/AuthContext';
+import Loader from '../components/Loader';
 
 const Booking = () => {
   const { movieId } = useParams();
@@ -234,24 +235,7 @@ const Booking = () => {
   };
 
   if (loading) {
-    return (
-      <div className="bg-void" style={{minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-          className="border-glass"
-          style={{
-            width: '64px',
-            height: '64px',
-            borderWidth: '4px',
-            borderStyle: 'solid',
-            borderColor: 'rgba(255, 255, 255, 0.1)',
-            borderTopColor: '#00ffff',
-            borderRadius: '50%'
-          }}
-        />
-      </div>
-    );
+    return <Loader message="Loading Movie Details" subtitle="Fetching information for your selection..." />;
   }
 
   if (error || !movie) {

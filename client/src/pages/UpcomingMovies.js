@@ -3,6 +3,7 @@ import { Container, Row, Col, Alert } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api/axios';
+import Loader from '../components/Loader';
 import { useAuth } from '../contexts/AuthContext';
 import { isUpcomingMovie, compareMovieDatesAsc } from '../utils/movieStatus';
 
@@ -37,119 +38,9 @@ const UpcomingMovies = () => {
   const upcomingMovies = movies;
 
   if (loading) {
-    return (
-      <div style={{
-        backgroundColor: '#f8f9fa',
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '2rem'
-      }}>
-        <div style={{
-          backgroundColor: 'white',
-          borderRadius: '12px',
-          padding: '2rem',
-          textAlign: 'center',
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-          border: '1px solid #e9ecef'
-        }}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            border: '3px solid #e9ecef',
-            borderTop: '3px solid #007bff',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-            margin: '0 auto 1rem'
-          }}></div>
-          <h4 style={{
-            color: '#495057',
-            marginBottom: '0.5rem',
-            fontWeight: '600'
-          }}>Loading Movies</h4>
-          <p style={{
-            color: '#6c757d',
-            margin: 0,
-            fontSize: '0.9rem'
-          }}>Please wait while we load the upcoming movies...</p>
-        </div>
-
-        <style>
-          {`
-            @keyframes spin {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
-            }
-
-            @keyframes randomFloat0 {
-              0% { transform: translate(0px, 0px) rotate(0deg); opacity: 0.2; }
-              25% { transform: translate(15px, -20px) rotate(90deg); opacity: 0.6; }
-              50% { transform: translate(-10px, -40px) rotate(180deg); opacity: 0.3; }
-              75% { transform: translate(5px, -20px) rotate(270deg); opacity: 0.5; }
-              100% { transform: translate(0px, 0px) rotate(360deg); opacity: 0.2; }
-            }
-
-            @keyframes randomFloat1 {
-              0% { transform: translate(0px, 0px) scale(1); opacity: 0.3; }
-              33% { transform: translate(-15px, -25px) scale(1.2); opacity: 0.7; }
-              66% { transform: translate(20px, -15px) scale(0.8); opacity: 0.4; }
-              100% { transform: translate(0px, 0px) scale(1); opacity: 0.3; }
-            }
-
-            @keyframes randomFloat2 {
-              0% { transform: translate(0px, 0px) rotate(0deg); opacity: 0.25; }
-              50% { transform: translate(18px, -22px) rotate(180deg); opacity: 0.6; }
-              100% { transform: translate(0px, 0px) rotate(360deg); opacity: 0.25; }
-            }
-
-            @keyframes randomFloat3 {
-              0% { transform: translate(0px, 0px) scale(1); opacity: 0.2; }
-              25% { transform: translate(10px, -15px) scale(1.3); opacity: 0.5; }
-              50% { transform: translate(-8px, -30px) scale(0.9); opacity: 0.3; }
-              75% { transform: translate(12px, -15px) scale(1.1); opacity: 0.4; }
-              100% { transform: translate(0px, 0px) scale(1); opacity: 0.2; }
-            }
-
-            @keyframes gentleWave {
-              0%, 100% { opacity: 0.2; transform: translateX(-10px); }
-              50% { opacity: 0.4; transform: translateX(10px); }
-            }
-
-            @keyframes slowRotate {
-              0% { transform: translate(-50%, -50%) rotate(0deg); }
-              100% { transform: translate(-50%, -50%) rotate(360deg); }
-            }
-
-            @media (max-width: 576px) {
-              .upcoming-heading {
-                font-size: 1.65rem !important;
-                margin-bottom: 0.5rem !important;
-                font-weight: 500 !important;
-                letter-spacing: -0.01em !important;
-              }
-
-              .upcoming-subtitle {
-                font-size: 1.18rem !important;
-                line-height: 1.4 !important;
-                color: #6c757d !important;
-              }
-            }
-
-            @keyframes slowRotateReverse {
-              0% { transform: translate(-50%, -50%) rotate(360deg); }
-              100% { transform: translate(-50%, -50%) rotate(0deg); }
-            }
-
-            @keyframes gridMove {
-              0% { transform: translate(0, 0); }
-              100% { transform: translate(50px, 50px); }
-            }
-          `}
-        </style>
-      </div>
-    );
+    return <Loader message="Loading Upcoming Movies" subtitle="Preparing your memories..." />;
   }
+
 
   return (
     <div className="bg-void" style={{minHeight: '100vh', position: 'relative', overflow: 'hidden'}}>

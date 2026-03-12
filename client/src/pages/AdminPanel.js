@@ -4,6 +4,7 @@ import api from '../api/axios';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import autoTable from 'jspdf-autotable';
+import Loader from '../components/Loader';
 import { getMovieStatus } from '../utils/movieStatus';
 
 // Configure axios to send cookies with requests
@@ -914,16 +915,7 @@ const AdminPanel = () => {
   // ... existing code ...
 
   if (loading) {
-    return (
-      <Container className="py-5">
-        <div className="text-center">
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </div>
-          <p className="mt-2">Loading admin panel...</p>
-        </div>
-      </Container>
-    );
+    return <Loader message="Accessing Admin Panel" subtitle="Securing your administrative access..." />;
   }
 
   // Filter users based on search term

@@ -1,7 +1,21 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, ListGroup } from 'react-bootstrap';
+import Loader from '../components/Loader';
 
 const Contact = () => {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 600);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <Loader message="Connecting" subtitle="Get in touch with Chalchitra..." />;
+  }
+
   return (
     <div className="bg-void" style={{minHeight: '100vh', position: 'relative', overflow: 'hidden'}}>
       {/* Animated Background Grid */}

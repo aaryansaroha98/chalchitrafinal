@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import api from '../api/axios';
 import { useAuth } from '../contexts/AuthContext';
+import Loader from '../components/Loader';
 
 // Derive API base URL to build absolute URLs for poster/image assets
 const apiBaseUrl = process.env.REACT_APP_API_URL ||
@@ -108,27 +109,7 @@ const Payment = () => {
   };
 
   if (loading) {
-    return (
-      <div className="payment-page">
-        <div className="particles">
-          {Array.from({ length: 15 }, (_, i) => (
-            <div
-              key={i}
-              className="particle"
-              style={{
-                left: Math.random() * 100 + '%',
-                animationDelay: Math.random() * 10 + 's',
-                animationDuration: (10 + Math.random() * 20) + 's'
-              }}
-            />
-          ))}
-        </div>
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
-          <p className="loading-text">Loading...</p>
-        </div>
-      </div>
-    );
+    return <Loader message="Processing Payment" subtitle="Setting up your secure transaction..." />;
   }
 
   if (error && !movie) {

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Button, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import Loader from '../components/Loader';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -20,6 +21,10 @@ const Login = () => {
   const handleTermsOfServiceClick = () => {
     navigate('/terms-of-service');
   };
+  
+  if (isLoading) {
+    return <Loader message="Authenticating" subtitle="Securely signing you in with Google..." />;
+  }
 
   return (
     <div className="bg-void" style={{minHeight: '100vh', position: 'relative', overflow: 'hidden'}}>

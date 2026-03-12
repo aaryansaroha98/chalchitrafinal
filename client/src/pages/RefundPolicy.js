@@ -1,7 +1,21 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
+import Loader from '../components/Loader';
 
 const RefundPolicy = () => {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <Loader message="Reviewing Policy" subtitle="Loading refund guidelines..." />;
+  }
+
   return (
     <div style={{
       minHeight: '100vh',

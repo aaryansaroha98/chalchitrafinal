@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Modal, Card, Badge, Alert } from 'react-bootstrap';
 import api from '../api/axios';
+import Loader from '../components/Loader';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
@@ -285,41 +286,7 @@ const MyBookings = () => {
   };
 
   if (loading) {
-    return (
-      <div style={{
-        background: 'linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 25%, #252525 50%, #1a1a1a 75%, #0f0f0f 100%)',
-        minHeight: '100vh',
-        position: 'relative',
-        overflow: 'hidden',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        <div style={{
-          textAlign: 'center',
-          color: '#f8f9fa',
-          position: 'relative',
-          zIndex: 1
-        }}>
-          <div style={{
-            width: '60px',
-            height: '60px',
-            border: '4px solid #e9ecef',
-            borderTop: '4px solid #007bff',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-            margin: '0 auto 1rem'
-          }}></div>
-          <p style={{fontSize: '1.1rem', fontWeight: '500'}}>Loading your bookings...</p>
-        </div>
-        <style>{`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}</style>
-      </div>
-    );
+    return <Loader message="Fetching Your Bookings" subtitle="Getting your tickets ready..." />;
   }
 
   return (
@@ -435,12 +402,47 @@ const MyBookings = () => {
         )}
 
         {bookings.length === 0 ? (
-          <Card style={{padding: '3rem', textAlign: 'center'}}>
+          <Card style={{
+            padding: '3rem',
+            textAlign: 'center',
+            background: 'rgba(255, 255, 255, 0.08)',
+            backdropFilter: 'blur(25px) saturate(180%)',
+            border: '1px solid rgba(255, 255, 255, 0.18)',
+            borderRadius: '24px',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+            color: '#ffffff'
+          }}>
             <Card.Body>
-              <i className="fas fa-ticket-alt" style={{fontSize: '4rem', color: '#dee2e6', marginBottom: '1rem'}}></i>
-              <h3>No Bookings Yet</h3>
-              <p>You haven't booked any movie tickets yet. Discover amazing films and reserve your seats!</p>
-              <Button variant="primary" onClick={() => window.location.href = '/upcoming-movies'}>
+              <i className="fas fa-ticket-alt" style={{
+                fontSize: '4rem',
+                color: 'rgba(255, 255, 255, 0.6)',
+                marginBottom: '1.5rem',
+                display: 'block'
+              }}></i>
+              <h3 style={{
+                fontSize: '1.8rem',
+                fontWeight: '600',
+                marginBottom: '1rem'
+              }}>No Bookings Yet</h3>
+              <p style={{
+                color: 'rgba(255, 255, 255, 0.7)',
+                fontSize: '1.1rem',
+                marginBottom: '2rem',
+                maxWidth: '500px',
+                margin: '0 auto 2rem'
+              }}>You haven't booked any movie tickets yet. Discover amazing films and reserve your seats!</p>
+              <Button 
+                variant="primary" 
+                onClick={() => window.location.href = '/upcoming-movies'}
+                style={{
+                  background: 'linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%)',
+                  padding: '0.75rem 2rem',
+                  borderRadius: '12px',
+                  fontWeight: '600',
+                  border: 'none',
+                  boxShadow: '0 4px 15px rgba(13, 110, 253, 0.3)'
+                }}
+              >
                 Explore Movies
               </Button>
             </Card.Body>

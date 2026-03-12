@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Alert, Modal } from 'react-bootstrap';
 import api from '../api/axios';
+import Loader from '../components/Loader';
 
 const Gallery = () => {
   const [gallery, setGallery] = useState([]);
@@ -62,78 +63,7 @@ const Gallery = () => {
   };
 
   if (loading) {
-    return (
-      <div style={{
-        background: 'linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 50%, var(--gray-200) 100%)',
-        minHeight: '100vh',
-        position: 'relative',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        {/* Animated Background Grid */}
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: `
-            radial-gradient(circle at 25% 25%, var(--primary-color) 1px, transparent 1px),
-            radial-gradient(circle at 75% 75%, var(--secondary-color) 1px, transparent 1px),
-            radial-gradient(circle at 50% 50%, var(--accent-color) 1px, transparent 1px)
-          `,
-          backgroundSize: '100px 100px, 150px 150px, 200px 200px',
-          backgroundPosition: '0 0, 50px 50px, 25px 25px',
-          opacity: 0.03,
-          animation: 'gridMove 20s linear infinite'
-        }}></div>
-
-        <div style={{
-          background: 'rgba(255, 255, 255, 0.1)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
-          borderRadius: '20px',
-          padding: '3rem',
-          textAlign: 'center',
-          boxShadow: '0 8px 32px rgba(0, 255, 255, 0.2)',
-          zIndex: 2
-        }}>
-          <div style={{
-            width: '60px',
-            height: '60px',
-            border: '4px solid rgba(0, 255, 255, 0.3)',
-            borderTop: '4px solid var(--primary-color)',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-            margin: '0 auto 1.5rem'
-          }}></div>
-          <h3 style={{
-            color: 'var(--gray-800)',
-            marginBottom: '0.5rem',
-            fontWeight: '600'
-          }}>Loading Gallery</h3>
-          <p style={{
-            color: 'var(--gray-600)',
-            margin: 0,
-            fontSize: '0.95rem'
-          }}>Preparing your memories...</p>
-        </div>
-
-        <style>
-          {`
-            @keyframes spin {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
-            }
-            @keyframes gridMove {
-              0% { transform: translate(0, 0); }
-              100% { transform: translate(50px, 50px); }
-            }
-          `}
-        </style>
-      </div>
-    );
+    return <Loader message="Loading Gallery" subtitle="Preparing your memories..." />;
   }
 
   return (

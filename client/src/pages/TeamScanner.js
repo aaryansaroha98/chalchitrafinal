@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Alert, Badge, Modal } from 'react-bootstrap';
 import api from '../api/axios';
 import QRScanner from '../components/QRScanner';
+import Loader from '../components/Loader';
 
 const TeamScanner = () => {
   const [showScanner, setShowScanner] = useState(false);
@@ -122,16 +123,7 @@ const TeamScanner = () => {
   };
 
   if (loading) {
-    return (
-      <Container className="py-5">
-        <div className="text-center">
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </div>
-          <p className="mt-2">Checking scanner access...</p>
-        </div>
-      </Container>
-    );
+    return <Loader message="Verifying Scanner Access" subtitle="Authenticating your administrative privileges..." />;
   }
 
   if (error || !isCodeScanner) {
