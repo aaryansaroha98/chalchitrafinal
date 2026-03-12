@@ -227,32 +227,31 @@ const Footer = () => {
                 color: '#e94560',
                 fontSize: '1.5rem',
                 transition: 'all 0.3s ease',
-                padding: '10px',
+                padding: '0',
                 borderRadius: '50%',
                 background: 'rgba(255, 255, 255, 0.1)',
                 border: '1px solid rgba(255, 255, 255, 0.2)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width: '52px',
-                height: '52px'
+                width: '58px',
+                height: '58px',
+                overflow: 'hidden'
               }}
               onMouseEnter={(e) => {
-                e.target.style.color = '#ffffff';
-                e.target.style.background = 'rgba(255, 255, 255, 0.2)';
-                e.target.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+                e.currentTarget.style.transform = 'translateY(-2px)';
               }}
               onMouseLeave={(e) => {
-                e.target.style.color = '#e94560';
-                e.target.style.background = 'rgba(255, 255, 255, 0.1)';
-                e.target.style.transform = 'translateY(0)';
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                e.currentTarget.style.transform = 'translateY(0)';
               }}>
                 <img
                   src="/logos/maillogo.png"
                   alt="Email"
                   style={{
-                    width: '30px',
-                    height: '30px',
+                    width: '38px',
+                    height: '38px',
                     objectFit: 'contain'
                   }}
                 />
@@ -262,32 +261,31 @@ const Footer = () => {
                 color: '#e94560',
                 fontSize: '1.5rem',
                 transition: 'all 0.3s ease',
-                padding: '10px',
+                padding: '0',
                 borderRadius: '50%',
                 background: 'rgba(255, 255, 255, 0.1)',
                 border: '1px solid rgba(255, 255, 255, 0.2)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width: '52px',
-                height: '52px'
+                width: '58px',
+                height: '58px',
+                overflow: 'hidden'
               }}
               onMouseEnter={(e) => {
-                e.target.style.color = '#ffffff';
-                e.target.style.background = 'rgba(255, 255, 255, 0.2)';
-                e.target.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+                e.currentTarget.style.transform = 'translateY(-2px)';
               }}
               onMouseLeave={(e) => {
-                e.target.style.color = '#e94560';
-                e.target.style.background = 'rgba(255, 255, 255, 0.1)';
-                e.target.style.transform = 'translateY(0)';
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                e.currentTarget.style.transform = 'translateY(0)';
               }}>
                 <img
                   src="/logos/instalogo.png"
                   alt="Instagram"
                   style={{
-                    width: '48px',
-                    height: '48px',
+                    width: '54px',
+                    height: '54px',
                     objectFit: 'contain'
                   }}
                 />
@@ -297,32 +295,31 @@ const Footer = () => {
                 color: '#e94560',
                 fontSize: '1.5rem',
                 transition: 'all 0.3s ease',
-                padding: '10px',
+                padding: '0',
                 borderRadius: '50%',
                 background: 'rgba(255, 255, 255, 0.1)',
                 border: '1px solid rgba(255, 255, 255, 0.2)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width: '52px',
-                height: '52px'
+                width: '58px',
+                height: '58px',
+                overflow: 'hidden'
               }}
               onMouseEnter={(e) => {
-                e.target.style.color = '#ffffff';
-                e.target.style.background = 'rgba(255, 255, 255, 0.2)';
-                e.target.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+                e.currentTarget.style.transform = 'translateY(-2px)';
               }}
               onMouseLeave={(e) => {
-                e.target.style.color = '#e94560';
-                e.target.style.background = 'rgba(255, 255, 255, 0.1)';
-                e.target.style.transform = 'translateY(0)';
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                e.currentTarget.style.transform = 'translateY(0)';
               }}>
                 <img
                   src="/misc/telephone.png"
                   alt="Mobile"
                   style={{
-                    width: '30px',
-                    height: '30px',
+                    width: '38px',
+                    height: '38px',
                     objectFit: 'contain'
                   }}
                 />
@@ -332,34 +329,32 @@ const Footer = () => {
                 color: '#e94560',
                 fontSize: '1.5rem',
                 transition: 'all 0.3s ease',
-                padding: '10px',
+                padding: '0',
                 borderRadius: '50%',
                 background: 'rgba(255, 255, 255, 0.1)',
                 border: '1px solid rgba(255, 255, 255, 0.2)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width: '52px',
-                height: '52px'
+                width: '58px',
+                height: '58px',
+                overflow: 'hidden'
               }}
               onMouseEnter={(e) => {
-                e.target.style.color = '#ffffff';
-                e.target.style.background = 'rgba(255, 255, 255, 0.2)';
-                e.target.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+                e.currentTarget.style.transform = 'translateY(-2px)';
               }}
               onMouseLeave={(e) => {
-                e.target.style.color = '#e94560';
-                e.target.style.background = 'rgba(255, 255, 255, 0.1)';
-                e.target.style.transform = 'translateY(0)';
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                e.currentTarget.style.transform = 'translateY(0)';
               }}>
                 <img
                   src="/misc/adress.jpeg"
                   alt="Address"
                   style={{
-                    width: '35px',
-                    height: '35px',
-                    objectFit: 'contain',
-                    borderRadius: '50%'
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover'
                   }}
                 />
               </a>
