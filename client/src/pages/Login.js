@@ -121,7 +121,7 @@ const Login = () => {
       <Container fluid style={{padding: '2rem', position: 'relative', zIndex: 10}}>
         <Row className="justify-content-center align-items-center" style={{minHeight: '80vh'}}>
           <Col xs={12} lg={9} xl={7}>
-            <div style={{
+            <div className="login-card-container" style={{
               background: 'rgba(255, 255, 255, 0.02)',
               backdropFilter: 'blur(40px) saturate(180%)',
               border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -601,7 +601,7 @@ const Login = () => {
             }
 
             h1 {
-              font-size: 2rem !important;
+              font-size: 2.5rem !important;
             }
           }
 
@@ -610,14 +610,23 @@ const Login = () => {
               padding: 0 !important;
             }
 
+            .login-card-container {
+              background: transparent !important;
+              backdrop-filter: none !important;
+              border: none !important;
+              box-shadow: none !important;
+            }
+
             h1 {
-              font-size: 1.8rem !important;
-              margin-bottom: 1rem !important;
+              font-size: 3rem !important;
+              margin-bottom: 1.5rem !important;
+              font-weight: 700 !important;
             }
 
             .btn {
-              padding: 0.875rem 1.5rem !important;
-              font-size: 1rem !important;
+              padding: 1rem 1.5rem !important;
+              font-size: 1.15rem !important;
+              border-radius: 20px !important;
             }
 
             .login-iit-info {
@@ -626,42 +635,48 @@ const Login = () => {
 
             .login-welcome-mobile {
               display: block !important;
+              background: rgba(255, 255, 255, 0.05) !important;
+              padding: 1.5rem !important;
+              border-radius: 24px !important;
+              margin-bottom: 2rem !important;
             }
 
             .login-welcome-title {
-              font-size: 1.15rem !important;
+              font-size: 1.6rem !important;
+              margin-bottom: 0.5rem !important;
             }
 
             .login-welcome-subtitle {
-              font-size: 0.9rem !important;
+              font-size: 1.1rem !important;
+              margin-bottom: 1rem !important;
             }
 
             .login-only-email {
-              font-size: 0.85rem !important;
+              font-size: 1.05rem !important;
+              line-height: 1.6 !important;
             }
 
             .login-terms {
-              font-size: 0.8rem !important;
+              font-size: 0.95rem !important;
+              margin-top: 1rem !important;
             }
 
             .login-secure-title {
-              font-size: 0.75rem !important;
-            }
-
-            .login-secure-text {
-              font-size: 0.75rem !important;
-            }
-
-            .login-secure-icon {
               font-size: 0.9rem !important;
             }
 
+            .login-secure-text {
+              font-size: 0.85rem !important;
+            }
+
+            .login-secure-icon {
+              font-size: 1.1rem !important;
+            }
+
             .login-form-wrap {
-              max-width: 130px;
-              max-height: none;
-              overflow: visible;
-              padding-left: 4px;
-              padding-right: 4px;
+              max-width: 320px;
+              margin: 0 auto;
+              padding: 0 15px;
             }
           }
         `}
