@@ -150,31 +150,52 @@ const Scanner = () => {
   const scanQRFromImage = (imageData) => {
     return new Promise((resolve) => {
       const img = new Image();
+      img.crossOrigin = "anonymous";
       img.onload = () => {
-        // Create canvas for image processing
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
+        console.log(`🖼️ Image loaded for scanning: ${img.width}x${img.height}`);
+        
+        const scanAtScale = (scale) => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          
+          const width = Math.floor(img.width * scale);
+          const height = Math.floor(img.height * scale);
+          
+          canvas.width = width;
+          canvas.height = height;
+          
+          // Use low image smoothing for sharper edges on downscaling (better for QR)
+          ctx.imageSmoothingEnabled = false;
+          
+          ctx.drawImage(img, 0, 0, width, height);
+          const imageData = ctx.getImageData(0, 0, width, height);
+          return jsQR(imageData.data, width, height);
+        };
 
-        // Set canvas size to image size
-        canvas.width = img.width;
-        canvas.height = img.height;
+        // Try multiple scales for robust detection
+        // jsQR works best when QR module size is around 2-4 pixels
+        const scales = [1.0, 0.75, 0.5, 0.25];
+        let code = null;
 
-        // Draw image to canvas
-        ctx.drawImage(img, 0, 0);
-
-        // Get image data
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-        // Scan for QR code
-        const code = jsQR(imageData.data, imageData.width, imageData.height);
+        for (const scale of scales) {
+          if (scale < 1.0 && img.width * scale < 200) continue; // Don't scale too small
+          
+          console.log(`🔄 Attempting QR detection at ${scale}x scale (${Math.floor(img.width * scale)}px wide)...`);
+          code = scanAtScale(scale);
+          if (code) break;
+        }
 
         if (code) {
           console.log('🎯 QR Code detected in image:', code.data);
           resolve(code.data);
         } else {
-          console.log('❌ No QR code found in image');
+          console.log('❌ No QR code found in image after multiple scaling attempts');
           resolve(null);
         }
+      };
+      img.onerror = (err) => {
+        console.error('❌ Failed to load image for scanning:', err);
+        resolve(null);
       };
       img.src = imageData;
     });
@@ -575,7 +596,7 @@ const Scanner = () => {
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title">
-                <i className="fas fa-file-image me-2"></i>
+                <i class="fas fa-file-image me-2"></i>
                 Processing Image: ${file.name}
               </h5>
             </div>
@@ -630,7 +651,7 @@ const Scanner = () => {
               <div class="modal-content">
                 <div class="modal-header bg-warning">
                   <h5 class="modal-title">
-                    <i className="fas fa-exclamation-triangle me-2"></i>
+                    <i class="fas fa-exclamation-triangle me-2"></i>
                     No QR Code Found
                   </h5>
                 </div>
@@ -799,209 +820,6 @@ const Scanner = () => {
   };
 
   // Food Marking Component
-  const FoodMarkingComponent = ({ bookingId, foodStatus, onFoodMarked }) => {
-    const [loadingFood, setLoadingFood] = useState(null);
-
-    const handleMarkGiven = async (foodId, quantity) => {
-      setLoadingFood(foodId);
-      try {
-        await markFoodAsGiven(bookingId, foodId, quantity);
-        if (onFoodMarked) onFoodMarked();
-      } catch (error) {
-        alert('Failed to mark food as given: ' + error.message);
-      } finally {
-        setLoadingFood(null);
-      }
-    };
-
-    if (!foodStatus || foodStatus.length === 0) {
-      return null;
-    }
-
-    const pendingCount = foodStatus.filter(food => food.quantity_given < food.ordered_quantity).length;
-    const completedCount = foodStatus.filter(food => food.quantity_given >= food.ordered_quantity).length;
-
-    return (
-      <div style={{
-        background: 'linear-gradient(135deg, rgba(255, 193, 7, 0.15), rgba(255, 152, 0, 0.08))',
-        borderRadius: '12px',
-        padding: '1rem',
-        border: '2px solid rgba(255, 193, 7, 0.3)',
-        position: 'relative',
-        overflow: 'hidden'
-      }}>
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'linear-gradient(45deg, rgba(255, 193, 7, 0.05), rgba(255, 152, 0, 0.03))',
-          borderRadius: '12px'
-        }}></div>
-
-        <div style={{
-          position: 'relative',
-          zIndex: 2,
-          fontSize: '1.1rem',
-          fontWeight: '700',
-          color: '#f57c00',
-          marginBottom: '1rem',
-          textAlign: 'center'
-        }}>
-          <i className="fas fa-utensils me-2"></i>
-          🍽️ Food Status ({foodStatus.length} items)
-        </div>
-
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '0.75rem'
-        }}>
-          {/* Sort by pending first, then completed */}
-          {foodStatus
-            .sort((a, b) => {
-              const aPending = a.quantity_given < a.ordered_quantity ? 1 : 0;
-              const bPending = b.quantity_given < b.ordered_quantity ? 1 : 0;
-              return bPending - aPending; // Pending first
-            })
-            .map((food) => {
-              const isCompleted = food.quantity_given >= food.ordered_quantity;
-              const isPending = food.quantity_given < food.ordered_quantity;
-              const remaining = food.ordered_quantity - food.quantity_given;
-
-              return (
-                <div key={food.food_id} style={{
-                  background: isCompleted ?
-                    'linear-gradient(135deg, rgba(40, 167, 69, 0.1), rgba(34, 197, 94, 0.05))' :
-                    'white',
-                  borderRadius: '10px',
-                  padding: '0.75rem',
-                  border: `2px solid ${
-                    isCompleted ?
-                      'rgba(40, 167, 69, 0.3)' :
-                      'rgba(255, 193, 7, 0.2)'
-                  }`,
-                  boxShadow: '0 2px 8px rgba(255, 152, 0, 0.1)',
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}>
-                  {isCompleted && (
-                    <div style={{
-                      position: 'absolute',
-                      top: '5px',
-                      right: '5px',
-                      background: '#28a745',
-                      color: 'white',
-                      borderRadius: '50%',
-                      width: '20px',
-                      height: '20px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '0.7rem',
-                      fontWeight: 'bold'
-                    }}>
-                      ✓
-                    </div>
-                  )}
-
-                  <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div style={{ flex: 1 }}>
-                      <div style={{
-                        fontSize: '1rem',
-                        fontWeight: '600',
-                        color: isCompleted ? '#28a745' : '#333',
-                        marginBottom: '0.25rem',
-                        textDecoration: isCompleted ? 'line-through' : 'none',
-                        opacity: isCompleted ? 0.7 : 1
-                      }}>
-                        {food.name}
-                      </div>
-                      <div style={{
-                        fontSize: '0.85rem',
-                        color: '#666'
-                      }}>
-                        Ordered: {food.ordered_quantity} |
-                        Served: {food.quantity_given}
-                        {remaining > 0 && (
-                          <span style={{ color: '#f57c00', marginLeft: '0.5rem' }}>
-                            (Remaining: {remaining})
-                          </span>
-                        )}
-                        {food.given_at && (
-                          <span style={{ color: '#28a745', marginLeft: '0.5rem' }}>
-                            • Served at {new Date(food.given_at).toLocaleTimeString()}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {isPending && (
-                      <Button
-                        variant="success"
-                        size="sm"
-                        onClick={() => handleMarkGiven(food.food_id, remaining)}
-                        disabled={loadingFood === food.food_id}
-                        style={{
-                          minWidth: '80px',
-                          fontWeight: '600'
-                        }}
-                      >
-                        {loadingFood === food.food_id ? (
-                          <Spinner animation="border" size="sm" />
-                        ) : (
-                          <>
-                            <i className="fas fa-check me-1"></i>
-                            Give ({remaining})
-                          </>
-                        )}
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-        </div>
-
-        <div style={{
-          marginTop: '1rem',
-          padding: '0.75rem',
-          background: 'rgba(0, 0, 0, 0.1)',
-          borderRadius: '8px',
-          border: '1px solid rgba(255, 193, 7, 0.2)',
-          textAlign: 'center'
-        }}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-around',
-            marginBottom: '0.5rem'
-          }}>
-            {pendingCount > 0 && (
-              <small style={{ color: '#f57c00', fontWeight: '600' }}>
-                <i className="fas fa-clock me-1"></i>
-                {pendingCount} to serve
-              </small>
-            )}
-            {completedCount > 0 && (
-              <small style={{ color: '#28a745', fontWeight: '600' }}>
-                <i className="fas fa-check me-1"></i>
-                {completedCount} served
-              </small>
-            )}
-          </div>
-          <small style={{
-            color: '#f57c00',
-            fontWeight: '600',
-            fontSize: '0.85rem'
-          }}>
-            <i className="fas fa-info-circle me-1"></i>
-            Click "Give" when food is ready for the customer
-          </small>
-        </div>
-      </div>
-    );
-  };
 
 
   return (
@@ -1471,6 +1289,7 @@ const Scanner = () => {
                                   loadFoodStatus(scanResult.data.booking_id);
                                 }
                               }}
+                              markFoodAsGiven={markFoodAsGiven}
                             />
                           </Col>
                         </Row>
@@ -1805,6 +1624,7 @@ const Scanner = () => {
                             loadFoodStatus(partialAdmissionData.booking_id);
                           }
                         }}
+                        markFoodAsGiven={markFoodAsGiven}
                       />
                     ) : (
                       <Alert variant="secondary" className="py-3 text-center">
@@ -1990,6 +1810,7 @@ const Scanner = () => {
                                   loadFoodStatus(lastScanResult.booking_id);
                                 }
                               }}
+                              markFoodAsGiven={markFoodAsGiven}
                             />
                           </Col>
                         </Row>
@@ -2010,7 +1831,7 @@ const Scanner = () => {
                         <Col xs={8} className="text-start">
                           <Badge bg="success" className="px-3 py-2">
                             <i className="fas fa-check me-1"></i>
-                            {lastScanResult.validity_status || 'VALID'}
+                            {lastScanResult?.validity_status || 'VALID'}
                           </Badge>
                         </Col>
                       </Row>
@@ -2076,25 +1897,25 @@ const Scanner = () => {
                     <Col xs={8} className="text-start">
                       <Badge bg="danger" className="px-3 py-2">
                         <i className="fas fa-times me-1"></i>
-                        {lastScanResult.validity_status || 'INVALID'}
+                        {lastScanResult?.validity_status || 'INVALID'}
                       </Badge>
                     </Col>
                   </Row>
-                  {lastScanResult.student_name && (
+                  {lastScanResult?.student_name && (
                     <Row className="mb-2">
                       <Col xs={4} className="text-start fw-bold">Name:</Col>
                       <Col xs={8} className="text-start">{lastScanResult.student_name}</Col>
                     </Row>
                   )}
-                  {lastScanResult.movie_name && (
+                  {lastScanResult?.movie_name && (
                     <Row className="mb-2">
                       <Col xs={4} className="text-start fw-bold">Movie:</Col>
                       <Col xs={8} className="text-start">{lastScanResult.movie_name}</Col>
                     </Row>
                   )}
-                  {(lastScanResult.total_people !== undefined ||
-                    lastScanResult.admitted_people !== undefined ||
-                    lastScanResult.remaining_people !== undefined) && (
+                  {(lastScanResult?.total_people !== undefined ||
+                    lastScanResult?.admitted_people !== undefined ||
+                    lastScanResult?.remaining_people !== undefined) && (
                     <>
                       <Row className="mb-2">
                         <Col xs={4} className="text-start fw-bold">Total:</Col>
@@ -2116,7 +1937,7 @@ const Scanner = () => {
                       </Row>
                     </>
                   )}
-                  {lastScanResult.message && (
+                  {lastScanResult?.message && (
                     <Row className="mb-0">
                       <Col xs={12} className="text-center">
                         <small className="text-muted">{lastScanResult.message}</small>
@@ -2138,6 +1959,7 @@ const Scanner = () => {
                           loadFoodStatus(lastScanResult.booking_id);
                         }
                       }}
+                      markFoodAsGiven={markFoodAsGiven}
                     />
                   </Col>
                 </Row>
@@ -2182,6 +2004,136 @@ const Scanner = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+    </div>
+  );
+};
+
+// Food Marking Component - defined outside to avoid re-creation on every render
+const FoodMarkingComponent = ({ bookingId, foodStatus, onFoodMarked, markFoodAsGiven }) => {
+  const [loadingFood, setLoadingFood] = useState(null);
+
+  const handleMarkGiven = async (foodId, quantity) => {
+    setLoadingFood(foodId);
+    try {
+      await markFoodAsGiven(bookingId, foodId, quantity);
+      if (onFoodMarked) onFoodMarked();
+    } catch (error) {
+      alert('Failed to mark food as given: ' + error.message);
+    } finally {
+      setLoadingFood(null);
+    }
+  };
+
+  // Robust check for array
+  if (!Array.isArray(foodStatus) || foodStatus.length === 0) {
+    return null;
+  }
+
+  const pendingCount = foodStatus.filter(food => (food.quantity_given || 0) < (food.ordered_quantity || 0)).length;
+
+  return (
+    <div style={{
+      background: 'linear-gradient(135deg, rgba(255, 193, 7, 0.15), rgba(255, 152, 0, 0.08))',
+      borderRadius: '12px',
+      padding: '1rem',
+      border: '2px solid rgba(255, 193, 7, 0.3)',
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'linear-gradient(45deg, rgba(255, 193, 7, 0.05), rgba(255, 152, 0, 0.03))',
+        borderRadius: '12px'
+      }}></div>
+
+      <div style={{
+        position: 'relative',
+        zIndex: 2,
+        fontSize: '1.1rem',
+        fontWeight: '700',
+        color: '#f57c00',
+        marginBottom: '1rem',
+        textAlign: 'center'
+      }}>
+        <i className="fas fa-utensils me-2"></i>
+        🍽️ Food Status ({foodStatus.length} items)
+      </div>
+
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '0.75rem'
+      }}>
+        {foodStatus.map((food, index) => {
+          const isCompleted = (food.quantity_given || 0) >= (food.ordered_quantity || 0);
+          const remaining = Math.max(0, (food.ordered_quantity || 0) - (food.quantity_given || 0));
+
+          return (
+            <div key={food.food_id || index} style={{
+              background: isCompleted ? 'rgba(232, 245, 233, 0.8)' : 'white',
+              borderRadius: '10px',
+              padding: '0.75rem',
+              border: isCompleted ? '2px solid #81c784' : '2px solid rgba(255, 193, 7, 0.2)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              transition: 'all 0.3s ease'
+            }}>
+              <div style={{ flex: 1 }}>
+                <div style={{
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  color: '#333',
+                  marginBottom: '0.25rem',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}>
+                  {food.food_name || food.name || `Food Item ${index + 1}`}
+                  {isCompleted && (
+                    <Badge bg="success" className="ms-2">
+                      <i className="fas fa-check me-1"></i>
+                      Served
+                    </Badge>
+                  )}
+                </div>
+                <div style={{
+                  fontSize: '0.85rem',
+                  color: '#666'
+                }}>
+                  Ordered: {food.ordered_quantity} | Served: {food.quantity_given}
+                </div>
+              </div>
+
+              {!isCompleted && (
+                <Button
+                  variant="success"
+                  size="sm"
+                  onClick={() => handleMarkGiven(food.food_id, remaining)}
+                  disabled={loadingFood === food.food_id}
+                  style={{
+                    minWidth: '80px',
+                    fontWeight: '600'
+                  }}
+                >
+                  {loadingFood === food.food_id ? (
+                    <Spinner animation="border" size="sm" />
+                  ) : (
+                    <>
+                      <i className="fas fa-check me-1"></i>
+                      Give All
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
