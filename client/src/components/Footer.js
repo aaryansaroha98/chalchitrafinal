@@ -234,8 +234,8 @@ const Footer = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width: '58px',
-                height: '58px',
+                width: '44px',
+                height: '44px',
                 overflow: 'hidden'
               }}
               onMouseEnter={(e) => {
@@ -250,8 +250,8 @@ const Footer = () => {
                   src="/logos/maillogo.png"
                   alt="Email"
                   style={{
-                    width: '38px',
-                    height: '38px',
+                    width: '30px',
+                    height: '30px',
                     objectFit: 'contain'
                   }}
                 />
@@ -268,8 +268,8 @@ const Footer = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width: '58px',
-                height: '58px',
+                width: '44px',
+                height: '44px',
                 overflow: 'hidden'
               }}
               onMouseEnter={(e) => {
@@ -284,8 +284,8 @@ const Footer = () => {
                   src="/logos/instalogo.png"
                   alt="Instagram"
                   style={{
-                    width: '54px',
-                    height: '54px',
+                    width: '42px',
+                    height: '42px',
                     objectFit: 'contain'
                   }}
                 />
@@ -302,8 +302,8 @@ const Footer = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width: '58px',
-                height: '58px',
+                width: '44px',
+                height: '44px',
                 overflow: 'hidden'
               }}
               onMouseEnter={(e) => {
@@ -318,8 +318,8 @@ const Footer = () => {
                   src="/misc/telephone.png"
                   alt="Mobile"
                   style={{
-                    width: '38px',
-                    height: '38px',
+                    width: '30px',
+                    height: '30px',
                     objectFit: 'contain'
                   }}
                 />
@@ -336,8 +336,8 @@ const Footer = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width: '58px',
-                height: '58px',
+                width: '44px',
+                height: '44px',
                 overflow: 'hidden'
               }}
               onMouseEnter={(e) => {
