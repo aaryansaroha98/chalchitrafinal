@@ -339,8 +339,8 @@ const Footer = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width: '45px',
-                height: '45px'
+                width: '52px',
+                height: '52px'
               }}
               onMouseEnter={(e) => {
                 e.target.style.color = '#ffffff';
@@ -356,8 +356,8 @@ const Footer = () => {
                   src="/misc/adress.jpeg"
                   alt="Address"
                   style={{
-                    width: '32px',
-                    height: '32px',
+                    width: '35px',
+                    height: '35px',
                     objectFit: 'contain',
                     borderRadius: '50%'
                   }}
