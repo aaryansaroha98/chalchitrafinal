@@ -4,10 +4,6 @@ import api from '../api/axios';
 import jsQR from 'jsqr';
 import Loader from '../components/Loader';
 
-// Configure axios for the correct server URL - use relative URLs for proxy
-api.defaults.baseURL = '';
-api.defaults.headers.common['Content-Type'] = 'application/json';
-
 const Scanner = () => {
   const [loading, setLoading] = useState(true);
   const [isScanning, setIsScanning] = useState(false);
@@ -62,9 +58,6 @@ const Scanner = () => {
     };
   }, []);
 
-  if (loading) {
-    return <Loader message="Accessing Scanner" subtitle="Initializing camera and security modules..." />;
-  }
 
   // Load food status when scan result changes
   useEffect(() => {
@@ -104,17 +97,17 @@ const Scanner = () => {
     }
   }, [partialAdmissionData]);
 
-  const updateStats = (history) => {
+  function updateStats(history) {
     const total = history.length;
     const valid = history.filter(h => h.valid).length;
     const invalid = total - valid;
     setStats({ total, valid, invalid });
-  };
+  }
 
-  const saveScanHistory = (history) => {
+  function saveScanHistory(history) {
     localStorage.setItem('scanner_history', JSON.stringify(history));
     updateStats(history);
-  };
+  }
 
   const enumerateCameras = async () => {
     try {
@@ -555,7 +548,7 @@ const Scanner = () => {
     }
   };
 
-  const stopScanner = () => {
+  function stopScanner() {
     console.log('🛑 Stopping scanner...');
     setIsScanning(false);
 
@@ -784,7 +777,7 @@ const Scanner = () => {
   };
 
   // Food marking functions
-  const loadFoodStatus = async (bookingId) => {
+  async function loadFoodStatus(bookingId) {
     // Guard: Don't load food status if no booking ID
     if (!bookingId) {
       console.log('⚠️ No booking ID provided for food status');
@@ -1080,6 +1073,10 @@ const Scanner = () => {
       </div>
     );
   };
+
+  if (loading) {
+    return <Loader message="Accessing Scanner" subtitle="Initializing camera and security modules..." />;
+  }
 
   return (
     <div className="bg-void" style={{minHeight: '100vh', position: 'relative', overflow: 'hidden'}}>
