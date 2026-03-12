@@ -1090,13 +1090,13 @@ const Home = () => {
             }
 
             .home-featured-badge {
-              top: 8px !important;
-              left: 8px !important;
-              padding: clamp(3px, 3vw, 8px) clamp(8px, 4.5vw, 12px) !important;
-              font-size: clamp(0.75rem, 3.5vw, 0.95rem) !important;
-              border-radius: 8px !important;
-              box-shadow: 0 4px 15px rgba(0,0,0,0.6) !important;
-              background-color: rgba(0, 0, 0, 0.85) !important;
+              top: 6px !important;
+              left: 6px !important;
+              padding: clamp(2px, 2vw, 5px) clamp(6px, 3.5vw, 10px) !important;
+              font-size: clamp(0.65rem, 3vw, 0.85rem) !important;
+              border-radius: 6px !important;
+              box-shadow: 0 2px 10px rgba(0,0,0,0.5) !important;
+              background-color: rgba(0, 0, 0, 0.8) !important;
             }
 
             .home-featured-btn {
