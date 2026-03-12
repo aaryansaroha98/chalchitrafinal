@@ -251,8 +251,8 @@ const Footer = () => {
                   src="/logos/maillogo.png"
                   alt="Email"
                   style={{
-                    width: '25px',
-                    height: '25px',
+                    width: '30px',
+                    height: '30px',
                     objectFit: 'contain'
                   }}
                 />
@@ -321,8 +321,8 @@ const Footer = () => {
                   src="/misc/telephone.png"
                   alt="Mobile"
                   style={{
-                    width: '25px',
-                    height: '25px',
+                    width: '30px',
+                    height: '30px',
                     objectFit: 'contain'
                   }}
                 />
