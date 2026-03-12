@@ -2,10 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Container, Row, Col, Card, Button, Alert, Modal, Badge, Spinner } from 'react-bootstrap';
 import api from '../api/axios';
 import jsQR from 'jsqr';
-import Loader from '../components/Loader';
 
 const Scanner = () => {
-  const [loading, setLoading] = useState(true);
   const [isScanning, setIsScanning] = useState(false);
   const [scanResult, setScanResult] = useState(null);
   const [scanHistory, setScanHistory] = useState([]);
@@ -33,12 +31,6 @@ const Scanner = () => {
   const scanIntervalRef = useRef(null);
   const currentFoodLoadingRef = useRef(null); // Track current food loading request
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 600);
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     // Load scan history from localStorage
@@ -1074,9 +1066,6 @@ const Scanner = () => {
     );
   };
 
-  if (loading) {
-    return <Loader message="Accessing Scanner" subtitle="Initializing camera and security modules..." />;
-  }
 
   return (
     <div className="bg-void" style={{minHeight: '100vh', position: 'relative', overflow: 'hidden'}}>
