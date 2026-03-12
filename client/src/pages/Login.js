@@ -618,8 +618,8 @@ const Login = () => {
             }
 
             h1 {
-              font-size: 3rem !important;
-              margin-bottom: 1.5rem !important;
+              font-size: 2rem !important;
+              margin-bottom: 1.25rem !important;
               font-weight: 700 !important;
             }
 
@@ -636,47 +636,48 @@ const Login = () => {
             .login-welcome-mobile {
               display: block !important;
               background: rgba(255, 255, 255, 0.05) !important;
-              padding: 1.5rem !important;
-              border-radius: 24px !important;
-              margin-bottom: 2rem !important;
+              padding: 1rem 0.75rem !important;
+              border-radius: 20px !important;
+              margin-bottom: 1.5rem !important;
             }
 
             .login-welcome-title {
-              font-size: 1.6rem !important;
-              margin-bottom: 0.5rem !important;
+              font-size: 1.5rem !important;
+              margin-bottom: 0.4rem !important;
             }
 
             .login-welcome-subtitle {
-              font-size: 1.1rem !important;
-              margin-bottom: 1rem !important;
+              font-size: 1.05rem !important;
+              margin-bottom: 0.8rem !important;
             }
 
             .login-only-email {
-              font-size: 1.05rem !important;
-              line-height: 1.6 !important;
+              font-size: 0.95rem !important;
+              line-height: 1.5 !important;
             }
 
             .login-terms {
-              font-size: 0.95rem !important;
-              margin-top: 1rem !important;
+              font-size: 0.9rem !important;
+              margin-top: 0.75rem !important;
             }
 
             .login-secure-title {
-              font-size: 0.9rem !important;
-            }
-
-            .login-secure-text {
               font-size: 0.85rem !important;
             }
 
+            .login-secure-text {
+              font-size: 0.8rem !important;
+            }
+
             .login-secure-icon {
-              font-size: 1.1rem !important;
+              font-size: 1rem !important;
             }
 
             .login-form-wrap {
-              max-width: 320px;
+              max-width: 380px;
+              width: 96%;
               margin: 0 auto;
-              padding: 0 15px;
+              padding: 0 4px;
             }
           }
         `}
