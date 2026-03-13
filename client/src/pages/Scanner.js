@@ -942,7 +942,7 @@ const Scanner = () => {
         <div className="text-center mb-4">
           <h1 className="mb-3" style={{color: 'white'}}>
             <i className="fas fa-qrcode text-primary me-3"></i>
-            🎫 QR Code Scanner
+            QR Code Scanner
           </h1>
           <p style={{color: 'white'}}>Scan student tickets for entry validation</p>
           <Badge bg="info" className="fs-6 px-3 py-2">
@@ -954,38 +954,47 @@ const Scanner = () => {
         {/* Stats Dashboard */}
         <Row className="mb-4">
           <Col md={4}>
-            <Card className="text-center border-primary shadow-sm h-100">
-              <Card.Body className="py-4">
-                <div className="mb-2">
-                  <i className="fas fa-qrcode fa-2x text-primary"></i>
-                </div>
-                <h2 className="text-primary mb-1">{stats.total}</h2>
-                <p className="mb-0 fw-bold">Total Scanned</p>
-                <small className="text-muted">All time</small>
+            <Card className="text-center h-100" style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04))',
+              border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: '14px',
+              boxShadow: '0 12px 32px rgba(0,0,0,0.35)',
+              backdropFilter: 'blur(10px)'
+            }}>
+              <Card.Body className="py-3">
+                <h3 className="mb-1" style={{color: '#9ad0ff', fontWeight: 700}}>{stats.total}</h3>
+                <p className="mb-0 fw-semibold" style={{color: 'white'}}>Total Scanned</p>
+                <small style={{color: 'rgba(255,255,255,0.75)'}}>All time</small>
               </Card.Body>
             </Card>
           </Col>
           <Col md={4}>
-            <Card className="text-center border-success shadow-sm h-100">
-              <Card.Body className="py-4">
-                <div className="mb-2">
-                  <i className="fas fa-check-circle fa-2x text-success"></i>
-                </div>
-                <h2 className="text-success mb-1">{stats.valid}</h2>
-                <p className="mb-0 fw-bold">Valid Tickets</p>
-                <small className="text-muted">Entry Allowed</small>
+            <Card className="text-center h-100" style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04))',
+              border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: '14px',
+              boxShadow: '0 12px 32px rgba(0,0,0,0.35)',
+              backdropFilter: 'blur(10px)'
+            }}>
+              <Card.Body className="py-3">
+                <h3 className="mb-1" style={{color: '#a0f0c5', fontWeight: 700}}>{stats.valid}</h3>
+                <p className="mb-0 fw-semibold" style={{color: 'white'}}>Valid Tickets</p>
+                <small style={{color: 'rgba(255,255,255,0.75)'}}>Entry Allowed</small>
               </Card.Body>
             </Card>
           </Col>
           <Col md={4}>
-            <Card className="text-center border-danger shadow-sm h-100">
-              <Card.Body className="py-4">
-                <div className="mb-2">
-                  <i className="fas fa-times-circle fa-2x text-danger"></i>
-                </div>
-                <h2 className="text-danger mb-1">{stats.invalid}</h2>
-                <p className="mb-0 fw-bold">Invalid Tickets</p>
-                <small className="text-muted">Entry Denied</small>
+            <Card className="text-center h-100" style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04))',
+              border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: '14px',
+              boxShadow: '0 12px 32px rgba(0,0,0,0.35)',
+              backdropFilter: 'blur(10px)'
+            }}>
+              <Card.Body className="py-3">
+                <h3 className="mb-1" style={{color: '#f5a6a6', fontWeight: 700}}>{stats.invalid}</h3>
+                <p className="mb-0 fw-semibold" style={{color: 'white'}}>Invalid Tickets</p>
+                <small style={{color: 'rgba(255,255,255,0.75)'}}>Entry Denied</small>
               </Card.Body>
             </Card>
           </Col>
