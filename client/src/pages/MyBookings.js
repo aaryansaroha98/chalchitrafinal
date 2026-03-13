@@ -1014,10 +1014,10 @@ const MyBookings = () => {
           }}
         >
           <div style={{
-            background: 'radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.05), transparent 40%), radial-gradient(circle at 80% 0%, rgba(255, 88, 88, 0.12), transparent 35%), linear-gradient(145deg, #0f1118 0%, #131826 60%, #0f1118 100%)',
-            borderRadius: '20px',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
-            boxShadow: '0 20px 50px rgba(0,0,0,0.45)',
+            background: 'linear-gradient(160deg, rgba(13,16,24,0.95) 0%, rgba(18,22,34,0.96) 45%, rgba(10,12,18,0.98) 100%)',
+            borderRadius: '26px',
+            border: '1px solid rgba(255, 255, 255, 0.06)',
+            boxShadow: '0 26px 60px rgba(0,0,0,0.55)',
             color: '#e9edf5',
             position: 'relative',
             overflow: 'hidden'
@@ -1026,7 +1026,7 @@ const MyBookings = () => {
             <div style={{
               position: 'absolute',
               inset: 0,
-              background: 'radial-gradient(circle at 50% 20%, rgba(255,96,96,0.12), transparent 40%)',
+              background: 'radial-gradient(circle at 30% 10%, rgba(255,255,255,0.08), transparent 35%), radial-gradient(circle at 80% 0%, rgba(90,121,255,0.12), transparent 38%)',
               pointerEvents: 'none'
             }} />
 
@@ -1034,7 +1034,7 @@ const MyBookings = () => {
             <Modal.Header
               closeButton
               style={{
-                borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
                 background: 'transparent',
                 padding: '1.4rem 1.6rem',
                 zIndex: 1
@@ -1042,20 +1042,20 @@ const MyBookings = () => {
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <div style={{
-                  width: '44px',
-                  height: '44px',
-                  borderRadius: '12px',
-                  background: 'linear-gradient(135deg, rgba(255, 94, 94, 0.18), rgba(255, 0, 92, 0.24))',
-                  border: '1px solid rgba(255, 94, 94, 0.35)',
+                  width: '46px',
+                  height: '46px',
+                  borderRadius: '14px',
+                  background: 'linear-gradient(135deg, rgba(120, 138, 255, 0.16), rgba(118, 211, 255, 0.08))',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
                   display: 'grid',
                   placeItems: 'center',
-                  color: '#ff8f8f'
+                  color: '#cfd6ff'
                 }}>
                   <i className="fas fa-trash"></i>
                 </div>
                 <div>
-                  <div style={{ fontSize: '0.9rem', color: '#98a0b3', letterSpacing: '0.4px' }}>Bulk Action</div>
-                  <h5 style={{ margin: 0, color: '#fff', fontWeight: 700 }}>Confirm Delete</h5>
+                  <div style={{ fontSize: '0.9rem', color: '#9ea7bd', letterSpacing: '0.4px' }}>Bulk Action</div>
+                  <h5 style={{ margin: 0, color: '#f7f8fc', fontWeight: 700 }}>Confirm Delete</h5>
                 </div>
               </div>
             </Modal.Header>
@@ -1070,22 +1070,22 @@ const MyBookings = () => {
                   <div style={{
                     marginTop: '0.75rem',
                     padding: '0.75rem 1rem',
-                    borderRadius: '12px',
-                    background: 'rgba(255, 94, 94, 0.08)',
-                    border: '1px solid rgba(255, 94, 94, 0.18)',
-                    color: '#ffb3b3',
+                    borderRadius: '14px',
+                    background: 'rgba(255, 255, 255, 0.04)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    color: '#d8deec',
                     fontSize: '0.9rem'
                   }}>
-                    <i className="fas fa-shield-alt me-2"></i>
+                    <i className="fas fa-info-circle me-2" style={{color: '#cfd6ff'}}></i>
                     Make sure you’ve exported or downloaded tickets if you still need them.
                   </div>
                 </div>
 
                 {/* Selected bookings preview */}
                 <div style={{
-                  background: 'rgba(255, 255, 255, 0.04)',
-                  borderRadius: '14px',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  borderRadius: '16px',
+                  border: '1px solid rgba(255, 255, 255, 0.05)',
                   maxHeight: '240px',
                   overflow: 'auto',
                   padding: '0.75rem'
@@ -1100,9 +1100,9 @@ const MyBookings = () => {
                           justifyContent: 'space-between',
                           alignItems: 'center',
                           padding: '0.65rem 0.75rem',
-                          borderRadius: '10px',
-                          background: 'rgba(255,255,255,0.02)',
-                          border: '1px solid rgba(255,255,255,0.05)',
+                          borderRadius: '12px',
+                          background: 'rgba(255,255,255,0.025)',
+                          border: '1px solid rgba(255,255,255,0.04)',
                           marginBottom: '0.6rem'
                         }}
                       >
@@ -1115,9 +1115,9 @@ const MyBookings = () => {
                           </span>
                         </div>
                         <span style={{
-                          color: '#c4cbe0',
+                          color: '#c9d1e6',
                           fontSize: '0.9rem',
-                          background: 'rgba(255,255,255,0.06)',
+                          background: 'rgba(255,255,255,0.05)',
                           borderRadius: '10px',
                           padding: '0.3rem 0.7rem',
                           border: '1px solid rgba(255,255,255,0.08)'
@@ -1138,7 +1138,7 @@ const MyBookings = () => {
 
             {/* Modal Footer */}
             <Modal.Footer style={{
-              borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+              borderTop: '1px solid rgba(255, 255, 255, 0.05)',
               padding: '1.2rem 1.6rem',
               background: 'transparent',
               zIndex: 1
@@ -1151,22 +1151,25 @@ const MyBookings = () => {
                   borderRadius: '12px',
                   fontWeight: 600,
                   color: '#e9edf5',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  background: 'rgba(255,255,255,0.05)'
+                  border: '1px solid rgba(255, 255, 255, 0.16)',
+                  background: 'rgba(255,255,255,0.06)',
+                  backdropFilter: 'blur(10px)'
                 }}
               >
                 Cancel
               </Button>
               <Button
-                variant="danger"
+                variant="dark"
                 onClick={handleBulkDelete}
                 style={{
                   padding: '0.75rem 1.6rem',
                   borderRadius: '12px',
                   fontWeight: 700,
-                  background: 'linear-gradient(135deg, #ff5f6d, #c81d25)',
-                  border: '1px solid rgba(255,255,255,0.15)',
-                  boxShadow: '0 10px 30px rgba(200, 29, 37, 0.35)'
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06))',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  color: '#0f1118',
+                  boxShadow: '0 12px 30px rgba(0,0,0,0.35)',
+                  backdropFilter: 'blur(10px)'
                 }}
               >
                 Delete {selectedBookings.size}
