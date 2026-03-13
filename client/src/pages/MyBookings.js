@@ -1014,10 +1014,10 @@ const MyBookings = () => {
           }}
         >
           <div style={{
-            background: 'linear-gradient(160deg, rgba(13,16,24,0.95) 0%, rgba(18,22,34,0.96) 45%, rgba(10,12,18,0.98) 100%)',
-            borderRadius: '26px',
-            border: '1px solid rgba(255, 255, 255, 0.06)',
-            boxShadow: '0 26px 60px rgba(0,0,0,0.55)',
+            background: 'linear-gradient(150deg, rgba(11,14,22,0.96) 0%, rgba(14,18,26,0.97) 50%, rgba(9,12,18,0.98) 100%)',
+            borderRadius: '28px',
+            border: '1px solid rgba(255, 255, 255, 0.02)',
+            boxShadow: '0 28px 70px rgba(0,0,0,0.55)',
             color: '#e9edf5',
             position: 'relative',
             overflow: 'hidden'
@@ -1026,7 +1026,7 @@ const MyBookings = () => {
             <div style={{
               position: 'absolute',
               inset: 0,
-              background: 'radial-gradient(circle at 30% 10%, rgba(255,255,255,0.08), transparent 35%), radial-gradient(circle at 80% 0%, rgba(90,121,255,0.12), transparent 38%)',
+              background: 'radial-gradient(circle at 30% 10%, rgba(255,255,255,0.06), transparent 35%), radial-gradient(circle at 80% 0%, rgba(90,121,255,0.08), transparent 38%)',
               pointerEvents: 'none'
             }} />
 
@@ -1034,112 +1034,90 @@ const MyBookings = () => {
             <Modal.Header
               closeButton
               style={{
-                borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                borderBottom: 'none',
                 background: 'transparent',
-                padding: '1.4rem 1.6rem',
+                padding: '1.1rem 1.4rem 0.6rem',
                 zIndex: 1
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <div style={{
-                  width: '46px',
-                  height: '46px',
-                  borderRadius: '14px',
-                  background: 'linear-gradient(135deg, rgba(120, 138, 255, 0.16), rgba(118, 211, 255, 0.08))',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '12px',
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.05)',
                   display: 'grid',
                   placeItems: 'center',
-                  color: '#cfd6ff'
+                  color: '#e9edf5'
                 }}>
                   <i className="fas fa-trash"></i>
                 </div>
                 <div>
-                  <div style={{ fontSize: '0.9rem', color: '#9ea7bd', letterSpacing: '0.4px' }}>Bulk Action</div>
-                  <h5 style={{ margin: 0, color: '#f7f8fc', fontWeight: 700 }}>Confirm Delete</h5>
+                  <h5 style={{ margin: 0, color: '#f7f8fc', fontWeight: 700 }}>Delete booking{selectedBookings.size > 1 ? 's' : ''}</h5>
                 </div>
               </div>
             </Modal.Header>
 
             {/* Modal Body */}
-            <Modal.Body style={{ padding: '1.3rem 1.6rem', zIndex: 1 }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <div>
-                  <div style={{ color: '#b7bfd3', fontSize: '0.95rem', lineHeight: 1.6 }}>
-                    You are about to delete <strong>{selectedBookings.size}</strong> booking{selectedBookings.size > 1 ? 's' : ''}. This action is permanent and cannot be undone.
-                  </div>
-                  <div style={{
-                    marginTop: '0.75rem',
-                    padding: '0.75rem 1rem',
-                    borderRadius: '14px',
-                    background: 'rgba(255, 255, 255, 0.04)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                    color: '#d8deec',
-                    fontSize: '0.9rem'
-                  }}>
-                    <i className="fas fa-info-circle me-2" style={{color: '#cfd6ff'}}></i>
-                    Make sure you’ve exported or downloaded tickets if you still need them.
-                  </div>
-                </div>
-
-                {/* Selected bookings preview */}
-                <div style={{
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  borderRadius: '16px',
-                  border: '1px solid rgba(255, 255, 255, 0.05)',
-                  maxHeight: '240px',
-                  overflow: 'auto',
-                  padding: '0.75rem'
-                }}>
-                  {Array.from(selectedBookings).map((bookingId) => {
-                    const booking = bookings.find(b => b.id === bookingId);
-                    return (
-                      <div
-                        key={bookingId}
-                        style={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          padding: '0.65rem 0.75rem',
-                          borderRadius: '12px',
-                          background: 'rgba(255,255,255,0.025)',
-                          border: '1px solid rgba(255,255,255,0.04)',
-                          marginBottom: '0.6rem'
-                        }}
-                      >
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                          <span style={{ color: '#fff', fontWeight: 600, fontSize: '0.98rem' }}>
-                            {booking?.title || 'Booking'}
-                          </span>
-                          <span style={{ color: '#98a0b3', fontSize: '0.85rem' }}>
-                            #{booking?.booking_code || booking?.id}
-                          </span>
-                        </div>
-                        <span style={{
-                          color: '#c9d1e6',
-                          fontSize: '0.9rem',
-                          background: 'rgba(255,255,255,0.05)',
-                          borderRadius: '10px',
-                          padding: '0.3rem 0.7rem',
-                          border: '1px solid rgba(255,255,255,0.08)'
-                        }}>
-                          {booking ? new Date(booking.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : ''}
+            <Modal.Body style={{ padding: '0.6rem 1.4rem 1rem', zIndex: 1 }}>
+              <div style={{
+                background: 'rgba(255, 255, 255, 0.03)',
+                borderRadius: '16px',
+                border: '1px solid rgba(255, 255, 255, 0.05)',
+                maxHeight: '260px',
+                overflow: 'auto',
+                padding: '0.75rem'
+              }}>
+                {Array.from(selectedBookings).map((bookingId) => {
+                  const booking = bookings.find(b => b.id === bookingId);
+                  return (
+                    <div
+                      key={bookingId}
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '0.65rem 0.75rem',
+                        borderRadius: '12px',
+                        background: 'rgba(255,255,255,0.025)',
+                        border: '1px solid rgba(255,255,255,0.04)',
+                        marginBottom: '0.6rem'
+                      }}
+                    >
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        <span style={{ color: '#fff', fontWeight: 600, fontSize: '1rem' }}>
+                          {booking?.title || 'Booking'}
+                        </span>
+                        <span style={{ color: '#98a0b3', fontSize: '0.85rem' }}>
+                          #{booking?.booking_code || booking?.id}
                         </span>
                       </div>
-                    );
-                  })}
-                  {selectedBookings.size === 0 && (
-                    <div style={{ color: '#98a0b3', textAlign: 'center', padding: '1rem' }}>
-                      No bookings selected.
+                      <span style={{
+                        color: '#e9edf5',
+                        fontSize: '0.9rem',
+                        background: 'rgba(255,255,255,0.05)',
+                        borderRadius: '10px',
+                        padding: '0.3rem 0.7rem',
+                        border: '1px solid rgba(255,255,255,0.08)'
+                      }}>
+                        {booking ? new Date(booking.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : ''}
+                      </span>
                     </div>
-                  )}
-                </div>
+                  );
+                })}
+                {selectedBookings.size === 0 && (
+                  <div style={{ color: '#98a0b3', textAlign: 'center', padding: '1rem' }}>
+                    No bookings selected.
+                  </div>
+                )}
               </div>
             </Modal.Body>
 
             {/* Modal Footer */}
             <Modal.Footer style={{
-              borderTop: '1px solid rgba(255, 255, 255, 0.05)',
-              padding: '1.2rem 1.6rem',
+              borderTop: 'none',
+              padding: '1rem 1.4rem 1.3rem',
               background: 'transparent',
               zIndex: 1
             }}>
@@ -1165,9 +1143,9 @@ const MyBookings = () => {
                   padding: '0.75rem 1.6rem',
                   borderRadius: '12px',
                   fontWeight: 700,
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06))',
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08))',
                   border: '1px solid rgba(255,255,255,0.2)',
-                  color: '#0f1118',
+                  color: '#ffffff',
                   boxShadow: '0 12px 30px rgba(0,0,0,0.35)',
                   backdropFilter: 'blur(10px)'
                 }}
