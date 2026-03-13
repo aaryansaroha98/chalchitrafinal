@@ -387,8 +387,8 @@ const MyBookings = () => {
         {`
           @media (max-width: 768px) {
             .my-bookings-title {
-              font-size: 2rem !important;
-              font-weight: 600 !important;
+              font-size: 2.3rem !important;
+              font-weight: 700 !important;
               margin-bottom: 0.4rem !important;
               letter-spacing: -0.01em !important;
               margin-top: 1rem !important;
