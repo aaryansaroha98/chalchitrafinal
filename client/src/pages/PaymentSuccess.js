@@ -25,6 +25,8 @@ const PaymentSuccess = () => {
 
   const { ticket, movie, payment, selectedSeats: navigationSelectedSeats, customerDetails: navCustomerDetails } = resolvedState;
   const selectedSeats = ticket?.selectedSeats || ticket?.selected_seats || navigationSelectedSeats;
+  const bookingIdentifier = ticket?.booking_id || ticket?.booking_code || ticket?.id || ticket?.bookingId;
+  const emailStatusKey = bookingIdentifier ? `ticket_email_status_${bookingIdentifier}` : null;
   const hasAttemptedEmailRef = useRef(false);
   const [emailStatus, setEmailStatus] = useState('idle'); // idle | sending | sent | failed
   const [emailError, setEmailError] = useState('');
@@ -38,6 +40,14 @@ const PaymentSuccess = () => {
   useEffect(() => {
     const sendTicketEmail = async () => {
       if (!ticket || hasAttemptedEmailRef.current) return;
+
+      // If we've already sent the email for this booking in this session, skip re-sending on reload
+      const alreadySent = emailStatusKey && sessionStorage.getItem(emailStatusKey) === 'sent';
+      if (alreadySent) {
+        setEmailStatus('sent');
+        return;
+      }
+
       hasAttemptedEmailRef.current = true;
 
       try {
@@ -197,8 +207,9 @@ const PaymentSuccess = () => {
           payment_id: payment?.transaction_id
         }).then(response => {
           const data = response.data;
-          if (data.status === 'sent') {
+          if (data.status === 'sent' || data.status === 'duplicate') {
             setEmailStatus('sent');
+            if (emailStatusKey) sessionStorage.setItem(emailStatusKey, 'sent');
           } else if (data.status === 'skipped') {
             console.warn('Email skipped:', data.error || data.message);
             setEmailStatus('failed');
@@ -210,6 +221,7 @@ const PaymentSuccess = () => {
           } else {
             // Legacy fallback
             setEmailStatus('sent');
+            if (emailStatusKey) sessionStorage.setItem(emailStatusKey, 'sent');
           }
         });
       } catch (err) {

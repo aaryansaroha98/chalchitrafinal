@@ -240,6 +240,7 @@ if (usePostgres) {
         sent_by INTEGER,
         status TEXT DEFAULT 'sent',
         error_message TEXT,
+        booking_id TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`,
       `CREATE TABLE IF NOT EXISTS coupon_winners (
@@ -347,6 +348,14 @@ if (usePostgres) {
       console.log('✅ users.created_at column ensured');
     } catch (err) {
       console.log('users.created_at ensure warning:', err.message);
+    }
+
+    // Ensure email_history.booking_id column exists for older databases
+    try {
+      await pool.query('ALTER TABLE email_history ADD COLUMN IF NOT EXISTS booking_id TEXT');
+      console.log('✅ email_history.booking_id column ensured');
+    } catch (err) {
+      console.log('email_history.booking_id ensure warning:', err.message);
     }
 
     // Set AARYAN's join date and clean up other non-admin users
@@ -547,6 +556,7 @@ if (usePostgres) {
         sent_by INTEGER,
         status TEXT DEFAULT 'sent',
         error_message TEXT,
+        booking_id TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )`,
       `CREATE TABLE IF NOT EXISTS coupon_winners (
@@ -626,6 +636,7 @@ if (usePostgres) {
           createIndices();
           ensureUserCreatedAtColumn();
           ensureGalleryEventDateColumn();
+          ensureEmailHistoryBookingId();
           createDefaultData();
         }
       });
@@ -691,6 +702,26 @@ if (usePostgres) {
     });
   }
 
+  function ensureEmailHistoryBookingId() {
+    db.all('PRAGMA table_info(email_history)', [], (err, columns) => {
+      if (err) {
+        console.log('⚠️  Could not inspect email_history table columns:', err.message);
+        return;
+      }
+
+      const hasBookingId = Array.isArray(columns) && columns.some((col) => col.name === 'booking_id');
+      if (!hasBookingId) {
+        db.run('ALTER TABLE email_history ADD COLUMN booking_id TEXT', (alterErr) => {
+          if (alterErr) {
+            console.log('⚠️  Could not add email_history.booking_id:', alterErr.message);
+            return;
+          }
+          console.log('✅ email_history.booking_id column added');
+        });
+      }
+    });
+  }
+
   function createDefaultData() {
     db.get('SELECT * FROM users WHERE email = ?', ['2025uee0154@iitjammu.ac.in'], (err, user) => {
       if (err) {
@@ -713,4 +744,3 @@ if (usePostgres) {
 
 // Export database object
 module.exports = db;
-

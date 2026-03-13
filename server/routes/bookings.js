@@ -1086,6 +1086,9 @@ router.post('/send-ticket-email', async (req, res) => {
           return res.status(404).json({ error: 'Booking not found' });
         }
 
+        const allowResend = req.body.allow_resend === true || req.body.allow_resend === 'true';
+        const bookingIdentifier = booking.booking_code || booking.id || String(booking_id);
+
         const customerEmail = booking.user_email || req.body.customer_email;
         const customerName = booking.user_name || req.body.customer_name || 'Student';
 
@@ -1158,62 +1161,84 @@ router.post('/send-ticket-email', async (req, res) => {
           </html>
         `;
 
-        // Check if Brevo is configured
-        if (!process.env.BREVO_API_KEY) {
-          console.warn('Email not configured (BREVO_API_KEY not set), skipping ticket email');
-          db.run(
-            `INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status, error_message)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-            ['ticket', customerEmail, customerName, `🎫 Your Movie Ticket - ${booking.movie_title}`,
-             'Ticket email skipped (email not configured)', booking.user_id || 1, 'skipped', 'BREVO_API_KEY not set'],
-            (logErr) => { if (logErr) console.error('Error logging skipped ticket email:', logErr); }
-          );
-          return res.json({ message: 'Email not configured', status: 'skipped', error: 'BREVO_API_KEY not set' });
-        }
-
-        const cleanMovieName = (booking.movie_title || 'Movie').replace(/[^a-zA-Z0-9]/g, '_');
-        const filename = `${cleanMovieName}_${booking.booking_code || booking.id}.pdf`;
-        const emailSubject = `🎫 Your Movie Ticket - ${booking.movie_title}`;
-
-        // Respond immediately to avoid Render's 30s request timeout
-        // Email sends in background — check email_history for actual status
-        res.json({ message: 'Ticket email queued for delivery', status: 'sent' });
-
-        // Send email in background with retry via Brevo (HTTP API, no SMTP)
-        setImmediate(async () => {
-          try {
-            console.log(`[Email] Sending ticket to ${customerEmail} for movie "${booking.movie_title}"...`);
-            const result = await sendEmailWithRetry({
-              sender: getBrevoSender(),
-              to: [{ email: customerEmail, name: customerName }],
-              subject: emailSubject,
-              htmlContent: emailHtml,
-              attachment: [
-                {
-                  name: filename,
-                  content: pdf_base64,
-                }
-              ]
-            }, 3);
-            console.log(`[Email] ✅ Ticket sent to ${customerEmail} — messageId: ${result?.messageId}`);
-            
+        const proceedToSend = () => {
+          // Check if Brevo is configured
+          if (!process.env.BREVO_API_KEY) {
+            console.warn('Email not configured (BREVO_API_KEY not set), skipping ticket email');
             db.run(
-              `INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
-               VALUES (?, ?, ?, ?, ?, ?, ?)`,
-              ['ticket', customerEmail, customerName, emailSubject, 'Ticket PDF sent', booking.user_id || 1, 'sent'],
-              (logErr) => { if (logErr) console.error('Error logging ticket email history:', logErr); }
+              `INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status, error_message, booking_id)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+              ['ticket', customerEmail, customerName, `🎫 Your Movie Ticket - ${booking.movie_title}`,
+               'Ticket email skipped (email not configured)', booking.user_id || 1, 'skipped', 'BREVO_API_KEY not set', bookingIdentifier],
+              (logErr) => { if (logErr) console.error('Error logging skipped ticket email:', logErr); }
             );
-          } catch (sendErr) {
-            console.error(`[Email] ❌ Failed to send to ${customerEmail}:`, sendErr.message);
-            
-            db.run(
-              `INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status, error_message)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-              ['ticket', customerEmail, customerName, emailSubject, 'Ticket email failed', booking.user_id || 1, 'failed', sendErr?.message || String(sendErr)],
-              (logErr) => { if (logErr) console.error('Error logging failed ticket email:', logErr); }
-            );
+            return res.json({ message: 'Email not configured', status: 'skipped', error: 'BREVO_API_KEY not set' });
           }
-        });
+
+          const cleanMovieName = (booking.movie_title || 'Movie').replace(/[^a-zA-Z0-9]/g, '_');
+          const filename = `${cleanMovieName}_${booking.booking_code || booking.id}.pdf`;
+          const emailSubject = `🎫 Your Movie Ticket - ${booking.movie_title}`;
+
+          // Respond immediately to avoid Render's 30s request timeout
+          // Email sends in background — check email_history for actual status
+          res.json({ message: 'Ticket email queued for delivery', status: 'sent' });
+
+          // Send email in background with retry via Brevo (HTTP API, no SMTP)
+          setImmediate(async () => {
+            try {
+              console.log(`[Email] Sending ticket to ${customerEmail} for movie "${booking.movie_title}"...`);
+              const result = await sendEmailWithRetry({
+                sender: getBrevoSender(),
+                to: [{ email: customerEmail, name: customerName }],
+                subject: emailSubject,
+                htmlContent: emailHtml,
+                attachment: [
+                  {
+                    name: filename,
+                    content: pdf_base64,
+                  }
+                ]
+              }, 3);
+              console.log(`[Email] ✅ Ticket sent to ${customerEmail} — messageId: ${result?.messageId}`);
+              
+              db.run(
+                `INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status, booking_id)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                ['ticket', customerEmail, customerName, emailSubject, 'Ticket PDF sent', booking.user_id || 1, 'sent', bookingIdentifier],
+                (logErr) => { if (logErr) console.error('Error logging ticket email history:', logErr); }
+              );
+            } catch (sendErr) {
+              console.error(`[Email] ❌ Failed to send to ${customerEmail}:`, sendErr.message);
+              
+              db.run(
+                `INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status, error_message, booking_id)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                ['ticket', customerEmail, customerName, emailSubject, 'Ticket email failed', booking.user_id || 1, 'failed', sendErr?.message || String(sendErr), bookingIdentifier],
+                (logErr) => { if (logErr) console.error('Error logging failed ticket email:', logErr); }
+              );
+            }
+          });
+        };
+
+        // Prevent duplicate sends unless explicitly allowed
+        if (!allowResend) {
+          db.get(
+            `SELECT status FROM email_history WHERE email_type = 'ticket' AND booking_id = ? ORDER BY created_at DESC LIMIT 1`,
+            [bookingIdentifier],
+            (dupErr, dupRow) => {
+              if (dupErr) {
+                console.error('Error checking previous ticket email:', dupErr);
+                return res.status(500).json({ error: 'Failed to check prior ticket email status' });
+              }
+              if (dupRow && dupRow.status === 'sent') {
+                return res.json({ message: 'Ticket email already sent for this booking', status: 'duplicate' });
+              }
+              proceedToSend();
+            }
+          );
+        } else {
+          proceedToSend();
+        }
       }
     );
   } catch (error) {
