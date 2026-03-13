@@ -1014,184 +1014,162 @@ const MyBookings = () => {
           }}
         >
           <div style={{
-            background: 'linear-gradient(135deg, rgba(20, 20, 30, 0.95), rgba(10, 10, 20, 0.98))',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            borderRadius: '16px',
-            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+            background: 'radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.05), transparent 40%), radial-gradient(circle at 80% 0%, rgba(255, 88, 88, 0.12), transparent 35%), linear-gradient(145deg, #0f1118 0%, #131826 60%, #0f1118 100%)',
+            borderRadius: '20px',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.45)',
+            color: '#e9edf5',
             position: 'relative',
             overflow: 'hidden'
           }}>
-            {/* Modal Header */}
-            <Modal.Header style={{
-              background: 'transparent',
-              border: 'none',
-              color: '#ffffff',
-              position: 'relative',
-              zIndex: 2,
-              padding: '2rem 2rem 1rem'
-            }}>
-              <Modal.Title style={{
-                fontSize: '1.5rem',
-                fontWeight: '700',
-                textAlign: 'center',
-                width: '100%',
-                margin: 0,
-                textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
-              }}>
-                <i className="fas fa-exclamation-triangle" style={{marginRight: '0.5rem', color: '#ff6b6b'}}></i>
-                Confirm Bulk Delete
-              </Modal.Title>
-            </Modal.Header>
+            {/* Glow accent */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'radial-gradient(circle at 50% 20%, rgba(255,96,96,0.12), transparent 40%)',
+              pointerEvents: 'none'
+            }} />
 
-            {/* Modal Body */}
-            <Modal.Body style={{
-              padding: '1rem 2rem 2rem',
-              position: 'relative',
-              zIndex: 2
-            }}>
-              <div style={{textAlign: 'center', marginBottom: '2rem'}}>
+            {/* Modal Header */}
+            <Modal.Header
+              closeButton
+              style={{
+                borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+                background: 'transparent',
+                padding: '1.4rem 1.6rem',
+                zIndex: 1
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <div style={{
-                  width: '60px',
-                  height: '60px',
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, rgba(220, 53, 69, 0.2), rgba(176, 42, 55, 0.1))',
-                  border: '1px solid rgba(220, 53, 69, 0.3)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: '0 auto 1.5rem',
-                  color: '#ff6b6b',
-                  fontSize: '1.5rem'
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, rgba(255, 94, 94, 0.18), rgba(255, 0, 92, 0.24))',
+                  border: '1px solid rgba(255, 94, 94, 0.35)',
+                  display: 'grid',
+                  placeItems: 'center',
+                  color: '#ff8f8f'
                 }}>
                   <i className="fas fa-trash"></i>
                 </div>
-                
-                <h5 style={{
-                  color: '#ffffff',
-                  marginBottom: '1rem',
-                  fontSize: '1.2rem',
-                  fontWeight: '600',
-                  textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
-                }}>
-                  Delete {selectedBookings.size} Booking{selectedBookings.size > 1 ? 's' : ''}?
-                </h5>
+                <div>
+                  <div style={{ fontSize: '0.9rem', color: '#98a0b3', letterSpacing: '0.4px' }}>Bulk Action</div>
+                  <h5 style={{ margin: 0, color: '#fff', fontWeight: 700 }}>Confirm Delete</h5>
+                </div>
+              </div>
+            </Modal.Header>
 
-                <p style={{
-                  color: 'rgba(255, 255, 255, 0.8)',
-                  fontSize: '1rem',
-                  lineHeight: '1.5',
-                  marginBottom: '2rem'
-                }}>
-                  This action cannot be undone. All selected bookings will be permanently deleted.
-                </p>
+            {/* Modal Body */}
+            <Modal.Body style={{ padding: '1.3rem 1.6rem', zIndex: 1 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div>
+                  <div style={{ color: '#b7bfd3', fontSize: '0.95rem', lineHeight: 1.6 }}>
+                    You are about to delete <strong>{selectedBookings.size}</strong> booking{selectedBookings.size > 1 ? 's' : ''}. This action is permanent and cannot be undone.
+                  </div>
+                  <div style={{
+                    marginTop: '0.75rem',
+                    padding: '0.75rem 1rem',
+                    borderRadius: '12px',
+                    background: 'rgba(255, 94, 94, 0.08)',
+                    border: '1px solid rgba(255, 94, 94, 0.18)',
+                    color: '#ffb3b3',
+                    fontSize: '0.9rem'
+                  }}>
+                    <i className="fas fa-shield-alt me-2"></i>
+                    Make sure you’ve exported or downloaded tickets if you still need them.
+                  </div>
+                </div>
 
                 {/* Selected bookings preview */}
                 <div style={{
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  backdropFilter: 'blur(15px)',
-                  padding: '1rem',
-                  borderRadius: '12px',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  maxHeight: '200px',
-                  overflow: 'auto'
+                  background: 'rgba(255, 255, 255, 0.04)',
+                  borderRadius: '14px',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  maxHeight: '240px',
+                  overflow: 'auto',
+                  padding: '0.75rem'
                 }}>
                   {Array.from(selectedBookings).map((bookingId) => {
                     const booking = bookings.find(b => b.id === bookingId);
                     return (
-                      <div key={bookingId} style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        padding: '0.5rem',
-                        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-                        fontSize: '0.9rem'
-                      }}>
-                        <span style={{color: '#ffffff', fontWeight: '600'}}>
-                          {booking?.title}
-                        </span>
-                        <span style={{color: 'rgba(255, 255, 255, 0.7)'}}>
-                          {booking ? new Date(booking.date).toLocaleDateString('en-IN') : ''}
+                      <div
+                        key={bookingId}
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          padding: '0.65rem 0.75rem',
+                          borderRadius: '10px',
+                          background: 'rgba(255,255,255,0.02)',
+                          border: '1px solid rgba(255,255,255,0.05)',
+                          marginBottom: '0.6rem'
+                        }}
+                      >
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          <span style={{ color: '#fff', fontWeight: 600, fontSize: '0.98rem' }}>
+                            {booking?.title || 'Booking'}
+                          </span>
+                          <span style={{ color: '#98a0b3', fontSize: '0.85rem' }}>
+                            #{booking?.booking_code || booking?.id}
+                          </span>
+                        </div>
+                        <span style={{
+                          color: '#c4cbe0',
+                          fontSize: '0.9rem',
+                          background: 'rgba(255,255,255,0.06)',
+                          borderRadius: '10px',
+                          padding: '0.3rem 0.7rem',
+                          border: '1px solid rgba(255,255,255,0.08)'
+                        }}>
+                          {booking ? new Date(booking.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : ''}
                         </span>
                       </div>
                     );
                   })}
+                  {selectedBookings.size === 0 && (
+                    <div style={{ color: '#98a0b3', textAlign: 'center', padding: '1rem' }}>
+                      No bookings selected.
+                    </div>
+                  )}
                 </div>
               </div>
             </Modal.Body>
 
             {/* Modal Footer */}
             <Modal.Footer style={{
-              border: 'none',
-              padding: '1rem 2rem 2rem',
+              borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+              padding: '1.2rem 1.6rem',
               background: 'transparent',
-              position: 'relative',
-              zIndex: 2
+              zIndex: 1
             }}>
               <Button
-                variant="secondary"
+                variant="outline-light"
                 onClick={() => setShowBulkDelete(false)}
                 style={{
-                  padding: '0.875rem 2rem',
+                  padding: '0.75rem 1.4rem',
                   borderRadius: '12px',
-                  fontWeight: '600',
-                  background: 'rgba(255, 255, 255, 0.1)',
+                  fontWeight: 600,
+                  color: '#e9edf5',
                   border: '1px solid rgba(255, 255, 255, 0.2)',
-                  color: '#ffffff',
-                  backdropFilter: 'blur(10px)',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.background = 'rgba(255, 255, 255, 0.2)';
-                  e.target.style.transform = 'translateY(-2px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.background = 'rgba(255, 255, 255, 0.1)';
-                  e.target.style.transform = 'translateY(0)';
+                  background: 'rgba(255,255,255,0.05)'
                 }}
               >
-                <i className="fas fa-times" style={{marginRight: '0.5rem'}}></i>
                 Cancel
               </Button>
               <Button
                 variant="danger"
                 onClick={handleBulkDelete}
                 style={{
-                  background: 'linear-gradient(135deg, #dc3545, #c82333)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                  padding: '0.875rem 2.5rem',
+                  padding: '0.75rem 1.6rem',
                   borderRadius: '12px',
-                  fontWeight: '600',
-                  color: '#ffffff',
-                  backdropFilter: 'blur(10px)',
-                  boxShadow: '0 8px 32px rgba(220, 53, 69, 0.3)',
-                  transition: 'all 0.3s ease',
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.transform = 'translateY(-2px)';
-                  e.target.style.boxShadow = '0 12px 40px rgba(220, 53, 69, 0.4)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.transform = 'translateY(0)';
-                  e.target.style.boxShadow = '0 8px 32px rgba(220, 53, 69, 0.3)';
+                  fontWeight: 700,
+                  background: 'linear-gradient(135deg, #ff5f6d, #c81d25)',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  boxShadow: '0 10px 30px rgba(200, 29, 37, 0.35)'
                 }}
               >
-                <div style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: '-100%',
-                  width: '100%',
-                  height: '100%',
-                  background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent)',
-                  transition: 'left 0.5s',
-                  zIndex: 1
-                }}></div>
-                <span style={{position: 'relative', zIndex: 2}}>
-                  <i className="fas fa-trash me-1"></i>
-                  Delete {selectedBookings.size}
-                </span>
+                Delete {selectedBookings.size}
               </Button>
             </Modal.Footer>
           </div>
