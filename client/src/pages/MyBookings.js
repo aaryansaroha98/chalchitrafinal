@@ -1014,10 +1014,11 @@ const MyBookings = () => {
           }}
         >
           <div style={{
-            background: 'linear-gradient(150deg, rgba(11,14,22,0.96) 0%, rgba(14,18,26,0.97) 50%, rgba(9,12,18,0.98) 100%)',
+            background: 'rgba(5,7,10,0.96)',
+            backdropFilter: 'blur(14px)',
             borderRadius: '18px',
-            border: '1px solid rgba(255, 255, 255, 0.01)',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.55)',
+            border: '1px solid rgba(255, 255, 255, 0.005)',
+            boxShadow: '0 22px 60px rgba(0,0,0,0.6)',
             color: '#e9edf5',
             position: 'relative',
             overflow: 'hidden'
@@ -1026,7 +1027,7 @@ const MyBookings = () => {
             <div style={{
               position: 'absolute',
               inset: 0,
-              background: 'radial-gradient(circle at 30% 10%, rgba(255,255,255,0.06), transparent 35%), radial-gradient(circle at 80% 0%, rgba(90,121,255,0.08), transparent 38%)',
+              background: 'radial-gradient(circle at 50% -10%, rgba(255,255,255,0.03), transparent 35%)',
               pointerEvents: 'none'
             }} />
 
@@ -1035,13 +1036,13 @@ const MyBookings = () => {
               style={{
                 borderBottom: 'none',
                 background: 'transparent',
-                padding: '1rem 1.2rem 0.4rem',
-                zIndex: 1
+                padding: '1rem 1.2rem 0.2rem',
+                zIndex: 1,
+                display: 'flex',
+                justifyContent: 'center'
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                <h5 style={{ margin: 0, color: '#f7f8fc', fontWeight: 700 }}>Delete booking{selectedBookings.size > 1 ? 's' : ''}</h5>
-              </div>
+              <h5 style={{ margin: 0, color: '#f7f8fc', fontWeight: 700, textAlign: 'center' }}>Delete booking{selectedBookings.size > 1 ? 's' : ''}</h5>
             </Modal.Header>
 
             {/* Modal Body */}
