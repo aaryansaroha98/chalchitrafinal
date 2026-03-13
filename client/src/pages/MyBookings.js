@@ -387,8 +387,8 @@ const MyBookings = () => {
         {`
           @media (max-width: 768px) {
             .my-bookings-title {
-              font-size: 1.65rem !important;
-              font-weight: 500 !important;
+              font-size: 2rem !important;
+              font-weight: 600 !important;
               margin-bottom: 0.4rem !important;
               letter-spacing: -0.01em !important;
               margin-top: 1rem !important;
@@ -403,8 +403,9 @@ const MyBookings = () => {
           textAlign: 'center',
           marginBottom: '3rem',
           color: '#ffffff',
-          fontSize: '2.5rem',
-          fontWeight: '600'
+          fontSize: '3rem',
+          fontWeight: '700',
+          letterSpacing: '-0.01em'
         }}>
           My Booking
         </h1>
