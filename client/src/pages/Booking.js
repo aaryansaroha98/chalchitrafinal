@@ -591,7 +591,7 @@ const Booking = () => {
                 overflowX: 'hidden',
                 padding: '0 20px'
               }}>
-                {/* Block A - 5 rows × 5 seats */}
+                {/* Block A - uniform grid (15 × 7) */}
                 <div className="seat-block-wrap" style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
                   <div style={{
                     fontSize: '18px',
@@ -620,16 +620,10 @@ const Booking = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.8 }}
                   >
-                    {Array.from({ length: 5 }, (_, rowIndex) => {
-                      // Progressive seat sizing: smaller at front, larger at back
-                      const baseSize = 24;
-                      const sizeIncrement = 2.5;
-                      const seatSize = baseSize + (rowIndex * sizeIncrement); // 24, 26.5, 29, 31.5, 34
-                      const fontSize = 9 + (rowIndex * 0.4); // 9, 9.4, 9.8, 10.2, 10.6
-                      const seatGap = 4 + (rowIndex * 0.4); // 4, 4.4, 4.8, 5.2, 5.6
-                      // First row right, last row left for Block A
-                      const shiftAmount = rowIndex === 0 ? 20 : rowIndex === 4 ? -20 : 0; // Row 1: +20px, Row 5: -20px, others: 0
-
+                    {Array.from({ length: 15 }, (_, rowIndex) => {
+                      const seatSize = 28;
+                      const fontSize = 10;
+                      const seatGap = 4;
                       return (
                         <motion.div
                           key={rowIndex}
@@ -637,14 +631,13 @@ const Booking = () => {
                             display: 'flex',
                             justifyContent: 'center',
                             gap: `${seatGap}px`,
-                            marginBottom: '2px',
-                            transform: `translateX(${shiftAmount}px)`
+                            marginBottom: '2px'
                           }}
                           initial={{ opacity: 0, scale: 0.9 }}
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ delay: 0.05 * rowIndex }}
                         >
-                          {Array.from({ length: 5 }, (_, col) => {
+                          {Array.from({ length: 7 }, (_, col) => {
                             const seatNumber = col + 1;
                             const seatId = `A-R${rowIndex + 1}-S${col + 1}`;
                             const isSelected = selectedSeats.includes(seatId);
@@ -670,7 +663,7 @@ const Booking = () => {
                   </motion.div>
                 </div>
 
-                {/* Block B - 7 rows with varying seats */}
+                {/* Block B - uniform grid (14 × 11) */}
                 <div className="seat-block-wrap" ref={blockBRef} style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
                   <div style={{
                     fontSize: '18px',
@@ -699,16 +692,10 @@ const Booking = () => {
                     animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.9 }}
                   >
-                    {Array.from({ length: 7 }, (_, rowIndex) => {
-                      // Define seats per row for Block B
-                      const seatsPerRow = [8, 8, 9, 10, 11, 12, 12];
-                      // Progressive seat sizing: smaller at front, larger at back
-                      const baseSize = 22;
-                      const sizeIncrement = 2;
-                      const seatSize = baseSize + (rowIndex * sizeIncrement); // 22, 24, 26, 28, 30, 32, 34
-                      const fontSize = 8.5 + (rowIndex * 0.3); // 8.5, 8.8, 9.1, 9.4, 9.7, 10.0, 10.3
-                      const seatGap = 3 + (rowIndex * 0.2); // 3, 3.2, 3.4, 3.6, 3.8, 4.0, 4.2
-
+                    {Array.from({ length: 14 }, (_, rowIndex) => {
+                      const seatSize = 28;
+                      const fontSize = 10;
+                      const seatGap = 4;
                       return (
                         <motion.div
                           key={rowIndex}
@@ -722,7 +709,7 @@ const Booking = () => {
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ delay: 0.05 * rowIndex }}
                         >
-                          {Array.from({ length: seatsPerRow[rowIndex] }, (_, col) => {
+                          {Array.from({ length: 11 }, (_, col) => {
                             const seatNumber = col + 1;
                             const seatId = `B-R${rowIndex + 1}-S${col + 1}`;
                             const isSelected = selectedSeats.includes(seatId);
@@ -751,7 +738,7 @@ const Booking = () => {
                   </div>
                 </div>
 
-                {/* Block C - 5 rows × 5 seats */}
+                {/* Block C - uniform grid (15 × 7) */}
                 <div className="seat-block-wrap" style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
                   <div style={{
                     fontSize: '18px',
@@ -780,16 +767,10 @@ const Booking = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 1.0 }}
                   >
-                    {Array.from({ length: 5 }, (_, rowIndex) => {
-                      // Progressive seat sizing: smaller at front, larger at back
-                      const baseSize = 24;
-                      const sizeIncrement = 2.5;
-                      const seatSize = baseSize + (rowIndex * sizeIncrement); // 24, 26.5, 29, 31.5, 34
-                      const fontSize = 9 + (rowIndex * 0.4); // 9, 9.4, 9.8, 10.2, 10.6
-                      const seatGap = 4 + (rowIndex * 0.4); // 4, 4.4, 4.8, 5.2, 5.6
-                      // First row left, last row right for Block C
-                      const shiftAmount = rowIndex === 0 ? -20 : rowIndex === 4 ? 20 : 0; // Row 1: -20px, Row 5: +20px, others: 0
-
+                    {Array.from({ length: 15 }, (_, rowIndex) => {
+                      const seatSize = 28;
+                      const fontSize = 10;
+                      const seatGap = 4;
                       return (
                         <motion.div
                           key={rowIndex}
@@ -797,14 +778,13 @@ const Booking = () => {
                             display: 'flex',
                             justifyContent: 'center',
                             gap: `${seatGap}px`,
-                            marginBottom: '2px',
-                            transform: `translateX(${shiftAmount}px)`
+                            marginBottom: '2px'
                           }}
                           initial={{ opacity: 0, scale: 0.9 }}
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ delay: 0.05 * rowIndex }}
                         >
-                          {Array.from({ length: 5 }, (_, col) => {
+                          {Array.from({ length: 7 }, (_, col) => {
                             const seatNumber = col + 1;
                             const seatId = `C-R${rowIndex + 1}-S${col + 1}`;
                             const isSelected = selectedSeats.includes(seatId);
