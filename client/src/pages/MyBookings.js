@@ -1016,7 +1016,7 @@ const MyBookings = () => {
           <div style={{
             background: '#0b0c10',
             backdropFilter: 'blur(14px)',
-            borderRadius: '14px',
+            borderRadius: '6px',
             border: '1px solid rgba(0, 0, 0, 0.4)',
             boxShadow: '0 20px 50px rgba(0,0,0,0.6)',
             color: '#e9edf5',
