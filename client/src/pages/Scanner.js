@@ -963,8 +963,8 @@ const Scanner = () => {
             }}>
               <Card.Body className="py-3">
                 <h3 className="mb-1" style={{color: '#9ad0ff', fontWeight: 700}}>{stats.total}</h3>
-                <p className="mb-0 fw-semibold" style={{color: 'white'}}>Total Scanned</p>
-                <small style={{color: 'rgba(255,255,255,0.75)'}}>All time</small>
+                <p className="mb-0 fw-semibold" style={{color: '#ffffff'}}>Total Scanned</p>
+                <small style={{color: 'rgba(255,255,255,0.9)'}}>All time</small>
               </Card.Body>
             </Card>
           </Col>
@@ -978,8 +978,8 @@ const Scanner = () => {
             }}>
               <Card.Body className="py-3">
                 <h3 className="mb-1" style={{color: '#a0f0c5', fontWeight: 700}}>{stats.valid}</h3>
-                <p className="mb-0 fw-semibold" style={{color: 'white'}}>Valid Tickets</p>
-                <small style={{color: 'rgba(255,255,255,0.75)'}}>Entry Allowed</small>
+                <p className="mb-0 fw-semibold" style={{color: '#ffffff'}}>Valid Tickets</p>
+                <small style={{color: 'rgba(255,255,255,0.9)'}}>Entry Allowed</small>
               </Card.Body>
             </Card>
           </Col>
@@ -993,8 +993,8 @@ const Scanner = () => {
             }}>
               <Card.Body className="py-3">
                 <h3 className="mb-1" style={{color: '#f5a6a6', fontWeight: 700}}>{stats.invalid}</h3>
-                <p className="mb-0 fw-semibold" style={{color: 'white'}}>Invalid Tickets</p>
-                <small style={{color: 'rgba(255,255,255,0.75)'}}>Entry Denied</small>
+                <p className="mb-0 fw-semibold" style={{color: '#ffffff'}}>Invalid Tickets</p>
+                <small style={{color: 'rgba(255,255,255,0.9)'}}>Entry Denied</small>
               </Card.Body>
             </Card>
           </Col>
@@ -1003,20 +1003,30 @@ const Scanner = () => {
         {/* Scanner Controls */}
         <Row className="mb-4">
           <Col md={8} className="mx-auto">
-            <Card className="shadow">
-              <Card.Header className="bg-primary text-white text-center">
+            <Card className="shadow" style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04))',
+              border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: '14px',
+              boxShadow: '0 12px 32px rgba(0,0,0,0.35)',
+              backdropFilter: 'blur(10px)'
+            }}>
+              <Card.Header className="text-center" style={{
+                background: 'transparent',
+                borderBottom: '1px solid rgba(255,255,255,0.08)',
+                color: '#ffffff'
+              }}>
                 <h5 className="mb-0">
                   <i className="fas fa-camera me-2"></i>
                   QR Code Scanner
                 </h5>
               </Card.Header>
-              <Card.Body className="text-center">
+              <Card.Body className="text-center" style={{color: '#ffffff'}}>
                 {!isScanning ? (
                   <div>
                     <div className="mb-4">
                       <i className="fas fa-mobile-alt fa-4x text-primary mb-3"></i>
-                      <h5>Ready to Scan</h5>
-                      <p className="text-muted">Click start to begin scanning tickets</p>
+                      <h5 style={{color: '#ffffff'}}>Ready to Scan</h5>
+                      <p style={{color: 'rgba(255,255,255,0.75)'}}>Click start to begin scanning tickets</p>
                     </div>
                     <div className="d-flex gap-2 justify-content-center flex-wrap mb-3">
                       <Button
@@ -1460,9 +1470,19 @@ const Scanner = () => {
         )}
 
         {/* Scan History */}
-        <Card className="shadow">
-          <Card.Header className="bg-light d-flex justify-content-between align-items-center">
-            <h5 className="mb-0">
+        <Card className="shadow" style={{
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04))',
+          border: '1px solid rgba(255,255,255,0.12)',
+          borderRadius: '14px',
+          boxShadow: '0 12px 32px rgba(0,0,0,0.35)',
+          backdropFilter: 'blur(10px)'
+        }}>
+          <Card.Header className="d-flex justify-content-between align-items-center" style={{
+            background: 'transparent',
+            borderBottom: '1px solid rgba(255,255,255,0.08)',
+            color: '#ffffff'
+          }}>
+            <h5 className="mb-0" style={{color: '#ffffff'}}>
               <i className="fas fa-history me-2"></i>
               Recent Scans ({scanHistory.length})
             </h5>
@@ -1473,9 +1493,9 @@ const Scanner = () => {
               </Button>
             )}
           </Card.Header>
-          <Card.Body>
+          <Card.Body style={{color: '#ffffff'}}>
             {scanHistory.length === 0 ? (
-              <div className="text-center text-muted py-4">
+              <div className="text-center py-4" style={{color: 'rgba(255,255,255,0.7)'}}>
                 <i className="fas fa-inbox fa-2x mb-3"></i>
                 <p className="mb-0">No scans yet. Start scanning tickets!</p>
               </div>
@@ -1495,17 +1515,21 @@ const Scanner = () => {
                   });
 
                   return (
-                    <div key={scan.id} className="list-group-item d-flex justify-content-between align-items-center">
+                    <div key={scan.id} className="list-group-item d-flex justify-content-between align-items-center" style={{
+                      background: 'rgba(255,255,255,0.02)',
+                      border: '1px solid rgba(255,255,255,0.05)',
+                      color: '#ffffff'
+                    }}>
                       <div className="flex-grow-1">
                         <div className="d-flex justify-content-between align-items-start mb-1">
-                          <strong className="text-truncate me-2" style={{maxWidth: '200px'}}>
+                          <strong className="text-truncate me-2" style={{maxWidth: '200px', color: '#ffffff'}}>
                             {displayName}
                           </strong>
                           <Badge bg={scan.valid ? 'success' : 'danger'} className="px-2 py-1">
                             {scan.valid ? 'VALID' : 'INVALID'}
                           </Badge>
                         </div>
-                        <small className="text-muted d-block">
+                        <small className="d-block" style={{color: 'rgba(255,255,255,0.7)'}}>
                           {scan.timestamp} • {displayMovie}
                         </small>
                         {scan.data?.validity_status && (
