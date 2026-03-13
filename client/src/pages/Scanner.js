@@ -1010,16 +1010,6 @@ const Scanner = () => {
               boxShadow: '0 12px 32px rgba(0,0,0,0.35)',
               backdropFilter: 'blur(10px)'
             }}>
-              <Card.Header className="text-center" style={{
-                background: 'transparent',
-                borderBottom: '1px solid rgba(255,255,255,0.08)',
-                color: '#ffffff'
-              }}>
-                <h5 className="mb-0">
-                  <i className="fas fa-camera me-2"></i>
-                  QR Code Scanner
-                </h5>
-              </Card.Header>
               <Card.Body className="text-center" style={{color: '#ffffff'}}>
                 {!isScanning ? (
                   <div>
