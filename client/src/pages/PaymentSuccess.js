@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../api/axios';
-import Loader from '../components/Loader';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
@@ -246,10 +245,6 @@ const PaymentSuccess = () => {
     );
   }
 
-  if (emailStatus === 'sending') {
-    return <Loader message="Generating Ticket" subtitle="Finalizing your cinematic experience..." />;
-  }
-
   return (
     <div className="payment-success-page">
       {/* Particles Background */}
@@ -282,46 +277,44 @@ const PaymentSuccess = () => {
           </div>
 
           <div className="card-body">
-            {(emailStatus === 'sending' || emailStatus === 'failed' || emailStatus === 'sent') && (
-              <div style={{
-                background: 'rgba(255, 255, 255, 0.08)',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                borderRadius: '14px',
-                padding: '0.75rem 1rem',
-                marginBottom: '1rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.75rem'
-              }}>
-                {emailStatus === 'sending' && (
-                  <div style={{
-                    width: '28px',
-                    height: '28px',
-                    border: '3px solid rgba(255, 255, 255, 0.3)',
-                    borderTopColor: '#ffffff',
-                    borderRadius: '50%',
-                    animation: 'spin 1s linear infinite'
-                  }} />
-                )}
-                {emailStatus === 'sent' && (
-                  <div>
-                    <div style={{ color: '#7CFC00', fontWeight: '600' }}>Ticket email sent successfully!</div>
-                    <div style={{ color: '#adb5bd', fontSize: '0.85rem', marginTop: '4px' }}>
-                      <i className="fas fa-exclamation-circle me-1"></i>
-                      Please check your spam/junk folder if you don't see it in your inbox, and mark it as "Not Spam".
+            {(['sending', 'failed', 'sent'].includes(emailStatus)) && (
+              <div className={`email-status-banner status-${emailStatus}`}>
+                <div className="email-status-visual">
+                  {emailStatus === 'sending' && (
+                    <div className="mail-send-animation">
+                      <div className="mail-envelope">
+                        <div className="mail-letter" />
+                        <div className="mail-trail" />
+                      </div>
                     </div>
-                  </div>
-                )}
-                {emailStatus === 'failed' && (
-                  <div style={{ color: '#ff6b6b', fontWeight: '600' }}>
-                    Ticket email failed{emailError ? `: ${emailError}` : ''}.
-                  </div>
-                )}
-                {emailStatus === 'sending' && (
-                  <div style={{ color: '#ffffff', fontWeight: '500' }}>
-                    Sending your ticket to your email...
-                  </div>
-                )}
+                  )}
+                  {emailStatus === 'sent' && (
+                    <div className="mail-status-icon success">✓</div>
+                  )}
+                  {emailStatus === 'failed' && (
+                    <div className="mail-status-icon error">!</div>
+                  )}
+                </div>
+                <div className="email-status-copy">
+                  {emailStatus === 'sending' && (
+                    <>
+                      <div className="email-status-title">Sending your ticket to your email...</div>
+                      <div className="email-status-sub">Hang tight while we deliver your PDF ticket.</div>
+                    </>
+                  )}
+                  {emailStatus === 'sent' && (
+                    <>
+                      <div className="email-status-title">Ticket email sent successfully!</div>
+                      <div className="email-status-sub">Check spam/junk if it's not in your inbox and mark it as "Not Spam".</div>
+                    </>
+                  )}
+                  {emailStatus === 'failed' && (
+                    <>
+                      <div className="email-status-title">Ticket email failed{emailError ? `: ${emailError}` : ''}.</div>
+                      <div className="email-status-sub">You can download it from My Bookings or try again later.</div>
+                    </>
+                  )}
+                </div>
               </div>
             )}
 
@@ -433,12 +426,6 @@ const PaymentSuccess = () => {
           <span>Thank you for choosing Chalchitra! Enjoy your movie experience.</span>
         </div>
       </div>
-      <style>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 };

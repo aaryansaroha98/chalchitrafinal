@@ -876,6 +876,169 @@ a:hover {
   font-size: 1rem;
 }
 
+.email-status-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.email-status-banner.status-sending {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.35);
+}
+
+.email-status-banner.status-sent {
+  background: rgba(74, 222, 128, 0.12);
+  border-color: rgba(74, 222, 128, 0.35);
+}
+
+.email-status-banner.status-failed {
+  background: rgba(248, 113, 113, 0.12);
+  border-color: rgba(248, 113, 113, 0.35);
+}
+
+.email-status-visual {
+  width: 52px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mail-send-animation {
+  position: relative;
+  width: 52px;
+  height: 32px;
+}
+
+.mail-envelope {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.mail-envelope::before,
+.mail-envelope::after {
+  content: '';
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.mail-envelope::before {
+  top: 10px;
+  transform: rotate(12deg);
+}
+
+.mail-envelope::after {
+  top: 16px;
+  transform: rotate(-12deg);
+}
+
+.mail-letter {
+  position: absolute;
+  width: 72%;
+  height: 65%;
+  background: rgba(255, 255, 255, 0.9);
+  top: 6px;
+  left: 50%;
+  transform: translate(-50%, 14px);
+  border-radius: 4px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  animation: mailLetterLift 1.6s ease-in-out infinite;
+}
+
+.mail-trail {
+  position: absolute;
+  width: 16px;
+  height: 2px;
+  background: rgba(59, 130, 246, 0.9);
+  top: 15px;
+  left: -18px;
+  border-radius: 2px;
+  animation: mailTrailSlide 1.2s ease-in-out infinite;
+}
+
+.mail-status-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.mail-status-icon.success {
+  background: rgba(74, 222, 128, 0.2);
+  border: 1px solid rgba(74, 222, 128, 0.6);
+  color: #4ade80;
+}
+
+.mail-status-icon.error {
+  background: rgba(248, 113, 113, 0.2);
+  border: 1px solid rgba(248, 113, 113, 0.6);
+  color: #f87171;
+}
+
+.email-status-copy {
+  flex: 1;
+}
+
+.email-status-title {
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 600;
+}
+
+.email-status-sub {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.9rem;
+  margin-top: 2px;
+}
+
+@keyframes mailLetterLift {
+  0% {
+    transform: translate(-50%, 16px);
+  }
+  35% {
+    transform: translate(-50%, 2px);
+  }
+  65% {
+    transform: translate(-50%, 2px);
+  }
+  100% {
+    transform: translate(-50%, 16px);
+  }
+}
+
+@keyframes mailTrailSlide {
+  0% {
+    left: -18px;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    left: 58px;
+    opacity: 0;
+  }
+}
+
 .action-btn {
   display: flex;
   align-items: center;

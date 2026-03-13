@@ -41,8 +41,12 @@ const ScrollToTop = () => {
 };
 
 // Protected Route Component
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, renderWhileLoading = false }) => {
   const { isAuthenticated, loading } = useAuth();
+
+  if (loading && renderWhileLoading) {
+    return children;
+  }
 
   if (loading) {
     return <Loader message="Verifying access..." subtitle="Checking your credentials..." />;
@@ -73,7 +77,7 @@ function App() {
             <Route path="/team" element={<Team />} />
             <Route path="/booking/:movieId" element={<ProtectedRoute><Booking /></ProtectedRoute>} />
             <Route path="/payment" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
-            <Route path="/payment-success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
+            <Route path="/payment-success" element={<ProtectedRoute renderWhileLoading><PaymentSuccess /></ProtectedRoute>} />
             <Route path="/my-bookings" element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
             <Route path="/scanner" element={<ProtectedRoute><Scanner /></ProtectedRoute>} />
