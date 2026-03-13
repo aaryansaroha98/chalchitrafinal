@@ -1039,6 +1039,47 @@ a:hover {
   }
 }
 
+.scanner-stat-card .scanner-stat-value {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1.6rem;
+  line-height: 1.2;
+}
+
+.scanner-stat-card .scanner-stat-label {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 0.95rem;
+}
+
+.scanner-stat-card .scanner-stat-sub {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 576px) {
+  .scanner-stats-row .col-4,
+  .scanner-stats-row .col-xs-4 {
+    padding-left: 0.35rem;
+    padding-right: 0.35rem;
+  }
+
+  .scanner-stat-card .card-body {
+    padding: 0.7rem 0.5rem;
+  }
+
+  .scanner-stat-card .scanner-stat-value {
+    font-size: 1.1rem;
+  }
+
+  .scanner-stat-card .scanner-stat-label {
+    font-size: 0.78rem;
+  }
+
+  .scanner-stat-card .scanner-stat-sub {
+    font-size: 0.72rem;
+  }
+}
+
 .action-btn {
   display: flex;
   align-items: center;
