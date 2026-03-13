@@ -503,6 +503,15 @@ router.get('/coupons', requireAdmin, (req, res) => {
         status = 'Unlimited';
       }
 
+      // Expiry check: if expiry_date set and in the past, mark expired
+      if (coupon.expiry_date) {
+        const now = new Date();
+        const expiry = new Date(coupon.expiry_date);
+        if (!isNaN(expiry.getTime()) && expiry < now) {
+          status = 'Expired';
+        }
+      }
+
       return {
         ...coupon,
         usage_percentage: usagePercentage,
