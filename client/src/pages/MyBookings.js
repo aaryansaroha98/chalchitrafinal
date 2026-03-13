@@ -1015,9 +1015,9 @@ const MyBookings = () => {
         >
           <div style={{
             background: 'linear-gradient(150deg, rgba(11,14,22,0.96) 0%, rgba(14,18,26,0.97) 50%, rgba(9,12,18,0.98) 100%)',
-            borderRadius: '28px',
-            border: '1px solid rgba(255, 255, 255, 0.02)',
-            boxShadow: '0 28px 70px rgba(0,0,0,0.55)',
+            borderRadius: '18px',
+            border: '1px solid rgba(255, 255, 255, 0.01)',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.55)',
             color: '#e9edf5',
             position: 'relative',
             overflow: 'hidden'
@@ -1032,30 +1032,15 @@ const MyBookings = () => {
 
             {/* Modal Header */}
             <Modal.Header
-              closeButton
               style={{
                 borderBottom: 'none',
                 background: 'transparent',
-                padding: '1.1rem 1.4rem 0.6rem',
+                padding: '1rem 1.2rem 0.4rem',
                 zIndex: 1
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <div style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '12px',
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.05)',
-                  display: 'grid',
-                  placeItems: 'center',
-                  color: '#e9edf5'
-                }}>
-                  <i className="fas fa-trash"></i>
-                </div>
-                <div>
-                  <h5 style={{ margin: 0, color: '#f7f8fc', fontWeight: 700 }}>Delete booking{selectedBookings.size > 1 ? 's' : ''}</h5>
-                </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                <h5 style={{ margin: 0, color: '#f7f8fc', fontWeight: 700 }}>Delete booking{selectedBookings.size > 1 ? 's' : ''}</h5>
               </div>
             </Modal.Header>
 
