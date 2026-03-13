@@ -581,16 +581,16 @@ const MyBookings = () => {
                 <Col lg={3} md={4} sm={6} xs={6} key={booking.id} className="mb-4">
                   <Card className="h-100 border-0 shadow-lg my-booking-card" style={{
                   background: selectedBookings.has(booking.id) 
-                    ? 'linear-gradient(135deg, rgba(40, 167, 69, 0.15), rgba(32, 201, 151, 0.1))'
+                    ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.06))'
                     : 'linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
                   backdropFilter: 'blur(20px)',
                   border: selectedBookings.has(booking.id) 
-                    ? '2px solid rgba(40, 167, 69, 0.6)'
+                    ? '1px solid rgba(255, 255, 255, 0.35)'
                     : '1px solid rgba(255, 215, 0, 0.2)',
                   borderRadius: '20px',
                   overflow: 'hidden',
                   boxShadow: selectedBookings.has(booking.id)
-                    ? '0 20px 40px rgba(40, 167, 69, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                    ? '0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
                     : '0 20px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                   position: 'relative',
                   transition: 'all 0.3s ease'
@@ -602,10 +602,10 @@ const MyBookings = () => {
                     right: '8px',
                     zIndex: 10,
                     background: selectedBookings.has(booking.id) 
-                      ? 'linear-gradient(135deg, #28a745, #20c997)'
+                      ? 'linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.12))'
                       : 'rgba(0, 0, 0, 0.5)',
                     border: selectedBookings.has(booking.id)
-                      ? 'none'
+                      ? '1px solid rgba(255,255,255,0.35)'
                       : '2px solid rgba(255, 255, 255, 0.8)',
                     borderRadius: '50%',
                     width: '22px',
@@ -616,7 +616,7 @@ const MyBookings = () => {
                     cursor: 'pointer',
                     transition: 'all 0.2s ease',
                     boxShadow: selectedBookings.has(booking.id)
-                      ? '0 2px 8px rgba(40, 167, 69, 0.6)'
+                      ? '0 2px 8px rgba(0, 0, 0, 0.4)'
                       : '0 2px 4px rgba(0, 0, 0, 0.3)'
                   }}
                     onClick={() => {
