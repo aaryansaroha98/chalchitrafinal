@@ -3,8 +3,8 @@ import React from 'react';
 const Loader = ({ message = 'Loading...', subtitle = 'Please wait while we prepare things for you...' }) => {
   return (
     <div style={{
-      backgroundColor: '#0a0a0f',
-      backgroundImage: 'linear-gradient(135deg, #0a0a0f 0%, #111118 50%, #1a1a23 100%)',
+      backgroundColor: '#000000',
+      backgroundImage: 'none',
       minHeight: '100vh',
       position: 'fixed',
       top: 0,
