@@ -952,8 +952,8 @@ const Scanner = () => {
         </div>
 
         {/* Stats Dashboard */}
-        <Row className="mb-4">
-          <Col md={4}>
+        <Row className="mb-4 g-3 g-md-4">
+          <Col md={4} xs={4}>
             <Card className="text-center h-100" style={{
               background: 'linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04))',
               border: '1px solid rgba(255,255,255,0.12)',
@@ -962,13 +962,13 @@ const Scanner = () => {
               backdropFilter: 'blur(10px)'
             }}>
               <Card.Body className="py-3">
-                <h3 className="mb-1" style={{color: '#9ad0ff', fontWeight: 700}}>{stats.total}</h3>
+                <h3 className="mb-1" style={{color: '#ffffff', fontWeight: 700, fontSize: '1.6rem'}}>{stats.total}</h3>
                 <p className="mb-0 fw-semibold" style={{color: '#ffffff'}}>Total Scanned</p>
                 <small style={{color: 'rgba(255,255,255,0.9)'}}>All time</small>
               </Card.Body>
             </Card>
           </Col>
-          <Col md={4}>
+          <Col md={4} xs={4}>
             <Card className="text-center h-100" style={{
               background: 'linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04))',
               border: '1px solid rgba(255,255,255,0.12)',
@@ -977,13 +977,13 @@ const Scanner = () => {
               backdropFilter: 'blur(10px)'
             }}>
               <Card.Body className="py-3">
-                <h3 className="mb-1" style={{color: '#a0f0c5', fontWeight: 700}}>{stats.valid}</h3>
+                <h3 className="mb-1" style={{color: '#ffffff', fontWeight: 700, fontSize: '1.6rem'}}>{stats.valid}</h3>
                 <p className="mb-0 fw-semibold" style={{color: '#ffffff'}}>Valid Tickets</p>
                 <small style={{color: 'rgba(255,255,255,0.9)'}}>Entry Allowed</small>
               </Card.Body>
             </Card>
           </Col>
-          <Col md={4}>
+          <Col md={4} xs={4}>
             <Card className="text-center h-100" style={{
               background: 'linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04))',
               border: '1px solid rgba(255,255,255,0.12)',
@@ -992,7 +992,7 @@ const Scanner = () => {
               backdropFilter: 'blur(10px)'
             }}>
               <Card.Body className="py-3">
-                <h3 className="mb-1" style={{color: '#f5a6a6', fontWeight: 700}}>{stats.invalid}</h3>
+                <h3 className="mb-1" style={{color: '#ffffff', fontWeight: 700, fontSize: '1.6rem'}}>{stats.invalid}</h3>
                 <p className="mb-0 fw-semibold" style={{color: '#ffffff'}}>Invalid Tickets</p>
                 <small style={{color: 'rgba(255,255,255,0.9)'}}>Entry Denied</small>
               </Card.Body>
