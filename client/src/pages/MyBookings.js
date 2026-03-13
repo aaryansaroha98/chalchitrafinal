@@ -1014,11 +1014,11 @@ const MyBookings = () => {
           }}
         >
           <div style={{
-            background: 'rgba(5,7,10,0.96)',
+            background: '#0b0c10',
             backdropFilter: 'blur(14px)',
-            borderRadius: '24px',
-            border: '1px solid rgba(255, 255, 255, 0.005)',
-            boxShadow: '0 22px 60px rgba(0,0,0,0.6)',
+            borderRadius: '26px',
+            border: '1px solid rgba(0, 0, 0, 0.4)',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.6)',
             color: '#e9edf5',
             position: 'relative',
             overflow: 'hidden'
@@ -1027,7 +1027,7 @@ const MyBookings = () => {
             <div style={{
               position: 'absolute',
               inset: 0,
-              background: 'radial-gradient(circle at 50% -10%, rgba(255,255,255,0.03), transparent 35%)',
+              background: 'radial-gradient(circle at 50% -20%, rgba(255,255,255,0.015), transparent 32%)',
               pointerEvents: 'none'
             }} />
 
