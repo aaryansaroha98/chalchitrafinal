@@ -543,7 +543,13 @@ const MyBookings = () => {
                   <Button
                     className="my-booking-bulk-delete"
                     variant="outline-danger"
-                  onClick={() => setShowBulkDelete(true)}
+                  onClick={() => {
+                    if (selectedBookings.size === 0) return;
+                    const confirmed = window.confirm(`Delete ${selectedBookings.size} booking${selectedBookings.size > 1 ? 's' : ''}? This action cannot be undone.`);
+                    if (confirmed) {
+                      handleBulkDelete();
+                    }
+                  }}
                   style={{
                     border: '1px solid #dc3545',
                     color: '#dc3545',
