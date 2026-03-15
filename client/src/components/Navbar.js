@@ -143,15 +143,49 @@ const NavigationBar = () => {
 
             {/* User Section - Bottom */}
             {user ? (
-              <>
-                <div style={{ color: '#ffd700', fontSize: '1.1rem', fontWeight: '600', padding: '0.5rem 0.75rem', borderTop: '1px solid rgba(255,255,255,0.1)', marginTop: '1rem' }}>Hi, {user?.name?.split(' ')[0] || 'User'}</div>
-                <Nav className="flex-column" style={{ gap: '0.5rem' }}>
-                  <Nav.Link as={Link} to="/my-bookings" onClick={() => setMenuOpen(false)} style={{ padding: '0.1rem 1rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '1rem' }}><i className="fas fa-ticket-alt me-1"></i>My Bookings</Nav.Link>
-                  {(user.code_scanner || user.team_scanner) && <Nav.Link as={Link} to="/scanner" onClick={() => setMenuOpen(false)} style={{ padding: '0.1rem 1rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '1rem' }}><i className="fas fa-qrcode me-1"></i>Scanner</Nav.Link>}
-                  {user.is_admin && <Nav.Link as={Link} to="/admin" onClick={() => setMenuOpen(false)} style={{ padding: '0.1rem 1rem', borderRadius: '15px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.3)', color: 'white', textDecoration: 'none', fontWeight: '500', fontSize: '1rem' }}><i className="fas fa-cog me-1"></i>{user.admin_tag || 'Admin'}</Nav.Link>}
-                  <button onClick={() => { logout(); setMenuOpen(false); }} style={{ padding: '0.1rem 1rem', borderRadius: '15px', background: 'transparent', border: 'none', color: '#ff6b6b', textDecoration: 'none', fontWeight: '500', fontSize: '1rem', cursor: 'pointer', textAlign: 'left', width: '100%' }}>Logout</button>
-                </Nav>
-              </>
+              <Nav className="flex-column" style={{ gap: '0.5rem', marginTop: 'auto' }}>
+                {user.is_admin && (
+                  <Nav.Link
+                    as={Link}
+                    to="/admin"
+                    onClick={() => setMenuOpen(false)}
+                    style={{ padding: '0.1rem 1rem', borderRadius: '15px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.3)', color: 'white', textDecoration: 'none', fontWeight: '500', fontSize: '1rem' }}
+                  >
+                    <i className="fas fa-cog me-1"></i>{user.admin_tag || 'Admin'}
+                  </Nav.Link>
+                )}
+
+                <div style={{ color: '#ffd700', fontSize: '1.1rem', fontWeight: '600', padding: '0.35rem 0.75rem 0.25rem', borderTop: '1px solid rgba(255,255,255,0.1)', marginTop: user.is_admin ? '0.35rem' : '1rem' }}>
+                  Hi, {user?.name?.split(' ')[0] || 'User'}
+                </div>
+
+                <Nav.Link
+                  as={Link}
+                  to="/my-bookings"
+                  onClick={() => setMenuOpen(false)}
+                  style={{ padding: '0.1rem 1rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '1rem' }}
+                >
+                  <i className="fas fa-ticket-alt me-1"></i>My Bookings
+                </Nav.Link>
+
+                {(user.code_scanner || user.team_scanner) && (
+                  <Nav.Link
+                    as={Link}
+                    to="/scanner"
+                    onClick={() => setMenuOpen(false)}
+                    style={{ padding: '0.1rem 1rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '1rem' }}
+                  >
+                    <i className="fas fa-qrcode me-1"></i>Scanner
+                  </Nav.Link>
+                )}
+
+                <button
+                  onClick={() => { logout(); setMenuOpen(false); }}
+                  style={{ padding: '0.1rem 1rem', borderRadius: '15px', background: 'transparent', border: 'none', color: '#ff6b6b', textDecoration: 'none', fontWeight: '500', fontSize: '1rem', cursor: 'pointer', textAlign: 'left', width: '100%' }}
+                >
+                  Logout
+                </button>
+              </Nav>
             ) : (
               <Nav className="flex-column" style={{ gap: '0.5rem', marginTop: 'auto' }}>
                 <Nav.Link as={Link} to="/login" onClick={() => setMenuOpen(false)} style={{ padding: '0.1rem 1rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
