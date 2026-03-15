@@ -116,13 +116,19 @@ const NavigationBar = () => {
         </div>
 
         {/* Mobile Offcanvas Menu */}
-        <Offcanvas show={menuOpen} onHide={() => setMenuOpen(false)} placement="end" style={{ backgroundColor: '#1a1a1a', display: 'flex', flexDirection: 'column', width: '70%' }}>
-          <Offcanvas.Header closeButton closeVariant="white">
-            <Offcanvas.Title style={{ color: 'white', fontWeight: '600', letterSpacing: '1px' }}>
-              CHALCHITRA
-            </Offcanvas.Title>
-          </Offcanvas.Header>
-          <Offcanvas.Body style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+        <Offcanvas
+          show={menuOpen}
+          onHide={() => setMenuOpen(false)}
+          placement="end"
+          style={{ backgroundColor: '#1a1a1a', display: 'flex', flexDirection: 'column', width: '70%' }}
+        >
+          {/* Keep close button, remove heading, tighten spacing so links sit higher */}
+          <Offcanvas.Header
+            closeButton
+            closeVariant="white"
+            style={{ padding: '0.5rem 0.75rem 0.25rem', borderBottom: 'none', minHeight: 'auto' }}
+          />
+          <Offcanvas.Body style={{ display: 'flex', flexDirection: 'column', flex: 1, paddingTop: '0.25rem' }}>
             {/* Main Navigation Links - Top */}
             <Nav className="flex-column" style={{ gap: '0.5rem' }}>
               <Nav.Link as={Link} to="/" onClick={() => setMenuOpen(false)} style={{ padding: '0.1rem 1rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '1rem' }}>Home</Nav.Link>
@@ -164,4 +170,3 @@ const NavigationBar = () => {
 };
 
 export default NavigationBar;
-
