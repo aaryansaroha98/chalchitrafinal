@@ -144,20 +144,20 @@ const NavigationBar = () => {
             {/* User Section - Bottom */}
             {user ? (
               <Nav className="flex-column" style={{ gap: '0.5rem', marginTop: 'auto' }}>
+                <div style={{ color: '#ffd700', fontSize: '1.1rem', fontWeight: '600', padding: '0.35rem 0.75rem 0.25rem', borderTop: '1px solid rgba(255,255,255,0.1)', marginTop: '1rem' }}>
+                  Hi, {user?.name?.split(' ')[0] || 'User'}
+                </div>
+
                 {user.is_admin && (
                   <Nav.Link
                     as={Link}
                     to="/admin"
                     onClick={() => setMenuOpen(false)}
-                    style={{ padding: '0.1rem 1rem', borderRadius: '15px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.3)', color: 'white', textDecoration: 'none', fontWeight: '500', fontSize: '1rem' }}
+                    style={{ padding: '0.1rem 1rem', borderRadius: '15px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.3)', color: 'white', textDecoration: 'none', fontWeight: '500', fontSize: '1rem', marginTop: '0.1rem' }}
                   >
                     <i className="fas fa-cog me-1"></i>{user.admin_tag || 'Admin'}
                   </Nav.Link>
                 )}
-
-                <div style={{ color: '#ffd700', fontSize: '1.1rem', fontWeight: '600', padding: '0.35rem 0.75rem 0.25rem', borderTop: '1px solid rgba(255,255,255,0.1)', marginTop: user.is_admin ? '0.35rem' : '1rem' }}>
-                  Hi, {user?.name?.split(' ')[0] || 'User'}
-                </div>
 
                 <Nav.Link
                   as={Link}
