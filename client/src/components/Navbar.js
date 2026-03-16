@@ -1,7 +1,8 @@
- import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navbar, Nav, Container, Offcanvas, CloseButton } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useRef } from 'react';
 
 const NavigationBar = () => {
   const navigate = useNavigate();
@@ -9,6 +10,7 @@ const NavigationBar = () => {
   const [navHidden, setNavHidden] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const mountTimeRef = useRef(Date.now());
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -16,6 +18,13 @@ const NavigationBar = () => {
 
     const updateNav = () => {
       const currentY = window.scrollY;
+      // Keep navbar visible during initial landing/auto-scroll (first 3s)
+      if (Date.now() - mountTimeRef.current < 3000) {
+        setNavHidden(false);
+        lastScrollY = currentY;
+        ticking = false;
+        return;
+      }
       const shouldHide = currentY > 80 && currentY > lastScrollY + 5;
       const shouldShow = currentY < lastScrollY - 5;
 
