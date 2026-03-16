@@ -1602,6 +1602,7 @@ router.post('/coupon-winners/send', requireAdmin, (req, res) => {
           sent_count: sentCount,
           failed_email_count: failedEmails.length,
           failed_record_count: failedRecords.length,
+          failed_record_errors: failedRecords.map(r => r.error).filter(Boolean),
           results: results,
           discount_amount: discount_amount,
           discount_type: discount_type,
@@ -1660,7 +1661,7 @@ router.post('/coupon-winners/send', requireAdmin, (req, res) => {
               function (couponErr) {
                 if (couponErr) {
                   console.error('Error creating coupon:', couponErr);
-                  results.push({ user: user.name, email: user.email, status: 'failed', error: 'Database error' });
+                  results.push({ user: user.name, email: user.email, status: 'failed', error: couponErr.message || 'Database error' });
                   processUser(userIndex + 1);
                   return;
                 }
@@ -1677,7 +1678,7 @@ router.post('/coupon-winners/send', requireAdmin, (req, res) => {
                     console.log('🏆 Winner record callback executed for:', user.email);
                     if (winnerErr) {
                       console.error('❌ Error creating winner record:', winnerErr);
-                      results.push({ user: user.name, email: user.email, coupon_code: couponCode, status: 'failed', error: 'Database error' });
+                      results.push({ user: user.name, email: user.email, coupon_code: couponCode, status: 'failed', error: winnerErr.message || 'Database error' });
                       processUser(userIndex + 1);
                     } else {
                       console.log('✅ Created coupon winner for:', user.email, 'Code:', couponCode);
