@@ -323,7 +323,7 @@ const Home = () => {
             fontWeight: '700',
             color: 'white',
             marginBottom: '0.5rem',
-            letterSpacing: '-0.025em'
+            letterSpacing: '0.05em'
           }}>
             <i className="fas fa-home" style={{
               color: '#007bff',
@@ -333,7 +333,7 @@ const Home = () => {
             WELCOME TO CHALCHITRA
           </h1>
           <p style={{
-            fontSize: 'clamp(0.9rem, 2vw, 1.15rem)',
+            fontSize: 'clamp(0.85rem, 2vw, 1.1rem)',
             color: '#6c757d',
             maxWidth: 'none',
             width: '100%',
@@ -353,7 +353,7 @@ const Home = () => {
             fontSize: '1.65rem',
             fontWeight: '600',
             color: 'white',
-            letterSpacing: '-0.01em',
+            letterSpacing: '0.05em',
             display: 'none'
           }}
         >
