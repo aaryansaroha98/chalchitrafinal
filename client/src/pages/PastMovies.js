@@ -158,8 +158,8 @@ const PastMovies = () => {
         {/* Clean Header */}
         <div className="past-movies-header" style={{
           textAlign: 'center',
-          marginBottom: '3rem',
-          marginTop: '-4rem',
+          marginBottom: '1.5rem',
+          marginTop: '-5rem',
           padding: '0 1rem'
         }}>
           <h1 className="past-movies-title" style={{
