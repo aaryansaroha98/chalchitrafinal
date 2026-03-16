@@ -176,9 +176,9 @@ const TermsOfService = () => {
                 color: '#ffffff',
                 lineHeight: '1.6'
               }}>
-                <p style={{margin: '0.5rem 0'}}><strong>Phone:</strong> +91 9569579671</p>
-                <p style={{margin: '0.5rem 0'}}><strong>Email:</strong> chalchitra@iitjammu.ac.in</p>
-                <p style={{margin: '0.5rem 0'}}>
+                <p style={{margin: '0.5rem 0', color: '#ffffff'}}><strong>Phone:</strong> +91 9569579671</p>
+                <p style={{margin: '0.5rem 0', color: '#ffffff'}}><strong>Email:</strong> chalchitra@iitjammu.ac.in</p>
+                <p style={{margin: '0.5rem 0', color: '#ffffff'}}>
                   <strong>Address:</strong> IIT Jammu, NH-44, PO Nagrota, Jagti, Jammu and Kashmir 181221
                 </p>
               </div>

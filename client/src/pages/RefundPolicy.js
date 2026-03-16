@@ -144,8 +144,8 @@ const RefundPolicy = () => {
                 color: '#ffffff',
                 lineHeight: '1.6'
               }}>
-                <p style={{margin: '0.5rem 0'}}><strong>Email:</strong> chalchitra@iitjammu.ac.in</p>
-                <p style={{margin: '0.5rem 0'}}><strong>Phone:</strong> +91 9569579671</p>
+                <p style={{margin: '0.5rem 0', color: '#ffffff'}}><strong>Email:</strong> chalchitra@iitjammu.ac.in</p>
+                <p style={{margin: '0.5rem 0', color: '#ffffff'}}><strong>Phone:</strong> +91 9569579671</p>
               </div>
             </div>
           </Col>
