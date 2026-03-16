@@ -26,12 +26,13 @@ const PrivacyPolicy = () => {
         <Row className="justify-content-center">
           <Col lg={8} xl={6}>
             {/* Header */}
-            <div className="policy-header privacy-header" style={{textAlign: 'center', marginBottom: '2rem'}}>
+            <div className="policy-header privacy-header" style={{ textAlign: 'center', marginBottom: '1.5rem', marginTop: '-5rem', padding: '0 1rem' }}>
               <h1 className="policy-title privacy-title" style={{
                 color: '#ffffff',
                 fontSize: '2.5rem',
                 fontWeight: '600',
-                marginBottom: '1rem'
+                marginBottom: '1rem',
+                letterSpacing: '-0.025em'
               }}>
                 PRIVACY POLICY
               </h1>

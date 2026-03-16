@@ -332,17 +332,6 @@ const Home = () => {
             }}></i>
             WELCOME TO CHALCHITRA
           </h1>
-          <p style={{
-            fontSize: '1.05rem',
-            color: '#6c757d',
-            maxWidth: 'none',
-            width: '100%',
-            margin: 0,
-            lineHeight: '1.5',
-            fontWeight: '400'
-          }}>
-            Experience premium cinema screenings exclusively for IIT JAMMU community
-          </p>
         </div>
 
         <div
