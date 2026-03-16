@@ -333,7 +333,7 @@ const Home = () => {
             WELCOME TO CHALCHITRA
           </h1>
           <p style={{
-            fontSize: 'clamp(0.85rem, 2vw, 1.1rem)',
+            fontSize: 'clamp(1rem, 2.4vw, 1.25rem)',
             color: '#6c757d',
             maxWidth: 'none',
             width: '100%',
