@@ -54,7 +54,7 @@ const Footer = () => {
                 fontStyle: 'normal',
                 fontWeight: '300'
               }}>
-                Elevating cinematic experiences for IIT Jammu students with premium screenings and exclusive events.
+                Elevating cinematic experiences for IIT Jammu community with premium screenings and exclusive events.
               </p>
 
               {/* Social Media Icons - Simple */}
@@ -414,4 +414,3 @@ const Footer = () => {
 };
 
 export default Footer;
-
