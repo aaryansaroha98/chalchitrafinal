@@ -173,7 +173,7 @@ const TermsOfService = () => {
                 If you have any questions about these terms and conditions, please contact us:
               </p>
               <div style={{
-                color: '#cccccc',
+                color: '#ffffff',
                 lineHeight: '1.6'
               }}>
                 <p style={{margin: '0.5rem 0'}}><strong>Phone:</strong> +91 9569579671</p>

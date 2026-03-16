@@ -141,7 +141,7 @@ const RefundPolicy = () => {
                 If you have any questions about our refund and cancellation policy, please contact us:
               </p>
               <div style={{
-                color: '#cccccc',
+                color: '#ffffff',
                 lineHeight: '1.6'
               }}>
                 <p style={{margin: '0.5rem 0'}}><strong>Email:</strong> chalchitra@iitjammu.ac.in</p>
