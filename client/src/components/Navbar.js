@@ -70,16 +70,16 @@ const NavigationBar = () => {
 
   return (
     <Navbar style={{ backgroundColor: '#1a1a1a', transform: navHidden ? 'translateY(-100%)' : 'translateY(0)', transition: 'transform 0.25s ease', padding: '0', height: isMobile ? '45px' : '45px' }} variant="dark" sticky="top">
-      <Container fluid style={{ display: 'flex', alignItems: 'center', height: '100%', gap: '0.5rem' }}>
+      <Container fluid style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
         {/* Logo - Left */}
-        <Navbar.Brand as={Link} to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'white', textDecoration: 'none', marginRight: '0.25rem' }}>
+        <Navbar.Brand as={Link} to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'white', textDecoration: 'none' }}>
           <img src="/logos/logo-removebg-preview.png" alt="Logo" style={{ height: '32px' }} />
           <span style={{ fontSize: '1.25rem', fontWeight: '600', letterSpacing: '1px' }}>CHALCHITRA</span>
         </Navbar.Brand>
 
-        {/* Desktop: Main nav links - Next to logo */}
-        <div className="d-none d-lg-flex" style={{ marginLeft: '0.25rem', flexShrink: 0 }}>
-          <Nav style={{ display: 'flex', gap: '0.20rem', alignItems: 'center' }}>
+        {/* Desktop: Main nav links - Center */}
+        <div className="d-none d-lg-flex" style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
+          <Nav style={{ display: 'flex', gap: '0.20rem' }}>
             <Nav.Link as={Link} to="/" style={{ padding: '0.1rem 0.5rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '0.85rem', letterSpacing: '-0.5px' }} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>Home</Nav.Link>
             <Nav.Link as={Link} to="/upcoming-movies" style={{ padding: '0.1rem 0.5rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '0.85rem', letterSpacing: '-0.5px' }} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>Upcoming</Nav.Link>
             <Nav.Link as={Link} to="/past-movies" style={{ padding: '0.1rem 0.5rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '0.85rem', letterSpacing: '-0.5px' }} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>Past Movies</Nav.Link>
