@@ -241,7 +241,7 @@ const Login = () => {
                       letterSpacing: '1px',
                       textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
                     }}>
-                      Welcome to Chalchitra
+                      WELCOME TO CHALCHITRA
                     </h3>
                     <p style={{
                       color: 'rgba(255, 255, 255, 0.7)',
