@@ -275,17 +275,32 @@ router.post('/', async (req, res) => {
                       }
                     }
 
-                    // Increment coupon usage count if coupon was used
+                    // Mark coupon usage ONLY when payment is confirmed (payment_id or explicit success flag)
+                    const paymentSuccess = !!req.body.payment_id || req.body.payment_status === 'success' || req.body.payment_success === true;
                     if (coupon_code) {
-                      console.log('Incrementing usage count for coupon:', coupon_code);
-                      db.run('UPDATE coupons SET used_count = used_count + 1 WHERE code = ?',
-                        [coupon_code.toUpperCase()], function(couponErr) {
-                          if (couponErr) {
-                            console.error('Error updating coupon usage count:', couponErr);
-                          } else {
-                            console.log(`Updated usage count for coupon ${coupon_code}: ${this.changes} rows affected`);
-                          }
-                        });
+                      if (paymentSuccess) {
+                        console.log('Marking coupon as used after payment success:', coupon_code);
+                        db.run('UPDATE coupons SET used_count = used_count + 1 WHERE code = ?',
+                          [coupon_code.toUpperCase()], function(couponErr) {
+                            if (couponErr) {
+                              console.error('Error updating coupon usage count:', couponErr);
+                            } else {
+                              console.log(`Updated usage count for coupon ${coupon_code}: ${this.changes} rows affected`);
+                            }
+                          });
+
+                        // If this is a winner coupon, mark it as used
+                        db.run('UPDATE coupon_winners SET is_used = 1, used_at = CURRENT_TIMESTAMP WHERE coupon_code = ? AND user_id = ? AND is_used = 0',
+                          [coupon_code.toUpperCase(), userId], function(winnerErr) {
+                            if (winnerErr) {
+                              console.error('Error marking winner coupon as used:', winnerErr);
+                            } else if (this.changes > 0) {
+                              console.log(`Marked winner coupon ${coupon_code} as used for user ${userId}`);
+                            }
+                          });
+                      } else {
+                        console.log('Skipping coupon usage mark because payment not confirmed yet');
+                      }
                     }
 
                     // Coupon usage tracking removed - email system disabled
