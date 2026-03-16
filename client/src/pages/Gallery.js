@@ -185,7 +185,7 @@ const Gallery = () => {
         <div className="gallery-header">
           <h1 className="gallery-title">
             <i className="fas fa-images me-3 gallery-title-icon" style={{ fontSize: '2.5rem' }}></i>
-            Event Gallery
+            EVENT GALLERY
           </h1>
           <p className="gallery-subtitle">
             Relive the magical moments from our cinematic events

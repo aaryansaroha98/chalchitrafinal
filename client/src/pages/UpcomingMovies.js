@@ -366,7 +366,7 @@ const UpcomingMovies = () => {
               marginRight: '0.75rem',
               fontSize: '2rem'
             }}></i>
-            Upcoming Movies
+            UPCOMING MOVIES
           </h1>
           <p className="upcoming-subtitle" style={{
             fontSize: '1.1rem',

@@ -156,7 +156,7 @@ const Team = () => {
             textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)',
             letterSpacing: '-0.02em'
           }}>
-        Our Team
+        OUR TEAM
           </h1>
           <p className="team-subtitle" style={{
             fontSize: '1.2rem',

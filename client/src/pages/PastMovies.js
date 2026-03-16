@@ -174,7 +174,7 @@ const PastMovies = () => {
               marginRight: '0.75rem',
               fontSize: '2rem'
             }}></i>
-            Past Movies
+            PAST MOVIES
           </h1>
           <p className="past-movies-subtitle" style={{
             fontSize: '1.1rem',
