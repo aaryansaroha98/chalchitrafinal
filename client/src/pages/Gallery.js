@@ -182,12 +182,12 @@ const Gallery = () => {
 
       <Container className="gallery-container" style={{ padding: '6rem 2rem 4rem', position: 'relative', zIndex: 2 }}>
         {/* Professional Header */}
-        <div className="gallery-header">
-          <h1 className="gallery-title">
-            <i className="fas fa-images me-3 gallery-title-icon" style={{ fontSize: '2.5rem' }}></i>
+        <div className="gallery-header" style={{ textAlign: 'center', marginBottom: '1.5rem', marginTop: '-5rem', padding: '0 1rem' }}>
+          <h1 className="gallery-title" style={{ fontSize: '2.5rem', fontWeight: '600', color: 'white', marginBottom: '1rem', letterSpacing: '-0.025em' }}>
+            <i className="fas fa-images me-3 gallery-title-icon" style={{ fontSize: '2rem', color: '#007bff', marginRight: '0.75rem' }}></i>
             EVENT GALLERY
           </h1>
-          <p className="gallery-subtitle">
+          <p className="gallery-subtitle" style={{ fontSize: '1.1rem', color: '#6c757d', maxWidth: '600px', margin: '0 auto', lineHeight: '1.6', fontWeight: '400' }}>
             Relive the magical moments from our cinematic events
           </p>
         </div>

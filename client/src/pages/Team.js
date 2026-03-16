@@ -145,26 +145,26 @@ const Team = () => {
         {/* Professional Header */}
         <div className="team-header" style={{
           textAlign: 'center',
-          marginBottom: '2rem',
-          marginTop: '-4rem'
+          marginBottom: '1.5rem',
+          marginTop: '-5rem',
+          padding: '0 1rem'
         }}>
           <h1 className="team-title" style={{
-            fontSize: '3.5rem',
+            fontSize: '2.5rem',
             fontWeight: '600',
             color: 'white',
             marginBottom: '1rem',
-            textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)',
-            letterSpacing: '-0.02em'
+            letterSpacing: '-0.025em'
           }}>
         OUR TEAM
           </h1>
           <p className="team-subtitle" style={{
-            fontSize: '1.2rem',
-            color: 'white',
+            fontSize: '1.1rem',
+            color: '#6c757d',
             maxWidth: '600px',
             margin: '0 auto',
             lineHeight: '1.6',
-            fontWeight: '300'
+            fontWeight: '400'
           }}>
             Meet the passionate individuals behind Chalchitra Series
           </p>
