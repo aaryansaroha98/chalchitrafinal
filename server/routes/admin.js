@@ -1511,6 +1511,13 @@ router.post('/coupon-winners/send', requireAdmin, (req, res) => {
   const { user_ids: rawUserIds, discount_amount, discount_type = 'fixed', max_discount, expiry_days = 30, winner_message = 'You have been selected as a coupon winner!' } = req.body;
   let userIds = Array.isArray(rawUserIds) ? [...rawUserIds] : [];
 
+  // Normalize numeric inputs to avoid "" -> double precision errors
+  const discountValue = Number(discount_amount);
+  const maxDiscountValue = max_discount === '' || max_discount === undefined || max_discount === null
+    ? null
+    : Number(max_discount);
+  const expiryDaysValue = Number(expiry_days) || 30;
+
   console.log('🎯 Received winner_message:', winner_message);
   console.log('🎯 Full request body:', req.body);
 
@@ -1529,7 +1536,7 @@ router.post('/coupon-winners/send', requireAdmin, (req, res) => {
     return res.status(400).json({ error: 'User IDs array is required' });
   }
 
-  if (!discount_amount || discount_amount <= 0) {
+  if (!discountValue || discountValue <= 0 || Number.isNaN(discountValue)) {
     return res.status(400).json({ error: 'Valid discount amount is required' });
   }
 
@@ -1537,7 +1544,7 @@ router.post('/coupon-winners/send', requireAdmin, (req, res) => {
     return res.status(400).json({ error: 'Discount type must be "fixed" or "percentage"' });
   }
 
-  if (discount_type === 'percentage' && (discount_amount < 0 || discount_amount > 100)) {
+  if (discount_type === 'percentage' && (discountValue < 0 || discountValue > 100)) {
     return res.status(400).json({ error: 'Percentage discount must be between 0 and 100' });
   }
 
@@ -1564,7 +1571,7 @@ router.post('/coupon-winners/send', requireAdmin, (req, res) => {
   console.log('✅ Final user list for processing:', userIds.length, 'users');
 
   const expiryDate = new Date();
-  expiryDate.setDate(expiryDate.getDate() + parseInt(expiry_days));
+  expiryDate.setDate(expiryDate.getDate() + parseInt(expiryDaysValue));
   const adminId = req.user?.id || 1;
 
   // Get user details
@@ -1653,11 +1660,11 @@ router.post('/coupon-winners/send', requireAdmin, (req, res) => {
             }
 
             // Code is unique, create coupon
-            const couponDescription = `Individual discount for ${user.name} - ${discount_type === 'percentage' ? discount_amount + '% off' : '₹' + discount_amount + ' off'}`;
+            const couponDescription = `Individual discount for ${user.name} - ${discount_type === 'percentage' ? discountValue + '% off' : '₹' + discountValue + ' off'}`;
 
             db.run(`INSERT INTO coupons (code, description, discount_type, discount_value, min_purchase, max_discount, usage_limit, expiry_date)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-              [couponCode, couponDescription, discount_type, discount_amount, 0, max_discount, 1, expiryDate.toISOString()],
+              [couponCode, couponDescription, discount_type, discountValue, 0, maxDiscountValue, 1, expiryDate.toISOString()],
               function (couponErr) {
                 if (couponErr) {
                   console.error('Error creating coupon:', couponErr);
@@ -1673,7 +1680,7 @@ router.post('/coupon-winners/send', requireAdmin, (req, res) => {
                 console.log('📝 Creating winner record for user:', user.email, 'coupon code:', couponCode);
                 db.run(`INSERT INTO coupon_winners (user_id, coupon_code, discount_amount, discount_type, max_discount, expiry_date, sent_by, shared_coupon_id)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-                  [user.id, couponCode, discount_amount, discount_type, max_discount, expiryDate.toISOString(), adminId, couponId],
+                  [user.id, couponCode, discountValue, discount_type, maxDiscountValue, expiryDate.toISOString(), adminId, couponId],
                   function (winnerErr) {
                     console.log('🏆 Winner record callback executed for:', user.email);
                     if (winnerErr) {
