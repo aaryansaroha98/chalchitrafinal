@@ -35,7 +35,11 @@ const Home = () => {
     if (!isDesktop || !isHomePath) return;
     hasAutoScrolled.current = true;
     const timer = setTimeout(() => {
-      window.scrollTo({ top: window.innerHeight * 0.25, behavior: 'smooth' });
+      // Scroll a bit further and make sure navbar becomes visible
+      window.scrollTo({ top: window.innerHeight * 0.35, behavior: 'smooth' });
+      setTimeout(() => {
+        window.dispatchEvent(new Event('scroll'));
+      }, 600);
     }, 900); // let hero load before nudging
     return () => clearTimeout(timer);
   }, []);
