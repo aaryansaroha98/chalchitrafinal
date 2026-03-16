@@ -330,7 +330,7 @@ const Home = () => {
               marginRight: '0.75rem',
               fontSize: '2rem'
             }}></i>
-            Welcome to Chalchitra
+            WELCOME TO CHALCHITRA
           </h1>
           <p style={{
             fontSize: '1.05rem',
@@ -357,7 +357,7 @@ const Home = () => {
             display: 'none'
           }}
         >
-          Welcome to Chalchitra
+          WELCOME TO CHALCHITRA
         </div>
         <div
           className="home-upcoming-subtitle"
