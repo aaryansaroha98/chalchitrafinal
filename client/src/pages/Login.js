@@ -367,7 +367,7 @@ const Login = () => {
                         backdropFilter: 'blur(20px)',
                         border: '1px solid rgba(255, 255, 255, 0.1)',
                         borderRadius: '16px',
-                        padding: '0.55rem 1.6rem',
+                        padding: 'clamp(0.38rem, 2vw, 0.55rem) 1.6rem',
                         fontSize: '0.9rem',
                         fontWeight: '400',
                         color: 'white',
