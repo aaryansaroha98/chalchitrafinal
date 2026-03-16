@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Alert } from 'react-bootstrap';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -10,6 +10,7 @@ import Loader from '../components/Loader';
 const Home = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
+  const hasAutoScrolled = useRef(false);
   const [upcomingMovies, setUpcomingMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -24,6 +25,19 @@ const Home = () => {
   useEffect(() => {
     fetchUpcomingMovies();
     fetchSettings();
+  }, []);
+
+  // Gentle auto-scroll on desktop to reveal content below hero video
+  useEffect(() => {
+    if (hasAutoScrolled.current) return;
+    const isDesktop = window.innerWidth >= 992;
+    const isHomePath = window.location.pathname === '/' || window.location.pathname === '';
+    if (!isDesktop || !isHomePath) return;
+    hasAutoScrolled.current = true;
+    const timer = setTimeout(() => {
+      window.scrollTo({ top: window.innerHeight * 0.25, behavior: 'smooth' });
+    }, 900); // let hero load before nudging
+    return () => clearTimeout(timer);
   }, []);
 
   const fetchSettings = async () => {
