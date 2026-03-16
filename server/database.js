@@ -637,6 +637,7 @@ if (usePostgres) {
           ensureUserCreatedAtColumn();
           ensureGalleryEventDateColumn();
           ensureEmailHistoryBookingId();
+          ensureCouponWinnerColumns();
           createDefaultData();
         }
       });
@@ -719,6 +720,35 @@ if (usePostgres) {
           console.log('✅ email_history.booking_id column added');
         });
       }
+    });
+  }
+
+  // Ensure coupon_winners has latest columns used by winner email flow
+  function ensureCouponWinnerColumns() {
+    db.all('PRAGMA table_info(coupon_winners)', [], (err, columns) => {
+      if (err) {
+        console.log('⚠️  Could not inspect coupon_winners table columns:', err.message);
+        return;
+      }
+
+      const colNames = Array.isArray(columns) ? columns.map((c) => c.name) : [];
+      const addColumn = (name, sql) => {
+        if (!colNames.includes(name)) {
+          db.run(sql, (alterErr) => {
+            if (alterErr) {
+              console.log(`⚠️  Could not add coupon_winners.${name}:`, alterErr.message);
+            } else {
+              console.log(`✅ coupon_winners.${name} column added`);
+            }
+          });
+        }
+      };
+
+      addColumn('max_discount', 'ALTER TABLE coupon_winners ADD COLUMN max_discount DOUBLE PRECISION');
+      addColumn('expiry_date', 'ALTER TABLE coupon_winners ADD COLUMN expiry_date TIMESTAMP');
+      addColumn('sent_by', 'ALTER TABLE coupon_winners ADD COLUMN sent_by INTEGER');
+      addColumn('shared_coupon_id', 'ALTER TABLE coupon_winners ADD COLUMN shared_coupon_id INTEGER');
+      addColumn('created_at', 'ALTER TABLE coupon_winners ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
     });
   }
 

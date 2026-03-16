@@ -6696,14 +6696,24 @@ const AdminPanel = () => {
 
               const total = data.total_users ?? selectedWinners.length;
               const sent = data.sent_count ?? (data.success === false ? total - (data.failed_email_count || 0) : total);
-              const failedList = data.failed_emails || [];
-              const failedCount = data.failed_email_count ?? failedList.length ?? 0;
+              const failedEmailList = data.failed_emails || [];
+              const failedEmailCount = data.failed_email_count ?? failedEmailList.length ?? 0;
+              const failedRecordCount = data.failed_record_count ?? 0;
+              const results = data.results || [];
+              const emailFailures = results.filter(r => r.status === 'email_failed');
+              const recordFailures = results.filter(r => r.status === 'failed');
               const message = data.message || `Processed ${total} winners`;
 
-              if (failedCount > 0 || data.success === false) {
-                alert(
-                  `${message}\nSent: ${sent}/${total}\nFailed: ${failedCount}${failedList.length ? ` (${failedList.join(', ')})` : ''}`
-                );
+              if (failedEmailCount > 0 || failedRecordCount > 0 || data.success === false) {
+                const lines = [
+                  message,
+                  `Sent: ${sent}/${total}`,
+                  `Email failed: ${failedEmailCount}${failedEmailList.length ? ` (${failedEmailList.join(', ')})` : ''}`,
+                  failedRecordCount ? `Record failed: ${failedRecordCount}` : null,
+                  emailFailures.length ? `Last email error: ${emailFailures[emailFailures.length - 1].email_error}` : null,
+                  recordFailures.length ? `Last record error: ${recordFailures[recordFailures.length - 1].error || recordFailures[recordFailures.length - 1].email_error || 'unknown'}` : null,
+                ].filter(Boolean);
+                alert(lines.join('\n'));
               } else {
                 alert(message || `Success! ${total} coupon winners selected and emails sent!`);
               }
