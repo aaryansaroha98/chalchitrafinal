@@ -79,7 +79,7 @@ const NavigationBar = () => {
 
         {/* Desktop: Main nav links - Center */}
         <div className="d-none d-lg-flex" style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
-          <Nav style={{ display: 'flex', gap: '0.20rem' }}>
+          <Nav style={{ display: 'flex', gap: '0.35rem' }}>
             <Nav.Link as={Link} to="/" style={{ padding: '0.1rem 0.5rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '0.85rem', letterSpacing: '-0.5px' }} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>Home</Nav.Link>
             <Nav.Link as={Link} to="/upcoming-movies" style={{ padding: '0.1rem 0.5rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '0.85rem', letterSpacing: '-0.5px' }} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>Upcoming</Nav.Link>
             <Nav.Link as={Link} to="/past-movies" style={{ padding: '0.1rem 0.5rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '0.85rem', letterSpacing: '-0.5px' }} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>Past Movies</Nav.Link>
@@ -89,8 +89,8 @@ const NavigationBar = () => {
         </div>
 
         {/* Desktop: User nav links - Right */}
-        <div className="d-none d-lg-flex" style={{ display: 'flex', alignItems: 'center', gap: '0.20rem', marginLeft: 'auto' }}>
-          <Nav style={{ display: 'flex', gap: '0.20rem', alignItems: 'center' }}>
+        <div className="d-none d-lg-flex" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginLeft: 'auto' }}>
+          <Nav style={{ display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
             {user ? (
               <>
                 <Nav.Link as={Link} to="/my-bookings" style={{ padding: '0.1rem 0.5rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '0.85rem', letterSpacing: '-0.5px' }} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}><i className="fas fa-ticket-alt me-1"></i>My Bookings</Nav.Link>
