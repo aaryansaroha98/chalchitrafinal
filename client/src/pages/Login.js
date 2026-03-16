@@ -265,15 +265,15 @@ const Login = () => {
                       textAlign: 'center',
                       marginBottom: '1.5rem'
                     }}>
-                      <h1 style={{
-                        color: 'white',
-                        fontSize: '2.6rem',
-                        fontWeight: '600',
-                        marginBottom: '0.35rem',
-                        letterSpacing: '0.6px'
-                      }}>
-                        Login
-                      </h1>
+                    <h1 style={{
+                      color: 'white',
+                      fontSize: '2.6rem',
+                      fontWeight: '600',
+                      marginBottom: '0.35rem',
+                      letterSpacing: '0.6px'
+                    }}>
+                      LOGIN
+                    </h1>
                       <div style={{
                         width: '52px',
                         height: '1.5px',
