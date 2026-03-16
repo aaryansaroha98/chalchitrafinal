@@ -272,7 +272,7 @@ const Login = () => {
                       marginBottom: '0.35rem',
                       letterSpacing: '0.6px'
                     }}>
-                      LOGIN
+                      SIGN IN
                     </h1>
                       <div style={{
                         width: '52px',
