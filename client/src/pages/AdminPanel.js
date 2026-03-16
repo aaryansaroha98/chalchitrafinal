@@ -257,6 +257,7 @@ const AdminPanel = () => {
     winner_message: 'You have been selected as a coupon winner!'
   });
   const [winnerSearchTerm, setWinnerSearchTerm] = useState('');
+  const [winnerSending, setWinnerSending] = useState(false);
   const [selectedCoupons, setSelectedCoupons] = useState([]);
   const [selectAllCoupons, setSelectAllCoupons] = useState(false);
   const normalizedSingleEmailSearch = singleEmailSearch.trim().toLowerCase();
@@ -6671,6 +6672,7 @@ const AdminPanel = () => {
           </Modal.Header>
           <Form onSubmit={async (e) => {
             e.preventDefault();
+            if (winnerSending) return;
             if (selectedWinners.length === 0) {
               alert('Please select at least one winner.');
               return;
@@ -6680,6 +6682,7 @@ const AdminPanel = () => {
               return;
             }
             try {
+              setWinnerSending(true);
               const result = await api.post('/api/admin/coupon-winners/send', {
                 user_ids: selectedWinners,
                 discount_amount: winnerForm.discount_amount,
@@ -6688,7 +6691,22 @@ const AdminPanel = () => {
                 expiry_days: winnerForm.expiry_days,
                 winner_message: winnerForm.winner_message
               });
-              alert(`Success! ${result.data.total_users} coupon winners selected and emails sent!`);
+              const data = result.data || {};
+              console.log('Winner email API response:', data);
+
+              const total = data.total_users ?? selectedWinners.length;
+              const sent = data.sent_count ?? (data.success === false ? total - (data.failed_email_count || 0) : total);
+              const failedList = data.failed_emails || [];
+              const failedCount = data.failed_email_count ?? failedList.length ?? 0;
+              const message = data.message || `Processed ${total} winners`;
+
+              if (failedCount > 0 || data.success === false) {
+                alert(
+                  `${message}\nSent: ${sent}/${total}\nFailed: ${failedCount}${failedList.length ? ` (${failedList.join(', ')})` : ''}`
+                );
+              } else {
+                alert(message || `Success! ${total} coupon winners selected and emails sent!`);
+              }
               setShowWinnerModal(false);
               setSelectedWinners([]);
               setWinnerForm({
@@ -6714,6 +6732,8 @@ const AdminPanel = () => {
             } catch (err) {
               console.error('Error selecting winners:', err);
               alert('Error selecting winners: ' + (err.response?.data?.error || err.message));
+            } finally {
+              setWinnerSending(false);
             }
           }}>
             <Modal.Body>
@@ -6904,10 +6924,12 @@ const AdminPanel = () => {
               <Button
                 variant="success"
                 type="submit"
-                disabled={selectedWinners.length === 0 || !winnerForm.discount_amount}
+                disabled={winnerSending || selectedWinners.length === 0 || !winnerForm.discount_amount}
               >
                 <i className="fas fa-trophy me-2"></i>
-                Select {selectedWinners.length} Winner{selectedWinners.length !== 1 ? 's' : ''} & Send Emails
+                {winnerSending
+                  ? 'Sending...'
+                  : `Select ${selectedWinners.length} Winner${selectedWinners.length !== 1 ? 's' : ''} & Send Emails`}
               </Button>
             </Modal.Footer>
           </Form>
