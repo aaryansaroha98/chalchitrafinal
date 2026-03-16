@@ -924,6 +924,24 @@ async function sendBrevoEmail(options) {
   return data;
 }
 
+// Helper: retry Brevo email a few times to smooth over transient failures/rate limits
+async function sendEmailWithRetry(emailOptions, maxRetries = 2) {
+  let attempt = 0;
+  let lastError;
+  while (attempt <= maxRetries) {
+    try {
+      return await sendBrevoEmail(emailOptions);
+    } catch (err) {
+      lastError = err;
+      attempt += 1;
+      if (attempt > maxRetries) break;
+      const delay = 500 * attempt; // backoff: 0.5s, 1s, 1.5s...
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  throw lastError;
+}
+
 // Get all users for email sending
 router.get('/email/users', requireAdmin, (req, res) => {
   db.all('SELECT id, name, email FROM users ORDER BY name', [], (err, users) => {
@@ -1703,20 +1721,31 @@ router.post('/coupon-winners/send', requireAdmin, (req, res) => {
                         </div>
                       `;
 
-                      sendBrevoEmail({
+                      sendEmailWithRetry({
                         sender: getBrevoSender(),
                         to: [{ email: user.email, name: user.name }],
                         subject: 'Your Exclusive Chalchitra Coupon Code!',
                         htmlContent: emailHtml
-                      }).then((data) => {
+                      }, 2).then((data) => {
                         console.log('✅ Email sent successfully to:', user.email, 'messageId:', data?.messageId);
                         resultEntry.status = 'sent';
                         resultEntry.messageId = data?.messageId;
+
+                        db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
+                                VALUES (?, ?, ?, ?, ?, ?, ?)`,
+                          ['winner', user.email, user.name, 'Your Exclusive Chalchitra Coupon Code!', winner_message, adminId, 'sent'],
+                          (logErr) => { if (logErr) console.error('Error logging winner email success:', logErr); });
+
                         processUser(userIndex + 1);
                       }).catch(sendError => {
                         console.error('❌ FAILED to send coupon email to', user.email, ':', sendError.message);
                         resultEntry.status = 'email_failed';
                         resultEntry.email_error = sendError.message;
+
+                        db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status, error_message)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                          ['winner', user.email, user.name, 'Your Exclusive Chalchitra Coupon Code!', winner_message, adminId, 'failed', sendError.message],
+                          (logErr) => { if (logErr) console.error('Error logging winner email failure:', logErr); });
 
                         // Delete the coupon and winner record since email failed
                         db.run('DELETE FROM coupons WHERE id = ?', [couponId], (deleteCouponErr) => {
