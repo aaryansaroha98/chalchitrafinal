@@ -35,13 +35,6 @@ const TermsOfService = () => {
               }}>
                 Terms of Service
               </h1>
-              <p className="policy-subtitle terms-subtitle" style={{
-                color: '#cccccc',
-                fontSize: '1rem',
-                margin: 0
-              }}>
-                Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-              </p>
             </div>
 
             {/* Content */}
