@@ -1490,15 +1490,24 @@ router.get('/coupon-winners', requireAdmin, (req, res) => {
 
 // Send coupon codes to winners - MEMORY OPTIMIZED VERSION
 router.post('/coupon-winners/send', requireAdmin, (req, res) => {
-  const { user_ids, discount_amount, discount_type = 'fixed', max_discount, expiry_days = 30, winner_message = 'You have been selected as a coupon winner!' } = req.body;
+  const { user_ids: rawUserIds, discount_amount, discount_type = 'fixed', max_discount, expiry_days = 30, winner_message = 'You have been selected as a coupon winner!' } = req.body;
+  let userIds = Array.isArray(rawUserIds) ? [...rawUserIds] : [];
 
   console.log('🎯 Received winner_message:', winner_message);
   console.log('🎯 Full request body:', req.body);
 
-  console.log('Coupon winners request received:', { user_ids: user_ids?.length, discount_amount, discount_type });
+  console.log('Coupon winners request received:', { user_ids: userIds?.length, discount_amount, discount_type });
+
+  if (!process.env.BREVO_API_KEY) {
+    console.error('❌ BREVO_API_KEY is not set. Cannot send winner emails.');
+    return res.status(500).json({
+      error: 'Email is not configured. Set BREVO_API_KEY (Brevo SMTP API key) and try again.',
+      hint: 'Add BREVO_API_KEY and BREVO_FROM_EMAIL to your environment or Render/Neon secrets.'
+    });
+  }
 
   // Validate input
-  if (!user_ids || !Array.isArray(user_ids) || user_ids.length === 0) {
+  if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
     return res.status(400).json({ error: 'User IDs array is required' });
   }
 
@@ -1515,34 +1524,34 @@ router.post('/coupon-winners/send', requireAdmin, (req, res) => {
   }
 
   // Limit to prevent memory issues - reduce to 5 max
-  if (user_ids.length > 5) {
+  if (userIds.length > 5) {
     return res.status(400).json({ error: 'Cannot process more than 5 users at once. Please select fewer users.' });
   }
 
-  console.log('🚀 Starting coupon winner creation for', user_ids.length, 'users:', user_ids);
+  console.log('🚀 Starting coupon winner creation for', userIds.length, 'users:', userIds);
 
   // Validate that user_ids array contains unique IDs only
-  const uniqueUserIds = [...new Set(user_ids)];
-  if (uniqueUserIds.length !== user_ids.length) {
+  const uniqueUserIds = [...new Set(userIds)];
+  if (uniqueUserIds.length !== userIds.length) {
     console.warn('⚠️ Duplicate user IDs detected, removing duplicates');
-    user_ids = uniqueUserIds;
+    userIds = uniqueUserIds;
   }
 
   // Double check the limit
-  if (user_ids.length > 5) {
-    console.error('❌ Too many users selected:', user_ids.length);
+  if (userIds.length > 5) {
+    console.error('❌ Too many users selected:', userIds.length);
     return res.status(400).json({ error: 'Cannot process more than 5 users at once. Please select fewer users.' });
   }
 
-  console.log('✅ Final user list for processing:', user_ids.length, 'users');
+  console.log('✅ Final user list for processing:', userIds.length, 'users');
 
   const expiryDate = new Date();
   expiryDate.setDate(expiryDate.getDate() + parseInt(expiry_days));
   const adminId = req.user?.id || 1;
 
   // Get user details
-  const placeholders = user_ids.map(() => '?').join(',');
-  db.all(`SELECT id, name, email FROM users WHERE id IN (${placeholders})`, user_ids, (err, users) => {
+  const placeholders = userIds.map(() => '?').join(',');
+  db.all(`SELECT id, name, email FROM users WHERE id IN (${placeholders})`, userIds, (err, users) => {
     if (err) {
       console.error('Error getting users:', err);
       return res.status(500).json({ error: 'Failed to get user details: ' + err.message });
@@ -1554,23 +1563,41 @@ router.post('/coupon-winners/send', requireAdmin, (req, res) => {
 
     const results = [];
     const generatedCodes = [];
-    let processed = 0;
 
     // Process each user synchronously to avoid memory issues
     const processUser = (userIndex) => {
       if (userIndex >= users.length) {
         // All done
         console.log('All coupon winners processed successfully');
-        return res.json({
-          message: `Individual coupon codes created for ${users.length} selected user${users.length > 1 ? 's' : ''}.`,
+
+        const sentCount = results.filter(r => r.status === 'sent').length;
+        const failedEmails = results.filter(r => r.status === 'email_failed');
+        const failedRecords = results.filter(r => r.status === 'failed');
+        const isSuccess = failedEmails.length === 0 && failedRecords.length === 0;
+
+        const responsePayload = {
+          success: isSuccess,
+          message: isSuccess
+            ? `Emails sent to all ${users.length} winner${users.length > 1 ? 's' : ''}.`
+            : `Emails sent to ${sentCount}/${users.length} winner${users.length > 1 ? 's' : ''}.`,
           total_users: users.length,
+          sent_count: sentCount,
+          failed_email_count: failedEmails.length,
+          failed_record_count: failedRecords.length,
           results: results,
           discount_amount: discount_amount,
           discount_type: discount_type,
           expiry_date: expiryDate.toISOString(),
           generated_codes: generatedCodes,
           note: 'Codes are stored in database and can be viewed in history.'
-        });
+        };
+
+        if (!isSuccess) {
+          responsePayload.error = 'Some winner emails failed to send.';
+          responsePayload.failed_emails = failedEmails.map(r => r.email);
+        }
+
+        return res.status(isSuccess ? 200 : 207).json(responsePayload);
       }
 
       const user = users[userIndex];
@@ -1636,7 +1663,8 @@ router.post('/coupon-winners/send', requireAdmin, (req, res) => {
                       processUser(userIndex + 1);
                     } else {
                       console.log('✅ Created coupon winner for:', user.email, 'Code:', couponCode);
-                      results.push({ user: user.name, email: user.email, coupon_code: couponCode, status: 'recorded' });
+                      const resultEntry = { user: user.name, email: user.email, coupon_code: couponCode, status: 'recorded' };
+                      results.push(resultEntry);
 
                       // Send email to user via Brevo
                       console.log('📧 Sending coupon email via Brevo...');
@@ -1682,11 +1710,13 @@ router.post('/coupon-winners/send', requireAdmin, (req, res) => {
                         htmlContent: emailHtml
                       }).then((data) => {
                         console.log('✅ Email sent successfully to:', user.email, 'messageId:', data?.messageId);
-                        results.push({ user: user.name, email: user.email, coupon_code: couponCode, status: 'sent' });
+                        resultEntry.status = 'sent';
+                        resultEntry.messageId = data?.messageId;
                         processUser(userIndex + 1);
                       }).catch(sendError => {
                         console.error('❌ FAILED to send coupon email to', user.email, ':', sendError.message);
-                        results.push({ user: user.name, email: user.email, coupon_code: couponCode, status: 'email_failed', email_error: sendError.message });
+                        resultEntry.status = 'email_failed';
+                        resultEntry.email_error = sendError.message;
 
                         // Delete the coupon and winner record since email failed
                         db.run('DELETE FROM coupons WHERE id = ?', [couponId], (deleteCouponErr) => {
