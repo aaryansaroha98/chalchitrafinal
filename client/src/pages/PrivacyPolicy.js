@@ -33,7 +33,7 @@ const PrivacyPolicy = () => {
                 fontWeight: '600',
                 marginBottom: '1rem'
               }}>
-                Privacy Policy
+                PRIVACY POLICY
               </h1>
             </div>
 

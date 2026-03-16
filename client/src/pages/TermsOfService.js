@@ -33,7 +33,7 @@ const TermsOfService = () => {
                 fontWeight: '600',
                 marginBottom: '1rem'
               }}>
-                Terms of Service
+                TERMS OF SERVICE
               </h1>
             </div>
 

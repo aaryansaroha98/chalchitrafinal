@@ -33,7 +33,7 @@ const RefundPolicy = () => {
                 fontWeight: '600',
                 marginBottom: '1rem'
               }}>
-                Refund and Cancellation Policy
+                REFUND AND CANCELLATION POLICY
               </h1>
             </div>
 

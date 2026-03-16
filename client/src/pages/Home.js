@@ -691,7 +691,7 @@ const Home = () => {
                   marginBottom: '1.5rem',
                   letterSpacing: '-0.025em'
                 }}>
-                  About Us
+                  ABOUT US
                 </h2>
                 <div className="about-text" style={{
                   fontSize: '1.18rem',
