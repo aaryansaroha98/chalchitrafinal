@@ -241,7 +241,7 @@ const Login = () => {
                       letterSpacing: '1px',
                       textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
                     }}>
-                      WELCOME TO CHALCHITRA
+                      Welcome to Chalchitra
                     </h3>
                     <p style={{
                       color: 'rgba(255, 255, 255, 0.7)',
@@ -272,7 +272,7 @@ const Login = () => {
                       marginBottom: '0.35rem',
                       letterSpacing: '0.6px'
                     }}>
-                      SIGN IN
+                      LOGIN
                     </h1>
                       <div style={{
                         width: '52px',
