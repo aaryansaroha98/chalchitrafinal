@@ -382,44 +382,83 @@ const Payment = () => {
                   return;
                 }
 
-                // For paid bookings, use Instamojo dynamic link
-                try {
-                  setProcessing(true);
+                // For paid bookings, use Razorpay
+                const options = {
+                  key: 'rzp_test_S4CeLCFntBQ1aD',
+                  amount: totalAmount * 100,
+                  currency: 'INR',
+                  name: 'Chalchitra',
+                  description: `Tickets for ${movie?.title}`,
+                  image: '/logos/newlogo.png',
+                  handler: async function (response) {
+                    try {
+                      const movieIdToUse = movieIdFromState || movieId;
+                      const bookingRes = await api.post('/api/bookings', {
+                        movie_id: movieIdToUse,
+                        selectedSeats: selectedSeats,
+                        quantity: quantity,
+                        payment_id: response.razorpay_payment_id,
+                        customer_details: customerDetails,
+                        food_orders: selectedFoods
+                      });
 
-                  // Persist pending booking so success page can finalize after redirect
-                  const pending = {
-                    movie_id: movieIdFromState || movieId,
-                    selectedSeats,
-                    quantity,
-                    customerDetails,
-                    food_orders: selectedFoods,
-                    totalAmount
-                  };
-                  sessionStorage.setItem('pending_booking', JSON.stringify(pending));
+                      const successPayload = {
+                        ticket: bookingRes.data,
+                        movie: movie,
+                        payment: {
+                          transaction_id: response.razorpay_payment_id,
+                          amount: totalAmount,
+                          method: 'razorpay'
+                        },
+                        selectedSeats: selectedSeats,
+                        customerDetails: customerDetails
+                      };
 
-                  const createRes = await api.post('/api/payments/instamojo/create', {
-                    amount: totalAmount,
-                    purpose: `Chalchitra - ${movie?.title || 'Ticket'}`,
-                    buyer_name: customerDetails?.name,
-                    email: customerDetails?.email,
-                    phone: customerDetails?.phone,
-                    redirect_url: `${window.location.origin}/payment-success`,
-                    metadata: { booking_id_hint: `${Date.now()}`, movie_id: pending.movie_id }
-                  });
+                      try {
+                        sessionStorage.setItem('payment_success', JSON.stringify(successPayload));
+                      } catch (storageErr) {
+                        console.warn('Failed to store payment success payload:', storageErr);
+                      }
 
-                  const longurl = createRes.data?.longurl;
-                  if (!longurl) {
-                    setProcessing(false);
-                    setError('Failed to create payment. Please try again.');
-                    return;
+                      navigate('/payment-success', { state: successPayload, replace: true });
+
+                      // Fallback: if navigation fails, force redirect
+                      setTimeout(() => {
+                        if (window.location.pathname === '/payment') {
+                          window.location.href = '/payment-success';
+                        }
+                      }, 300);
+                    } catch (err) {
+                      setError('Booking failed. Please try again.');
+                    } finally {
+                      setProcessing(false);
+                    }
+                  },
+                  prefill: {
+                    name: customerDetails.name,
+                    email: customerDetails.email,
+                    contact: customerDetails.phone
+                  },
+                  notes: {
+                    address: 'Chalchitra IIT Jammu'
+                  },
+                  theme: {
+                    color: '#ffffff',
+                    backdrop_color: 'rgba(0, 0, 0, 0.8)'
+                  },
+                  modal: {
+                    backdropclose: false,
+                    escape: false,
+                    confirm_close: true,
+                    ondismiss: function() {
+                      setProcessing(false);
+                      setError('Payment was cancelled.');
+                    }
                   }
+                };
 
-                  window.location.href = longurl;
-                } catch (err) {
-                  console.error('Instamojo create failed:', err.response?.data || err.message);
-                  setError('Payment could not be initiated. Please try again.');
-                  setProcessing(false);
-                }
+                const rzp = new window.Razorpay(options);
+                rzp.open();
               } catch (err) {
                 setProcessing(false);
                 setError('Payment gateway failed. Please try again.');
