@@ -408,7 +408,7 @@ const MyBookings = () => {
             fontWeight: '600',
             letterSpacing: '-0.025em'
           }}>
-            My Booking
+            MY BOOKINGS
           </h1>
 
         {error && (
