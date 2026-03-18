@@ -389,9 +389,9 @@ const MyBookings = () => {
             .my-bookings-title {
               font-size: 2.3rem !important;
               font-weight: 700 !important;
-              margin-bottom: 0.4rem !important;
-              letter-spacing: -0.01em !important;
-              margin-top: 1rem !important;
+              margin-bottom: 1rem !important;
+              letter-spacing: -0.025em !important;
+              margin-top: -2rem !important;
             }
           }
         `}
@@ -400,15 +400,16 @@ const MyBookings = () => {
       <div style={{position: 'relative', zIndex: 2}}>
         <Container>
           <h1 className="my-bookings-title" style={{
-          textAlign: 'center',
-          marginBottom: '3rem',
-          color: '#ffffff',
-          fontSize: '3rem',
-          fontWeight: '700',
-          letterSpacing: '-0.01em'
-        }}>
-          My Booking
-        </h1>
+            textAlign: 'center',
+            marginBottom: '1.5rem',
+            marginTop: '-5rem',
+            color: '#ffffff',
+            fontSize: '2.5rem',
+            fontWeight: '600',
+            letterSpacing: '-0.025em'
+          }}>
+            My Booking
+          </h1>
 
         {error && (
           <Alert variant="danger" style={{marginBottom: '2rem'}}>
