@@ -290,7 +290,7 @@ const MyBookings = () => {
   }
 
   return (
-    <div className="bg-void" style={{minHeight: '100vh', position: 'relative', overflow: 'hidden', padding: '2rem 0'}}>
+    <div className="bg-void" style={{minHeight: '100vh', position: 'relative', overflow: 'hidden'}}>
       {/* Classic Simple Animated Background */}
       <div style={{
         position: 'fixed',
@@ -385,31 +385,80 @@ const MyBookings = () => {
 
       <style>
         {`
+          .my-bookings-container {
+            padding: 6rem 2rem 3.5rem;
+          }
+
+          .my-bookings-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            margin-top: -4.5rem;
+            padding: 0 1rem;
+          }
+
+          .my-bookings-title {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 0.85rem;
+            letter-spacing: -0.025em;
+          }
+
+          .my-bookings-title i {
+            color: #0d6efd;
+            font-size: 2rem;
+          }
+
+          .my-bookings-subtitle {
+            font-size: 1.05rem;
+            color: #6c757d;
+            max-width: 620px;
+            margin: 0 auto;
+            line-height: 1.6;
+            font-weight: 400;
+          }
+
           @media (max-width: 768px) {
+            .my-bookings-container {
+              padding: 5.2rem 1.25rem 3rem;
+            }
+
+            .my-bookings-header {
+              margin-top: -3.4rem !important;
+              margin-bottom: 1.1rem !important;
+            }
+
             .my-bookings-title {
-              font-size: 2.3rem !important;
+              font-size: 1.9rem !important;
               font-weight: 700 !important;
-              margin-bottom: 1rem !important;
-              letter-spacing: -0.025em !important;
-              margin-top: -2rem !important;
+            }
+
+            .my-bookings-title i {
+              font-size: 1.55rem !important;
+            }
+
+            .my-bookings-subtitle {
+              font-size: 1rem !important;
+              margin-top: -0.15rem !important;
             }
           }
         `}
       </style>
 
       <div style={{position: 'relative', zIndex: 2}}>
-        <Container>
-          <h1 className="my-bookings-title" style={{
-            textAlign: 'center',
-            marginBottom: '1.5rem',
-            marginTop: '-5rem',
-            color: '#ffffff',
-            fontSize: '2.5rem',
-            fontWeight: '600',
-            letterSpacing: '-0.025em'
-          }}>
-            MY BOOKINGS
-          </h1>
+        <Container className="my-bookings-container">
+          <div className="my-bookings-header">
+            <h1 className="my-bookings-title">
+              <i className="fas fa-ticket-alt"></i>
+              MY BOOKINGS
+            </h1>
+            <p className="my-bookings-subtitle">
+              Access your tickets, download passes, and manage bookings in one place.
+            </p>
+          </div>
 
         {error && (
           <Alert variant="danger" style={{marginBottom: '2rem'}}>
