@@ -383,82 +383,29 @@ const Payment = () => {
                 }
 
                 // For paid bookings, use Razorpay
-                const options = {
-                  key: 'rzp_test_S4CeLCFntBQ1aD',
-                  amount: totalAmount * 100,
-                  currency: 'INR',
-                  name: 'Chalchitra',
-                  description: `Tickets for ${movie?.title}`,
-                  image: '/logos/newlogo.png',
-                  handler: async function (response) {
-                    try {
-                      const movieIdToUse = movieIdFromState || movieId;
-                      const bookingRes = await api.post('/api/bookings', {
-                        movie_id: movieIdToUse,
-                        selectedSeats: selectedSeats,
-                        quantity: quantity,
-                        payment_id: response.razorpay_payment_id,
-                        customer_details: customerDetails,
-                        food_orders: selectedFoods
-                      });
+                // For paid bookings, use Cashfree
+                try {
+                  const movieIdToUse = movieIdFromState || movieId;
+                  const orderRes = await api.post('/api/payments/order', {
+                    movie_id: movieIdToUse,
+                    selectedSeats: selectedSeats,
+                    food_orders: selectedFoods,
+                    coupon_code: couponCode,
+                    customer_id: user?.id || 'guest',
+                    customer_email: customerDetails.email,
+                    customer_phone: customerDetails.phone
+                  });
 
-                      const successPayload = {
-                        ticket: bookingRes.data,
-                        movie: movie,
-                        payment: {
-                          transaction_id: response.razorpay_payment_id,
-                          amount: totalAmount,
-                          method: 'razorpay'
-                        },
-                        selectedSeats: selectedSeats,
-                        customerDetails: customerDetails
-                      };
-
-                      try {
-                        sessionStorage.setItem('payment_success', JSON.stringify(successPayload));
-                      } catch (storageErr) {
-                        console.warn('Failed to store payment success payload:', storageErr);
-                      }
-
-                      navigate('/payment-success', { state: successPayload, replace: true });
-
-                      // Fallback: if navigation fails, force redirect
-                      setTimeout(() => {
-                        if (window.location.pathname === '/payment') {
-                          window.location.href = '/payment-success';
-                        }
-                      }, 300);
-                    } catch (err) {
-                      setError('Booking failed. Please try again.');
-                    } finally {
-                      setProcessing(false);
-                    }
-                  },
-                  prefill: {
-                    name: customerDetails.name,
-                    email: customerDetails.email,
-                    contact: customerDetails.phone
-                  },
-                  notes: {
-                    address: 'Chalchitra IIT Jammu'
-                  },
-                  theme: {
-                    color: '#ffffff',
-                    backdrop_color: 'rgba(0, 0, 0, 0.8)'
-                  },
-                  modal: {
-                    backdropclose: false,
-                    escape: false,
-                    confirm_close: true,
-                    ondismiss: function() {
-                      setProcessing(false);
-                      setError('Payment was cancelled.');
-                    }
+                  if (orderRes.data && orderRes.data.payment_link) {
+                    window.location.href = orderRes.data.payment_link;
+                  } else {
+                    setProcessing(false);
+                    setError('Failed to create Cashfree payment order.');
                   }
-                };
-
-                const rzp = new window.Razorpay(options);
-                rzp.open();
+                } catch (err) {
+                  setProcessing(false);
+                  setError('Payment gateway failed. Please try again.');
+                }
               } catch (err) {
                 setProcessing(false);
                 setError('Payment gateway failed. Please try again.');
