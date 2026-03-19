@@ -2,7 +2,7 @@ const express = require('express');
 const axios = require('axios');
 const db = require('../database');
 const { calculateSubtotalFromDb, getCouponDiscount } = require('../utils/pricing');
-// Cashfree integration: remove Razorpay settings
+const { getRazorpayKeys } = require('../utils/razorpaySettings');
 
 const router = express.Router();
 
@@ -21,12 +21,19 @@ router.post('/order', async (req, res) => {
     return res.status(400).json({ error: 'Maximum 6 seats allowed per booking' });
   }
 
-  // Cashfree API keys from environment variables
-  const cashfreeAppId = process.env.CASHFREE_APP_ID;
-  const cashfreeSecretKey = process.env.CASHFREE_SECRET_KEY;
+  let keyId = '';
+  let keySecret = '';
+  try {
+    const keys = await getRazorpayKeys(db);
+    keyId = keys.keyId;
+    keySecret = keys.keySecret;
+  } catch (keyErr) {
+    console.error('Error loading Razorpay keys:', keyErr);
+    return res.status(500).json({ error: 'Failed to load Razorpay configuration' });
+  }
 
-  if (!cashfreeAppId || !cashfreeSecretKey) {
-    return res.status(500).json({ error: 'Cashfree keys are not configured in environment variables.' });
+  if (!keyId || !keySecret) {
+    return res.status(500).json({ error: 'Razorpay keys are not configured' });
   }
 
   db.get('SELECT * FROM movies WHERE id = ? AND is_upcoming = 1', [movie_id], async (err, movie) => {
@@ -58,47 +65,39 @@ router.post('/order', async (req, res) => {
         order_id: null,
         amount: 0,
         currency: 'INR',
+        key_id: keyId,
         final_amount: 0,
         is_free: true
       });
     }
 
-    // Cashfree order creation
-    const amount = finalAmount;
-    const orderId = `booking_${movie_id}_${Date.now()}`;
+    const amountPaise = Math.round(finalAmount * 100);
+    const receipt = `booking_${movie_id}_${Date.now()}`;
+    const auth = Buffer.from(`${keyId}:${keySecret}`).toString('base64');
+
     try {
-      const cfOrderRes = await axios.post(
-        'https://sandbox.cashfree.com/pg/orders',
+      const orderResponse = await axios.post(
+        'https://api.razorpay.com/v1/orders',
         {
-          order_id: orderId,
-          order_amount: amount,
-          order_currency: 'INR',
-          customer_details: {
-            customer_id: String(req.body.customer_id || 'guest'),
-            customer_email: req.body.customer_email || 'guest@iitjammu.ac.in',
-            customer_phone: req.body.customer_phone || ''
-          },
-          order_note: `Movie booking for ${movie_id}`
+          amount: amountPaise,
+          currency: 'INR',
+          receipt,
+          notes: {
+            movie_id: String(movie_id),
+            seats: selectedSeats.join(',')
+          }
         },
         {
           headers: {
-            'x-api-version': '2022-01-01',
-            'Content-Type': 'application/json',
-            'x-client-id': cashfreeAppId,
-            'x-client-secret': cashfreeSecretKey
+            Authorization: `Basic ${auth}`
           },
           timeout: 15000
         }
       );
 
       return res.json({
-        order_id: cfOrderRes.data.order_id,
-        payment_link: cfOrderRes.data.payment_link,
-        amount: cfOrderRes.data.order_amount,
-        currency: cfOrderRes.data.order_currency,
-        final_amount: amount,
-        is_free: false
-      });
+        order_id: orderResponse.data.id,
+        amount: orderResponse.data.amount,
         currency: orderResponse.data.currency,
         key_id: keyId,
         final_amount: finalAmount,
