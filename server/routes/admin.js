@@ -853,7 +853,7 @@ router.put('/settings', requireAdmin, uploadFields, (req, res) => {
 
 // Get team members (public - for team page)
 router.get('/team', (req, res) => {
-  db.all('SELECT * FROM team ORDER BY name', [], (err, team) => {
+  db.all('SELECT * FROM team ORDER BY section, display_order, name', [], (err, team) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(team);
   });
@@ -861,9 +861,9 @@ router.get('/team', (req, res) => {
 
 // Add team member
 router.post('/team', requireAdmin, uploadTeam.single('photo'), (req, res) => {
-  const { name, student_id, role, section } = req.body;
+  const { name, student_id, role, section, display_order } = req.body;
   const photo_url = getUploadUrl(req.file, '/team') || req.body.photo_url;
-  db.run('INSERT INTO team (name, student_id, photo_url, role, section) VALUES (?, ?, ?, ?, ?)', [name, student_id, photo_url, role, section || 'foundation_team'], function (err) {
+  db.run('INSERT INTO team (name, student_id, photo_url, role, section, display_order) VALUES (?, ?, ?, ?, ?, ?)', [name, student_id, photo_url, role, section || 'foundation_team', display_order || 0], function (err) {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ id: this.lastID });
   });
@@ -871,10 +871,10 @@ router.post('/team', requireAdmin, uploadTeam.single('photo'), (req, res) => {
 
 // Update team member
 router.put('/team/:id', requireAdmin, uploadTeam.single('photo'), (req, res) => {
-  const { name, student_id, role, section } = req.body;
+  const { name, student_id, role, section, display_order } = req.body;
   const photo_url = getUploadUrl(req.file, '/team') || req.body.photo_url;
-  db.run('UPDATE team SET name = ?, student_id = ?, photo_url = ?, role = ?, section = ? WHERE id = ?',
-    [name, student_id, photo_url, role, section, req.params.id], function (err) {
+  db.run('UPDATE team SET name = ?, student_id = ?, photo_url = ?, role = ?, section = ?, display_order = ? WHERE id = ?',
+    [name, student_id, photo_url, role, section, display_order || 0, req.params.id], function (err) {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ changes: this.changes });
     });

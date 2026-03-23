@@ -205,7 +205,7 @@ const AdminPanel = () => {
   const [freeFoodIds, setFreeFoodIds] = useState([]);
   const [availableFoods, setAvailableFoods] = useState([]);
   const [teamForm, setTeamForm] = useState({
-    name: '', student_id: '', photo: null, role: '', section: 'foundation_team'
+    name: '', student_id: '', photo: null, role: '', section: 'foundation_team', display_order: 0
   });
   const [foods, setFoods] = useState([]);
   const [showFoodModal, setShowFoodModal] = useState(false);
@@ -837,6 +837,7 @@ const AdminPanel = () => {
       formData.append('student_id', teamForm.student_id);
       formData.append('role', teamForm.role);
       formData.append('section', teamForm.section);
+      formData.append('display_order', teamForm.display_order || 0);
       if (teamForm.photo) {
         formData.append('photo', teamForm.photo);
       }
@@ -853,7 +854,7 @@ const AdminPanel = () => {
 
       setShowTeamModal(false);
       setEditingTeam(null);
-      setTeamForm({ name: '', student_id: '', photo: null, role: '' });
+      setTeamForm({ name: '', student_id: '', photo: null, role: '', section: 'foundation_team', display_order: 0 });
       fetchAllData();
     } catch (err) {
       console.error('Error saving team member:', err);
@@ -2861,6 +2862,8 @@ const AdminPanel = () => {
                   <th>Photo</th>
                   <th>Name</th>
                   <th>Role</th>
+                  <th>Section</th>
+                  <th>Order</th>
                   <th>Student ID</th>
                   <th>Actions</th>
                 </tr>
@@ -2909,6 +2912,17 @@ const AdminPanel = () => {
                     </td>
                     <td>{member.name}</td>
                     <td>{member.role}</td>
+                    <td>
+                      <Badge bg="info" style={{fontSize: '0.7rem'}}>
+                        {member.section === 'foundation_team' ? 'Foundation' : 
+                         member.section === 'current_team' ? 'Current' : 'Backend'}
+                      </Badge>
+                    </td>
+                    <td>
+                      <Badge bg="secondary" pill>
+                        {member.display_order || 0}
+                      </Badge>
+                    </td>
                     <td>{member.student_id}</td>
                     <td>
                       <Button
@@ -2922,6 +2936,7 @@ const AdminPanel = () => {
                             student_id: member.student_id,
                             role: member.role,
                             section: member.section,
+                            display_order: member.display_order || 0,
                             photo: null
                           });
                           setShowTeamModal(true);
@@ -6578,7 +6593,7 @@ const AdminPanel = () => {
         <Modal show={showTeamModal} onHide={() => {
           setShowTeamModal(false);
           setEditingTeam(null);
-          setTeamForm({ name: '', student_id: '', photo: null, role: '' });
+          setTeamForm({ name: '', student_id: '', photo: null, role: '', section: 'foundation_team', display_order: 0 });
         }}>
           <Modal.Header closeButton>
             <Modal.Title>{editingTeam ? 'Edit Team Member' : 'Add Team Member'}</Modal.Title>
@@ -6627,6 +6642,18 @@ const AdminPanel = () => {
                 </Form.Select>
               </Form.Group>
               <Form.Group className="mb-3">
+                <Form.Label>Display Order</Form.Label>
+                <Form.Control
+                  type="number"
+                  value={teamForm.display_order}
+                  onChange={(e) => setTeamForm({ ...teamForm, display_order: parseInt(e.target.value) || 0 })}
+                  placeholder="0"
+                />
+                <Form.Text className="text-muted">
+                  Lower numbers appear first within the section.
+                </Form.Text>
+              </Form.Group>
+              <Form.Group className="mb-3">
                 <Form.Label>Photo</Form.Label>
                 <Form.Control
                   type="file"
@@ -6642,7 +6669,7 @@ const AdminPanel = () => {
               <Button variant="secondary" onClick={() => {
                 setShowTeamModal(false);
                 setEditingTeam(null);
-                setTeamForm({ name: '', student_id: '', photo: null, role: '' });
+                setTeamForm({ name: '', student_id: '', photo: null, role: '', section: 'foundation_team', display_order: 0 });
               }}>
                 Cancel
               </Button>

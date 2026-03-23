@@ -188,6 +188,7 @@ if (usePostgres) {
         photo_url TEXT,
         role TEXT,
         section TEXT DEFAULT 'current_team',
+        display_order INTEGER DEFAULT 0,
         scanner_access INTEGER DEFAULT 0
       )`,
       `CREATE TABLE IF NOT EXISTS gallery (
@@ -527,6 +528,7 @@ if (usePostgres) {
         photo_url TEXT,
         role TEXT,
         section TEXT DEFAULT 'current_team',
+        display_order INTEGER DEFAULT 0,
         scanner_access INTEGER DEFAULT 0
       )`,
       `CREATE TABLE IF NOT EXISTS gallery (
@@ -662,6 +664,7 @@ if (usePostgres) {
           createIndices();
           ensureUserCreatedAtColumn();
           ensureUserLastSeenColumn();
+          ensureTeamDisplayOrderColumn();
           ensureGalleryEventDateColumn();
           ensureEmailHistoryBookingId();
           ensureMovieSpecialColumns();
@@ -852,6 +855,26 @@ if (usePostgres) {
       addColumn('sent_by', 'ALTER TABLE coupon_winners ADD COLUMN sent_by INTEGER');
       addColumn('shared_coupon_id', 'ALTER TABLE coupon_winners ADD COLUMN shared_coupon_id INTEGER');
       addColumn('created_at', 'ALTER TABLE coupon_winners ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+    });
+  }
+
+  function ensureTeamDisplayOrderColumn() {
+    db.all('PRAGMA table_info(team)', [], (err, columns) => {
+      if (err) {
+        console.log('⚠️  Could not inspect team table columns:', err.message);
+        return;
+      }
+
+      const hasDisplayOrder = Array.isArray(columns) && columns.some((col) => col.name === 'display_order');
+      if (!hasDisplayOrder) {
+        db.run('ALTER TABLE team ADD COLUMN display_order INTEGER DEFAULT 0', (alterErr) => {
+          if (alterErr) {
+            console.log('⚠️  Could not add team.display_order:', alterErr.message);
+          } else {
+            console.log('✅ team.display_order column added');
+          }
+        });
+      }
     });
   }
 
