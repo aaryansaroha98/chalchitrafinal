@@ -454,10 +454,6 @@ const Payment = () => {
           </div>
         )}
 
-        {/* Footer */}
-        <div className="footer-note">
-          <span>Secured by Razorpay</span>
-        </div>
       </div>
     </div>
   );
