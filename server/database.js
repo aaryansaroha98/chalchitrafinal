@@ -379,7 +379,8 @@ if (usePostgres) {
       console.log('Schema update ensure warning:', err.message);
     }
 
-    // Set AARYAN's join date and clean up other non-admin users
+    // Set AARYAN's join date and clean up other non-admin users (DISABLED to ensure all users are persisted)
+    /*
     try {
       await pool.query(`UPDATE users SET created_at = '2026-01-08T00:00:00.000Z' WHERE email = $1`, ['2025uee0154@iitjammu.ac.in']);
       console.log('✅ AARYAN join date set to 8 Jan 2026');
@@ -389,6 +390,7 @@ if (usePostgres) {
     } catch (err) {
       console.log('User cleanup warning:', err.message);
     }
+    */
 
     // Create default admin user
     try {
