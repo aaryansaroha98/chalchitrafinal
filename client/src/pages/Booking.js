@@ -1563,19 +1563,18 @@ const Booking = () => {
                   }}>
                     <div style={{
                       padding: '12px 28px',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      background: 'transparent',
+                      border: '2px dotted #ffd700',
                       borderRadius: '12px',
-                      color: '#ffffff',
+                      color: '#ffd700',
                       fontSize: '14px',
-                      fontWeight: '500',
+                      fontWeight: '600',
                       letterSpacing: '1px',
                       textAlign: 'center',
                       fontFamily: 'Arial, sans-serif',
                       boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
                     }}>
-                      "{movie.special_message}"
+                      {movie.special_message}
                     </div>
                   </div>
                 )}
