@@ -305,7 +305,7 @@ const PaymentSuccess = () => {
                   {emailStatus === 'sent' && (
                     <>
                       <div className="email-status-title">Ticket email sent successfully!</div>
-                      <div className="email-status-sub">Check spam/junk if it's not in your inbox and mark it as "Not Spam".</div>
+                      <div className="email-status-sub">Check spam/junk if it's not in your inbox and mark it as <span style={{ color: '#ffd700', fontWeight: 'bold' }}>"Not Spam"</span>.</div>
                     </>
                   )}
                   {emailStatus === 'failed' && (
