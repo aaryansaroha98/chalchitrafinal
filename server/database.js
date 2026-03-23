@@ -375,7 +375,9 @@ if (usePostgres) {
       await pool.query('ALTER TABLE movies ADD COLUMN IF NOT EXISTS is_special INTEGER DEFAULT 0');
       await pool.query('ALTER TABLE movies ADD COLUMN IF NOT EXISTS special_message TEXT');
       await pool.query('ALTER TABLE movie_foods ADD COLUMN IF NOT EXISTS is_free INTEGER DEFAULT 0');
-      console.log('✅ movies/movie_foods special columns ensured');
+      await pool.query('ALTER TABLE team ADD COLUMN IF NOT EXISTS section TEXT DEFAULT \'current_team\'');
+      await pool.query('ALTER TABLE team ADD COLUMN IF NOT EXISTS display_order INTEGER DEFAULT 0');
+      console.log('✅ movies/movie_foods/team columns ensured');
     } catch (err) {
       console.log('Schema update ensure warning:', err.message);
     }
