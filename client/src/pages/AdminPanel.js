@@ -205,7 +205,7 @@ const AdminPanel = () => {
   const [freeFoodIds, setFreeFoodIds] = useState([]);
   const [availableFoods, setAvailableFoods] = useState([]);
   const [teamForm, setTeamForm] = useState({
-    name: '', student_id: '', photo: null, role: '', section: 'foundation_team', display_order: 0
+    name: '', student_id: '', photo: null, photo_url: '', role: '', section: 'foundation_team', display_order: 0
   });
   const [foods, setFoods] = useState([]);
   const [showFoodModal, setShowFoodModal] = useState(false);
@@ -837,6 +837,9 @@ const AdminPanel = () => {
       formData.append('student_id', teamForm.student_id);
       formData.append('role', teamForm.role);
       formData.append('section', teamForm.section);
+      if (teamForm.photo_url) {
+        formData.append('photo_url', teamForm.photo_url);
+      }
       formData.append('display_order', teamForm.display_order || 0);
       if (teamForm.photo) {
         formData.append('photo', teamForm.photo);
@@ -854,7 +857,7 @@ const AdminPanel = () => {
 
       setShowTeamModal(false);
       setEditingTeam(null);
-      setTeamForm({ name: '', student_id: '', photo: null, role: '', section: 'foundation_team', display_order: 0 });
+      setTeamForm({ name: '', student_id: '', photo: null, photo_url: '', role: '', section: 'foundation_team', display_order: 0 });
       fetchAllData();
     } catch (err) {
       console.error('Error saving team member:', err);
@@ -2937,7 +2940,8 @@ const AdminPanel = () => {
                             role: member.role,
                             section: member.section,
                             display_order: member.display_order || 0,
-                            photo: null
+                            photo: null,
+                            photo_url: member.photo_url || ''
                           });
                           setShowTeamModal(true);
                         }}
@@ -6593,7 +6597,7 @@ const AdminPanel = () => {
         <Modal show={showTeamModal} onHide={() => {
           setShowTeamModal(false);
           setEditingTeam(null);
-          setTeamForm({ name: '', student_id: '', photo: null, role: '', section: 'foundation_team', display_order: 0 });
+          setTeamForm({ name: '', student_id: '', photo: null, photo_url: '', role: '', section: 'foundation_team', display_order: 0 });
         }}>
           <Modal.Header closeButton>
             <Modal.Title>{editingTeam ? 'Edit Team Member' : 'Add Team Member'}</Modal.Title>
@@ -6669,7 +6673,7 @@ const AdminPanel = () => {
               <Button variant="secondary" onClick={() => {
                 setShowTeamModal(false);
                 setEditingTeam(null);
-                setTeamForm({ name: '', student_id: '', photo: null, role: '', section: 'foundation_team', display_order: 0 });
+                setTeamForm({ name: '', student_id: '', photo: null, photo_url: '', role: '', section: 'foundation_team', display_order: 0 });
               }}>
                 Cancel
               </Button>
