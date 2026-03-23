@@ -197,7 +197,9 @@ const AdminPanel = () => {
     imdb_rating: '',
     language: '',
     poster: null,
-    availableFoods: []
+    availableFoods: [],
+    is_special: 0,
+    special_message: ''
   });
   const [selectedFoodsForMovie, setSelectedFoodsForMovie] = useState([]);
   const [availableFoods, setAvailableFoods] = useState([]);
@@ -733,7 +735,6 @@ const AdminPanel = () => {
             headers: { 'Content-Type': 'multipart/form-data' }
           });
 
-          // Link foods to the new movie
           if (selectedFoodsForMovie.length > 0) {
             try {
               await updateMovieFoodLinks(response.data.id, selectedFoodsForMovie);
@@ -757,7 +758,7 @@ const AdminPanel = () => {
         // Close modal and reset form
         setShowMovieModal(false);
         setEditingMovie(null);
-        setMovieForm({ title: '', description: '', date: '', venue: '', price: '', category: '', duration: '', imdb_rating: '', language: '', poster: null, availableFoods: [] });
+        setMovieForm({ title: '', description: '', date: '', venue: '', price: '', category: '', duration: '', imdb_rating: '', language: '', poster: null, availableFoods: [], is_special: 0, special_message: '' });
         setSelectedFoodsForMovie([]);
 
         // Update the local state directly for immediate UI update
@@ -1889,7 +1890,9 @@ const AdminPanel = () => {
                     duration: '',
                     imdb_rating: '',
                     language: '',
-                    poster: null
+                    poster: null,
+                    is_special: 0,
+                    special_message: ''
                   });
                   setSelectedFoodsForMovie([]);
                   setShowMovieModal(true);
@@ -2123,7 +2126,9 @@ const AdminPanel = () => {
                                     duration: movie.duration || '',
                                     imdb_rating: movie.imdb_rating || '',
                                     language: movie.language || '',
-                                    poster: null
+                                    poster: null,
+                                    is_special: movie.is_special || 0,
+                                    special_message: movie.special_message || ''
                                   });
                                   // Load existing food links
                                   api.get(`/api/foods/movie/${movie.id}`)
@@ -5820,6 +5825,32 @@ const AdminPanel = () => {
                       placeholder="Hindi, English..."
                     />
                   </Form.Group>
+                </Col>
+              </Row>
+              
+              <Row className="mb-3">
+                <Col md={12}>
+                  <Form.Check 
+                    type="switch"
+                    id="is-special-switch"
+                    label="Special Movie (e.g., Event with Free Tickets)"
+                    checked={movieForm.is_special === 1}
+                    onChange={(e) => setMovieForm({ ...movieForm, is_special: e.target.checked ? 1 : 0 })}
+                    className="mb-2 fw-bold text-primary"
+                  />
+                  {movieForm.is_special === 1 && (
+                    <Form.Group>
+                      <Form.Label>Special Message (Shown on Booking & Payment pages)</Form.Label>
+                      <Form.Control
+                        as="textarea"
+                        rows={2}
+                        value={movieForm.special_message}
+                        onChange={(e) => setMovieForm({ ...movieForm, special_message: e.target.value })}
+                        placeholder="e.g., Special event: Use code FREEENTRY for 100% off!"
+						required={movieForm.is_special === 1}
+                      />
+                    </Form.Group>
+                  )}
                 </Col>
               </Row>
 

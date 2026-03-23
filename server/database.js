@@ -144,6 +144,8 @@ if (usePostgres) {
         imdb_rating TEXT,
         language TEXT,
         is_upcoming INTEGER DEFAULT 1,
+        is_special INTEGER DEFAULT 0,
+        special_message TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`,
       `CREATE TABLE IF NOT EXISTS bookings (
@@ -358,6 +360,15 @@ if (usePostgres) {
       console.log('email_history.booking_id ensure warning:', err.message);
     }
 
+    // Ensure movies.is_special and special_message columns exist for older databases
+    try {
+      await pool.query('ALTER TABLE movies ADD COLUMN IF NOT EXISTS is_special INTEGER DEFAULT 0');
+      await pool.query('ALTER TABLE movies ADD COLUMN IF NOT EXISTS special_message TEXT');
+      console.log('✅ movies.is_special and special_message columns ensured');
+    } catch (err) {
+      console.log('movies special columns ensure warning:', err.message);
+    }
+
     // Set AARYAN's join date and clean up other non-admin users
     try {
       await pool.query(`UPDATE users SET created_at = '2026-01-08T00:00:00.000Z' WHERE email = $1`, ['2025uee0154@iitjammu.ac.in']);
@@ -460,6 +471,8 @@ if (usePostgres) {
         imdb_rating TEXT,
         language TEXT,
         is_upcoming INTEGER DEFAULT 1,
+        is_special INTEGER DEFAULT 0,
+        special_message TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )`,
       `CREATE TABLE IF NOT EXISTS bookings (
@@ -637,6 +650,7 @@ if (usePostgres) {
           ensureUserCreatedAtColumn();
           ensureGalleryEventDateColumn();
           ensureEmailHistoryBookingId();
+          ensureMovieSpecialColumns();
           ensureCouponWinnerColumns();
           createDefaultData();
         }
@@ -718,6 +732,37 @@ if (usePostgres) {
             return;
           }
           console.log('✅ email_history.booking_id column added');
+        });
+      }
+    });
+  }
+
+  function ensureMovieSpecialColumns() {
+    db.all('PRAGMA table_info(movies)', [], (err, columns) => {
+      if (err) {
+        console.log('⚠️  Could not inspect movies table columns:', err.message);
+        return;
+      }
+
+      const colNames = Array.isArray(columns) ? columns.map(c => c.name) : [];
+      
+      if (!colNames.includes('is_special')) {
+        db.run('ALTER TABLE movies ADD COLUMN is_special INTEGER DEFAULT 0', (alterErr) => {
+          if (alterErr) {
+            console.log('⚠️  Could not add movies.is_special:', alterErr.message);
+          } else {
+            console.log('✅ movies.is_special column added');
+          }
+        });
+      }
+      
+      if (!colNames.includes('special_message')) {
+        db.run('ALTER TABLE movies ADD COLUMN special_message TEXT', (alterErr) => {
+          if (alterErr) {
+            console.log('⚠️  Could not add movies.special_message:', alterErr.message);
+          } else {
+            console.log('✅ movies.special_message column added');
+          }
         });
       }
     });

@@ -323,6 +323,25 @@ const Payment = () => {
             </div>
           )}
         </div>
+        
+        {/* Special Movie Message */}
+        {movie && movie.is_special === 1 && movie.special_message && (
+          <div style={{
+            marginBottom: '20px',
+            padding: '12px 15px',
+            background: 'rgba(108, 92, 231, 0.1)',
+            border: '1px dashed #6c5ce7',
+            borderRadius: '10px',
+            color: '#6c5ce7',
+            fontSize: '13px',
+            textAlign: 'left',
+            fontWeight: '600',
+            lineHeight: '1.4'
+          }}>
+            <i className="fas fa-star me-2"></i>
+            <strong>Event Note:</strong> {movie.special_message}
+          </div>
+        )}
 
         {/* Pay Button */}
         <div className="pay-section">
