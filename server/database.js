@@ -128,6 +128,7 @@ if (usePostgres) {
         is_admin INTEGER DEFAULT 0,
         code_scanner INTEGER DEFAULT 0,
         admin_tag TEXT,
+        last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`,
       `CREATE TABLE IF NOT EXISTS movies (
@@ -345,12 +346,19 @@ if (usePostgres) {
       console.log('gallery.event_date ensure warning:', err.message);
     }
 
-    // Ensure users.created_at column exists for older databases
     try {
       await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
       console.log('✅ users.created_at column ensured');
     } catch (err) {
       console.log('users.created_at ensure warning:', err.message);
+    }
+
+    // Ensure users.last_seen column exists for older databases
+    try {
+      await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+      console.log('✅ users.last_seen column ensured');
+    } catch (err) {
+      console.log('users.last_seen ensure warning:', err.message);
     }
 
     // Ensure email_history.booking_id column exists for older databases
@@ -457,6 +465,7 @@ if (usePostgres) {
         is_admin INTEGER DEFAULT 0,
         code_scanner INTEGER DEFAULT 0,
         admin_tag TEXT,
+        last_seen DATETIME DEFAULT CURRENT_TIMESTAMP,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )`,
       `CREATE TABLE IF NOT EXISTS movies (
@@ -650,6 +659,7 @@ if (usePostgres) {
           console.log('🗄️  SQLite initialization complete!');
           createIndices();
           ensureUserCreatedAtColumn();
+          ensureUserLastSeenColumn();
           ensureGalleryEventDateColumn();
           ensureEmailHistoryBookingId();
           ensureMovieSpecialColumns();
@@ -696,6 +706,29 @@ if (usePostgres) {
         });
       } else {
         db.run('UPDATE users SET created_at = CURRENT_TIMESTAMP WHERE created_at IS NULL');
+      }
+    });
+  }
+
+  function ensureUserLastSeenColumn() {
+    db.all('PRAGMA table_info(users)', [], (err, columns) => {
+      if (err) {
+        console.log('⚠️  Could not inspect users table columns:', err.message);
+        return;
+      }
+
+      const hasLastSeen = Array.isArray(columns) && columns.some((col) => col.name === 'last_seen');
+      if (!hasLastSeen) {
+        db.run('ALTER TABLE users ADD COLUMN last_seen DATETIME DEFAULT CURRENT_TIMESTAMP', (alterErr) => {
+          if (alterErr) {
+            console.log('⚠️  Could not add users.last_seen:', alterErr.message);
+            return;
+          }
+          db.run('UPDATE users SET last_seen = CURRENT_TIMESTAMP WHERE last_seen IS NULL');
+          console.log('✅ users.last_seen column added');
+        });
+      } else {
+        db.run('UPDATE users SET last_seen = CURRENT_TIMESTAMP WHERE last_seen IS NULL');
       }
     });
   }

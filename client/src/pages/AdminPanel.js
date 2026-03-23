@@ -44,6 +44,15 @@ const formatExactJoinDateTime = (value) => {
   });
 };
 
+const isUserOnline = (lastSeen) => {
+  if (!lastSeen) return false;
+  const lastSeenDate = new Date(lastSeen);
+  if (Number.isNaN(lastSeenDate.getTime())) return false;
+  const now = new Date();
+  const diffInMinutes = (now - lastSeenDate) / 1000 / 60;
+  return diffInMinutes < 5; // Online if seen in the last 5 minutes
+};
+
 const normalizeGalleryEventDate = (value) => {
   if (!value) return '';
   if (value instanceof Date && !Number.isNaN(value.getTime())) {
@@ -2805,6 +2814,7 @@ const AdminPanel = () => {
                   <th>Name</th>
                   <th>Email</th>
                   <th>Role</th>
+                  <th>Status</th>
                   <th>Joined</th>
                 </tr>
               </thead>
@@ -2818,11 +2828,23 @@ const AdminPanel = () => {
                         {user.is_admin ? 'Admin' : 'User'}
                       </Badge>
                     </td>
+                    <td>
+                      {isUserOnline(user.last_seen) ? (
+                        <Badge bg="success" pill>
+                          <i className="fas fa-circle me-1" style={{ fontSize: '0.6rem' }}></i>
+                          Online
+                        </Badge>
+                      ) : (
+                        <span className="text-muted small">
+                          {user.last_seen ? `Last seen: ${new Date(user.last_seen).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}` : 'Offline'}
+                        </span>
+                      )}
+                    </td>
                     <td>{formatExactJoinDateTime(user.created_at)}</td>
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan="4" className="text-center text-muted py-4">
+                    <td colSpan="5" className="text-center text-muted py-4">
                       <i className="fas fa-users fa-2x mb-2"></i>
                       <br />
                       No users found

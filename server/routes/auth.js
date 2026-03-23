@@ -272,6 +272,9 @@ router.get('/current_user', (req, res) => {
       });
     }
 
+    // Update last_seen timestamp
+    db.run('UPDATE users SET last_seen = CURRENT_TIMESTAMP WHERE id = ?', [req.user.id]);
+
     // Fetch the latest user data including admin_tag from database
     db.get('SELECT * FROM users WHERE id = ?', [req.user.id], (err, freshUser) => {
       if (err) {
@@ -310,6 +313,9 @@ router.get('/current_user', (req, res) => {
         if (err || !freshUser) {
           return res.json(req.session.adminUser);
         }
+
+        // Update last_seen timestamp
+        db.run('UPDATE users SET last_seen = CURRENT_TIMESTAMP WHERE id = ?', [freshUser.id]);
         
         // Check team scanner access
         const emailParts = freshUser.email.split('@');

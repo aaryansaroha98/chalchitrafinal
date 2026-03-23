@@ -103,8 +103,8 @@ const NavigationBar = () => {
             {user ? (
               <>
                 <Nav.Link as={Link} to="/my-bookings" style={{ padding: '0.1rem 0.5rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '0.85rem', letterSpacing: '-0.5px' }} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}><i className="fas fa-ticket-alt me-1"></i>MY BOOKINGS</Nav.Link>
-                  {(user.code_scanner || user.team_scanner) && <Nav.Link as={Link} to="/scanner" style={{ padding: '0.1rem 0.5rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '0.85rem', letterSpacing: '-0.5px' }} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}><i className="fas fa-qrcode me-1"></i>Scanner</Nav.Link>}
-                {user.is_admin && <Nav.Link as={Link} to="/admin" style={{ padding: '0.1rem 0.5rem', borderRadius: '15px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.3)', color: 'white', textDecoration: 'none', fontWeight: '500', fontSize: '0.85rem', letterSpacing: '-0.5px' }} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}><i className="fas fa-cog me-1"></i>{user.admin_tag || 'Admin'}</Nav.Link>}
+                  {!!(user.code_scanner || user.team_scanner) && <Nav.Link as={Link} to="/scanner" style={{ padding: '0.1rem 0.5rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '0.85rem', letterSpacing: '-0.5px' }} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}><i className="fas fa-qrcode me-1"></i>Scanner</Nav.Link>}
+                {!!user.is_admin && <Nav.Link as={Link} to="/admin" style={{ padding: '0.1rem 0.5rem', borderRadius: '15px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.3)', color: 'white', textDecoration: 'none', fontWeight: '500', fontSize: '0.85rem', letterSpacing: '-0.5px' }} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}><i className="fas fa-cog me-1"></i>{user.admin_tag || 'Admin'}</Nav.Link>}
                 <Nav.Link onClick={() => logout()} style={{ padding: '0.1rem 0.5rem', color: 'white', textDecoration: 'none', fontWeight: '500', fontSize: '0.85rem', letterSpacing: '-0.5px', cursor: 'pointer' }}>Logout</Nav.Link>
               </>
             ) : (
@@ -157,7 +157,7 @@ const NavigationBar = () => {
                   Hi, {user?.name?.split(' ')[0] || 'User'}
                 </div>
 
-                {user.is_admin && (
+                {!!user.is_admin && (
                   <Nav.Link
                     as={Link}
                     to="/admin"
@@ -177,7 +177,7 @@ const NavigationBar = () => {
                     <i className="fas fa-ticket-alt me-1"></i>MY BOOKINGS
                   </Nav.Link>
 
-                {(user.code_scanner || user.team_scanner) && (
+                {!!(user.code_scanner || user.team_scanner) && (
                   <Nav.Link
                     as={Link}
                     to="/scanner"
