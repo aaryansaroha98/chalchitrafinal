@@ -1154,10 +1154,6 @@ router.post('/send-ticket-email', async (req, res) => {
                 <p style="color: #555; font-size: 16px; margin: 12px 0;"><strong>Seats:</strong> ${selectedSeats.join(', ') || 'N/A'}</p>
                 <p style="color: #555; font-size: 16px; margin: 12px 0;"><strong>Booking ID:</strong> ${booking.booking_code || booking.id}</p>
 
-                <p style="color: #555; font-size: 16px; margin: 20px 0 8px 0;"><strong>Payment Details</strong></p>
-                <p style="color: #555; font-size: 16px; margin: 8px 0;"><strong>Amount:</strong> ${paymentAmount ? `Rs.${paymentAmount}` : 'N/A'}</p>
-                <p style="color: #555; font-size: 16px; margin: 8px 0;"><strong>Payment Method:</strong> ${paymentMethod || 'N/A'}</p>
-                <p style="color: #555; font-size: 16px; margin: 8px 0;"><strong>Transaction ID:</strong> ${paymentId || 'N/A'}</p>
 
                 <p style="color: #555; font-size: 16px; margin: 24px 0; line-height: 1.6;">
                   Thank you for booking with Chalchitra Series. We look forward to hosting you!
