@@ -1476,7 +1476,7 @@ const Booking = () => {
                               fontWeight: 'bold',
                               fontFamily: 'Arial, sans-serif'
                             }}>
-                              ₹{food.price * quantity}
+                              {food.is_free ? 'FREE' : `₹${food.price * quantity}`}
                             </span>
                           </div>
                         );
