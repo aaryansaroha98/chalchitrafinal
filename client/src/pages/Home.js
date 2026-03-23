@@ -916,13 +916,13 @@ const Home = () => {
           }
 
           .home-featured-label {
-            font-size: clamp(0.42rem, 0.9vw, 0.55rem) !important;
+            font-size: clamp(0.5rem, 1.1vw, 0.7rem) !important;
             letter-spacing: 0.3px !important;
             line-height: 1.1 !important;
           }
 
           .home-featured-value {
-            font-size: clamp(0.5rem, 1.05vw, 0.72rem) !important;
+            font-size: clamp(0.7rem, 1.3vw, 0.95rem) !important;
             line-height: 1.15 !important;
           }
 
@@ -931,8 +931,8 @@ const Home = () => {
           }
 
           .home-featured-badge {
-            font-size: clamp(0.48rem, 0.8vw, 0.65rem) !important;
-            padding: clamp(2.5px, 0.4vw, 4px) clamp(5px, 0.8vw, 9px) !important;
+            font-size: clamp(0.65rem, 1vw, 0.85rem) !important;
+            padding: clamp(3.5px, 0.5vw, 6px) clamp(7px, 1vw, 12px) !important;
             top: 10px !important;
             left: 10px !important;
             z-index: 10;
