@@ -422,7 +422,7 @@ const Payment = () => {
               </span>
             ) : (
               <span className="btn-content">
-                Pay Rs.{getTotalPrice()}
+                {getTotalPrice() === 0 ? 'CONFIRM TICKET' : `Pay Rs.${getTotalPrice()}`}
               </span>
             )}
           </button>
