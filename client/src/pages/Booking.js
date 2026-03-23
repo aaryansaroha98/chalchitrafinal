@@ -1440,26 +1440,6 @@ const Booking = () => {
                     </div>
                   </div>
                 )}
-                {/* Special Movie Message */}
-                {movie && movie.is_special === 1 && movie.special_message && (
-                  <div style={{
-                    marginBottom: '24px',
-                    padding: '16px',
-                    background: 'rgba(0, 255, 255, 0.05)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(0, 255, 255, 0.3)',
-                    borderRadius: '12px',
-                    color: '#ffffff',
-                    fontSize: '14px',
-                    textAlign: 'center',
-                    fontWeight: '600',
-                    fontFamily: 'Arial, sans-serif',
-                    boxShadow: '0 4px 15px rgba(0, 255, 255, 0.1)'
-                  }}>
-                    <i className="fas fa-info-circle me-2" style={{ color: '#00ffff' }}></i>
-                    {movie.special_message}
-                  </div>
-                )}
 
                 {/* Total Price and Book Ticket Button in same row */}
                 <div className="booking-total-row" style={{
@@ -1528,6 +1508,22 @@ const Booking = () => {
                     Book Ticket{selectedSeats.length > 1 ? 's' : ''}
                   </button>
                 </div>
+
+                {/* Special Movie Message */}
+                {movie && movie.is_special === 1 && movie.special_message && (
+                  <div style={{
+                    marginTop: '20px',
+                    color: 'rgba(255, 255, 255, 0.85)',
+                    fontSize: '16px',
+                    textAlign: 'center',
+                    fontStyle: 'italic',
+                    fontFamily: '"Crimson Text", "Georgia", serif',
+                    letterSpacing: '0.8px',
+                    padding: '0 20px'
+                  }}>
+                    "{movie.special_message}"
+                  </div>
+                )}
               </div>
             </div>
           </motion.div>
