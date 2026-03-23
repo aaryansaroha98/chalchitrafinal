@@ -429,16 +429,27 @@ const Payment = () => {
         {/* Special Movie Message */}
         {movie && movie.is_special === 1 && movie.special_message && (
           <div style={{
-            marginTop: '20px',
-            color: 'rgba(255, 255, 255, 0.85)',
-            fontSize: '16px',
-            textAlign: 'center',
-            fontStyle: 'italic',
-            fontFamily: '"Crimson Text", "Georgia", serif',
-            letterSpacing: '0.8px',
-            padding: '0 20px'
+            marginTop: '28px',
+            display: 'flex',
+            justifyContent: 'center',
+            width: '100%'
           }}>
-            "{movie.special_message}"
+            <div style={{
+              padding: '12px 28px',
+              background: 'rgba(255, 255, 255, 0.05)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              borderRadius: '12px',
+              color: '#ffffff',
+              fontSize: '14px',
+              fontWeight: '500',
+              letterSpacing: '1px',
+              textAlign: 'center',
+              fontFamily: 'Arial, sans-serif',
+              boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
+            }}>
+              "{movie.special_message}"
+            </div>
           </div>
         )}
 
