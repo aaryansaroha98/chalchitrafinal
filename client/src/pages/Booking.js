@@ -140,7 +140,9 @@ const Booking = () => {
     const ticketPrice = selectedSeats.length * TICKET_PRICE;
     const foodPrice = Object.entries(selectedFoods).reduce((total, [foodId, quantity]) => {
       const food = availableFoods.find(f => f.id === parseInt(foodId));
-      return total + (food ? food.price * quantity : 0);
+      // If food is free for this movie, price is 0
+      const price = food && food.is_free ? 0 : (food ? food.price : 0);
+      return total + (price * quantity);
     }, 0);
     return ticketPrice + foodPrice;
   };
@@ -445,7 +447,7 @@ const Booking = () => {
                       {availableFoods && availableFoods.length > 0 ? (
                         availableFoods.map(food => (
                           <span key={food.id} className="booking-food-pill">
-                            {food.name} - ₹{food.price}
+                            {food.name} - {food.is_free ? 'FREE' : `₹${food.price}`}
                           </span>
                         ))
                       ) : (
@@ -1213,7 +1215,7 @@ const Booking = () => {
                           fontSize: '16px',
                           fontWeight: 'bold'
                         }}>
-                          ₹{food.price}
+                          {food.is_free ? 'FREE' : `₹${food.price}`}
                         </p>
                       </div>
                     </div>
@@ -1225,70 +1227,112 @@ const Booking = () => {
                       width: '100%',
                       marginTop: '-10px'
                     }}>
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px'
-                      }}>
-                        <button
+                      {food.is_free ? (
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
                           onClick={() => {
-                            const currentQty = selectedFoods[food.id] || 0;
-                            handleFoodChange(food.id, currentQty - 1);
+                            const isSelected = !!selectedFoods[food.id];
+                            handleFoodChange(food.id, isSelected ? 0 : 1);
                           }}
-                          disabled={!selectedFoods[food.id] || selectedFoods[food.id] <= 0}
-                          className="booking-food-btn"
                           style={{
-                            background: 'rgba(255, 255, 255, 0.1)',
-                            border: '1px solid rgba(255, 255, 255, 0.2)',
+                            background: selectedFoods[food.id] 
+                              ? 'rgba(0, 255, 255, 0.2)' 
+                              : 'rgba(255, 255, 255, 0.1)',
+                            backdropFilter: 'blur(10px)',
+                            border: '1px solid aria-label',
+                            borderColor: selectedFoods[food.id] 
+                              ? 'rgba(0, 255, 255, 0.5)' 
+                              : 'rgba(255, 255, 255, 0.2)',
                             color: '#ffffff',
-                            borderRadius: '6px',
-                            width: '28px',
-                            height: '28px',
+                            borderRadius: '20px',
+                            padding: '6px 16px',
+                            fontSize: '12px',
+                            fontWeight: '600',
+                            letterSpacing: '0.5px',
+                            cursor: 'pointer',
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                            fontSize: '14px',
-                            fontWeight: 'bold'
+                            gap: '6px',
+                            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
+                            transition: 'all 0.3s ease'
                           }}
                         >
-                          -
-                        </button>
-
-                        <span className="booking-food-qty" style={{
-                          color: '#ffffff',
-                          fontSize: '16px',
-                          fontWeight: 'bold',
-                          minWidth: '30px',
-                          textAlign: 'center'
+                          {selectedFoods[food.id] ? (
+                            <>
+                              <i className="fas fa-check" style={{fontSize: '10px'}}></i>
+                              INCLUDED
+                            </>
+                          ) : (
+                            'INCLUDE'
+                          )}
+                        </motion.button>
+                      ) : (
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
                         }}>
-                          {selectedFoods[food.id] || 0}
-                        </span>
+                          <button
+                            onClick={() => {
+                              const currentQty = selectedFoods[food.id] || 0;
+                              handleFoodChange(food.id, currentQty - 1);
+                            }}
+                            disabled={!selectedFoods[food.id] || selectedFoods[food.id] <= 0}
+                            className="booking-food-btn"
+                            style={{
+                              background: 'rgba(255, 255, 255, 0.1)',
+                              border: '1px solid rgba(255, 255, 255, 0.2)',
+                              color: '#ffffff',
+                              borderRadius: '6px',
+                              width: '28px',
+                              height: '28px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              fontSize: '14px',
+                              fontWeight: 'bold'
+                            }}
+                          >
+                            -
+                          </button>
 
-                        <button
-                          onClick={() => {
-                            const currentQty = selectedFoods[food.id] || 0;
-                            handleFoodChange(food.id, currentQty + 1);
-                          }}
-                          className="booking-food-btn"
-                          style={{
-                            background: 'rgba(255, 255, 255, 0.1)',
-                            border: '1px solid rgba(255, 255, 255, 0.2)',
+                          <span className="booking-food-qty" style={{
                             color: '#ffffff',
-                            borderRadius: '6px',
-                            width: '28px',
-                            height: '28px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                            fontSize: '14px',
-                            fontWeight: 'bold'
-                          }}
-                        >
-                          +
-                        </button>
-                      </div>
+                            fontSize: '16px',
+                            fontWeight: 'bold',
+                            minWidth: '30px',
+                            textAlign: 'center'
+                          }}>
+                            {selectedFoods[food.id] || 0}
+                          </span>
+
+                          <button
+                            onClick={() => {
+                              const currentQty = selectedFoods[food.id] || 0;
+                              handleFoodChange(food.id, currentQty + 1);
+                            }}
+                            className="booking-food-btn"
+                            style={{
+                              background: 'rgba(255, 255, 255, 0.1)',
+                              border: '1px solid rgba(255, 255, 255, 0.2)',
+                              color: '#ffffff',
+                              borderRadius: '6px',
+                              width: '28px',
+                              height: '28px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              fontSize: '14px',
+                              fontWeight: 'bold'
+                            }}
+                          >
+                            +
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}

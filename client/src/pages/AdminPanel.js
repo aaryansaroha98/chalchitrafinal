@@ -202,6 +202,7 @@ const AdminPanel = () => {
     special_message: ''
   });
   const [selectedFoodsForMovie, setSelectedFoodsForMovie] = useState([]);
+  const [freeFoodIds, setFreeFoodIds] = useState([]);
   const [availableFoods, setAvailableFoods] = useState([]);
   const [teamForm, setTeamForm] = useState({
     name: '', student_id: '', photo: null, role: '', section: 'foundation_team'
@@ -713,7 +714,7 @@ const AdminPanel = () => {
 
           // Update food links (isolated to prevent errors from affecting movie update)
           try {
-            await updateMovieFoodLinks(editingMovie.id, selectedFoodsForMovie);
+            await updateMovieFoodLinks(editingMovie.id, selectedFoodsForMovie, freeFoodIds);
           } catch (foodErr) {
             console.warn('Food linking failed, but movie was updated successfully:', foodErr.message);
           }
@@ -737,7 +738,7 @@ const AdminPanel = () => {
 
           if (selectedFoodsForMovie.length > 0) {
             try {
-              await updateMovieFoodLinks(response.data.id, selectedFoodsForMovie);
+              await updateMovieFoodLinks(response.data.id, selectedFoodsForMovie, freeFoodIds);
             } catch (foodErr) {
               console.warn('Food linking failed, but movie was created successfully:', foodErr.message);
             }
@@ -760,6 +761,7 @@ const AdminPanel = () => {
         setEditingMovie(null);
         setMovieForm({ title: '', description: '', date: '', venue: '', price: '', category: '', duration: '', imdb_rating: '', language: '', poster: null, availableFoods: [], is_special: 0, special_message: '' });
         setSelectedFoodsForMovie([]);
+        setFreeFoodIds([]);
 
         // Update the local state directly for immediate UI update
         console.log('Updating local state after movie update...');
@@ -794,11 +796,12 @@ const AdminPanel = () => {
     }
   };
 
-  const updateMovieFoodLinks = async (movieId, foodIds) => {
+  const updateMovieFoodLinks = async (movieId, foodIds, freeIds = []) => {
     try {
       // Get current food links for this movie
       const currentLinksRes = await api.get(`/api/foods/movie/${movieId}`);
-      const currentFoodIds = currentLinksRes.data.map(link => link.id);
+      const currentFoodLinks = currentLinksRes.data;
+      const currentFoodIds = currentFoodLinks.map(link => link.id);
 
       // Remove links that are no longer selected
       for (const currentFoodId of currentFoodIds) {
@@ -807,10 +810,14 @@ const AdminPanel = () => {
         }
       }
 
-      // Add new links for selected foods
+      // Add or update links for selected foods
       for (const foodId of foodIds) {
-        if (!currentFoodIds.includes(foodId)) {
-          await api.post(`/api/foods/link/${movieId}/${foodId}`);
+        const isFree = freeIds.includes(foodId) ? 1 : 0;
+        const existingLink = currentFoodLinks.find(link => link.id === foodId);
+        
+        // If link doesn't exist OR is_free status has changed, update it
+        if (!existingLink || existingLink.is_free !== isFree) {
+          await api.post(`/api/foods/link/${movieId}/${foodId}`, { is_free: isFree });
         }
       }
     } catch (err) {
@@ -2134,12 +2141,15 @@ const AdminPanel = () => {
                                   api.get(`/api/foods/movie/${movie.id}`)
                                     .then(res => {
                                       const foodIds = res.data.map(f => f.id);
+                                      const freeIds = res.data.filter(f => f.is_free).map(f => f.id);
                                       setSelectedFoodsForMovie(foodIds);
+                                      setFreeFoodIds(freeIds);
                                       setShowMovieModal(true);
                                     })
                                     .catch(err => {
                                       console.error('Error loading movie foods:', err);
                                       setSelectedFoodsForMovie([]);
+                                      setFreeFoodIds([]);
                                       setShowMovieModal(true);
                                     });
                                 }}
@@ -5865,21 +5875,39 @@ const AdminPanel = () => {
                   padding: '0.75rem'
                 }}>
                   {availableFoods && availableFoods.length > 0 ? availableFoods.map(food => (
-                    <Form.Check
-                      key={food.id}
-                      type="checkbox"
-                      id={`food-${food.id}`}
-                      label={`${food.name} - ₹${food.price}`}
-                      checked={selectedFoodsForMovie.includes(food.id)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedFoodsForMovie([...selectedFoodsForMovie, food.id]);
-                        } else {
-                          setSelectedFoodsForMovie(selectedFoodsForMovie.filter(id => id !== food.id));
-                        }
-                      }}
-                      className="mb-2"
-                    />
+                    <div key={food.id} className="d-flex align-items-center justify-content-between mb-2 p-2 border rounded" style={{ background: selectedFoodsForMovie.includes(food.id) ? '#f8f9fa' : 'transparent' }}>
+                      <Form.Check
+                        type="checkbox"
+                        id={`food-${food.id}`}
+                        label={`${food.name} - ₹${food.price}`}
+                        checked={selectedFoodsForMovie.includes(food.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedFoodsForMovie([...selectedFoodsForMovie, food.id]);
+                          } else {
+                            setSelectedFoodsForMovie(selectedFoodsForMovie.filter(id => id !== food.id));
+                            setFreeFoodIds(freeFoodIds.filter(id => id !== food.id));
+                          }
+                        }}
+                        className="mb-0"
+                      />
+                      {selectedFoodsForMovie.includes(food.id) && (
+                        <Form.Check
+                          type="switch"
+                          id={`free-food-${food.id}`}
+                          label="Free"
+                          checked={freeFoodIds.includes(food.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setFreeFoodIds([...freeFoodIds, food.id]);
+                            } else {
+                              setFreeFoodIds(freeFoodIds.filter(id => id !== food.id));
+                            }
+                          }}
+                          className="ms-3"
+                        />
+                      )}
+                    </div>
                   )) : (
                     <p className="text-muted mb-0">No food items available. Add some in the Foods tab first.</p>
                   )}
@@ -5895,6 +5923,7 @@ const AdminPanel = () => {
                 setEditingMovie(null);
                 setMovieForm({ title: '', description: '', date: '', venue: '', price: '', category: '', duration: '', imdb_rating: '', language: '', poster: null });
                 setSelectedFoodsForMovie([]);
+                setFreeFoodIds([]);
               }}>
                 Cancel
               </Button>

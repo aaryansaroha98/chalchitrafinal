@@ -89,7 +89,8 @@ const Payment = () => {
   const getFoodTotal = () => {
     return Object.entries(selectedFoods).reduce((total, [foodId, qty]) => {
       const foodItem = foodData[foodId];
-      const price = foodItem ? foodItem.price : 30;
+      // If food is free for this movie, price is 0
+      const price = foodItem && foodItem.is_free ? 0 : (foodItem ? foodItem.price : 0);
       return total + (price * qty);
     }, 0);
   };
@@ -227,13 +228,14 @@ const Payment = () => {
 
               {Object.entries(selectedFoods).map(([foodId, qty]) => {
                 const foodItem = foodData[foodId];
-                const price = foodItem ? foodItem.price : 30;
+                const isFree = foodItem && foodItem.is_free;
+                const price = isFree ? 0 : (foodItem ? foodItem.price : 0);
                 const itemTotal = price * qty;
 
                 return (
                   <div key={foodId} className="detail-item">
                     <span className="detail-label">{foodItem ? foodItem.name : `Food ${foodId}`} x {qty}</span>
-                    <span className="detail-value">Rs.{itemTotal.toFixed(2)}</span>
+                    <span className="detail-value">{isFree ? 'FREE' : `Rs.${itemTotal.toFixed(2)}`}</span>
                   </div>
                 );
               })}

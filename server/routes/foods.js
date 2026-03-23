@@ -35,7 +35,7 @@ router.get('/available/:movieId', (req, res) => {
   const movieId = req.params.movieId;
 
   const query = `
-    SELECT f.* FROM foods f
+    SELECT f.*, mf.is_free FROM foods f
     JOIN movie_foods mf ON f.id = mf.food_id
     WHERE mf.movie_id = ? AND f.is_available = 1
     ORDER BY f.category, f.name
@@ -161,13 +161,16 @@ router.delete('/:id', requireAdmin, (req, res) => {
 // Link food to movie (admin only)
 router.post('/link/:movieId/:foodId', requireAdmin, (req, res) => {
   const { movieId, foodId } = req.params;
+  const { is_free = 0 } = req.body;
 
+  // Use INSERT OR REPLACE to update is_free if the link already exists
   const query = `
-    INSERT OR IGNORE INTO movie_foods (movie_id, food_id)
-    VALUES (?, ?)
+    INSERT INTO movie_foods (movie_id, food_id, is_free)
+    VALUES (?, ?, ?)
+    ON CONFLICT(movie_id, food_id) DO UPDATE SET is_free = EXCLUDED.is_free
   `;
 
-  db.run(query, [movieId, foodId], function(err) {
+  db.run(query, [movieId, foodId, is_free], function(err) {
     if (err) {
       console.error('Error linking food to movie:', err);
       return res.status(500).json({ error: 'Failed to link food to movie' });
@@ -194,7 +197,7 @@ router.get('/movie/:movieId', requireAdmin, (req, res) => {
   const { movieId } = req.params;
 
   const query = `
-    SELECT f.*, mf.created_at as linked_at
+    SELECT f.*, mf.is_free, mf.created_at as linked_at
     FROM foods f
     JOIN movie_foods mf ON f.id = mf.food_id
     WHERE mf.movie_id = ?

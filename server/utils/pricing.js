@@ -59,7 +59,7 @@ const calculateFoodCostFromDb = (db, movieId, foodOrders) => new Promise((resolv
 
   const placeholders = foodIds.map(() => '?').join(',');
   const query = `
-    SELECT f.id, f.price
+    SELECT f.id, f.price, mf.is_free
     FROM foods f
     JOIN movie_foods mf ON mf.food_id = f.id
     WHERE mf.movie_id = ?
@@ -72,7 +72,8 @@ const calculateFoodCostFromDb = (db, movieId, foodOrders) => new Promise((resolv
 
     const priceById = new Map();
     (rows || []).forEach((row) => {
-      const price = Number(row.price);
+      // If food is marked as free for this movie, price is 0
+      const price = row.is_free ? 0 : Number(row.price);
       priceById.set(Number(row.id), Number.isFinite(price) ? price : 0);
     });
 

@@ -263,6 +263,7 @@ if (usePostgres) {
         id SERIAL PRIMARY KEY,
         movie_id INTEGER NOT NULL,
         food_id INTEGER NOT NULL,
+        is_free INTEGER DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(movie_id, food_id)
       )`,
@@ -364,9 +365,10 @@ if (usePostgres) {
     try {
       await pool.query('ALTER TABLE movies ADD COLUMN IF NOT EXISTS is_special INTEGER DEFAULT 0');
       await pool.query('ALTER TABLE movies ADD COLUMN IF NOT EXISTS special_message TEXT');
-      console.log('✅ movies.is_special and special_message columns ensured');
+      await pool.query('ALTER TABLE movie_foods ADD COLUMN IF NOT EXISTS is_free INTEGER DEFAULT 0');
+      console.log('✅ movies/movie_foods special columns ensured');
     } catch (err) {
-      console.log('movies special columns ensure warning:', err.message);
+      console.log('Schema update ensure warning:', err.message);
     }
 
     // Set AARYAN's join date and clean up other non-admin users
@@ -652,6 +654,7 @@ if (usePostgres) {
           ensureEmailHistoryBookingId();
           ensureMovieSpecialColumns();
           ensureCouponWinnerColumns();
+          ensureMovieFoodIsFreeColumn();
           createDefaultData();
         }
       });
@@ -759,9 +762,29 @@ if (usePostgres) {
       if (!colNames.includes('special_message')) {
         db.run('ALTER TABLE movies ADD COLUMN special_message TEXT', (alterErr) => {
           if (alterErr) {
-            console.log('⚠️  Could not add movies.special_message:', alterErr.message);
+            console.error('⚠️  Could not add movies.special_message:', alterErr.message);
           } else {
             console.log('✅ movies.special_message column added');
+          }
+        });
+      }
+    });
+  }
+
+  function ensureMovieFoodIsFreeColumn() {
+    db.all('PRAGMA table_info(movie_foods)', [], (err, columns) => {
+      if (err) {
+        console.log('⚠️  Could not inspect movie_foods table columns:', err.message);
+        return;
+      }
+
+      const colNames = Array.isArray(columns) ? columns.map(c => c.name) : [];
+      if (!colNames.includes('is_free')) {
+        db.run('ALTER TABLE movie_foods ADD COLUMN is_free INTEGER DEFAULT 0', (alterErr) => {
+          if (alterErr) {
+            console.log('⚠️  Could not add movie_foods.is_free:', alterErr.message);
+          } else {
+            console.log('✅ movie_foods.is_free column added');
           }
         });
       }
