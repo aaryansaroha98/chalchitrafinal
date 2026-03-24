@@ -1447,8 +1447,8 @@ const AdminPanel = () => {
             </div>
           </div>
 
-          <div style="position: absolute; left: 641px; top: 167px; color: #1a5f7a; fontSize: 15px; fontWeight: 'bold';">:</div>
-          <div style="position: absolute; right: -30px; top: 169.5px; width: 180px; color: #000000; textAlign: 'left'; fontFamily: 'Tahoma, Arial, sans-serif';">
+          <div style="position: absolute; left: 641px; top: 165.5px; color: #1a5f7a; fontSize: 15px; fontWeight: 'bold';">:</div>
+          <div style="position: absolute; right: -30px; top: 171px; width: 180px; color: #000000; textAlign: 'left'; fontFamily: 'Tahoma, Arial, sans-serif';">
             <div style="font-size: 13px; font-weight: 400; letter-spacing: 0.2px; line-height: 1.2;">
               ${booking.venue || 'N/A'}
             </div>
