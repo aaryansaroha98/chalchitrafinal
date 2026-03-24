@@ -569,10 +569,10 @@ router.post('/scan', (req, res) => {
         return; // Exit early since we're handling this asynchronously
       }
 
-      // Check if this is a multi-person ticket that needs partial admission
-      if (booking.num_people > 1 && booking.remaining_people > 1) {
-        // Multi-person ticket - return options for partial admission
-        console.log('Multi-person ticket detected:', booking.num_people, 'people,', booking.remaining_people, 'remaining');
+      // All valid tickets now go through the "admit" selection process manually
+      if (booking.remaining_people > 0) {
+        // Return options for manual admission
+        console.log('Ticket detected, requiring manual admission:', booking.num_people, 'people total,', booking.remaining_people, 'remaining');
 
         // Get food orders for this booking even for group tickets
         const foodQuery = `
@@ -628,7 +628,7 @@ router.post('/scan', (req, res) => {
           }
 
           return res.json({
-            message: `GROUP TICKET - Choose how many people to admit`,
+            message: `TICKET VALIDATED - Choose how many people to admit`,
             partial_admission: true,
             needs_selection: true,
             student_name: booking.name || 'Unknown',

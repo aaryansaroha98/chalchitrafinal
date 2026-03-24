@@ -1617,7 +1617,7 @@ const Scanner = () => {
         <Modal.Header closeButton>
           <Modal.Title>
             <i className="fas fa-users me-2"></i>
-            Group Ticket - Select People
+            Ticket Validation - Select People
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -1625,8 +1625,8 @@ const Scanner = () => {
             <div>
               <div className="text-center mb-4">
                 <i className="fas fa-ticket-alt fa-3x text-primary mb-3"></i>
-                <h5>🎫 Group Ticket Detected</h5>
-                <p className="text-muted">How many people would you like to admit?</p>
+                <h5>🎫 Ticket Detected</h5>
+                <p className="text-muted">TICKET VALIDATED - Choose how many people you like to admit?</p>
               </div>
 
               {/* Food Orders with Give Button */}
