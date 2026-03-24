@@ -1022,6 +1022,25 @@ const AdminPanel = () => {
     }
   };
 
+  // Handle reset feedback ratings
+  const handleResetFeedback = async () => {
+    if (!window.confirm('Are you sure you want to reset all ratings? This will permanently delete all feedback data.')) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await api.delete('/api/admin/feedback/reset');
+      setFeedback([]);
+      alert('All feedback ratings have been reset successfully.');
+    } catch (err) {
+      console.error('Error resetting feedback:', err);
+      alert('Error resetting feedback: ' + (err.response?.data?.error || err.message));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Handle select all winners
   const handleSelectAllWinners = (isSelected) => {
     if (isSelected) {
@@ -3540,7 +3559,22 @@ const AdminPanel = () => {
 
         {activeTab === 'feedback' && (
           <div className="text-white py-4">
-            <h2 className="text-center mb-4">Feedback Analytics</h2>
+            <div className="d-flex justify-content-between align-items-center mb-4">
+              <h2 className="mb-0">Feedback Analytics</h2>
+              <Button 
+                variant="danger" 
+                onClick={handleResetFeedback}
+                style={{
+                  borderRadius: '12px',
+                  padding: '0.5rem 1.25rem',
+                  fontWeight: '600',
+                  boxShadow: '0 4px 15px rgba(220, 53, 69, 0.3)',
+                  border: 'none'
+                }}
+              >
+                <i className="fas fa-trash-alt me-2"></i> Reset All Ratings
+              </Button>
+            </div>
 
             {/* Overall Stats Cards */}
             <Row className="mb-4">

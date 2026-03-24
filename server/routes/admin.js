@@ -480,6 +480,15 @@ router.get('/feedback', requireAdmin, (req, res) => {
     });
 });
 
+// Reset (delete) all feedback ratings
+router.delete('/feedback/reset', requireAdmin, (req, res) => {
+  db.run('DELETE FROM feedback', [], function (err) {
+    if (err) return res.status(500).json({ error: err.message });
+    console.log(`Reset ${this.changes} feedback entries`);
+    res.json({ message: 'All feedback ratings have been reset successfully', deleted: this.changes });
+  });
+});
+
 // Get all coupons with usage tracking
 router.get('/coupons', requireAdmin, (req, res) => {
   db.all('SELECT * FROM coupons ORDER BY created_at DESC', [], (err, coupons) => {
