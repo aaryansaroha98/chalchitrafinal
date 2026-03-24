@@ -201,6 +201,12 @@ router.post('/login', (req, res) => {
 
 // Routes
 router.get('/google', (req, res) => {
+  const { redirectTo } = req.query;
+  if (redirectTo) {
+    req.session.redirectTo = redirectTo;
+    console.log('Stored redirectTo in session:', redirectTo);
+  }
+
   const clientId = process.env.GOOGLE_CLIENT_ID || 'your-google-client-id';
   const port = process.env.PORT || 3000;
   
@@ -230,6 +236,14 @@ router.get('/google/callback', (req, res, next) => {
   }
   next();
 }, passport.authenticate('google', { failureRedirect: '/login' }), (req, res) => {
+  // Check for preserved redirect URL
+  const redirectTo = req.session.redirectTo;
+  if (redirectTo) {
+    delete req.session.redirectTo;
+    console.log('Redirecting to preserved URL:', redirectTo);
+    return res.redirect(redirectTo);
+  }
+
   // Use FRONTEND_URL for production, otherwise use request host
   const frontendUrl = process.env.FRONTEND_URL;
   if (frontendUrl) {

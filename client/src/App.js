@@ -43,6 +43,7 @@ const ScrollToTop = () => {
 // Protected Route Component
 const ProtectedRoute = ({ children, renderWhileLoading = false }) => {
   const { isAuthenticated, loading } = useAuth();
+  const location = useLocation();
 
   if (loading && renderWhileLoading) {
     return children;
@@ -53,7 +54,8 @@ const ProtectedRoute = ({ children, renderWhileLoading = false }) => {
   }
 
   if (!isAuthenticated) {
-    window.location.href = '/login';
+    const redirectTo = encodeURIComponent(location.pathname + location.search);
+    window.location.href = `/login?redirectTo=${redirectTo}`;
     return null;
   }
 

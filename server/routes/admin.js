@@ -1295,7 +1295,7 @@ router.post('/email/feedback-request', requireAdmin, async (req, res) => {
                       </p>
 
                       <div style="text-align: center; margin: 30px 0;">
-                        <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/my-bookings?user_id=${user.id}&feedback=true"
+                        <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/my-bookings?movie_id=${selectedMovie.id}&feedback=true"
                            style="background: linear-gradient(145deg, #007bff, #0056b3); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block; box-shadow: 0 4px 8px rgba(0,123,255,0.3);">
                           Give Feedback
                         </a>

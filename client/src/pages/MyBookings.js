@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Modal, Card, Badge, Alert } from 'react-bootstrap';
+import { useSearchParams } from 'react-router-dom';
 import api from '../api/axios';
 import Loader from '../components/Loader';
 import html2canvas from 'html2canvas';
@@ -22,6 +23,7 @@ const MyBookings = () => {
   const [downloadingTicket, setDownloadingTicket] = useState(null);
   const [selectedBookings, setSelectedBookings] = useState(new Set());
   const [showBulkDelete, setShowBulkDelete] = useState(false);
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     fetchBookings();
@@ -32,6 +34,18 @@ const MyBookings = () => {
       const res = await api.get('/api/bookings/my');
       setBookings(res.data);
       setLoading(false);
+
+      // Check for feedback request in URL
+      const movieId = searchParams.get('movie_id');
+      const isFeedback = searchParams.get('feedback') === 'true';
+
+      if (isFeedback && movieId && res.data.length > 0) {
+        const bookingToFeedback = res.data.find(b => b.movie_id === parseInt(movieId, 10));
+        if (bookingToFeedback) {
+          setSelectedBooking(bookingToFeedback);
+          setShowFeedback(true);
+        }
+      }
     } catch (err) {
       setError('Failed to load bookings');
       setLoading(false);

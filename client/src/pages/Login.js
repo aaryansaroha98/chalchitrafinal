@@ -9,9 +9,17 @@ const Login = () => {
 
   const handleGoogleLogin = () => {
     setIsLoading(true);
+    // Capture redirectTo from search params to pass to backend
+    const searchParams = new URLSearchParams(window.location.search);
+    const redirectTo = searchParams.get('redirectTo');
+    
     // Use current browser origin for mobile compatibility
     const apiBaseUrl = window.location.origin;
-    window.location.href = `${apiBaseUrl}/api/auth/google`;
+    let authUrl = `${apiBaseUrl}/api/auth/google`;
+    if (redirectTo) {
+      authUrl += `?redirectTo=${encodeURIComponent(redirectTo)}`;
+    }
+    window.location.href = authUrl;
   };
 
   const handlePrivacyPolicyClick = () => {
