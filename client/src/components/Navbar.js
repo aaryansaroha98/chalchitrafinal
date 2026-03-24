@@ -69,7 +69,7 @@ const NavigationBar = () => {
         <Container fluid style={{ display: 'flex', alignItems: 'center' }}>
           <Navbar.Brand as={Link} to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'white', textDecoration: 'none' }}>
             <img src="/logos/logo-removebg-preview.png" alt="Logo" style={{ height: '38px' }} />
-            <span style={{ display: 'inline-block', transform: 'scaleY(1.5)', transformOrigin: 'center', fontSize: '1.3rem', fontWeight: '600', letterSpacing: '1px' }}>CHALCHITRA</span>
+            <span style={{ display: 'inline-block', transform: 'scaleY(1.35)', transformOrigin: 'center', fontSize: '1.3rem', fontWeight: '600', letterSpacing: '1px' }}>CHALCHITRA</span>
           </Navbar.Brand>
           {!user && <button onClick={handleLoginClick} style={{ background: 'transparent', border: 'none', padding: '0.5rem', cursor: 'pointer', marginLeft: 'auto' }}><img src="/logos/login_b_inverted.png" alt="Login" style={{ width: '24px', height: '24px' }} /></button>}
         </Container>
@@ -83,7 +83,7 @@ const NavigationBar = () => {
         {/* Logo - Left */}
         <Navbar.Brand as={Link} to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'white', textDecoration: 'none' }}>
           <img src="/logos/logo-removebg-preview.png" alt="Logo" style={{ height: '38px' }} />
-          <span style={{ display: 'inline-block', transform: 'scaleY(1.5)', transformOrigin: 'center', fontSize: '1.3rem', fontWeight: '600', letterSpacing: '1px' }}>CHALCHITRA</span>
+          <span style={{ display: 'inline-block', transform: 'scaleY(1.35)', transformOrigin: 'center', fontSize: '1.3rem', fontWeight: '600', letterSpacing: '1px' }}>CHALCHITRA</span>
         </Navbar.Brand>
 
         {/* Desktop: Main nav links - Center */}
