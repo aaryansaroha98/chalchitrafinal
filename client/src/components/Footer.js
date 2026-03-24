@@ -369,13 +369,13 @@ const Footer = () => {
               marginTop: '0.5rem'
             }}>
               <p style={{margin: '0 0 0.25rem 0'}}>
-                <strong style={{color: '#ffffff'}}>Chalchitra Series</strong>
+                <strong style={{color: '#ffffff'}}>Chalchitra Series, IIT Jammu</strong>
               </p>
               <p style={{margin: '0 0 0.25rem 0', color: '#ffffff'}}>
-                IIT Jammu, Jagti
+                Jagti, PO Nagrota, NH-44
               </p>
               <p style={{margin: '0', color: '#ffffff'}}>
-                Jammu & Kashmir, India
+                Jammu - 181221, J&K, India
               </p>
             </div>
           </Col>
