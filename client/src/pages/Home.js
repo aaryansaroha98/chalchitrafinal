@@ -323,7 +323,7 @@ const Home = () => {
             fontWeight: '700',
             color: 'white',
             marginBottom: '0.5rem',
-            letterSpacing: '0.05em'
+            letterSpacing: '0.02em'
           }}>
             <i className="fas fa-home" style={{
               color: '#007bff',
@@ -353,7 +353,7 @@ const Home = () => {
             fontSize: '1.65rem',
             fontWeight: '600',
             color: 'white',
-            letterSpacing: '0.05em',
+            letterSpacing: '0.02em',
             display: 'none'
           }}
         >
