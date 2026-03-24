@@ -59,7 +59,7 @@ const TermsOfService = () => {
                 lineHeight: '1.6',
                 marginBottom: '2rem'
               }}>
-                Welcome to Chalchitra. By using our website and services, you agree to the following terms and conditions. Please read them carefully.
+                Welcome to Chalchitra Series, an initiative by IIT Jammu. By using our website and services, you agree to the following terms and conditions. Please read them carefully.
               </p>
 
               <h2 style={{
@@ -180,7 +180,7 @@ const TermsOfService = () => {
                 <p style={{margin: '0.5rem 0', color: '#ffffff'}}><strong>Phone:</strong> +91 9569579671</p>
                 <p style={{margin: '0.5rem 0', color: '#ffffff'}}><strong>Email:</strong> chalchitra@iitjammu.ac.in</p>
                 <p style={{margin: '0.5rem 0', color: '#ffffff'}}>
-                  <strong>Address:</strong> IIT Jammu, NH-44, PO Nagrota, Jagti, Jammu and Kashmir 181221
+                  <strong>Address:</strong> Indian Institute of Technology Jammu, Jagti, PO Nagrota, NH-44, Jammu - 181221, J&K, India.
                 </p>
               </div>
             </div>

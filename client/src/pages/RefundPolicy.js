@@ -147,6 +147,9 @@ const RefundPolicy = () => {
               }}>
                 <p style={{margin: '0.5rem 0', color: '#ffffff'}}><strong>Email:</strong> chalchitra@iitjammu.ac.in</p>
                 <p style={{margin: '0.5rem 0', color: '#ffffff'}}><strong>Phone:</strong> +91 9569579671</p>
+                <p style={{margin: '0.5rem 0', color: '#ffffff'}}>
+                  <strong>Address:</strong> Indian Institute of Technology Jammu, Jagti, PO Nagrota, NH-44, Jammu - 181221, J&K, India.
+                </p>
               </div>
             </div>
           </Col>

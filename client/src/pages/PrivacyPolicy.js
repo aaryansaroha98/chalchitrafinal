@@ -59,7 +59,23 @@ const PrivacyPolicy = () => {
                 lineHeight: '1.6',
                 marginBottom: '2rem'
               }}>
-                We respect your privacy and are committed to protecting your personal information. This privacy policy explains how we collect, use, and safeguard your data.
+                We, Chalchitra Series, IIT Jammu, respect your privacy and are committed to protecting your personal information. This privacy policy explains how we collect, use, and safeguard your data.
+              </p>
+
+              <h2 style={{
+                color: '#ffffff',
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                marginBottom: '1rem'
+              }}>
+                Products and Services
+              </h2>
+              <p style={{
+                color: '#cccccc',
+                lineHeight: '1.6',
+                marginBottom: '2rem'
+              }}>
+                Chalchitra Series is an online platform designed for the IIT Jammu community to facilitate movie ticket bookings for screenings organized at the institute. Our services include ticket reservation, payment processing, and digital ticket issuance.
               </p>
 
               <h2 style={{
@@ -125,13 +141,16 @@ const PrivacyPolicy = () => {
               }}>
                 If you have any questions about this privacy policy, please contact us at:
               </p>
-              <p style={{
+              <div style={{
                 color: '#cccccc',
-                fontWeight: 'bold',
-                margin: 0
+                lineHeight: '1.6'
               }}>
-                Email: chalchitra@iitjammu.ac.in
-              </p>
+                <p style={{margin: '0.5rem 0', color: '#cccccc'}}><strong>Email:</strong> chalchitra@iitjammu.ac.in</p>
+                <p style={{margin: '0.5rem 0', color: '#cccccc'}}><strong>Phone:</strong> +91 9569579671</p>
+                <p style={{margin: '0.5rem 0', color: '#cccccc'}}>
+                  <strong>Address:</strong> Indian Institute of Technology Jammu, Jagti, PO Nagrota, NH-44, Jammu - 181221, J&K, India.
+                </p>
+              </div>
             </div>
           </Col>
         </Row>
