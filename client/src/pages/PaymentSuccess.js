@@ -95,7 +95,7 @@ const PaymentSuccess = () => {
               </div>
             </div>
 
-            <div style="position: absolute; right: -25px; top: 69px; width: 180px; color: #000000; textAlign: 'left'; fontFamily: 'Tahoma, Arial, sans-serif';">
+            <div style="position: absolute; right: -25px; top: 60px; width: 180px; color: #000000; textAlign: 'left'; fontFamily: 'Tahoma, Arial, sans-serif';">
               <div style="font-size: 13px; font-weight: 400; letter-spacing: 0.2px; line-height: 1.2; text-transform: uppercase;">
                 ${ticket.date ? new Date(ticket.date).toLocaleDateString('en-IN', { weekday: 'long' }) : 'N/A'}
               </div>
@@ -104,13 +104,13 @@ const PaymentSuccess = () => {
               </div>
             </div>
 
-            <div style="position: absolute; right: -25px; top: 120px; width: 180px; color: #000000; textAlign: 'left'; fontFamily: 'Tahoma, Arial, sans-serif';">
+            <div style="position: absolute; right: -25px; top: 111px; width: 180px; color: #000000; textAlign: 'left'; fontFamily: 'Tahoma, Arial, sans-serif';">
               <div style="font-size: 13px; font-weight: 400; letter-spacing: 0.2px; line-height: 1.2;">
                 ${ticket.date ? new Date(ticket.date).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : 'N/A'}
               </div>
             </div>
 
-            <div style="position: absolute; right: -30px; top: 171.5px; width: 180px; color: #000000; textAlign: 'left'; fontFamily: 'Tahoma, Arial, sans-serif';">
+            <div style="position: absolute; right: -30px; top: 162.5px; width: 180px; color: #000000; textAlign: 'left'; fontFamily: 'Tahoma, Arial, sans-serif';">
               <div style="font-size: 13px; font-weight: 400; letter-spacing: 0.2px; line-height: 1.2;">
                 ${ticket.venue || 'N/A'}
               </div>
