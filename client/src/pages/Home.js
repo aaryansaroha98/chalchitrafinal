@@ -1134,18 +1134,18 @@ const Home = () => {
             .home-hero-text {
               width: min(96vw, 520px);
               padding: 0 0.75rem !important;
-              gap: 0.25rem;
+              gap: 0.15rem;
             }
 
             .home-hero-text h1 {
               font-size: 1.55rem !important;
               font-weight: 500 !important;
               line-height: 1.15 !important;
-              margin-bottom: 0.3rem !important;
+              margin-bottom: 0.15rem !important;
             }
 
             .home-hero-text p {
-              font-size: clamp(0.72rem, 3.2vw, 0.86rem) !important;
+              font-size: clamp(0.68rem, 3vw, 0.82rem) !important;
               line-height: 1.35 !important;
               max-width: 100% !important;
               white-space: normal !important; /* allow wrapping */
@@ -1177,7 +1177,7 @@ const Home = () => {
 
             /* Hero Section Mobile */
             section:first-of-type {
-              padding: 2rem 0 0 0;
+              padding: 1rem 0 0 0;
               min-height: 90vh !important;
             }
 
