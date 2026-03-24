@@ -156,7 +156,7 @@ const MyBookings = () => {
             </div>
           </div>
 
-          <div style="position: absolute; left: 638px; top: 66px; color: #1a5f7a; fontSize: 15px; fontWeight: 'bold';">:</div>
+          <div style="position: absolute; left: 635px; top: 64px; color: #1a5f7a; fontSize: 15px; fontWeight: 'bold';">:</div>
           <div style="position: absolute; right: -25px; top: 67px; width: 180px; color: #000000; textAlign: 'left'; fontFamily: 'Tahoma, Arial, sans-serif';">
             <div style="font-size: 13px; font-weight: 400; letter-spacing: 0.2px; line-height: 1.2; text-transform: uppercase;">
               ${booking.date ? new Date(booking.date).toLocaleDateString('en-IN', { weekday: 'long' }) : 'N/A'}
@@ -166,7 +166,7 @@ const MyBookings = () => {
             </div>
           </div>
 
-          <div style="position: absolute; left: 638px; top: 117px; color: #1a5f7a; fontSize: 15px; fontWeight: 'bold';">:</div>
+          <div style="position: absolute; left: 635px; top: 115px; color: #1a5f7a; fontSize: 15px; fontWeight: 'bold';">:</div>
           <div style="position: absolute; right: -25px; top: 118px; width: 180px; color: #000000; textAlign: 'left'; fontFamily: 'Tahoma, Arial, sans-serif';">
             <div style="font-size: 13px; font-weight: 400; letter-spacing: 0.2px; line-height: 1.2;">
               ${booking.date ? new Date(booking.date).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : 'N/A'}
