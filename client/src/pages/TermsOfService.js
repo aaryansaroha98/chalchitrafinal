@@ -68,6 +68,31 @@ const TermsOfService = () => {
                 fontWeight: 'bold',
                 marginBottom: '1rem'
               }}>
+                Description of Services
+              </h2>
+              <p style={{
+                 color: '#cccccc',
+                 lineHeight: '1.6',
+                 marginBottom: '2rem'
+              }}>
+                Chalchitra Series is an online platform exclusively developed for the Indian Institute of Technology Jammu (IIT Jammu) community. Our primary service is to facilitate the online booking of movie tickets for cinematic screenings held at the institute's venues (such as the Mansar Auditorium). 
+                <br/><br/>
+                Our services include:
+                <ul style={{ paddingLeft: '1.2rem' }}>
+                  <li>Browsing upcoming movie screenings and event details.</li>
+                  <li>Secure online payment processing for ticket purchases via PayU.</li>
+                  <li>Generation and delivery of digital tickets (PDF) with unique QR codes.</li>
+                  <li>QR code-based admission management at event venues.</li>
+                </ul>
+                The services provided through this website are intended for authorized users within the IIT Jammu ecosystem.
+              </p>
+
+              <h2 style={{
+                color: '#ffffff',
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                marginBottom: '1rem'
+              }}>
                 General Terms
               </h2>
               <p style={{
