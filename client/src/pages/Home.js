@@ -301,7 +301,7 @@ const Home = () => {
 
 
 
-      <Container className="home-content" style={{padding: '2rem 2rem 4rem', position: 'relative', zIndex: 2}}>
+      <Container className="home-content" style={{padding: '1rem 2rem 4rem', position: 'relative', zIndex: 2}}>
 
         {/* Clean Header */}
         <div
@@ -315,14 +315,14 @@ const Home = () => {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '0.5rem'
+            gap: '0.3rem'
           }}
         >
           <h1 style={{
             fontSize: '2.5rem',
             fontWeight: '700',
             color: 'white',
-            marginBottom: '0.5rem',
+            marginBottom: '0.3rem',
             letterSpacing: '0.02em'
           }}>
             <i className="fas fa-home" style={{
@@ -333,7 +333,7 @@ const Home = () => {
             WELCOME TO CHALCHITRA
           </h1>
           <p style={{
-            fontSize: 'clamp(1rem, 2.4vw, 1.25rem)',
+            fontSize: 'clamp(1.1rem, 2.6vw, 1.4rem)',
             color: '#6c757d',
             maxWidth: 'none',
             width: '100%',
