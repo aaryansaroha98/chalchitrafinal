@@ -4,7 +4,7 @@ import api from '../api/axios';
 import jsQR from 'jsqr';
 
 const Scanner = () => {
-  const SCAN_BEEP_MP3_PATH = '/Nextel beep boop - QuickSounds (mp3cut.net).mp3';
+  const SCAN_BEEP_MP3_PATH = '/Nextel beep boop - QuickSounds (mp3cut.net).mp3?v=2';
   const [isScanning, setIsScanning] = useState(false);
   const [scanResult, setScanResult] = useState(null);
   const [scanHistory, setScanHistory] = useState([]);
@@ -31,8 +31,8 @@ const Scanner = () => {
   const videoRef = useRef(null);
   const scanIntervalRef = useRef(null);
   const currentFoodLoadingRef = useRef(null); // Track current food loading request
-  const audioContextRef = useRef(null);
   const beepAudioRef = useRef(null);
+  const beepPrimedRef = useRef(false);
 
   const getOrCreateBeepAudio = () => {
     if (!beepAudioRef.current) {
@@ -43,47 +43,33 @@ const Scanner = () => {
     return beepAudioRef.current;
   };
 
-  const playFallbackTone = async () => {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) return;
-
-    if (!audioContextRef.current) {
-      audioContextRef.current = new AudioContextClass();
+  const primeScanBeep = async () => {
+    try {
+      const audio = getOrCreateBeepAudio();
+      if (beepPrimedRef.current) return;
+      audio.muted = true;
+      audio.currentTime = 0;
+      await audio.play();
+      audio.pause();
+      audio.currentTime = 0;
+      audio.muted = false;
+      beepPrimedRef.current = true;
+    } catch (error) {
+      // Browser autoplay policies can still block this in some contexts.
+      // We retry normal playback after a successful user interaction.
+      console.warn('Beep prime blocked, will retry on scan:', error);
     }
-
-    const audioContext = audioContextRef.current;
-    if (audioContext.state === 'suspended') {
-      await audioContext.resume();
-    }
-
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(880, audioContext.currentTime);
-    gainNode.gain.setValueAtTime(0.0001, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.22, audioContext.currentTime + 0.01);
-    gainNode.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.99);
-
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 1.0);
   };
 
   const playScanBeep = async () => {
     try {
       const audio = getOrCreateBeepAudio();
+      audio.muted = false;
       audio.pause();
       audio.currentTime = 0;
       await audio.play();
     } catch (error) {
-      console.warn('MP3 beep playback failed, using fallback tone:', error);
-      try {
-        await playFallbackTone();
-      } catch (fallbackError) {
-        console.warn('Fallback beep playback failed:', fallbackError);
-      }
+      console.warn('MP3 beep playback failed:', error);
     }
   };
 
@@ -106,9 +92,6 @@ const Scanner = () => {
       if (beepAudioRef.current) {
         beepAudioRef.current.pause();
         beepAudioRef.current = null;
-      }
-      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
-        audioContextRef.current.close().catch(() => { });
       }
     };
   }, []);
@@ -271,6 +254,7 @@ const Scanner = () => {
 
       setIsScanning(true);
       setScanResult(null);
+      await primeScanBeep();
 
       // Get camera access using selected device or default constraints
       const videoConstraints = selectedCamera ? {
