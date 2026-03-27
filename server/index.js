@@ -11,6 +11,8 @@ const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
 const bodyParser = require('body-parser');
+const appDb = require('./database');
+const DatabaseSessionStore = require('./sessionStore');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -78,7 +80,12 @@ app.use((req, res, next) => {
 });
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
+const sessionStore = new DatabaseSessionStore(appDb, {
+  ttlMs: SESSION_MAX_AGE_MS,
+  cleanupIntervalMs: 15 * 60 * 1000
+});
 app.use(session({
+  store: sessionStore,
   secret: process.env.SESSION_SECRET || 'chalchitra-secret-key',
   resave: false,
   saveUninitialized: false,
