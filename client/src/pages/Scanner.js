@@ -54,13 +54,13 @@ const Scanner = () => {
 
       gainNode.gain.setValueAtTime(0.0001, audioContext.currentTime);
       gainNode.gain.exponentialRampToValueAtTime(0.22, audioContext.currentTime + 0.01);
-      gainNode.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.14);
+      gainNode.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.24);
 
       oscillator.connect(gainNode);
       gainNode.connect(audioContext.destination);
 
       oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 0.15);
+      oscillator.stop(audioContext.currentTime + 0.25);
     } catch (error) {
       console.warn('Beep playback failed:', error);
     }
