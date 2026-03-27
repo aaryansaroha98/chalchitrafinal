@@ -2023,11 +2023,11 @@ const Scanner = () => {
             ❌ INVALID TICKET - Entry Denied
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body className="text-center py-5">
+        <Modal.Body className="text-center pt-3 pb-2">
           {lastScanResult && (
             <div>
-              <i className="fas fa-times-circle fa-5x text-danger mb-4"></i>
-              <h4 className="text-danger mb-4">Entry Denied!</h4>
+              <i className="fas fa-times-circle fa-5x text-danger mb-3"></i>
+              <h4 className="text-danger mb-3">Entry Denied!</h4>
 
               <Card className="border-danger shadow-sm mb-4" style={{ maxWidth: '400px', margin: '0 auto' }}>
                 <Card.Body>
@@ -2117,7 +2117,7 @@ const Scanner = () => {
             </div>
           )}
         </Modal.Body>
-        <Modal.Footer className="bg-light" style={{ border: 'none' }}>
+        <Modal.Footer className="bg-light" style={{ border: 'none', paddingTop: '0.4rem', paddingBottom: '0.6rem' }}>
           <Button
             variant="danger"
             onClick={() => {
