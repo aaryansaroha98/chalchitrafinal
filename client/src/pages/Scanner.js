@@ -30,6 +30,41 @@ const Scanner = () => {
   const videoRef = useRef(null);
   const scanIntervalRef = useRef(null);
   const currentFoodLoadingRef = useRef(null); // Track current food loading request
+  const audioContextRef = useRef(null);
+
+  const playScanBeep = async () => {
+    try {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return;
+
+      if (!audioContextRef.current) {
+        audioContextRef.current = new AudioContextClass();
+      }
+
+      const audioContext = audioContextRef.current;
+      if (audioContext.state === 'suspended') {
+        await audioContext.resume();
+      }
+
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(880, audioContext.currentTime);
+
+      gainNode.gain.setValueAtTime(0.0001, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.22, audioContext.currentTime + 0.01);
+      gainNode.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.14);
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.15);
+    } catch (error) {
+      console.warn('Beep playback failed:', error);
+    }
+  };
 
 
   useEffect(() => {
@@ -47,6 +82,9 @@ const Scanner = () => {
 
     return () => {
       stopScanner();
+      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+        audioContextRef.current.close().catch(() => { });
+      }
     };
   }, []);
 
@@ -331,6 +369,7 @@ const Scanner = () => {
   const handleScan = async (qrCode, numPeople = null) => {
     console.log('🎯 Processing QR code:', qrCode, 'People:', numPeople);
 
+    playScanBeep();
     setScanResult({ status: 'processing' });
     
     // We don't want to block the whole screen during a quick scan, 
