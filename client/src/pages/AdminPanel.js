@@ -2887,7 +2887,7 @@ const AdminPanel = () => {
                         onClick={() => {
                           // Mark as used/unused
                           api.put(`/api/admin/bookings/${booking.id}`, {
-                            is_used: !booking.is_used
+                            is_used: booking.is_used ? 0 : 1
                           }).then(() => {
                             fetchAllData();
                           }).catch(err => alert('Error updating booking status'));

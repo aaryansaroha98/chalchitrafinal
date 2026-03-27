@@ -454,10 +454,22 @@ router.get('/bookings', requireAdmin, (req, res) => {
 
 // Update booking (admin)
 router.put('/bookings/:id', requireAdmin, (req, res) => {
-  const { is_used } = req.body;
-  db.run('UPDATE bookings SET is_used = ? WHERE id = ?', [is_used, req.params.id], function (err) {
+  const rawIsUsed = req.body ? req.body.is_used : undefined;
+
+  if (rawIsUsed === undefined || rawIsUsed === null) {
+    return res.status(400).json({ error: 'is_used is required' });
+  }
+
+  const normalized = (rawIsUsed === true || rawIsUsed === 1 || rawIsUsed === '1' || rawIsUsed === 'true') ? 1 : 0;
+
+  const updateSql = normalized === 1
+    ? 'UPDATE bookings SET is_used = 1, admitted_people = num_people, remaining_people = 0 WHERE id = ?'
+    : 'UPDATE bookings SET is_used = 0, admitted_people = 0, remaining_people = num_people WHERE id = ?';
+
+  db.run(updateSql, [req.params.id], function (err) {
     if (err) return res.status(500).json({ error: err.message });
-    res.json({ changes: this.changes });
+    if (this.changes === 0) return res.status(404).json({ error: 'Booking not found' });
+    res.json({ changes: this.changes, is_used: normalized });
   });
 });
 
