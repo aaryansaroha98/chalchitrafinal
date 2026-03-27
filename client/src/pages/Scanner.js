@@ -4,7 +4,7 @@ import api from '../api/axios';
 import jsQR from 'jsqr';
 
 const Scanner = () => {
-  const SCAN_BEEP_MP3_PATH = `${process.env.PUBLIC_URL || ''}/scanner-beep.mp3?v=2`;
+  const SCAN_BEEP_MP3_PATH = `${process.env.PUBLIC_URL || ''}/scanner-beep.mp3?v=3`;
   const [isScanning, setIsScanning] = useState(false);
   const [scanResult, setScanResult] = useState(null);
   const [scanHistory, setScanHistory] = useState([]);
