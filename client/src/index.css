@@ -2682,7 +2682,7 @@ a:hover {
   }
 
   .team-member-card {
-    width: min(100%, clamp(96px, 30vw, 150px)) !important;
+    width: 100% !important;
     border-radius: 12px !important;
     justify-self: center !important;
   }
