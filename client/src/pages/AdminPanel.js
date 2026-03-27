@@ -1619,7 +1619,27 @@ const AdminPanel = () => {
     }
   };
 
-  // Search users to make them admin
+  const refreshUserAndAdminLists = async () => {
+    const usersRes = await api.get('/api/admin/users');
+    const refreshedUsers = usersRes.data || [];
+    setUsers(refreshedUsers);
+
+    if (myPermissions?.is_super_admin) {
+      const adminsRes = await api.get('/api/admin/permission-admins');
+      setAdminUsers(adminsRes.data);
+    }
+
+    if (showMakeAdminModal && userSearchTerm.length >= 2) {
+      const loweredSearchTerm = userSearchTerm.toLowerCase();
+      const filteredUsers = refreshedUsers.filter(user =>
+      ((user.name || '').toLowerCase().includes(loweredSearchTerm) ||
+        (user.email || '').toLowerCase().includes(loweredSearchTerm))
+      );
+      setSearchedUsers(filteredUsers);
+    }
+  };
+
+  // Search users to manage admin and scanner-only access
   const searchUsers = async (searchTerm) => {
     setUserSearchTerm(searchTerm);
     if (searchTerm.length < 2) {
@@ -1631,8 +1651,8 @@ const AdminPanel = () => {
     try {
       // Search users by name or email (including admins)
       const filteredUsers = users.filter(user =>
-      (user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()))
+      ((user.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (user.email || '').toLowerCase().includes(searchTerm.toLowerCase()))
       );
       setSearchedUsers(filteredUsers);
     } catch (err) {
@@ -1648,13 +1668,7 @@ const AdminPanel = () => {
     try {
       await api.put(`/api/admin/users/${userId}/make_admin`);
       alert('User promoted to admin successfully!');
-
-      // Refresh users and admin lists
-      const usersRes = await api.get('/api/admin/users');
-      setUsers(usersRes.data);
-
-      const adminsRes = await api.get('/api/admin/permission-admins');
-      setAdminUsers(adminsRes.data);
+      await refreshUserAndAdminLists();
 
       setShowMakeAdminModal(false);
       setUserSearchTerm('');
@@ -1674,21 +1688,40 @@ const AdminPanel = () => {
     try {
       await api.put(`/api/admin/users/${userId}/remove_admin`);
       alert('Admin privileges removed successfully!');
-
-      // Refresh users and admin lists
-      const usersRes = await api.get('/api/admin/users');
-      setUsers(usersRes.data);
-
-      const adminsRes = await api.get('/api/admin/permission-admins');
-      setAdminUsers(adminsRes.data);
-
-      // Refresh search results if modal is open
-      if (showMakeAdminModal) {
-        searchUsers(userSearchTerm);
-      }
+      await refreshUserAndAdminLists();
     } catch (err) {
       console.error('Error removing admin:', err);
       alert('Error removing admin privileges: ' + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const grantScannerOnlyAccess = async (userId, userName) => {
+    if (!window.confirm(`Give scanner-only access to ${userName}? They will get Scanner access without admin privileges.`)) {
+      return;
+    }
+
+    try {
+      await api.put(`/api/admin/users/${userId}/make_scanner`);
+      alert(`Scanner-only access granted to ${userName}!`);
+      await refreshUserAndAdminLists();
+    } catch (err) {
+      console.error('Error granting scanner-only access:', err);
+      alert('Error granting scanner access: ' + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const removeScannerOnlyAccess = async (userId, userName) => {
+    if (!window.confirm(`Remove scanner-only access from ${userName}?`)) {
+      return;
+    }
+
+    try {
+      await api.put(`/api/admin/users/${userId}/remove_scanner`);
+      alert(`Scanner access removed from ${userName}.`);
+      await refreshUserAndAdminLists();
+    } catch (err) {
+      console.error('Error removing scanner-only access:', err);
+      alert('Error removing scanner access: ' + (err.response?.data?.error || err.message));
     }
   };
 
@@ -5420,8 +5453,8 @@ const AdminPanel = () => {
                     padding: '10px 20px'
                   }}
                 >
-                  <i className="fas fa-user-plus me-2"></i>
-                  Make Admin
+                  <i className="fas fa-user-shield me-2"></i>
+                  Manage Access
                 </Button>
                 <Button
                   variant="outline-light"
@@ -7085,8 +7118,8 @@ const AdminPanel = () => {
         >
           <Modal.Header closeButton>
             <Modal.Title>
-              <i className="fas fa-user-plus me-2"></i>
-              Make User Admin
+              <i className="fas fa-user-shield me-2"></i>
+              Manage User Access
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
@@ -7097,10 +7130,9 @@ const AdminPanel = () => {
               color: 'black',
               marginBottom: '1.5rem'
             }}>
-              <strong>Search for a user to manage admin status:</strong>
+              <strong>Search for a user to manage access:</strong>
               <p className="mb-0 mt-2" style={{ fontSize: '0.9rem' }}>
-                Search for any user by name or email. Admins will show a "Remove Admin" option,
-                while regular users will show "Make Admin".
+                Search by name or email. You can grant scanner-only access or promote to admin.
               </p>
             </Alert>
 
@@ -7151,7 +7183,9 @@ const AdminPanel = () => {
                       padding: '12px 15px',
                       borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
                       transition: 'background 0.2s ease',
-                      background: user.is_admin ? 'rgba(255, 193, 7, 0.05)' : 'transparent'
+                      background: user.is_admin
+                        ? 'rgba(255, 193, 7, 0.05)'
+                        : (user.code_scanner ? 'rgba(23, 162, 184, 0.08)' : 'transparent')
                     }}
                   >
                     <div style={{ flex: 1 }}>
@@ -7183,23 +7217,58 @@ const AdminPanel = () => {
                           )}
                         </>
                       ) : (
-                        <Button
-                          variant="success"
-                          size="sm"
-                          onClick={() => {
-                            if (window.confirm(`Are you sure you want to make ${user.name} (${user.email}) an admin?`)) {
-                              makeUserAdmin(user.id);
-                            }
-                          }}
-                          style={{
-                            background: 'linear-gradient(145deg, rgba(40, 167, 69, 0.8), rgba(40, 167, 69, 0.6))',
-                            border: '1px solid rgba(255, 255, 255, 0.2)',
-                            borderRadius: '20px'
-                          }}
-                        >
-                          <i className="fas fa-check me-1"></i>
-                          Make Admin
-                        </Button>
+                        <>
+                          <Badge bg={user.code_scanner ? 'info' : 'secondary'} style={{ fontSize: '0.75rem' }}>
+                            <i className={`fas ${user.code_scanner ? 'fa-qrcode' : 'fa-user'} me-1`}></i>
+                            {user.code_scanner ? 'Scanner Only' : 'User'}
+                          </Badge>
+
+                          {user.code_scanner ? (
+                            <Button
+                              variant="outline-secondary"
+                              size="sm"
+                              onClick={() => removeScannerOnlyAccess(user.id, user.name)}
+                              style={{
+                                borderRadius: '20px',
+                                background: 'transparent'
+                              }}
+                            >
+                              <i className="fas fa-ban me-1"></i>
+                              Remove Scanner
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="outline-info"
+                              size="sm"
+                              onClick={() => grantScannerOnlyAccess(user.id, user.name)}
+                              style={{
+                                borderRadius: '20px',
+                                background: 'transparent'
+                              }}
+                            >
+                              <i className="fas fa-qrcode me-1"></i>
+                              Give Scanner Access
+                            </Button>
+                          )}
+
+                          <Button
+                            variant="success"
+                            size="sm"
+                            onClick={() => {
+                              if (window.confirm(`Are you sure you want to make ${user.name} (${user.email}) an admin?`)) {
+                                makeUserAdmin(user.id);
+                              }
+                            }}
+                            style={{
+                              background: 'linear-gradient(145deg, rgba(40, 167, 69, 0.8), rgba(40, 167, 69, 0.6))',
+                              border: '1px solid rgba(255, 255, 255, 0.2)',
+                              borderRadius: '20px'
+                            }}
+                          >
+                            <i className="fas fa-check me-1"></i>
+                            Make Admin
+                          </Button>
+                        </>
                       )}
                     </div>
                   </div>
