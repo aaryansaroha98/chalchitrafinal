@@ -5,6 +5,7 @@ import jsQR from 'jsqr';
 
 const Scanner = () => {
   const SCAN_BEEP_MP3_PATH = `${process.env.PUBLIC_URL || ''}/scanner-beep.mp3?v=3`;
+  const BEEP_POOL_SIZE = 3;
   const [isScanning, setIsScanning] = useState(false);
   const [scanResult, setScanResult] = useState(null);
   const [scanHistory, setScanHistory] = useState([]);
@@ -31,20 +32,33 @@ const Scanner = () => {
   const videoRef = useRef(null);
   const scanIntervalRef = useRef(null);
   const currentFoodLoadingRef = useRef(null); // Track current food loading request
-  const beepAudioRef = useRef(null);
+  const beepAudioPoolRef = useRef([]);
+  const beepAudioIndexRef = useRef(0);
   const beepPrimedRef = useRef(false);
 
-  const getOrCreateBeepAudio = () => {
-    if (!beepAudioRef.current) {
-      const audio = new Audio(SCAN_BEEP_MP3_PATH);
-      audio.preload = 'auto';
-      audio.volume = 1;
-      audio.setAttribute('playsinline', 'true');
-      audio.setAttribute('webkit-playsinline', 'true');
-      audio.load();
-      beepAudioRef.current = audio;
+  const createBeepAudioElement = () => {
+    const audio = new Audio(SCAN_BEEP_MP3_PATH);
+    audio.preload = 'auto';
+    audio.volume = 1;
+    audio.setAttribute('playsinline', 'true');
+    audio.setAttribute('webkit-playsinline', 'true');
+    audio.load();
+    return audio;
+  };
+
+  const getOrCreateBeepPool = () => {
+    if (beepAudioPoolRef.current.length === 0) {
+      beepAudioPoolRef.current = Array.from({ length: BEEP_POOL_SIZE }, () => createBeepAudioElement());
+      beepAudioIndexRef.current = 0;
     }
-    return beepAudioRef.current;
+    return beepAudioPoolRef.current;
+  };
+
+  const getNextBeepAudio = () => {
+    const pool = getOrCreateBeepPool();
+    const next = pool[beepAudioIndexRef.current % pool.length];
+    beepAudioIndexRef.current = (beepAudioIndexRef.current + 1) % pool.length;
+    return next;
   };
 
   const waitForAudioReady = (audio, timeoutMs = 1200) => new Promise((resolve) => {
@@ -75,16 +89,19 @@ const Scanner = () => {
 
   const primeScanBeep = async () => {
     try {
-      const audio = getOrCreateBeepAudio();
       if (beepPrimedRef.current) return;
-      await waitForAudioReady(audio);
-      audio.muted = false;
+      const pool = getOrCreateBeepPool();
+      await Promise.all(pool.map((audio) => waitForAudioReady(audio)));
+
+      const audio = pool[0];
       const previousVolume = audio.volume || 1;
-      audio.volume = 0.001;
+      audio.muted = true;
+      audio.volume = 0;
       audio.currentTime = 0;
       await audio.play();
       audio.pause();
       audio.currentTime = 0;
+      audio.muted = false;
       audio.volume = previousVolume;
       beepPrimedRef.current = true;
     } catch (error) {
@@ -96,10 +113,10 @@ const Scanner = () => {
 
   const playScanBeep = async () => {
     try {
-      const audio = getOrCreateBeepAudio();
       if (!beepPrimedRef.current) {
         await primeScanBeep();
       }
+      const audio = getNextBeepAudio();
       await waitForAudioReady(audio, 800);
       audio.muted = false;
       audio.volume = 1;
@@ -107,14 +124,24 @@ const Scanner = () => {
       audio.currentTime = 0;
       await audio.play();
     } catch (error) {
-      console.warn('MP3 beep playback failed:', error);
+      console.warn('MP3 beep playback failed, retrying once:', error);
+      try {
+        beepPrimedRef.current = false;
+        await primeScanBeep();
+        const retryAudio = getNextBeepAudio();
+        retryAudio.pause();
+        retryAudio.currentTime = 0;
+        await retryAudio.play();
+      } catch (retryError) {
+        console.warn('MP3 beep retry failed:', retryError);
+      }
     }
   };
 
 
   useEffect(() => {
     // Preload beep early to reduce first-play delay.
-    waitForAudioReady(getOrCreateBeepAudio()).catch(() => { });
+    Promise.all(getOrCreateBeepPool().map((audio) => waitForAudioReady(audio))).catch(() => { });
 
     // Load scan history from localStorage
     const saved = localStorage.getItem('scanner_history');
@@ -130,11 +157,10 @@ const Scanner = () => {
 
     return () => {
       stopScanner();
-      if (beepAudioRef.current) {
-        beepAudioRef.current.pause();
-        beepAudioRef.current = null;
-        beepPrimedRef.current = false;
-      }
+      getOrCreateBeepPool().forEach((audio) => audio.pause());
+      beepAudioPoolRef.current = [];
+      beepAudioIndexRef.current = 0;
+      beepPrimedRef.current = false;
     };
   }, []);
 
@@ -420,7 +446,7 @@ const Scanner = () => {
   const handleScan = async (qrCode, numPeople = null) => {
     console.log('🎯 Processing QR code:', qrCode, 'People:', numPeople);
 
-    playScanBeep();
+    await playScanBeep();
     setScanResult({ status: 'processing' });
     
     // We don't want to block the whole screen during a quick scan, 
