@@ -4,7 +4,7 @@ import api from '../api/axios';
 import jsQR from 'jsqr';
 
 const Scanner = () => {
-  const SCAN_BEEP_MP3_PATH = '/beep_afknTK7.mp3';
+  const SCAN_BEEP_MP3_PATH = '/Nextel beep boop - QuickSounds (mp3cut.net).mp3';
   const [isScanning, setIsScanning] = useState(false);
   const [scanResult, setScanResult] = useState(null);
   const [scanHistory, setScanHistory] = useState([]);
@@ -36,7 +36,7 @@ const Scanner = () => {
 
   const getOrCreateBeepAudio = () => {
     if (!beepAudioRef.current) {
-      const audio = new Audio(SCAN_BEEP_MP3_PATH);
+      const audio = new Audio(encodeURI(SCAN_BEEP_MP3_PATH));
       audio.preload = 'auto';
       beepAudioRef.current = audio;
     }
