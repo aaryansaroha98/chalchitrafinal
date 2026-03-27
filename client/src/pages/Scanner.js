@@ -4,7 +4,7 @@ import api from '../api/axios';
 import jsQR from 'jsqr';
 
 const Scanner = () => {
-  const SCAN_BEEP_MP3_PATH = '/Nextel beep boop - QuickSounds (mp3cut.net).mp3?v=2';
+  const SCAN_BEEP_MP3_PATH = '/scanner-beep.mp3?v=1';
   const [isScanning, setIsScanning] = useState(false);
   const [scanResult, setScanResult] = useState(null);
   const [scanHistory, setScanHistory] = useState([]);
@@ -36,23 +36,56 @@ const Scanner = () => {
 
   const getOrCreateBeepAudio = () => {
     if (!beepAudioRef.current) {
-      const audio = new Audio(encodeURI(SCAN_BEEP_MP3_PATH));
+      const audio = new Audio(SCAN_BEEP_MP3_PATH);
       audio.preload = 'auto';
+      audio.volume = 1;
+      audio.setAttribute('playsinline', 'true');
+      audio.setAttribute('webkit-playsinline', 'true');
+      audio.load();
       beepAudioRef.current = audio;
     }
     return beepAudioRef.current;
   };
 
+  const waitForAudioReady = (audio, timeoutMs = 1200) => new Promise((resolve) => {
+    if (audio.readyState >= 2) {
+      resolve();
+      return;
+    }
+
+    let resolved = false;
+    const done = () => {
+      if (resolved) return;
+      resolved = true;
+      resolve();
+    };
+
+    audio.addEventListener('canplaythrough', done, { once: true });
+    audio.addEventListener('canplay', done, { once: true });
+    audio.addEventListener('loadeddata', done, { once: true });
+    audio.addEventListener('error', done, { once: true });
+
+    setTimeout(done, timeoutMs);
+    try {
+      audio.load();
+    } catch (error) {
+      done();
+    }
+  });
+
   const primeScanBeep = async () => {
     try {
       const audio = getOrCreateBeepAudio();
       if (beepPrimedRef.current) return;
-      audio.muted = true;
+      await waitForAudioReady(audio);
+      audio.muted = false;
+      const previousVolume = audio.volume || 1;
+      audio.volume = 0.001;
       audio.currentTime = 0;
       await audio.play();
       audio.pause();
       audio.currentTime = 0;
-      audio.muted = false;
+      audio.volume = previousVolume;
       beepPrimedRef.current = true;
     } catch (error) {
       // Browser autoplay policies can still block this in some contexts.
@@ -64,7 +97,12 @@ const Scanner = () => {
   const playScanBeep = async () => {
     try {
       const audio = getOrCreateBeepAudio();
+      if (!beepPrimedRef.current) {
+        await primeScanBeep();
+      }
+      await waitForAudioReady(audio, 800);
       audio.muted = false;
+      audio.volume = 1;
       audio.pause();
       audio.currentTime = 0;
       await audio.play();
@@ -75,6 +113,9 @@ const Scanner = () => {
 
 
   useEffect(() => {
+    // Preload beep early to reduce first-play delay.
+    waitForAudioReady(getOrCreateBeepAudio()).catch(() => { });
+
     // Load scan history from localStorage
     const saved = localStorage.getItem('scanner_history');
     if (saved) {
@@ -92,6 +133,7 @@ const Scanner = () => {
       if (beepAudioRef.current) {
         beepAudioRef.current.pause();
         beepAudioRef.current = null;
+        beepPrimedRef.current = false;
       }
     };
   }, []);
