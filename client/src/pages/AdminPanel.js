@@ -7512,7 +7512,7 @@ const AdminPanel = () => {
                   </div>
                 ))}
               </div>
-            ) : null}
+            )}
           </Modal.Body>
           <Modal.Footer>
             <Button
