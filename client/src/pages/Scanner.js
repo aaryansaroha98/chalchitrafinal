@@ -597,6 +597,7 @@ const Scanner = () => {
 
     console.log('👥 Processing partial admission:', numPeople, 'people');
 
+    await playScanBeep();
     setShowPartialAdmission(false);
     setScanResult({ status: 'processing' });
 
@@ -1729,14 +1730,14 @@ const Scanner = () => {
       </Modal>
 
       {/* Partial Admission Modal */}
-      <Modal show={showPartialAdmission} onHide={() => setShowPartialAdmission(false)} centered size="lg">
+      <Modal show={showPartialAdmission} onHide={() => setShowPartialAdmission(false)} centered size="lg" scrollable>
         <Modal.Header closeButton>
           <Modal.Title>
             <i className="fas fa-users me-2"></i>
             Ticket Validation - Select People
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body className="pt-2 pb-2">
           {partialAdmissionData && (
             <div>
               <div className="text-center mb-4">
@@ -1830,13 +1831,16 @@ const Scanner = () => {
             </div>
           )}
         </Modal.Body>
-        <Modal.Footer className="justify-content-center gap-2">
+        <Modal.Footer
+          className="justify-content-center align-items-center flex-nowrap gap-2"
+          style={{ paddingTop: '0.35rem', paddingBottom: '0.5rem', paddingLeft: '0.75rem', paddingRight: '0.75rem' }}
+        >
           <Button
             variant="secondary"
             size="lg"
             onClick={() => setShowPartialAdmission(false)}
-            className="px-4"
-            style={{ minWidth: '130px', fontWeight: '600' }}
+            className="px-3"
+            style={{ minWidth: '96px', fontWeight: '600' }}
           >
             Cancel
           </Button>
@@ -1844,8 +1848,8 @@ const Scanner = () => {
             variant="success"
             size="lg"
             onClick={() => handlePartialAdmission(selectedPeopleCount)}
-            className="px-5"
-            style={{ minWidth: '210px', fontWeight: '700' }}
+            className="px-4"
+            style={{ minWidth: '175px', fontWeight: '700' }}
           >
             <i className="fas fa-check me-2"></i>
             Admit {selectedPeopleCount} Person{selectedPeopleCount > 1 ? 's' : ''}
