@@ -597,7 +597,6 @@ const Scanner = () => {
 
     console.log('👥 Processing partial admission:', numPeople, 'people');
 
-    await playScanBeep();
     setShowPartialAdmission(false);
     setScanResult({ status: 'processing' });
 
