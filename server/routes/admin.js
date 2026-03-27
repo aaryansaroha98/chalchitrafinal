@@ -114,8 +114,17 @@ router.get('/stats', requireAdmin, (req, res) => {
   const results = {};
   let completed = 0;
   let responded = false;
+  const totalExpected = Object.keys(queries).length + 1; // + upcoming_bookings
 
-  Object.keys(queries).forEach(key => {
+  const finish = () => {
+    completed++;
+    if (completed === totalExpected && !responded) {
+      responded = true;
+      res.json(results);
+    }
+  };
+
+  Object.keys(queries).forEach((key) => {
     db.get(queries[key], [], (err, row) => {
       if (responded) return;
       if (err) {
@@ -123,14 +132,37 @@ router.get('/stats', requireAdmin, (req, res) => {
         console.error('Stats query error for', key, ':', err.message);
         return res.status(500).json({ error: err.message });
       }
-      results[key] = row ? row.count : 0;
-      completed++;
-      if (completed === Object.keys(queries).length) {
-        responded = true;
-        res.json(results);
-      }
+      results[key] = Number(row?.count || 0);
+      finish();
     });
   });
+
+  // Exact bookings count for upcoming movies (date-aware first, flag fallback).
+  db.all(
+    `SELECT b.id AS booking_id, m.date AS movie_date, m.is_upcoming
+     FROM bookings b
+     JOIN movies m ON b.movie_id = m.id`,
+    [],
+    (err, rows) => {
+      if (responded) return;
+      if (err) {
+        responded = true;
+        console.error('Stats query error for upcoming_bookings:', err.message);
+        return res.status(500).json({ error: err.message });
+      }
+
+      const now = new Date();
+      results.upcoming_bookings = (rows || []).filter((row) => {
+        const movieDate = new Date(row.movie_date);
+        if (!Number.isNaN(movieDate.getTime())) {
+          return movieDate >= now;
+        }
+        return Number(row.is_upcoming) === 1;
+      }).length;
+
+      finish();
+    }
+  );
 });
 
 // Get revenue statistics for Database Management (sensitive data - Config tab only)

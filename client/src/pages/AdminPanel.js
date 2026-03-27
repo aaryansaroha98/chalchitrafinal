@@ -134,7 +134,14 @@ const formatGalleryDisplayDate = (eventDate) => {
 const AdminPanel = () => {
   console.log('🔧 AdminPanel component starting...');
 
-  const [stats, setStats] = useState({ total_users: 0, total_movies: 0, upcoming_movies: 0, total_bookings: 0, recent_bookings: 0 });
+  const [stats, setStats] = useState({
+    total_users: 0,
+    total_movies: 0,
+    upcoming_movies: 0,
+    total_bookings: 0,
+    recent_bookings: 0,
+    upcoming_bookings: 0
+  });
 
   // Revenue stats for Database Management (Config tab)
   const [revenueStats, setRevenueStats] = useState({
@@ -413,7 +420,16 @@ const AdminPanel = () => {
       const [statsRes, allMoviesRes, pastMoviesRes, bookingsRes, usersRes, feedbackRes, teamRes, galleryRes, couponsRes, couponWinnersRes, settingsRes, foodsRes] = await Promise.all([
         api.get('/api/admin/stats').catch(err => {
           console.log('❌ Stats API failed:', err.message);
-          return { data: { total_users: 0, total_movies: 0, upcoming_movies: 0, total_bookings: 0, recent_bookings: 0 } };
+          return {
+            data: {
+              total_users: 0,
+              total_movies: 0,
+              upcoming_movies: 0,
+              total_bookings: 0,
+              recent_bookings: 0,
+              upcoming_bookings: 0
+            }
+          };
         }),
         api.get('/api/movies/all').catch(err => {
           console.log('❌ All Movies API failed:', err.message);
@@ -474,7 +490,14 @@ const AdminPanel = () => {
 
       // Set all the data
 
-      setStats(statsRes?.data || { total_users: 0, total_movies: 0, upcoming_movies: 0, total_bookings: 0, recent_bookings: 0 });
+      setStats(statsRes?.data || {
+        total_users: 0,
+        total_movies: 0,
+        upcoming_movies: 0,
+        total_bookings: 0,
+        recent_bookings: 0,
+        upcoming_bookings: 0
+      });
       setMovies(allMovies); // Show all movies for admin management
 
 
@@ -2454,7 +2477,7 @@ const AdminPanel = () => {
                       marginBottom: '0.5rem',
                       textShadow: '0 2px 10px rgba(0, 0, 0, 0.5)'
                     }}>
-                      {stats.upcoming_movies || 0}
+                      {stats.upcoming_bookings || 0}
                     </Card.Title>
                     <Card.Text style={{
                       fontSize: '1.1rem',
@@ -2463,7 +2486,7 @@ const AdminPanel = () => {
                       margin: 0,
                       textShadow: '0 1px 3px rgba(0,0,0,0.3)'
                     }}>
-                      Booking For Upcoming Movie
+                      Bookings For Upcoming Movies
                     </Card.Text>
                   </Card.Body>
                 </Card>
