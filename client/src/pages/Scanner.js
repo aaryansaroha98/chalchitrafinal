@@ -1827,21 +1827,25 @@ const Scanner = () => {
                 </div>
               </div>
 
-              <Alert variant="info">
-                <i className="fas fa-info-circle me-2"></i>
-                <strong>Note:</strong> You can scan this ticket multiple times to admit different groups of people, or admit everyone at once.
-              </Alert>
             </div>
           )}
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowPartialAdmission(false)}>
+        <Modal.Footer className="justify-content-center gap-2">
+          <Button
+            variant="secondary"
+            size="lg"
+            onClick={() => setShowPartialAdmission(false)}
+            className="px-4"
+            style={{ minWidth: '130px', fontWeight: '600' }}
+          >
             Cancel
           </Button>
           <Button
             variant="success"
+            size="lg"
             onClick={() => handlePartialAdmission(selectedPeopleCount)}
-            className="px-4"
+            className="px-5"
+            style={{ minWidth: '210px', fontWeight: '700' }}
           >
             <i className="fas fa-check me-2"></i>
             Admit {selectedPeopleCount} Person{selectedPeopleCount > 1 ? 's' : ''}
@@ -2120,13 +2124,15 @@ const Scanner = () => {
         <Modal.Footer className="bg-light" style={{ border: 'none', paddingTop: '0.4rem', paddingBottom: '0.6rem' }}>
           <Button
             variant="danger"
+            size="lg"
             onClick={() => {
               setShowErrorModal(false);
               setLastScanResult(null);
               // Auto-restart scanner
               setTimeout(() => startScanner(), 500);
             }}
-            className="px-4"
+            className="px-5"
+            style={{ minWidth: '190px', fontWeight: '600' }}
           >
             <i className="fas fa-redo me-2"></i>
             Scan Another
