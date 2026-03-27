@@ -199,8 +199,6 @@ const Team = () => {
           const backendTeam = team.filter(member => member.section === 'database_backend_team');
 
           const renderTeamSection = (sectionTitle, sectionMembers, icon, gradient) => {
-            const mobileColumns = Math.max(1, Math.min(sectionMembers.length, 3));
-
             return (
             <div style={{ marginBottom: '4rem' }}>
               <div className="team-section-header" style={{
@@ -256,7 +254,6 @@ const Team = () => {
                 </div>
               ) : (
                 <div className="team-members-grid" style={{
-                  '--team-mobile-columns': `${mobileColumns}`,
                   display: 'flex',
                   flexWrap: 'wrap',
                   gap: '1rem',
