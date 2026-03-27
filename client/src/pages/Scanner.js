@@ -4,6 +4,7 @@ import api from '../api/axios';
 import jsQR from 'jsqr';
 
 const Scanner = () => {
+  const SCAN_BEEP_MP3_PATH = '/beep_afknTK7.mp3';
   const [isScanning, setIsScanning] = useState(false);
   const [scanResult, setScanResult] = useState(null);
   const [scanHistory, setScanHistory] = useState([]);
@@ -31,38 +32,58 @@ const Scanner = () => {
   const scanIntervalRef = useRef(null);
   const currentFoodLoadingRef = useRef(null); // Track current food loading request
   const audioContextRef = useRef(null);
+  const beepAudioRef = useRef(null);
+
+  const getOrCreateBeepAudio = () => {
+    if (!beepAudioRef.current) {
+      const audio = new Audio(SCAN_BEEP_MP3_PATH);
+      audio.preload = 'auto';
+      beepAudioRef.current = audio;
+    }
+    return beepAudioRef.current;
+  };
+
+  const playFallbackTone = async () => {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+
+    if (!audioContextRef.current) {
+      audioContextRef.current = new AudioContextClass();
+    }
+
+    const audioContext = audioContextRef.current;
+    if (audioContext.state === 'suspended') {
+      await audioContext.resume();
+    }
+
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(880, audioContext.currentTime);
+    gainNode.gain.setValueAtTime(0.0001, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.22, audioContext.currentTime + 0.01);
+    gainNode.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.99);
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 1.0);
+  };
 
   const playScanBeep = async () => {
     try {
-      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContextClass) return;
-
-      if (!audioContextRef.current) {
-        audioContextRef.current = new AudioContextClass();
-      }
-
-      const audioContext = audioContextRef.current;
-      if (audioContext.state === 'suspended') {
-        await audioContext.resume();
-      }
-
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-
-      oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(880, audioContext.currentTime);
-
-      gainNode.gain.setValueAtTime(0.0001, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.22, audioContext.currentTime + 0.01);
-      gainNode.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.99);
-
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 1.0);
+      const audio = getOrCreateBeepAudio();
+      audio.pause();
+      audio.currentTime = 0;
+      await audio.play();
     } catch (error) {
-      console.warn('Beep playback failed:', error);
+      console.warn('MP3 beep playback failed, using fallback tone:', error);
+      try {
+        await playFallbackTone();
+      } catch (fallbackError) {
+        console.warn('Fallback beep playback failed:', fallbackError);
+      }
     }
   };
 
@@ -82,6 +103,10 @@ const Scanner = () => {
 
     return () => {
       stopScanner();
+      if (beepAudioRef.current) {
+        beepAudioRef.current.pause();
+        beepAudioRef.current = null;
+      }
       if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
         audioContextRef.current.close().catch(() => { });
       }
