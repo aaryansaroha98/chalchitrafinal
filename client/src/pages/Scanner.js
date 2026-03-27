@@ -2114,16 +2114,6 @@ const Scanner = () => {
                 </Row>
               )}
 
-              <Alert variant="warning" className="mb-4">
-                <i className="fas fa-exclamation-triangle me-2"></i>
-                <strong>Access Denied:</strong> This ticket cannot be used for entry.
-                However, food orders can still be served if applicable.
-                Please check the ticket details or contact support if you believe this is an error.
-              </Alert>
-
-              <p className="text-muted mb-0">
-                Scanner will restart automatically in a moment...
-              </p>
             </div>
           )}
         </Modal.Body>
@@ -2139,7 +2129,7 @@ const Scanner = () => {
             className="px-4"
           >
             <i className="fas fa-redo me-2"></i>
-            Try Again
+            Scan Another
           </Button>
         </Modal.Footer>
       </Modal>
