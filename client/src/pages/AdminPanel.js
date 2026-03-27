@@ -1631,21 +1631,26 @@ const AdminPanel = () => {
       setAdminUsers(adminsRes.data);
     }
 
-    if (showMakeAdminModal && userSearchTerm.length >= 2) {
-      const loweredSearchTerm = userSearchTerm.toLowerCase();
-      const filteredUsers = refreshedUsers.filter(user =>
-      ((user.name || '').toLowerCase().includes(loweredSearchTerm) ||
-        (user.email || '').toLowerCase().includes(loweredSearchTerm))
-      );
-      setSearchedUsers(filteredUsers);
+    if (showMakeAdminModal) {
+      const loweredSearchTerm = userSearchTerm.trim().toLowerCase();
+      if (!loweredSearchTerm) {
+        setSearchedUsers(refreshedUsers);
+      } else {
+        const filteredUsers = refreshedUsers.filter(user =>
+        ((user.name || '').toLowerCase().includes(loweredSearchTerm) ||
+          (user.email || '').toLowerCase().includes(loweredSearchTerm))
+        );
+        setSearchedUsers(filteredUsers);
+      }
     }
   };
 
   // Search users to manage admin and scanner-only access
   const searchUsers = async (searchTerm) => {
     setUserSearchTerm(searchTerm);
-    if (searchTerm.length < 2) {
-      setSearchedUsers([]);
+    const loweredSearchTerm = searchTerm.trim().toLowerCase();
+    if (!loweredSearchTerm) {
+      setSearchedUsers(users);
       return;
     }
 
@@ -1653,8 +1658,8 @@ const AdminPanel = () => {
     try {
       // Search users by name or email (including admins)
       const filteredUsers = users.filter(user =>
-      ((user.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (user.email || '').toLowerCase().includes(searchTerm.toLowerCase()))
+      ((user.name || '').toLowerCase().includes(loweredSearchTerm) ||
+        (user.email || '').toLowerCase().includes(loweredSearchTerm))
       );
       setSearchedUsers(filteredUsers);
     } catch (err) {
@@ -5504,7 +5509,11 @@ const AdminPanel = () => {
                 </Button>
                 <Button
                   variant="success"
-                  onClick={() => setShowMakeAdminModal(true)}
+                  onClick={() => {
+                    setUserSearchTerm('');
+                    setSearchedUsers(users);
+                    setShowMakeAdminModal(true);
+                  }}
                   style={{
                     background: 'linear-gradient(145deg, rgba(40, 167, 69, 0.8), rgba(40, 167, 69, 0.6))',
                     backdropFilter: 'blur(20px)',
@@ -7265,7 +7274,7 @@ const AdminPanel = () => {
                 autoFocus
               />
               <Form.Text className="text-muted">
-                Type at least 2 characters to search
+                Leave empty to show all users
               </Form.Text>
             </Form.Group>
 
@@ -7277,15 +7286,19 @@ const AdminPanel = () => {
                 </div>
                 <p className="mt-2 text-muted">Searching...</p>
               </div>
-            ) : userSearchTerm.length >= 2 && searchedUsers.length === 0 ? (
+            ) : searchedUsers.length === 0 ? (
               <div className="text-center py-4" style={{
                 background: 'rgba(255, 255, 255, 0.05)',
                 borderRadius: '10px'
               }}>
                 <i className="fas fa-search fa-2x mb-3 text-muted"></i>
-                <p className="text-muted mb-0">No users found matching "{userSearchTerm}"</p>
+                <p className="text-muted mb-0">
+                  {userSearchTerm.trim()
+                    ? `No users found matching "${userSearchTerm}"`
+                    : 'No users available'}
+                </p>
               </div>
-            ) : searchedUsers.length > 0 ? (
+            ) : (
               <div style={{
                 maxHeight: '300px',
                 overflowY: 'auto',
