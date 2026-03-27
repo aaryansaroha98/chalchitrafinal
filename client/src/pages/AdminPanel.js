@@ -300,6 +300,8 @@ const AdminPanel = () => {
   const [selectedAdminTabs, setSelectedAdminTabs] = useState([]);
   const [selectedAdminScanner, setSelectedAdminScanner] = useState(false);
   const [permissionLoading, setPermissionLoading] = useState(false);
+  const [selectedAdminIdsForBulkRemove, setSelectedAdminIdsForBulkRemove] = useState([]);
+  const [bulkRemovingAdmins, setBulkRemovingAdmins] = useState(false);
 
   // Search user for making admin state
   const [showMakeAdminModal, setShowMakeAdminModal] = useState(false);
@@ -1695,6 +1697,54 @@ const AdminPanel = () => {
     }
   };
 
+  const toggleAdminBulkSelection = (adminId) => {
+    setSelectedAdminIdsForBulkRemove(prev =>
+      prev.includes(adminId)
+        ? prev.filter(id => id !== adminId)
+        : [...prev, adminId]
+    );
+  };
+
+  const bulkRemoveAdminAccess = async () => {
+    const selectedAdmins = adminUsers.filter(
+      admin => selectedAdminIdsForBulkRemove.includes(admin.id) && admin.email !== SUPER_ADMIN_EMAIL
+    );
+
+    if (selectedAdmins.length === 0) {
+      alert('Please select at least one admin to remove access.');
+      return;
+    }
+
+    if (!window.confirm(`Remove admin access from ${selectedAdmins.length} selected admin(s)?`)) {
+      return;
+    }
+
+    try {
+      setBulkRemovingAdmins(true);
+
+      const results = await Promise.allSettled(
+        selectedAdmins.map(admin => api.put(`/api/admin/users/${admin.id}/remove_admin`))
+      );
+
+      const failedCount = results.filter(result => result.status === 'rejected').length;
+      const successCount = selectedAdmins.length - failedCount;
+
+      if (failedCount === 0) {
+        alert(`Admin access removed for ${successCount} user(s).`);
+      } else {
+        alert(`Admin access removed for ${successCount} user(s). Failed for ${failedCount} user(s).`);
+      }
+
+      setSelectedAdminIdsForBulkRemove([]);
+      await refreshUserAndAdminLists();
+    } catch (err) {
+      console.error('Error removing admin access in bulk:', err);
+      alert('Error removing admin access: ' + (err.response?.data?.error || err.message));
+    } finally {
+      setBulkRemovingAdmins(false);
+    }
+  };
+
   const grantScannerOnlyAccess = async (userId, userName) => {
     if (!window.confirm(`Give scanner-only access to ${userName}? They will get Scanner access without admin privileges.`)) {
       return;
@@ -1815,6 +1865,19 @@ const AdminPanel = () => {
 
   // Super admin email constant
   const SUPER_ADMIN_EMAIL = '2025uee0154@iitjammu.ac.in';
+  const removableAdmins = adminUsers.filter(admin => admin.email !== SUPER_ADMIN_EMAIL);
+  const removableAdminIds = removableAdmins.map(admin => admin.id);
+  const selectedRemovableAdminIds = selectedAdminIdsForBulkRemove.filter(id => removableAdminIds.includes(id));
+  const allRemovableAdminsSelected = removableAdmins.length > 0 &&
+    selectedRemovableAdminIds.length === removableAdmins.length;
+
+  const toggleSelectAllRemovableAdmins = () => {
+    if (allRemovableAdminsSelected) {
+      setSelectedAdminIdsForBulkRemove([]);
+    } else {
+      setSelectedAdminIdsForBulkRemove(removableAdmins.map(admin => admin.id));
+    }
+  };
 
   // Get filtered tabs based on user permissions
   // Show all tabs by default until permissions are loaded
@@ -5502,9 +5565,53 @@ const AdminPanel = () => {
               margin: '0 auto',
               boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
             }}>
+              <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <div style={{ color: 'black', fontWeight: '600', fontSize: '0.9rem' }}>
+                  Selected admins: {selectedRemovableAdminIds.length}
+                </div>
+                <div className="d-flex gap-2 flex-wrap">
+                  <Button
+                    variant="outline-secondary"
+                    size="sm"
+                    onClick={toggleSelectAllRemovableAdmins}
+                    disabled={removableAdmins.length === 0}
+                  >
+                    <i className={`fas ${allRemovableAdminsSelected ? 'fa-square-minus' : 'fa-check-square'} me-1`}></i>
+                    {allRemovableAdminsSelected ? 'Unselect All' : 'Select All'}
+                  </Button>
+                  <Button
+                    variant="outline-dark"
+                    size="sm"
+                    onClick={() => setSelectedAdminIdsForBulkRemove([])}
+                    disabled={selectedRemovableAdminIds.length === 0}
+                  >
+                    <i className="fas fa-eraser me-1"></i>
+                    Clear
+                  </Button>
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={bulkRemoveAdminAccess}
+                    disabled={selectedRemovableAdminIds.length === 0 || bulkRemovingAdmins}
+                  >
+                    <i className="fas fa-user-minus me-1"></i>
+                    {bulkRemovingAdmins ? 'Removing...' : 'Remove Selected Admin Access'}
+                  </Button>
+                </div>
+              </div>
+
               <Table striped bordered hover responsive style={{ marginBottom: 0 }}>
                 <thead style={{ borderBottom: '2px solid rgba(255,255,255,0.2)' }}>
                   <tr>
+                    <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'center', width: '70px' }}>
+                      <Form.Check
+                        type="checkbox"
+                        checked={allRemovableAdminsSelected}
+                        onChange={toggleSelectAllRemovableAdmins}
+                        disabled={removableAdmins.length === 0}
+                        aria-label="Select all removable admins"
+                      />
+                    </th>
                     <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'center' }}>Admin Name</th>
                     <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'center' }}>Tag Name</th>
                     <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'center' }}>Email</th>
@@ -5517,12 +5624,24 @@ const AdminPanel = () => {
                   {adminUsers && adminUsers.length > 0 ? adminUsers.map(admin => (
                     <tr key={admin.id} style={{
                       borderBottom: '1px solid rgba(255,255,255,0.05)',
-                      background: admin.email === '2025uee0154@iitjammu.ac.in' ? 'rgba(255, 215, 0, 0.05)' : 'transparent'
+                      background: admin.email === SUPER_ADMIN_EMAIL ? 'rgba(255, 215, 0, 0.05)' : 'transparent'
                     }}>
+                      <td style={{ border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'center' }}>
+                        {admin.email === SUPER_ADMIN_EMAIL ? (
+                          <i className="fas fa-lock" style={{ color: '#856404' }} title="Super admin cannot be selected"></i>
+                        ) : (
+                          <Form.Check
+                            type="checkbox"
+                            checked={selectedAdminIdsForBulkRemove.includes(admin.id)}
+                            onChange={() => toggleAdminBulkSelection(admin.id)}
+                            aria-label={`Select ${admin.name} for bulk admin removal`}
+                          />
+                        )}
+                      </td>
                       <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'left' }}>
                         <div className="d-flex align-items-center gap-2">
                           <strong>{admin.name}</strong>
-                          {admin.email === '2025uee0154@iitjammu.ac.in' && (
+                          {admin.email === SUPER_ADMIN_EMAIL && (
                             <Badge bg="warning" style={{ fontSize: '0.7rem' }}>Super Admin</Badge>
                           )}
                         </div>
@@ -5608,7 +5727,7 @@ const AdminPanel = () => {
                     </tr>
                   )) : (
                     <tr>
-                      <td colSpan="5" className="text-center py-5" style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
+                      <td colSpan="7" className="text-center py-5" style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
                         <div className="text-white-50">
                           <i className="fas fa-users fa-3x mb-3"></i>
                           <h5>No Admin Users Found</h5>
