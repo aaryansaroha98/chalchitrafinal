@@ -1780,6 +1780,25 @@ const AdminPanel = () => {
     }
   };
 
+  const openManageAccessModal = async () => {
+    setUserSearchTerm('');
+    setSearchedUsers(users);
+    setShowMakeAdminModal(true);
+    setSearchLoading(true);
+
+    try {
+      const usersRes = await api.get('/api/admin/users');
+      const refreshedUsers = Array.isArray(usersRes?.data) ? usersRes.data : [];
+      setUsers(refreshedUsers);
+      setSearchedUsers(refreshedUsers);
+    } catch (err) {
+      console.error('Error loading users for access management:', err);
+      setSearchedUsers(users);
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
   // Update admin tag
   const updateAdminTag = async (adminId, currentTag) => {
     const newTag = prompt('Enter a tag name for this admin (e.g., "Head Admin", "Movie Manager"):', currentTag || '');
@@ -1871,6 +1890,13 @@ const AdminPanel = () => {
   // Super admin email constant
   const SUPER_ADMIN_EMAIL = '2025uee0154@iitjammu.ac.in';
   const removableAdmins = adminUsers.filter(admin => admin.email !== SUPER_ADMIN_EMAIL);
+  const scannerOnlyUsers = users
+    .filter(user => {
+      const isAdmin = user.is_admin === 1 || user.is_admin === true;
+      const hasScanner = user.code_scanner === 1 || user.code_scanner === true;
+      return !isAdmin && hasScanner;
+    })
+    .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
   const removableAdminIds = removableAdmins.map(admin => admin.id);
   const selectedRemovableAdminIds = selectedAdminIdsForBulkRemove.filter(id => removableAdminIds.includes(id));
   const allRemovableAdminsSelected = removableAdmins.length > 0 &&
@@ -5488,13 +5514,11 @@ const AdminPanel = () => {
                   variant="info"
                   onClick={async () => {
                     try {
-                      const adminsRes = await api.get('/api/admin/permission-admins');
-                      console.log('✅ Refreshed admin users:', adminsRes.data);
-                      setAdminUsers(adminsRes.data);
-                      alert('Admin list refreshed!');
+                      await refreshUserAndAdminLists();
+                      alert('Access lists refreshed!');
                     } catch (err) {
-                      console.error('❌ Error refreshing admin list:', err);
-                      alert('Error refreshing admin list');
+                      console.error('❌ Error refreshing access lists:', err);
+                      alert('Error refreshing access lists');
                     }
                   }}
                   style={{
@@ -5509,11 +5533,7 @@ const AdminPanel = () => {
                 </Button>
                 <Button
                   variant="success"
-                  onClick={() => {
-                    setUserSearchTerm('');
-                    setSearchedUsers(users);
-                    setShowMakeAdminModal(true);
-                  }}
+                  onClick={openManageAccessModal}
                   style={{
                     background: 'linear-gradient(145deg, rgba(40, 167, 69, 0.8), rgba(40, 167, 69, 0.6))',
                     backdropFilter: 'blur(20px)',
@@ -5747,6 +5767,92 @@ const AdminPanel = () => {
                   )}
                 </tbody>
               </Table>
+            </div>
+
+            <div style={{
+              background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              borderRadius: '15px',
+              padding: '1.5rem',
+              maxWidth: '1200px',
+              margin: '1.5rem auto 0',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+            }}>
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <h5 style={{ color: 'black', margin: 0, fontWeight: '600' }}>
+                  <i className="fas fa-qrcode me-2"></i>
+                  Scanner-Only Users
+                </h5>
+                <Badge bg="info" style={{ fontSize: '0.8rem' }}>
+                  {scannerOnlyUsers.length} users
+                </Badge>
+              </div>
+
+              {scannerOnlyUsers.length > 0 ? (
+                <Table striped bordered hover responsive style={{ marginBottom: 0 }}>
+                  <thead style={{ borderBottom: '2px solid rgba(255,255,255,0.2)' }}>
+                    <tr>
+                      <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'center' }}>Name</th>
+                      <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'center' }}>Email</th>
+                      <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'center' }}>Access</th>
+                      <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'center' }}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {scannerOnlyUsers.map(user => (
+                      <tr key={user.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                        <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'left' }}>
+                          <strong>{user.name}</strong>
+                        </td>
+                        <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'left' }}>
+                          <code style={{ background: 'rgba(0,0,0,0.2)', padding: '4px 8px', borderRadius: '4px' }}>
+                            {user.email}
+                          </code>
+                        </td>
+                        <td style={{ border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'center' }}>
+                          <Badge bg="info" style={{ fontSize: '0.75rem' }}>
+                            <i className="fas fa-check-circle me-1"></i>
+                            Scanner Only
+                          </Badge>
+                        </td>
+                        <td style={{ border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'center' }}>
+                          <div className="d-flex gap-2 justify-content-center flex-wrap">
+                            <Button
+                              variant="outline-secondary"
+                              size="sm"
+                              onClick={() => removeScannerOnlyAccess(user.id, user.name)}
+                            >
+                              <i className="fas fa-ban me-1"></i>
+                              Remove Scanner
+                            </Button>
+                            <Button
+                              variant="success"
+                              size="sm"
+                              onClick={() => {
+                                if (window.confirm(`Promote ${user.name} (${user.email}) to admin?`)) {
+                                  makeUserAdmin(user.id);
+                                }
+                              }}
+                            >
+                              <i className="fas fa-user-shield me-1"></i>
+                              Make Admin
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              ) : (
+                <div className="text-center py-4" style={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  borderRadius: '10px'
+                }}>
+                  <i className="fas fa-user-slash fa-2x mb-3 text-muted"></i>
+                  <p className="text-muted mb-0">No scanner-only users right now.</p>
+                </div>
+              )}
             </div>
           </div>
         )}
