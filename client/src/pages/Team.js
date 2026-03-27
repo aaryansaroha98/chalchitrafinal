@@ -198,7 +198,10 @@ const Team = () => {
           const currentTeam = team.filter(member => member.section === 'current_team');
           const backendTeam = team.filter(member => member.section === 'database_backend_team');
 
-          const renderTeamSection = (sectionTitle, sectionMembers, icon, gradient) => (
+          const renderTeamSection = (sectionTitle, sectionMembers, icon, gradient) => {
+            const mobileColumns = Math.max(1, Math.min(sectionMembers.length, 3));
+
+            return (
             <div style={{ marginBottom: '4rem' }}>
               <div className="team-section-header" style={{
                 textAlign: 'center',
@@ -253,6 +256,7 @@ const Team = () => {
                 </div>
               ) : (
                 <div className="team-members-grid" style={{
+                  '--team-mobile-columns': `${mobileColumns}`,
                   display: 'flex',
                   flexWrap: 'wrap',
                   gap: '1rem',
@@ -319,6 +323,7 @@ const getImageUrl = (url) => {
               )}
             </div>
           );
+          };
 
           return (
             <>

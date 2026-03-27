@@ -2676,13 +2676,15 @@ a:hover {
 
   .team-members-grid {
     display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    grid-template-columns: repeat(var(--team-mobile-columns, 3), minmax(0, 1fr)) !important;
     gap: 0.6rem !important;
+    justify-items: center !important;
   }
 
   .team-member-card {
-    width: 100% !important;
+    width: min(100%, clamp(96px, 30vw, 150px)) !important;
     border-radius: 12px !important;
+    justify-self: center !important;
   }
 
   .team-member-photo img {
