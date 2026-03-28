@@ -360,15 +360,14 @@ const Booking = () => {
         <div className="booking-title-wrap" style={{textAlign: 'center', marginBottom: '48px', marginTop: '-10px'}}>
           <h1 className="booking-title" style={{
             fontSize: '2.5rem',
-            fontWeight: '550',
+            fontWeight: '600',
             color: '#ffffff',
             margin: '0',
             marginTop: '-6px',
             textShadow: '0 4px 20px rgba(0, 255, 255, 0.3), 0 2px 4px rgba(0, 0, 0, 0.5)',
-            letterSpacing: '0.02em',
-            fontFamily: 'Arial, Helvetica, sans-serif'
+            letterSpacing: '-0.025em'
           }}>
-            Book Your Ticket
+            BOOK YOUR TICKET
           </h1>
         </div>
 
