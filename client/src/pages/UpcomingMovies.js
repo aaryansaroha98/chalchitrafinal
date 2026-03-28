@@ -92,10 +92,6 @@ const UpcomingMovies = () => {
             padding: clamp(0.22rem, 0.75vw, 0.4rem) clamp(0.3rem, 0.85vw, 0.6rem) !important;
           }
 
-          .upcoming-movies-row {
-            justify-content: center;
-          }
-
           @media (max-width: 576px) {
             .upcoming-container {
               padding-left: 1rem !important;
