@@ -140,7 +140,8 @@ const AdminPanel = () => {
     upcoming_movies: 0,
     total_bookings: 0,
     recent_bookings: 0,
-    upcoming_bookings: 0
+    upcoming_bookings: 0,
+    upcoming_booked_seats: 0
   });
 
   // Revenue stats for Database Management (Config tab)
@@ -427,7 +428,8 @@ const AdminPanel = () => {
               upcoming_movies: 0,
               total_bookings: 0,
               recent_bookings: 0,
-              upcoming_bookings: 0
+              upcoming_bookings: 0,
+              upcoming_booked_seats: 0
             }
           };
         }),
@@ -496,7 +498,8 @@ const AdminPanel = () => {
         upcoming_movies: 0,
         total_bookings: 0,
         recent_bookings: 0,
-        upcoming_bookings: 0
+        upcoming_bookings: 0,
+        upcoming_booked_seats: 0
       });
       setMovies(allMovies); // Show all movies for admin management
 
@@ -2487,6 +2490,40 @@ const AdminPanel = () => {
                       textShadow: '0 1px 3px rgba(0,0,0,0.3)'
                     }}>
                       Bookings For Upcoming Movies
+                    </Card.Text>
+                  </Card.Body>
+                </Card>
+              </Col>
+
+              <Col md={3} className="mb-4">
+                <Card style={{
+                  background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06))',
+                  backdropFilter: 'blur(30px)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  borderRadius: '20px',
+                  boxShadow: '0 15px 50px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  minHeight: '160px'
+                }}>
+                  <Card.Body className="text-center" style={{ position: 'relative', zIndex: 1, padding: '2rem 1.5rem' }}>
+                    <Card.Title style={{
+                      fontSize: '3rem',
+                      fontWeight: '700',
+                      color: '#ffffff',
+                      marginBottom: '0.5rem',
+                      textShadow: '0 2px 10px rgba(0, 0, 0, 0.5)'
+                    }}>
+                      {stats.upcoming_booked_seats || 0}
+                    </Card.Title>
+                    <Card.Text style={{
+                      fontSize: '1.1rem',
+                      color: 'rgba(255, 255, 255, 0.9)',
+                      fontWeight: '500',
+                      margin: 0,
+                      textShadow: '0 1px 3px rgba(0,0,0,0.3)'
+                    }}>
+                      Seats Booked For Upcoming Movies
                     </Card.Text>
                   </Card.Body>
                 </Card>

@@ -114,7 +114,7 @@ router.get('/stats', requireAdmin, (req, res) => {
   const results = {};
   let completed = 0;
   let responded = false;
-  const totalExpected = Object.keys(queries).length + 1; // + upcoming_bookings
+  const totalExpected = Object.keys(queries).length + 1; // + upcoming booking stats
 
   const finish = () => {
     completed++;
@@ -137,9 +137,9 @@ router.get('/stats', requireAdmin, (req, res) => {
     });
   });
 
-  // Exact bookings count for upcoming movies (date-aware first, flag fallback).
+  // Exact upcoming booking and seat counts (date-aware first, flag fallback).
   db.all(
-    `SELECT b.id AS booking_id, m.date AS movie_date, m.is_upcoming
+    `SELECT b.id AS booking_id, b.num_people, b.selected_seats, m.date AS movie_date, m.is_upcoming
      FROM bookings b
      JOIN movies m ON b.movie_id = m.id`,
     [],
@@ -152,13 +152,30 @@ router.get('/stats', requireAdmin, (req, res) => {
       }
 
       const now = new Date();
-      results.upcoming_bookings = (rows || []).filter((row) => {
+      const upcomingRows = (rows || []).filter((row) => {
         const movieDate = new Date(row.movie_date);
         if (!Number.isNaN(movieDate.getTime())) {
           return movieDate >= now;
         }
         return Number(row.is_upcoming) === 1;
-      }).length;
+      });
+
+      results.upcoming_bookings = upcomingRows.length;
+      results.upcoming_booked_seats = upcomingRows.reduce((total, row) => {
+        const numPeople = Number(row.num_people);
+        if (Number.isFinite(numPeople) && numPeople > 0) {
+          return total + numPeople;
+        }
+
+        if (!row.selected_seats) return total;
+
+        try {
+          const seats = JSON.parse(row.selected_seats);
+          return total + (Array.isArray(seats) ? seats.length : 0);
+        } catch (_err) {
+          return total;
+        }
+      }, 0);
 
       finish();
     }
