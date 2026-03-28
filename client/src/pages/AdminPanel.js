@@ -44,6 +44,16 @@ const formatExactJoinDateTime = (value) => {
   });
 };
 
+const getUserLastLoginSortValue = (user) => {
+  const lastSeenTimestamp = new Date(user?.last_seen).getTime();
+  if (!Number.isNaN(lastSeenTimestamp)) return lastSeenTimestamp;
+
+  const createdAtTimestamp = new Date(user?.created_at).getTime();
+  if (!Number.isNaN(createdAtTimestamp)) return createdAtTimestamp;
+
+  return 0;
+};
+
 const normalizeGalleryEventDate = (value) => {
   if (!value) return '';
   if (value instanceof Date && !Number.isNaN(value.getTime())) {
@@ -957,10 +967,12 @@ const AdminPanel = () => {
   }
 
   // Filter users based on search term
-  const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(userSearchTerm.toLowerCase())
-  );
+  const filteredUsers = users
+    .filter(user =>
+      user.name.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(userSearchTerm.toLowerCase())
+    )
+    .sort((a, b) => getUserLastLoginSortValue(b) - getUserLastLoginSortValue(a));
 
   // Filter bookings based on selected movie
   const filteredBookings = selectedMovie
@@ -2981,7 +2993,7 @@ const AdminPanel = () => {
                   <th>Name</th>
                   <th>Email</th>
                   <th>Role</th>
-                  <th>Joined</th>
+                  <th>Last Login</th>
                 </tr>
               </thead>
               <tbody>
@@ -2994,7 +3006,7 @@ const AdminPanel = () => {
                         {user.is_admin ? 'Admin' : 'User'}
                       </Badge>
                     </td>
-                    <td>{formatExactJoinDateTime(user.created_at)}</td>
+                    <td>{formatExactJoinDateTime(user.last_seen || user.created_at)}</td>
                   </tr>
                 )) : (
                   <tr>
