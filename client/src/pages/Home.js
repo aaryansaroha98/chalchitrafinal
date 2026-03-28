@@ -322,22 +322,17 @@ const Home = () => {
             fontSize: '2.5rem',
             fontWeight: '700',
             color: 'white',
-            marginBottom: '0.3rem',
+            margin: '0 auto 0.3rem',
             letterSpacing: '0.02em'
           }}>
-            <i className="fas fa-home" style={{
-              color: '#007bff',
-              marginRight: '0.75rem',
-              fontSize: '2rem'
-            }}></i>
             WELCOME TO CHALCHITRA
           </h1>
           <p style={{
             fontSize: 'clamp(1.1rem, 2.6vw, 1.4rem)',
             color: '#6c757d',
-            maxWidth: 'none',
+            maxWidth: '900px',
             width: '100%',
-            margin: 0,
+            margin: '0 auto',
             lineHeight: '1.5',
             fontWeight: '400'
           }}>
@@ -894,6 +889,10 @@ const Home = () => {
             padding: clamp(0.5rem, 0.95vw, 0.7rem) clamp(0.85rem, 1.6vw, 1.15rem) !important;
             gap: 0.45rem !important;
             border-radius: 10px !important;
+          }
+
+          .home-featured-row {
+            justify-content: center;
           }
 
           /* Featured Movies - Responsive Compact Sizing */
