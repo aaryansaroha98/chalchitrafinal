@@ -131,6 +131,66 @@ const formatGalleryDisplayDate = (eventDate) => {
   return date.toLocaleDateString('en-IN', options);
 };
 
+const getVenueTotalSeats = (venue) => {
+  if (['Pushkar 11AC2022', 'Pushkar 11AC3027'].includes(venue)) {
+    return 120; // 5x5 + (8+8+9+10+11+12+12) + 5x5
+  }
+  if (venue) {
+    return 364; // 15x7 + 14x11 + 15x7 (Mansar layout)
+  }
+  return 0;
+};
+
+const getBookingSeatCount = (booking) => {
+  const numPeople = Number(booking?.num_people);
+  if (Number.isFinite(numPeople) && numPeople > 0) {
+    return numPeople;
+  }
+
+  if (!booking?.selected_seats) return 0;
+
+  if (Array.isArray(booking.selected_seats)) {
+    return booking.selected_seats.length;
+  }
+
+  if (typeof booking.selected_seats === 'string') {
+    try {
+      const parsedSeats = JSON.parse(booking.selected_seats);
+      if (Array.isArray(parsedSeats)) {
+        return parsedSeats.length;
+      }
+    } catch (_err) {
+      return booking.selected_seats
+        .split(',')
+        .map((seat) => seat.trim())
+        .filter(Boolean).length;
+    }
+  }
+
+  return 0;
+};
+
+const getNextUpcomingMovie = (movies = []) => {
+  const now = new Date();
+  const upcomingMovies = (movies || []).filter((movie) => {
+    const movieDate = new Date(movie?.date);
+    if (!Number.isNaN(movieDate.getTime())) {
+      return movieDate >= now;
+    }
+    return Number(movie?.is_upcoming) === 1;
+  });
+
+  return upcomingMovies
+    .slice()
+    .sort((a, b) => {
+      const aDate = new Date(a?.date);
+      const bDate = new Date(b?.date);
+      const aTime = Number.isNaN(aDate.getTime()) ? Number.POSITIVE_INFINITY : aDate.getTime();
+      const bTime = Number.isNaN(bDate.getTime()) ? Number.POSITIVE_INFINITY : bDate.getTime();
+      return aTime - bTime;
+    })[0] || null;
+};
+
 const AdminPanel = () => {
   console.log('🔧 AdminPanel component starting...');
 
@@ -192,6 +252,7 @@ const AdminPanel = () => {
   const [editingMovie, setEditingMovie] = useState(null);
   const [editingTeam, setEditingTeam] = useState(null);
   const [selectedMovie, setSelectedMovie] = useState(null);
+  const [bookingSearchTerm, setBookingSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('dashboard');
   const [userSearchTerm, setUserSearchTerm] = useState('');
   const [movieForm, setMovieForm] = useState({
@@ -297,6 +358,13 @@ const AdminPanel = () => {
       const isScanned = booking.is_used === 1 || booking.is_used === true || Number(booking.admitted_people) > 0;
       return sameMovie && isScanned;
     }).length
+    : 0;
+  const nextUpcomingMovie = getNextUpcomingMovie(movies);
+  const upcomingVenueTotalSeats = getVenueTotalSeats(nextUpcomingMovie?.venue);
+  const upcomingVenueBookedSeats = nextUpcomingMovie
+    ? (bookings || [])
+      .filter((booking) => String(booking.movie_id) === String(nextUpcomingMovie.id))
+      .reduce((total, booking) => total + getBookingSeatCount(booking), 0)
     : 0;
 
   // Permission management state
@@ -965,10 +1033,23 @@ const AdminPanel = () => {
     user.email.toLowerCase().includes(userSearchTerm.toLowerCase())
   );
 
-  // Filter bookings based on selected movie
-  const filteredBookings = selectedMovie
-    ? bookings.filter(booking => booking.movie_id == selectedMovie)
-    : bookings;
+  // Filter bookings based on selected movie + booking search
+  const normalizedBookingSearch = bookingSearchTerm.trim().toLowerCase();
+  const filteredBookings = (bookings || []).filter((booking) => {
+    const matchesMovie = selectedMovie ? booking.movie_id == selectedMovie : true;
+    if (!matchesMovie) return false;
+    if (!normalizedBookingSearch) return true;
+
+    const userName = String(booking.name || booking.user_name || '').toLowerCase();
+    const userEmail = String(booking.email || booking.user_email || '').toLowerCase();
+    const bookingId = String(booking.id || '');
+    const bookingCode = String(booking.booking_code || '').toLowerCase();
+
+    return userName.includes(normalizedBookingSearch)
+      || userEmail.includes(normalizedBookingSearch)
+      || bookingId.includes(normalizedBookingSearch)
+      || bookingCode.includes(normalizedBookingSearch);
+  });
 
   // Filter users for winner selection based on search term
   const filteredWinnerUsers = users.filter(user =>
@@ -2508,13 +2589,13 @@ const AdminPanel = () => {
                 }}>
                   <Card.Body className="text-center" style={{ position: 'relative', zIndex: 1, padding: '2rem 1.5rem' }}>
                     <Card.Title style={{
-                      fontSize: '3rem',
+                      fontSize: '2.6rem',
                       fontWeight: '700',
                       color: '#ffffff',
                       marginBottom: '0.5rem',
                       textShadow: '0 2px 10px rgba(0, 0, 0, 0.5)'
                     }}>
-                      {stats.upcoming_booked_seats || 0}
+                      {`${upcomingVenueBookedSeats} / ${upcomingVenueTotalSeats}`}
                     </Card.Title>
                     <Card.Text style={{
                       fontSize: '1.1rem',
@@ -2523,7 +2604,7 @@ const AdminPanel = () => {
                       margin: 0,
                       textShadow: '0 1px 3px rgba(0,0,0,0.3)'
                     }}>
-                      Seats Booked For Upcoming Movies
+                      Seats Booked / Total Seats (Upcoming Venue)
                     </Card.Text>
                   </Card.Body>
                 </Card>
@@ -2749,7 +2830,7 @@ const AdminPanel = () => {
 
             {/* Simple Glass Design Stats Cards */}
             <Row className="mb-5">
-              <Col md={4} className="mb-4">
+              <Col md={3} className="mb-4">
                 <Card className="text-white h-100" style={{
                   background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
                   backdropFilter: 'blur(20px)',
@@ -2769,7 +2850,7 @@ const AdminPanel = () => {
                 </Card>
               </Col>
 
-              <Col md={4} className="mb-4">
+              <Col md={3} className="mb-4">
                 <Card className="text-white h-100" style={{
                   background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
                   backdropFilter: 'blur(20px)',
@@ -2789,7 +2870,7 @@ const AdminPanel = () => {
                 </Card>
               </Col>
 
-              <Col md={4} className="mb-4">
+              <Col md={3} className="mb-4">
                 <Card className="text-white h-100" style={{
                   background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
                   backdropFilter: 'blur(20px)',
@@ -2808,6 +2889,26 @@ const AdminPanel = () => {
                   </Card.Body>
                 </Card>
               </Col>
+
+              <Col md={3} className="mb-4">
+                <Card className="text-white h-100" style={{
+                  background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
+                  backdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  borderRadius: '15px',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+                  transition: 'all 0.3s ease'
+                }}>
+                  <Card.Body className="text-center">
+                    <Card.Title className="mb-3 fw-bold text-white" style={{ fontSize: '2.1rem' }}>
+                      {`${upcomingVenueBookedSeats} / ${upcomingVenueTotalSeats}`}
+                    </Card.Title>
+                    <Card.Text className="h5 mb-0 text-white-50">
+                      Seats Booked / Total Seats
+                    </Card.Text>
+                  </Card.Body>
+                </Card>
+              </Col>
             </Row>
 
             <style jsx>{`
@@ -2821,7 +2922,7 @@ const AdminPanel = () => {
 
             {/* Movie Filter and Export Controls */}
             <Row className="mb-4">
-              <Col md={6}>
+              <Col md={4}>
                 <Form.Group>
                   <Form.Label>Filter by Movie:</Form.Label>
                   <Form.Select
@@ -2838,7 +2939,19 @@ const AdminPanel = () => {
                   </Form.Select>
                 </Form.Group>
               </Col>
-              <Col md={6} className="d-flex align-items-end gap-2">
+              <Col md={4}>
+                <Form.Group>
+                  <Form.Label>Search User Booking:</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={bookingSearchTerm}
+                    onChange={(e) => setBookingSearchTerm(e.target.value)}
+                    placeholder="Name, email, booking ID or code"
+                    className="bg-dark text-white border-secondary"
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={4} className="d-flex align-items-end gap-2">
                 <Button
                   variant="success"
                   onClick={() => exportBookingsToPDF(filteredBookings)}
@@ -2946,7 +3059,7 @@ const AdminPanel = () => {
                     <td colSpan="9" className="text-center text-muted py-4">
                       <i className="fas fa-ticket-alt fa-2x mb-2"></i>
                       <br />
-                      {selectedMovie ? 'No bookings found for selected movie' : 'No bookings found'}
+                      {(selectedMovie || bookingSearchTerm.trim()) ? 'No bookings found for selected filters' : 'No bookings found'}
                     </td>
                   </tr>
                 )}
