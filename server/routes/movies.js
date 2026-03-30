@@ -427,8 +427,7 @@ router.put('/:id/move_to_past', (req, res) => {
   });
 });
 
-// Stop booking for a movie (admin)
-router.put('/:id/stop-booking', (req, res) => {
+const handleStopBooking = (req, res) => {
   const movieId = parseInt(req.params.id);
 
   if (isNaN(movieId)) {
@@ -452,10 +451,9 @@ router.put('/:id/stop-booking', (req, res) => {
     }
     res.json({ message: 'Bookings stopped for this movie', booking_stopped: 1 });
   });
-});
+};
 
-// Resume booking for a movie (admin)
-router.put('/:id/start-booking', (req, res) => {
+const handleStartBooking = (req, res) => {
   const movieId = parseInt(req.params.id);
 
   if (isNaN(movieId)) {
@@ -479,6 +477,14 @@ router.put('/:id/start-booking', (req, res) => {
     }
     res.json({ message: 'Bookings resumed for this movie', booking_stopped: 0 });
   });
-});
+};
+
+// Stop booking for a movie (admin) - support hyphen and underscore for compatibility
+router.put('/:id/stop-booking', handleStopBooking);
+router.put('/:id/stop_booking', handleStopBooking);
+
+// Resume booking for a movie (admin) - support hyphen and underscore for compatibility
+router.put('/:id/start-booking', handleStartBooking);
+router.put('/:id/start_booking', handleStartBooking);
 
 module.exports = router;

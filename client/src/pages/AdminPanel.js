@@ -2466,21 +2466,34 @@ const AdminPanel = () => {
                               <Button
                                 variant="outline-dark"
                                 size="sm"
-                                onClick={() => {
+                                onClick={async () => {
                                   const shouldStop = !isBookingStopped;
                                   const actionText = shouldStop ? 'stop' : 'resume';
                                   const endpoint = shouldStop ? 'stop-booking' : 'start-booking';
+                                  const legacyEndpoint = shouldStop ? 'stop_booking' : 'start_booking';
 
                                   if (window.confirm(`${shouldStop ? 'Stop' : 'Resume'} bookings for "${movie.title}"?`)) {
-                                    api.put(`/api/movies/${movie.id}/${endpoint}`)
-                                      .then(() => {
-                                        alert(`Bookings ${actionText}d successfully!`);
-                                        fetchAllData();
-                                      })
-                                      .catch(err => {
-                                        console.error('Error updating booking status:', err);
-                                        alert('Error updating booking status: ' + (err.response?.data?.error || err.message));
-                                      });
+                                    try {
+                                      await api.put(`/api/movies/${movie.id}/${endpoint}`);
+                                      alert(`Bookings ${actionText}d successfully!`);
+                                      fetchAllData();
+                                    } catch (err) {
+                                      const notFound = err?.response?.status === 404 ||
+                                        err?.response?.data?.error === 'API endpoint not found';
+                                      if (notFound) {
+                                        try {
+                                          await api.put(`/api/movies/${movie.id}/${legacyEndpoint}`);
+                                          alert(`Bookings ${actionText}d successfully!`);
+                                          fetchAllData();
+                                          return;
+                                        } catch (legacyErr) {
+                                          console.error('Legacy booking status endpoint failed:', legacyErr);
+                                        }
+                                      }
+
+                                      console.error('Error updating booking status:', err);
+                                      alert('Error updating booking status: ' + (err.response?.data?.error || err.message));
+                                    }
                                   }
                                 }}
                                 style={{
