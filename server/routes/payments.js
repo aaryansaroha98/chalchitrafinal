@@ -39,6 +39,9 @@ router.post('/order', async (req, res) => {
   db.get('SELECT * FROM movies WHERE id = ? AND is_upcoming = 1', [movie_id], async (err, movie) => {
     if (err) return res.status(500).json({ error: err.message });
     if (!movie) return res.status(404).json({ error: 'Movie not found or not upcoming' });
+    if (Number(movie.booking_stopped) === 1) {
+      return res.status(403).json({ error: 'Movie booking time is complete' });
+    }
 
     let subtotal = 0;
     try {

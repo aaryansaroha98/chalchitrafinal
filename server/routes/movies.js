@@ -427,5 +427,58 @@ router.put('/:id/move_to_past', (req, res) => {
   });
 });
 
-module.exports = router;
+// Stop booking for a movie (admin)
+router.put('/:id/stop-booking', (req, res) => {
+  const movieId = parseInt(req.params.id);
 
+  if (isNaN(movieId)) {
+    return res.status(400).json({ error: 'Invalid movie ID' });
+  }
+
+  const isAdmin = (req.user && req.user.is_admin) ||
+    (req.session && req.session.adminUser && req.session.adminUser.is_admin) ||
+    (req.session && req.session.user && req.session.user.is_admin);
+
+  if (!isAdmin) {
+    return res.status(403).json({ error: 'Admin access required' });
+  }
+
+  db.run('UPDATE movies SET booking_stopped = 1 WHERE id = ?', [movieId], function (err) {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to stop bookings: ' + err.message });
+    }
+    if (this.changes === 0) {
+      return res.status(404).json({ error: 'Movie not found' });
+    }
+    res.json({ message: 'Bookings stopped for this movie', booking_stopped: 1 });
+  });
+});
+
+// Resume booking for a movie (admin)
+router.put('/:id/start-booking', (req, res) => {
+  const movieId = parseInt(req.params.id);
+
+  if (isNaN(movieId)) {
+    return res.status(400).json({ error: 'Invalid movie ID' });
+  }
+
+  const isAdmin = (req.user && req.user.is_admin) ||
+    (req.session && req.session.adminUser && req.session.adminUser.is_admin) ||
+    (req.session && req.session.user && req.session.user.is_admin);
+
+  if (!isAdmin) {
+    return res.status(403).json({ error: 'Admin access required' });
+  }
+
+  db.run('UPDATE movies SET booking_stopped = 0 WHERE id = ?', [movieId], function (err) {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to resume bookings: ' + err.message });
+    }
+    if (this.changes === 0) {
+      return res.status(404).json({ error: 'Movie not found' });
+    }
+    res.json({ message: 'Bookings resumed for this movie', booking_stopped: 0 });
+  });
+});
+
+module.exports = router;

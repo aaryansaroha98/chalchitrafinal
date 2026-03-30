@@ -15,6 +15,8 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showBookingClosedModal, setShowBookingClosedModal] = useState(false);
+  const [bookingClosedMovieTitle, setBookingClosedMovieTitle] = useState('');
   const [settings, setSettings] = useState({
     tagline: 'Student-led movie screening initiative at IIT Jammu',
     hero_background: '#007bff',
@@ -73,6 +75,23 @@ const Home = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const isBookingStoppedForMovie = (movie) => Number(movie?.booking_stopped) === 1 || movie?.booking_stopped === true;
+
+  const handleMovieCardClick = (movie) => {
+    if (!isAuthenticated) {
+      setShowLoginModal(true);
+      return;
+    }
+
+    if (isBookingStoppedForMovie(movie)) {
+      setBookingClosedMovieTitle(movie?.title || 'This movie');
+      setShowBookingClosedModal(true);
+      return;
+    }
+
+    navigate(`/booking/${movie.id}`);
   };
 
   if (loading) {
@@ -409,13 +428,7 @@ const Home = () => {
                 willChange: 'transform',
                 cursor: 'pointer'
               }}
-              onClick={() => {
-                if (!isAuthenticated) {
-                  setShowLoginModal(true);
-                } else {
-                  navigate(`/booking/${movie.id}`);
-                }
-              }}
+              onClick={() => handleMovieCardClick(movie)}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'perspective(1000px) rotateX(-2deg) translateY(-8px) scale(1.02)';
                 e.currentTarget.style.boxShadow = `
@@ -1523,6 +1536,109 @@ const Home = () => {
                 Only IIT Jammu students and faculty can book tickets.<br/>
                 Use your official @iitjammu.ac.in email address.
               </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Booking Closed Modal */}
+      <AnimatePresence>
+        {showBookingClosedModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0, 0, 0, 0.8)',
+              backdropFilter: 'blur(20px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000
+            }}
+            onClick={() => setShowBookingClosedModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              style={{
+                background: 'rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '24px',
+                padding: '24px',
+                maxWidth: '360px',
+                textAlign: 'center',
+                position: 'relative'
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setShowBookingClosedModal(false)}
+                style={{
+                  position: 'absolute',
+                  top: '14px',
+                  right: '14px',
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  cursor: 'pointer',
+                  fontSize: '16px'
+                }}
+              >
+                ×
+              </button>
+
+              <h2 style={{
+                color: '#ffffff',
+                fontSize: '22px',
+                fontWeight: 'bold',
+                marginBottom: '12px',
+                fontFamily: 'Arial, sans-serif'
+              }}>
+                Booking Closed
+              </h2>
+
+              <p style={{
+                color: 'rgba(255, 255, 255, 0.8)',
+                fontSize: '14px',
+                marginBottom: '20px',
+                lineHeight: '1.6'
+              }}>
+                Movie booking time is complete for <strong style={{ color: '#FFD700' }}>{bookingClosedMovieTitle}</strong>.
+              </p>
+
+              <button
+                onClick={() => setShowBookingClosedModal(false)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  backdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  borderRadius: '12px',
+                  color: 'white',
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                  padding: '10px 24px',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 6px 20px rgba(255, 255, 255, 0.18)',
+                  fontFamily: 'Arial, sans-serif'
+                }}
+              >
+                OK
+              </button>
             </motion.div>
           </motion.div>
         )}

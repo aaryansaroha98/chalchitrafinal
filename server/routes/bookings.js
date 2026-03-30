@@ -175,6 +175,12 @@ router.post('/', async (req, res) => {
     db.get('SELECT * FROM movies WHERE id = ? AND is_upcoming = 1', [movie_id], (err, movie) => {
       if (err) return res.status(500).json({ error: err.message });
       if (!movie) return res.status(404).json({ error: 'Movie not found or not upcoming' });
+      if (Number(movie.booking_stopped) === 1) {
+        return res.status(403).json({
+          error: 'BOOKING_CLOSED',
+          message: 'Movie booking time is complete'
+        });
+      }
 
       // Calculate food cost
       let food_cost = 0;

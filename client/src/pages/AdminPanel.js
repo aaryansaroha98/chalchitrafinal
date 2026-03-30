@@ -2309,7 +2309,9 @@ const AdminPanel = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {movies && movies.length > 0 ? movies.map(movie => (
+                    {movies && movies.length > 0 ? movies.map(movie => {
+                      const isBookingStopped = Number(movie.booking_stopped) === 1 || movie.booking_stopped === true;
+                      return (
                       <tr key={movie.id} style={{
                         borderBottom: '1px solid rgba(255,255,255,0.05)',
                         transition: 'all 0.2s ease'
@@ -2368,12 +2370,22 @@ const AdminPanel = () => {
                           </div>
                         </td>
                         <td style={{ padding: '15px', verticalAlign: 'middle', border: '1px solid black' }}>
-                          <Badge
-                            bg={getMovieStatus(movie.date) === 'Upcoming' ? 'success' : 'warning'}
-                            style={{ fontSize: '0.75rem', padding: '6px 10px' }}
-                          >
-                            {getMovieStatus(movie.date)}
-                          </Badge>
+                          <div className="d-flex flex-column align-items-start gap-1">
+                            <Badge
+                              bg={getMovieStatus(movie.date) === 'Upcoming' ? 'success' : 'warning'}
+                              style={{ fontSize: '0.75rem', padding: '6px 10px' }}
+                            >
+                              {getMovieStatus(movie.date)}
+                            </Badge>
+                            {isBookingStopped && (
+                              <Badge
+                                bg="danger"
+                                style={{ fontSize: '0.72rem', padding: '6px 10px' }}
+                              >
+                                Booking Stopped
+                              </Badge>
+                            )}
+                          </div>
                         </td>
                         <td style={{ padding: '15px', verticalAlign: 'middle', border: '1px solid black', textAlign: 'center' }}>
                           <div className="d-flex flex-column gap-1 align-items-center">
@@ -2455,6 +2467,37 @@ const AdminPanel = () => {
                                 variant="outline-dark"
                                 size="sm"
                                 onClick={() => {
+                                  const shouldStop = !isBookingStopped;
+                                  const actionText = shouldStop ? 'stop' : 'resume';
+                                  const endpoint = shouldStop ? 'stop-booking' : 'start-booking';
+
+                                  if (window.confirm(`${shouldStop ? 'Stop' : 'Resume'} bookings for "${movie.title}"?`)) {
+                                    api.put(`/api/movies/${movie.id}/${endpoint}`)
+                                      .then(() => {
+                                        alert(`Bookings ${actionText}d successfully!`);
+                                        fetchAllData();
+                                      })
+                                      .catch(err => {
+                                        console.error('Error updating booking status:', err);
+                                        alert('Error updating booking status: ' + (err.response?.data?.error || err.message));
+                                      });
+                                  }
+                                }}
+                                style={{
+                                  borderColor: isBookingStopped ? '#198754' : '#dc3545',
+                                  color: isBookingStopped ? '#198754' : '#dc3545',
+                                  background: 'transparent',
+                                  fontSize: '0.75rem'
+                                }}
+                              >
+                                <i className={`fas ${isBookingStopped ? 'fa-play' : 'fa-ban'} me-1`}></i>
+                                {isBookingStopped ? 'Start Booking' : 'Stop Booking'}
+                              </Button>
+
+                              <Button
+                                variant="outline-dark"
+                                size="sm"
+                                onClick={() => {
                                   if (window.confirm(`Are you sure you want to permanently delete "${movie.title}"? This action cannot be undone.`)) {
                                     api.delete(`/api/movies/${movie.id}`)
                                       .then(() => {
@@ -2481,7 +2524,8 @@ const AdminPanel = () => {
                           </div>
                         </td>
                       </tr>
-                    )) : (
+                    );
+                    }) : (
                       <tr>
                         <td colSpan="4" className="text-center py-5">
                           <div className="text-muted">

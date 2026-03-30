@@ -145,6 +145,7 @@ if (usePostgres) {
         imdb_rating TEXT,
         language TEXT,
         is_upcoming INTEGER DEFAULT 1,
+        booking_stopped INTEGER DEFAULT 0,
         is_special INTEGER DEFAULT 0,
         special_message TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -372,6 +373,7 @@ if (usePostgres) {
 
     // Ensure movies.is_special and special_message columns exist for older databases
     try {
+      await pool.query('ALTER TABLE movies ADD COLUMN IF NOT EXISTS booking_stopped INTEGER DEFAULT 0');
       await pool.query('ALTER TABLE movies ADD COLUMN IF NOT EXISTS is_special INTEGER DEFAULT 0');
       await pool.query('ALTER TABLE movies ADD COLUMN IF NOT EXISTS special_message TEXT');
       await pool.query('ALTER TABLE movie_foods ADD COLUMN IF NOT EXISTS is_free INTEGER DEFAULT 0');
@@ -487,6 +489,7 @@ if (usePostgres) {
         imdb_rating TEXT,
         language TEXT,
         is_upcoming INTEGER DEFAULT 1,
+        booking_stopped INTEGER DEFAULT 0,
         is_special INTEGER DEFAULT 0,
         special_message TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -805,6 +808,16 @@ if (usePostgres) {
             console.error('⚠️  Could not add movies.special_message:', alterErr.message);
           } else {
             console.log('✅ movies.special_message column added');
+          }
+        });
+      }
+
+      if (!colNames.includes('booking_stopped')) {
+        db.run('ALTER TABLE movies ADD COLUMN booking_stopped INTEGER DEFAULT 0', (alterErr) => {
+          if (alterErr) {
+            console.error('⚠️  Could not add movies.booking_stopped:', alterErr.message);
+          } else {
+            console.log('✅ movies.booking_stopped column added');
           }
         });
       }
