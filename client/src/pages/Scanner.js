@@ -1351,11 +1351,6 @@ const Scanner = () => {
                       </div>
                     </div>
 
-                    <Alert variant="info" className="mb-3">
-                      <i className="fas fa-info-circle me-2"></i>
-                      <strong>Scanning Active:</strong> Point camera at QR code on ticket. The scanner will automatically detect and validate.
-                    </Alert>
-
                     <Button
                       variant="danger"
                       size="lg"
