@@ -1298,14 +1298,6 @@ const Scanner = () => {
             </Card>
           </Col>
         </Row>
-        <div className="text-center mb-4">
-          <small style={{ color: 'rgba(255,255,255,0.65)' }}>
-            {serverStatsUpdatedAt
-              ? `Last updated: ${serverStatsUpdatedAt.toLocaleString()}`
-              : 'Loading live totals...'}
-          </small>
-        </div>
-
         {/* Scanner Controls */}
         <Row className="mb-4">
           <Col md={8} className="mx-auto">
@@ -1469,26 +1461,6 @@ const Scanner = () => {
                           </div>
                         </div>
 
-                        {/* Scan Instructions Overlay */}
-                        <div
-                          style={{
-                            position: 'absolute',
-                            bottom: '-60px',
-                            left: '50%',
-                            transform: 'translateX(-50%)',
-                            background: 'rgba(0, 123, 255, 0.9)',
-                            color: 'white',
-                            padding: '8px 16px',
-                            borderRadius: '20px',
-                            fontSize: '14px',
-                            fontWeight: 'bold',
-                            whiteSpace: 'nowrap',
-                            boxShadow: '0 4px 12px rgba(0, 123, 255, 0.4)'
-                          }}
-                        >
-                          <i className="fas fa-qrcode me-1"></i>
-                          Position QR Code Inside Frame
-                        </div>
                       </div>
                     </div>
 
