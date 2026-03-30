@@ -342,6 +342,45 @@ router.get('/my', (req, res) => {
     });
 });
 
+// Scanner dashboard overview (all-time totals)
+router.get('/scanner-overview', (req, res) => {
+  const scannerStatsQuery = `
+    SELECT
+      COUNT(*) AS total_bookings,
+      COALESCE(SUM(
+        CASE
+          WHEN COALESCE(admitted_people, 0) > 0 OR COALESCE(is_used, 0) = 1 THEN 1
+          ELSE 0
+        END
+      ), 0) AS total_scanned_tickets,
+      COALESCE(SUM(
+        CASE
+          WHEN COALESCE(remaining_people, 0) > 0 THEN COALESCE(remaining_people, 0)
+          WHEN COALESCE(remaining_people, 0) = 0
+               AND COALESCE(admitted_people, 0) = 0
+               AND COALESCE(num_people, 0) > 0
+            THEN COALESCE(num_people, 0)
+          ELSE 0
+        END
+      ), 0) AS total_remaining_tickets,
+      COALESCE(SUM(COALESCE(admitted_people, 0)), 0) AS total_seats_filled
+    FROM bookings
+  `;
+
+  db.get(scannerStatsQuery, [], (err, row) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+
+    res.json({
+      total_bookings: Number(row?.total_bookings) || 0,
+      total_scanned_tickets: Number(row?.total_scanned_tickets) || 0,
+      total_remaining_tickets: Number(row?.total_remaining_tickets) || 0,
+      total_seats_filled: Number(row?.total_seats_filled) || 0
+    });
+  });
+});
+
 // Scan QR code (scanner access required)
 router.post('/scan', (req, res) => {
   // Temporarily allow scanning without full authentication for testing

@@ -10,6 +10,13 @@ const Scanner = () => {
   const [scanResult, setScanResult] = useState(null);
   const [scanHistory, setScanHistory] = useState([]);
   const [stats, setStats] = useState({ total: 0, valid: 0, invalid: 0 });
+  const [serverStats, setServerStats] = useState({
+    totalScannedTickets: null,
+    totalRemainingTickets: null,
+    totalSeatsFilled: null
+  });
+  const [isTestingServer, setIsTestingServer] = useState(false);
+  const [serverStatsUpdatedAt, setServerStatsUpdatedAt] = useState(null);
   const [showManualInput, setShowManualInput] = useState(false);
   const [availableCameras, setAvailableCameras] = useState([]);
   const [selectedCamera, setSelectedCamera] = useState('');
@@ -214,6 +221,44 @@ const Scanner = () => {
     localStorage.setItem('scanner_history', JSON.stringify(history));
     updateStats(history);
   }
+
+  const formatStatValue = (value) => {
+    if (value === null || value === undefined) return '--';
+    return Number(value).toLocaleString();
+  };
+
+  const loadServerScannerOverview = async (showAlert = false) => {
+    setIsTestingServer(true);
+
+    try {
+      const response = await api.get('/api/bookings/scanner-overview');
+      const overview = response.data || {};
+      const normalizedStats = {
+        totalScannedTickets: Number(overview.total_scanned_tickets) || 0,
+        totalRemainingTickets: Number(overview.total_remaining_tickets) || 0,
+        totalSeatsFilled: Number(overview.total_seats_filled) || 0
+      };
+
+      setServerStats(normalizedStats);
+      setServerStatsUpdatedAt(new Date());
+
+      if (showAlert) {
+        alert(
+          `Server connection OK!\n\n` +
+          `Total Tickets Scanned: ${normalizedStats.totalScannedTickets}\n` +
+          `Total Remaining Tickets: ${normalizedStats.totalRemainingTickets}\n` +
+          `Total Seats Filled: ${normalizedStats.totalSeatsFilled}`
+        );
+      }
+    } catch (error) {
+      const message = error.response?.data?.error || error.message || 'Unknown error';
+      if (showAlert) {
+        alert('Server connection failed: ' + message);
+      }
+    } finally {
+      setIsTestingServer(false);
+    }
+  };
 
   const enumerateCameras = async () => {
     try {
@@ -1078,8 +1123,8 @@ const Scanner = () => {
               backdropFilter: 'blur(10px)'
             }}>
               <Card.Body className="py-3">
-                <h3 className="mb-1 scanner-stat-value">{stats.total}</h3>
-                <p className="mb-0 fw-semibold scanner-stat-label">Total Scanned</p>
+                <h3 className="mb-1 scanner-stat-value">{formatStatValue(serverStats.totalScannedTickets)}</h3>
+                <p className="mb-0 fw-semibold scanner-stat-label">Total Tickets Scanned</p>
                 <small className="scanner-stat-sub">All time</small>
               </Card.Body>
             </Card>
@@ -1093,9 +1138,9 @@ const Scanner = () => {
               backdropFilter: 'blur(10px)'
             }}>
               <Card.Body className="py-3">
-                <h3 className="mb-1 scanner-stat-value">{stats.valid}</h3>
-                <p className="mb-0 fw-semibold scanner-stat-label">Valid Tickets</p>
-                <small className="scanner-stat-sub">Entry Allowed</small>
+                <h3 className="mb-1 scanner-stat-value">{formatStatValue(serverStats.totalRemainingTickets)}</h3>
+                <p className="mb-0 fw-semibold scanner-stat-label">Total Remaining Tickets</p>
+                <small className="scanner-stat-sub">Pending entry</small>
               </Card.Body>
             </Card>
           </Col>
@@ -1108,13 +1153,20 @@ const Scanner = () => {
               backdropFilter: 'blur(10px)'
             }}>
               <Card.Body className="py-3">
-                <h3 className="mb-1 scanner-stat-value">{stats.invalid}</h3>
-                <p className="mb-0 fw-semibold scanner-stat-label">Invalid Tickets</p>
-                <small className="scanner-stat-sub">Entry Denied</small>
+                <h3 className="mb-1 scanner-stat-value">{formatStatValue(serverStats.totalSeatsFilled)}</h3>
+                <p className="mb-0 fw-semibold scanner-stat-label">Total Seats Filled</p>
+                <small className="scanner-stat-sub">Admitted</small>
               </Card.Body>
             </Card>
           </Col>
         </Row>
+        <div className="text-center mb-4">
+          <small style={{ color: 'rgba(255,255,255,0.65)' }}>
+            {serverStatsUpdatedAt
+              ? `Last updated: ${serverStatsUpdatedAt.toLocaleString()}`
+              : 'Click "Test Server" to load live totals from the server'}
+          </small>
+        </div>
 
         {/* Scanner Controls */}
         <Row className="mb-4">
@@ -1147,17 +1199,20 @@ const Scanner = () => {
                       <Button
                         variant="outline-info"
                         size="lg"
-                        onClick={async () => {
-                          try {
-                            const response = await api.get('/api/bookings');
-                            alert('Server connection OK! Found ' + response.data.length + ' bookings.');
-                          } catch (error) {
-                            alert('Server connection failed: ' + error.message);
-                          }
-                        }}
+                        disabled={isTestingServer}
+                        onClick={() => loadServerScannerOverview(true)}
                       >
-                        <i className="fas fa-server me-2"></i>
-                        Test Server
+                        {isTestingServer ? (
+                          <>
+                            <Spinner size="sm" animation="border" className="me-2" />
+                            Testing...
+                          </>
+                        ) : (
+                          <>
+                            <i className="fas fa-server me-2"></i>
+                            Test Server
+                          </>
+                        )}
                       </Button>
                     </div>
 
