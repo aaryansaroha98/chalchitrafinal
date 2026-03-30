@@ -42,6 +42,9 @@ const Scanner = () => {
   const beepAudioPoolRef = useRef([]);
   const beepAudioIndexRef = useRef(0);
   const beepPrimedRef = useRef(false);
+  const webAudioCtxRef = useRef(null);
+  const webAudioPrimedRef = useRef(false);
+  const serverStatsRefreshingRef = useRef(false);
 
   const createBeepAudioElement = () => {
     const audio = new Audio(SCAN_BEEP_MP3_PATH);
@@ -94,8 +97,66 @@ const Scanner = () => {
     }
   });
 
+  const getOrCreateWebAudioContext = () => {
+    if (typeof window === 'undefined') return null;
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return null;
+    if (!webAudioCtxRef.current) {
+      webAudioCtxRef.current = new AudioContextClass();
+    }
+    return webAudioCtxRef.current;
+  };
+
+  const primeWebAudioBeep = async () => {
+    try {
+      if (webAudioPrimedRef.current) return;
+      const ctx = getOrCreateWebAudioContext();
+      if (!ctx) return;
+      if (ctx.state === 'suspended') {
+        await ctx.resume();
+      }
+      webAudioPrimedRef.current = ctx.state === 'running';
+    } catch (error) {
+      console.warn('WebAudio prime blocked:', error);
+    }
+  };
+
+  const playOscillatorBeep = async () => {
+    try {
+      const ctx = getOrCreateWebAudioContext();
+      if (!ctx) return false;
+      if (ctx.state === 'suspended') {
+        await ctx.resume();
+      }
+      if (ctx.state !== 'running') return false;
+
+      const now = ctx.currentTime;
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(1100, now);
+
+      gainNode.gain.setValueAtTime(0.0001, now);
+      gainNode.gain.exponentialRampToValueAtTime(0.2, now + 0.01);
+      gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.13);
+
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
+
+      oscillator.start(now);
+      oscillator.stop(now + 0.13);
+      webAudioPrimedRef.current = true;
+      return true;
+    } catch (error) {
+      console.warn('WebAudio fallback beep failed:', error);
+      return false;
+    }
+  };
+
   const primeScanBeep = async () => {
     try {
+      await primeWebAudioBeep();
       if (beepPrimedRef.current) return;
       const pool = getOrCreateBeepPool();
       await Promise.all(pool.map((audio) => waitForAudioReady(audio)));
@@ -119,6 +180,7 @@ const Scanner = () => {
   };
 
   const playScanBeep = async () => {
+    let played = false;
     try {
       if (!beepPrimedRef.current) {
         await primeScanBeep();
@@ -130,6 +192,7 @@ const Scanner = () => {
       audio.pause();
       audio.currentTime = 0;
       await audio.play();
+      played = true;
     } catch (error) {
       console.warn('MP3 beep playback failed, retrying once:', error);
       try {
@@ -139,9 +202,16 @@ const Scanner = () => {
         retryAudio.pause();
         retryAudio.currentTime = 0;
         await retryAudio.play();
+        played = true;
       } catch (retryError) {
         console.warn('MP3 beep retry failed:', retryError);
       }
+    }
+    if (!played) {
+      played = await playOscillatorBeep();
+    }
+    if (!played) {
+      console.warn('All beep playback methods failed for this scan event.');
     }
   };
 
@@ -149,6 +219,13 @@ const Scanner = () => {
   useEffect(() => {
     // Preload beep early to reduce first-play delay.
     Promise.all(getOrCreateBeepPool().map((audio) => waitForAudioReady(audio))).catch(() => { });
+
+    // Prime audio on first user interaction for better mobile browser reliability.
+    const primeOnInteraction = () => {
+      primeScanBeep().catch(() => { });
+    };
+    window.addEventListener('pointerdown', primeOnInteraction, { once: true });
+    window.addEventListener('keydown', primeOnInteraction, { once: true });
 
     // Load scan history from localStorage
     const saved = localStorage.getItem('scanner_history');
@@ -168,6 +245,13 @@ const Scanner = () => {
       beepAudioPoolRef.current = [];
       beepAudioIndexRef.current = 0;
       beepPrimedRef.current = false;
+      window.removeEventListener('pointerdown', primeOnInteraction);
+      window.removeEventListener('keydown', primeOnInteraction);
+      if (webAudioCtxRef.current && typeof webAudioCtxRef.current.close === 'function') {
+        webAudioCtxRef.current.close().catch(() => { });
+      }
+      webAudioCtxRef.current = null;
+      webAudioPrimedRef.current = false;
     };
   }, []);
 
@@ -227,8 +311,10 @@ const Scanner = () => {
     return Number(value).toLocaleString();
   };
 
-  const loadServerScannerOverview = async (showAlert = false) => {
-    setIsTestingServer(true);
+  const loadServerScannerOverview = async (showAlert = false, useButtonLoader = false) => {
+    if (useButtonLoader) {
+      setIsTestingServer(true);
+    }
 
     try {
       const response = await api.get('/api/bookings/scanner-overview');
@@ -256,9 +342,56 @@ const Scanner = () => {
         alert('Server connection failed: ' + message);
       }
     } finally {
-      setIsTestingServer(false);
+      if (useButtonLoader) {
+        setIsTestingServer(false);
+      }
     }
   };
+
+  const applyImmediateServerStatsFromScan = (result) => {
+    if (!result?.allowed) return;
+
+    const peopleAdmittedNow = Number(result.people_admitted_now || 0);
+    const admittedPeople = Number(result.admitted_people || 0);
+
+    if (!Number.isFinite(peopleAdmittedNow) || peopleAdmittedNow <= 0) return;
+
+    setServerStats((prev) => {
+      if (
+        prev.totalScannedTickets === null ||
+        prev.totalRemainingTickets === null ||
+        prev.totalSeatsFilled === null
+      ) {
+        return prev;
+      }
+
+      const isFirstAdmitForTicket = admittedPeople === peopleAdmittedNow;
+
+      return {
+        totalScannedTickets: prev.totalScannedTickets + (isFirstAdmitForTicket ? 1 : 0),
+        totalRemainingTickets: Math.max(0, prev.totalRemainingTickets - peopleAdmittedNow),
+        totalSeatsFilled: prev.totalSeatsFilled + peopleAdmittedNow
+      };
+    });
+
+    setServerStatsUpdatedAt(new Date());
+  };
+
+  const refreshServerScannerOverviewSilently = async () => {
+    if (serverStatsRefreshingRef.current) return;
+    serverStatsRefreshingRef.current = true;
+
+    try {
+      await loadServerScannerOverview(false, false);
+    } finally {
+      serverStatsRefreshingRef.current = false;
+    }
+  };
+
+  useEffect(() => {
+    // Load live scanner totals on page open without requiring "Test Server".
+    refreshServerScannerOverviewSilently();
+  }, []);
 
   const enumerateCameras = async () => {
     try {
@@ -512,6 +645,8 @@ const Scanner = () => {
       console.log('Food orders in result:', result.food_orders);
       console.log('Food orders type:', typeof result.food_orders);
       console.log('Food orders keys:', result.food_orders ? Object.keys(result.food_orders) : 'No food_orders');
+      applyImmediateServerStatsFromScan(result);
+      refreshServerScannerOverviewSilently();
 
       // Check if this is a partial admission request
       if (result.needs_selection) {
@@ -654,6 +789,8 @@ const Scanner = () => {
       const result = response.data;
       console.log('Partial admission result:', result);
       console.log('Partial admission food_orders:', result.food_orders);
+      applyImmediateServerStatsFromScan(result);
+      refreshServerScannerOverviewSilently();
 
       const scanRecord = {
         id: Date.now(),
@@ -849,6 +986,7 @@ const Scanner = () => {
               const qrCode = qrInput.value.trim();
               if (qrCode) {
                 modal.remove();
+                await primeScanBeep();
                 await handleScan(qrCode);
               } else {
                 alert('Please enter the QR code data from the image.');
@@ -1164,7 +1302,7 @@ const Scanner = () => {
           <small style={{ color: 'rgba(255,255,255,0.65)' }}>
             {serverStatsUpdatedAt
               ? `Last updated: ${serverStatsUpdatedAt.toLocaleString()}`
-              : 'Click "Test Server" to load live totals from the server'}
+              : 'Loading live totals...'}
           </small>
         </div>
 
@@ -1200,7 +1338,7 @@ const Scanner = () => {
                         variant="outline-info"
                         size="lg"
                         disabled={isTestingServer}
-                        onClick={() => loadServerScannerOverview(true)}
+                        onClick={() => loadServerScannerOverview(true, true)}
                       >
                         {isTestingServer ? (
                           <>
@@ -1231,7 +1369,10 @@ const Scanner = () => {
                         </Button>
                         <Button
                           variant="outline-info"
-                          onClick={() => fileInputRef.current?.click()}
+                          onClick={async () => {
+                            await primeScanBeep();
+                            fileInputRef.current?.click();
+                          }}
                         >
                           <i className="fas fa-file-image me-2"></i>
                           Upload Image
