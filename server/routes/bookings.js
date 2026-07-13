@@ -278,9 +278,9 @@ router.post('/', async (req, res) => {
               
               console.log(`✅ ${total_coins} coins deducted from user ${userId} for booking ${customBookingId}`);
 
-          // Insert booking with custom booking code
-          db.run('INSERT INTO bookings (user_id, movie_id, num_people, food_option, coupon_code, total_price, discount_amount, payment_method, payment_id, payment_amount, selected_seats, admitted_people, remaining_people, booking_code, coin_amount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [userId, movie_id, num_people, food_option, coupon_code, total_coins, req.body.discount_amount || 0, 'coins', 'COINS_PAYMENT', total_coins, JSON.stringify(req.body.selectedSeats || []), 0, num_people, customBookingId, total_coins], function(err) {
+              // Insert booking with custom booking code
+              db.run('INSERT INTO bookings (user_id, movie_id, num_people, food_option, coupon_code, total_price, discount_amount, payment_method, payment_id, payment_amount, selected_seats, admitted_people, remaining_people, booking_code, coin_amount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                [userId, movie_id, num_people, food_option, coupon_code, total_coins, req.body.discount_amount || 0, 'coins', 'COINS_PAYMENT', total_coins, JSON.stringify(req.body.selectedSeats || []), 0, num_people, customBookingId, total_coins], function(err) {
               if (err) return res.status(500).json({ error: err.message });
 
               const databaseId = this.lastID; // Get the auto-generated database ID
@@ -368,6 +368,7 @@ router.post('/', async (req, res) => {
                   });
               });
             });
+            }); // End coin deduction callback
           }); // End coin balance check
         } catch (error) {
           console.error('Error generating booking ID:', error);
