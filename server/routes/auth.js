@@ -107,7 +107,19 @@ function initializeGoogleStrategy() {
                 if (isSuperAdmin) {
                   console.log('✅ Super admin user created via OAuth:', email);
                 }
-                db.get('SELECT * FROM users WHERE id = ?', [this.lastID], (err, newUser) => {
+                const newUserId = this.lastID;
+                // Grant signup bonus coins for new users
+                const BONUS_COINS = 20;
+                db.run('INSERT INTO coin_transactions (user_id, amount, type, reason) VALUES (?, ?, ?, ?)',
+                  [newUserId, BONUS_COINS, 'credit', 'signup_bonus'], function(coinErr) {
+                    if (coinErr) console.error('⚠️ Could not grant signup bonus coins:', coinErr.message);
+                  });
+                db.run('UPDATE users SET coins = COALESCE(coins, 0) + ? WHERE id = ?',
+                  [BONUS_COINS, newUserId], function(updateErr) {
+                    if (updateErr) console.error('⚠️ Could not update coin balance:', updateErr.message);
+                    else console.log(`✅ Signup bonus of ${BONUS_COINS} coins granted to new user ${newUserId}`);
+                  });
+                db.get('SELECT * FROM users WHERE id = ?', [newUserId], (err, newUser) => {
                   return done(null, newUser);
                 });
               });

@@ -163,6 +163,8 @@ app.use('/api/foods', require('./routes/foods'));
 console.log('✅ Foods routes loaded');
 app.use('/api/team', require('./routes/team'));
 console.log('✅ Team routes loaded');
+app.use('/api/coins', require('./routes/coins'));
+console.log('✅ Coins routes loaded');
 console.log('🎯 All API routes configured successfully');
 
 // Health check endpoint

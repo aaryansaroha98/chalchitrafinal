@@ -43,6 +43,8 @@ const Payment = () => {
   const [couponError, setCouponError] = useState('');
   const [applyingCoupon, setApplyingCoupon] = useState(false);
   const [foodData, setFoodData] = useState({});
+  const [useCoins, setUseCoins] = useState(false);
+  const [coinBalance, setCoinBalance] = useState(0);
 
   const TICKET_PRICE = parseFloat(movie?.price) || 0;
 
@@ -54,7 +56,17 @@ const Payment = () => {
 
     fetchMovie();
     fetchFoodData();
+    fetchCoinBalance();
   }, [movieId, bookingDetails, navigate]);
+
+  const fetchCoinBalance = async () => {
+    try {
+      const res = await api.get('/api/coins/balance', { withCredentials: true });
+      setCoinBalance(res.data.coins || 0);
+    } catch (err) {
+      setCoinBalance(0);
+    }
+  };
 
   const fetchMovie = async () => {
     try {
@@ -327,6 +339,66 @@ const Payment = () => {
         </div>
         
 
+        {/* Coin Payment Option */}
+        {user && getTotalPrice() > 0 && (
+          <div className="coupon-card" style={{marginTop: '16px'}}>
+            <h3 className="coupon-heading">🪙 Pay with Coins</h3>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '12px 16px',
+              background: 'rgba(255, 215, 0, 0.05)',
+              borderRadius: '12px',
+              border: useCoins ? '2px solid #ffd700' : '1px solid rgba(255,255,255,0.1)',
+              cursor: coinBalance >= getTotalPrice() ? 'pointer' : 'not-allowed',
+              opacity: coinBalance >= getTotalPrice() ? 1 : 0.5
+            }}
+            onClick={() => {
+              if (coinBalance >= getTotalPrice()) {
+                setUseCoins(!useCoins);
+              }
+            }}
+            >
+              <div>
+                <div style={{color: '#ffd700', fontWeight: '600', fontSize: '14px'}}>
+                  Your Balance: 🪙 {coinBalance}
+                </div>
+                <div style={{color: 'rgba(255,255,255,0.6)', fontSize: '12px', marginTop: '4px'}}>
+                  {coinBalance >= getTotalPrice() 
+                    ? `Enough coins to cover this booking` 
+                    : `Need ${getTotalPrice() - coinBalance} more coins`}
+                </div>
+              </div>
+              <div style={{
+                width: '24px',
+                height: '24px',
+                borderRadius: '4px',
+                border: '2px solid #ffd700',
+                background: useCoins ? '#ffd700' : 'transparent',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                {useCoins && <span style={{color: '#000', fontSize: '14px', fontWeight: 'bold'}}>✓</span>}
+              </div>
+            </div>
+            {useCoins && (
+              <div style={{
+                marginTop: '8px',
+                padding: '8px 12px',
+                background: 'rgba(255, 215, 0, 0.1)',
+                borderRadius: '8px',
+                fontSize: '12px',
+                color: '#ffd700',
+                textAlign: 'center'
+              }}>
+                🪙 You will pay {getTotalPrice()} coins now. Coins will be refunded after you attend the movie!
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Pay Button */}
         <div className="pay-section">
           <button
@@ -385,7 +457,53 @@ const Payment = () => {
                   return;
                 }
 
-                // For paid bookings, use Razorpay
+                // Handle coin payments directly
+                if (useCoins) {
+                  try {
+                    const movieIdToUse = movieIdFromState || movieId;
+                    const bookingRes = await api.post('/api/bookings', {
+                      movie_id: movieIdToUse,
+                      selectedSeats: selectedSeats,
+                      quantity: quantity,
+                      food_orders: selectedFoods,
+                      coupon_code: couponCode,
+                      use_coins: true,
+                      customer_details: customerDetails
+                    });
+
+                    const successPayload = {
+                      ticket: bookingRes.data,
+                      movie: movie,
+                      payment: {
+                        transaction_id: 'COINS_PAYMENT',
+                        amount: getTotalPrice(),
+                        method: 'coins'
+                      },
+                      selectedSeats: selectedSeats,
+                      customerDetails: customerDetails
+                    };
+
+                    try {
+                      sessionStorage.setItem('payment_success', JSON.stringify(successPayload));
+                    } catch (storageErr) {
+                      console.warn('Failed to store payment success payload:', storageErr);
+                    }
+
+                    navigate('/payment-success', { state: successPayload, replace: true });
+
+                    setTimeout(() => {
+                      if (window.location.pathname === '/payment') {
+                        window.location.href = '/payment-success';
+                      }
+                    }, 300);
+                  } catch (err) {
+                    setError(err.response?.data?.error || 'Coin payment failed. Please try again.');
+                  } finally {
+                    setProcessing(false);
+                  }
+                  return;
+                }
+
                 // For paid bookings, use Cashfree
                 try {
                   const movieIdToUse = movieIdFromState || movieId;

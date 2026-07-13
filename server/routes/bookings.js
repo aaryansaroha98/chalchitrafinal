@@ -235,9 +235,32 @@ router.post('/', async (req, res) => {
           const customBookingId = await generateUniqueBookingId();
           console.log('Generated custom booking ID:', customBookingId);
 
+          // Determine payment method
+          const useCoins = req.body.use_coins === true;
+          const paymentMethod = useCoins ? 'coins' : (req.body.payment_method || 'free');
+          const paymentAmount = useCoins ? total_price : (req.body.payment_amount || 0);
+          const paymentId = useCoins ? 'COINS_PAYMENT' : (req.body.payment_id || null);
+
+          // If paying with coins, deduct from user balance
+          if (useCoins) {
+            db.run('UPDATE users SET coins = COALESCE(coins, 0) - ? WHERE id = ? AND COALESCE(coins, 0) >= ?',
+              [total_price, userId, total_price], function(coinDeductErr) {
+                if (coinDeductErr || this.changes === 0) {
+                  console.error('❌ Coin deduction failed:', coinDeductErr?.message || 'Insufficient coins');
+                  return res.status(400).json({ error: 'Insufficient coins to complete booking' });
+                }
+                // Record coin transaction
+                db.run('INSERT INTO coin_transactions (user_id, amount, type, reason, booking_id) VALUES (?, ?, ?, ?, ?)',
+                  [userId, -total_price, 'debit', 'booking', customBookingId], function(txnErr) {
+                    if (txnErr) console.error('⚠️ Could not record coin transaction:', txnErr.message);
+                  });
+                console.log(`✅ ${total_price} coins deducted from user ${userId} for booking ${customBookingId}`);
+              });
+          }
+
           // Insert booking with custom booking code
-          db.run('INSERT INTO bookings (user_id, movie_id, num_people, food_option, coupon_code, total_price, selected_seats, admitted_people, remaining_people, booking_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [userId, movie_id, num_people, food_option, coupon_code, total_price, JSON.stringify(req.body.selectedSeats || []), 0, num_people, customBookingId], function(err) {
+          db.run('INSERT INTO bookings (user_id, movie_id, num_people, food_option, coupon_code, total_price, discount_amount, payment_method, payment_id, payment_amount, selected_seats, admitted_people, remaining_people, booking_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [userId, movie_id, num_people, food_option, coupon_code, total_price, req.body.discount_amount || 0, paymentMethod, paymentId, paymentAmount, JSON.stringify(req.body.selectedSeats || []), 0, num_people, customBookingId], function(err) {
               if (err) return res.status(500).json({ error: err.message });
 
               const databaseId = this.lastID; // Get the auto-generated database ID
@@ -759,6 +782,28 @@ router.post('/scan', (req, res) => {
             if (updateErr) {
               console.error('Error updating booking:', updateErr);
               return res.status(500).json({ error: 'Failed to update booking status' });
+            }
+
+            // If this booking was paid with coins, refund them on full admission
+            if (isFullyUsed && booking.payment_method === 'coins') {
+              const refundAmount = booking.total_price || booking.payment_amount || 0;
+              if (refundAmount > 0) {
+                db.run(
+                  'INSERT INTO coin_transactions (user_id, amount, type, reason, booking_id) VALUES (?, ?, ?, ?, ?)',
+                  [booking.user_id, refundAmount, 'credit', 'attendance_refund', booking.booking_code],
+                  function(refundErr) {
+                    if (refundErr) console.error('⚠️ Coin refund error:', refundErr.message);
+                  }
+                );
+                db.run(
+                  'UPDATE users SET coins = COALESCE(coins, 0) + ? WHERE id = ?',
+                  [refundAmount, booking.user_id],
+                  function(refundUpdateErr) {
+                    if (refundUpdateErr) console.error('⚠️ Coin refund update error:', refundUpdateErr.message);
+                    else console.log(`✅ ${refundAmount} coins refunded to user ${booking.user_id} for booking ${booking.booking_code}`);
+                  }
+                );
+              }
             }
 
             console.log('📤 Sending scan response with food_orders:', Object.keys(foodOrders).length > 0 ? foodOrders : null);

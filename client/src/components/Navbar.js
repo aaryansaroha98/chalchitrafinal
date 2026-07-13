@@ -6,7 +6,7 @@ import { useRef } from 'react';
 
 const NavigationBar = () => {
   const navigate = useNavigate();
-  const { user, logout, loading } = useAuth();
+  const { user, logout, loading, coinBalance, coinBalanceLoading } = useAuth();
   const [navHidden, setNavHidden] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -113,7 +113,14 @@ const NavigationBar = () => {
               </Nav.Link>
             )}
           </Nav>
-          {user && <span style={{ color: '#ffd700', fontSize: '0.85rem', fontWeight: '500', marginLeft: '0.5rem', letterSpacing: '-0.5px' }}>Hi, {user?.name?.split(' ')[0] || 'User'}</span>}
+          {user && (
+            <>
+              <span style={{ color: '#ffd700', fontSize: '0.85rem', fontWeight: '500', marginLeft: '0.5rem', letterSpacing: '-0.5px' }}>Hi, {user?.name?.split(' ')[0] || 'User'}</span>
+              <span style={{ color: '#ffd700', fontSize: '0.8rem', fontWeight: '600', marginLeft: '0.4rem', background: 'rgba(255, 215, 0, 0.15)', padding: '0.1rem 0.5rem', borderRadius: '12px', border: '1px solid rgba(255, 215, 0, 0.3)', display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
+                🪙 {coinBalanceLoading ? '...' : coinBalance}
+              </span>
+            </>
+          )}
         </div>
 
         {/* Mobile: Login + Hamburger - Right */}

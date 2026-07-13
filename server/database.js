@@ -308,6 +308,15 @@ if (usePostgres) {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`,
+      `CREATE TABLE IF NOT EXISTS coin_transactions (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        amount INTEGER NOT NULL,
+        type TEXT NOT NULL,
+        reason TEXT NOT NULL,
+        booking_id TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )`,
       `CREATE TABLE IF NOT EXISTS razorpay_settings (
         id INTEGER PRIMARY KEY,
         key_id TEXT,
@@ -361,6 +370,14 @@ if (usePostgres) {
       console.log('✅ users.last_seen column ensured');
     } catch (err) {
       console.log('users.last_seen ensure warning:', err.message);
+    }
+
+    // Ensure users.coins column exists for older databases
+    try {
+      await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS coins INTEGER DEFAULT 0');
+      console.log('✅ users.coins column ensured');
+    } catch (err) {
+      console.log('users.coins ensure warning:', err.message);
     }
 
     // Ensure email_history.booking_id column exists for older databases
@@ -645,6 +662,15 @@ if (usePostgres) {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )`,
+      `CREATE TABLE IF NOT EXISTS coin_transactions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        amount INTEGER NOT NULL,
+        type TEXT NOT NULL,
+        reason TEXT NOT NULL,
+        booking_id TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )`,
       `CREATE TABLE IF NOT EXISTS razorpay_settings (
         id INTEGER PRIMARY KEY,
         key_id TEXT,
@@ -675,6 +701,7 @@ if (usePostgres) {
           ensureMovieSpecialColumns();
           ensureCouponWinnerColumns();
           ensureMovieFoodIsFreeColumn();
+          ensureUserCoinsColumn();
           createDefaultData();
         }
       });
@@ -739,6 +766,29 @@ if (usePostgres) {
         });
       } else {
         db.run('UPDATE users SET last_seen = CURRENT_TIMESTAMP WHERE last_seen IS NULL');
+      }
+    });
+  }
+
+  function ensureUserCoinsColumn() {
+    db.all('PRAGMA table_info(users)', [], (err, columns) => {
+      if (err) {
+        console.log('⚠️  Could not inspect users table columns:', err.message);
+        return;
+      }
+
+      const hasCoins = Array.isArray(columns) && columns.some((col) => col.name === 'coins');
+      if (!hasCoins) {
+        db.run('ALTER TABLE users ADD COLUMN coins INTEGER DEFAULT 0', (alterErr) => {
+          if (alterErr) {
+            console.log('⚠️  Could not add users.coins:', alterErr.message);
+            return;
+          }
+          db.run('UPDATE users SET coins = 0 WHERE coins IS NULL');
+          console.log('✅ users.coins column added');
+        });
+      } else {
+        db.run('UPDATE users SET coins = 0 WHERE coins IS NULL');
       }
     });
   }
