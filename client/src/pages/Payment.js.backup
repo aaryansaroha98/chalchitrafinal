@@ -218,7 +218,7 @@ const Payment = () => {
 
                 <div className="info-item">
                   <span className="info-label">Tickets:</span>
-                  <span className="info-value">{quantity} x 🪙 {TICKET_COIN_PRICE}</span>
+                  <span className="info-value">{quantity} x Rs.{TICKET_PRICE}</span>
                 </div>
               </div>
             </div>
@@ -232,7 +232,7 @@ const Payment = () => {
 
               <div className="detail-item">
                 <span className="detail-label">Tickets x {quantity}</span>
-                <span className="detail-value">🪙 {(quantity * TICKET_COIN_PRICE).toFixed(2)}</span>
+                <span className="detail-value">Rs.{(quantity * TICKET_PRICE).toFixed(2)}</span>
               </div>
 
               {Object.entries(selectedFoods).map(([foodId, qty]) => {
@@ -346,11 +346,11 @@ const Payment = () => {
               background: 'rgba(255, 215, 0, 0.05)',
               borderRadius: '12px',
               border: coinBalance >= getTotalCoins() ? '2px solid #ffd700' : '1px solid rgba(255,255,255,0.1)',
-              cursor: coinBalance >= getTotalCoins() ? 'pointer' : 'not-allowed',
-              opacity: coinBalance >= getTotalCoins() ? 1 : 0.5
+              cursor: coinBalance >= getTotalPrice() ? 'pointer' : 'not-allowed',
+              opacity: coinBalance >= getTotalPrice() ? 1 : 0.5
             }}
             onClick={() => {
-              if (coinBalance >= getTotalCoins()) {
+              if (coinBalance >= getTotalPrice()) {
                 setUseCoins(!useCoins);
               }
             }}
@@ -360,9 +360,9 @@ const Payment = () => {
                   Your Balance: 🪙 {coinBalance}
                 </div>
                 <div style={{color: 'rgba(255,255,255,0.6)', fontSize: '12px', marginTop: '4px'}}>
-                  {coinBalance >= getTotalCoins() 
+                  {coinBalance >= getTotalPrice() 
                     ? `Enough coins to cover this booking` 
-                    : `Need ${getTotalCoins() - coinBalance} more coins`}
+                    : `Need ${getTotalPrice() - coinBalance} more coins`}
                 </div>
               </div>
               <div style={{
@@ -388,7 +388,7 @@ const Payment = () => {
                 color: '#ffd700',
                 textAlign: 'center'
               }}>
-                🪙 You will pay {getTotalCoins()} coins now. Coins will be refunded after you attend the movie!
+                🪙 You will pay {getTotalPrice()} coins now. Coins will be refunded after you attend the movie!
               </div>
             )}
           </div>
@@ -403,7 +403,7 @@ const Payment = () => {
               setProcessing(true);
 
               try {
-                const totalAmount = getTotalCoins();
+                const totalAmount = getTotalPrice();
 
                 // Handle free bookings (total = 0) directly without Razorpay
                 if (totalAmount === 0) {
@@ -471,7 +471,7 @@ const Payment = () => {
                       movie: movie,
                       payment: {
                         transaction_id: 'COINS_PAYMENT',
-                        amount: getTotalCoins(),
+                        amount: getTotalPrice(),
                         method: 'coins'
                       },
                       selectedSeats: selectedSeats,
@@ -535,7 +535,7 @@ const Payment = () => {
               </span>
             ) : (
               <span className="btn-content">
-                {getTotalCoins() === 0 ? 'CONFIRM TICKET' : `Pay 🪙${getTotalCoins()}`}
+                {getTotalPrice() === 0 ? 'CONFIRM TICKET' : `Pay Rs.${getTotalPrice()}`}
               </span>
             )}
           </button>
