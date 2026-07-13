@@ -145,9 +145,10 @@ router.post('/', async (req, res) => {
   const { movie_id, selectedSeats, food_option, coupon_code } = req.body;
   const num_people = selectedSeats ? selectedSeats.length : 0;
 
-  // Validate selectedSeats - allow 1-6 seats for group bookings
+  // Validate selectedSeats - use movie's booking_limit instead of hardcoded 6
   if (!selectedSeats || selectedSeats.length === 0) return res.status(400).json({ error: 'Please select at least one seat' });
-  if (selectedSeats.length > 6) return res.status(400).json({ error: 'Maximum 6 seats allowed per booking' });
+  
+  // Check movie-specific booking limit later after fetching movie data
 
   // Check if any selected seats are already booked
   db.all('SELECT selected_seats FROM bookings WHERE movie_id = ? AND selected_seats IS NOT NULL', [movie_id], (err, bookings) => {
@@ -168,9 +169,6 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: `Seats ${conflictingSeats.join(', ')} are already booked` });
     }
 
-    // Validate num_people <= 6
-    if (num_people > 6) return res.status(400).json({ error: 'Maximum 6 people allowed' });
-
     // Get movie details
     db.get('SELECT * FROM movies WHERE id = ? AND is_upcoming = 1', [movie_id], (err, movie) => {
       if (err) return res.status(500).json({ error: err.message });
@@ -182,26 +180,39 @@ router.post('/', async (req, res) => {
         });
       }
 
-      // Calculate food cost
+      // Check movie-specific booking limit
+      const movieBookingLimit = movie.booking_limit || 6;
+      if (selectedSeats.length > movieBookingLimit) {
+        return res.status(400).json({ error: `Maximum ${movieBookingLimit} seats allowed per booking for this movie` });
+      }
+
+      // Validate num_people against movie limit
+      if (num_people > movieBookingLimit) return res.status(400).json({ error: `Maximum ${movieBookingLimit} people allowed for this movie` });
+
+      // Use coin_price from movie instead of rupee price
+      const coinPrice = movie.coin_price || 20;
+      const ticketCoinCost = num_people * coinPrice;
+
+      // Calculate food cost in coins (assuming food prices are also in coins now)
       let food_cost = 0;
       if (req.body.food_orders && Object.keys(req.body.food_orders).length > 0) {
         const foodOrders = req.body.food_orders;
-        // Calculate food cost based on food prices
+        // Calculate food cost based on food prices (treating them as coins)
         const foodPrices = {
-          1: 50, // Popcorn
-          2: 30, // Soda
-          3: 80, // Combo Meal
-          4: 60, // Nachos
-          5: 20, // Candy
+          1: 5, // Popcorn - 5 coins
+          2: 3, // Soda - 3 coins
+          3: 8, // Combo Meal - 8 coins
+          4: 6, // Nachos - 6 coins
+          5: 2, // Candy - 2 coins
         };
 
         for (const [foodId, quantity] of Object.entries(foodOrders)) {
-          const price = foodPrices[foodId] || 30; // default price
+          const price = foodPrices[foodId] || 3; // default price in coins
           food_cost += price * quantity;
         }
       }
 
-      const total_price = (num_people * movie.price) + food_cost;
+      const total_coins = ticketCoinCost + food_cost;
 
       // Get user details for QR code (use dummy data if not authenticated)
       const userId = req.user ? req.user.id : 1; // Default to user ID 1 for testing
@@ -235,32 +246,41 @@ router.post('/', async (req, res) => {
           const customBookingId = await generateUniqueBookingId();
           console.log('Generated custom booking ID:', customBookingId);
 
-          // Determine payment method
-          const useCoins = req.body.use_coins === true;
-          const paymentMethod = useCoins ? 'coins' : (req.body.payment_method || 'free');
-          const paymentAmount = useCoins ? total_price : (req.body.payment_amount || 0);
-          const paymentId = useCoins ? 'COINS_PAYMENT' : (req.body.payment_id || null);
+          // ALL BOOKINGS NOW USE COINS - deduct from user balance
+          db.get('SELECT coins FROM users WHERE id = ?', [userId], (balanceErr, userBalance) => {
+            if (balanceErr) {
+              console.error('❌ Error checking user balance:', balanceErr.message);
+              return res.status(500).json({ error: 'Failed to check coin balance' });
+            }
 
-          // If paying with coins, deduct from user balance
-          if (useCoins) {
-            db.run('UPDATE users SET coins = COALESCE(coins, 0) - ? WHERE id = ? AND COALESCE(coins, 0) >= ?',
-              [total_price, userId, total_price], function(coinDeductErr) {
-                if (coinDeductErr || this.changes === 0) {
-                  console.error('❌ Coin deduction failed:', coinDeductErr?.message || 'Insufficient coins');
-                  return res.status(400).json({ error: 'Insufficient coins to complete booking' });
-                }
-                // Record coin transaction
-                db.run('INSERT INTO coin_transactions (user_id, amount, type, reason, booking_id) VALUES (?, ?, ?, ?, ?)',
-                  [userId, -total_price, 'debit', 'booking', customBookingId], function(txnErr) {
-                    if (txnErr) console.error('⚠️ Could not record coin transaction:', txnErr.message);
-                  });
-                console.log(`✅ ${total_price} coins deducted from user ${userId} for booking ${customBookingId}`);
+            const currentCoins = userBalance?.coins || 0;
+            if (currentCoins < total_coins) {
+              return res.status(400).json({ 
+                error: 'Insufficient coins',
+                required: total_coins,
+                available: currentCoins,
+                shortfall: total_coins - currentCoins
               });
-          }
+            }
+
+            // Deduct coins from user
+            db.run('UPDATE users SET coins = coins - ? WHERE id = ?', [total_coins, userId], function(coinDeductErr) {
+              if (coinDeductErr || this.changes === 0) {
+                console.error('❌ Coin deduction failed:', coinDeductErr?.message || 'No rows updated');
+                return res.status(400).json({ error: 'Failed to deduct coins from account' });
+              }
+
+              // Record coin transaction
+              db.run('INSERT INTO coin_transactions (user_id, amount, type, reason, booking_id) VALUES (?, ?, ?, ?, ?)',
+                [userId, -total_coins, 'debit', 'booking', customBookingId], function(txnErr) {
+                  if (txnErr) console.error('⚠️ Could not record coin transaction:', txnErr.message);
+                });
+              
+              console.log(`✅ ${total_coins} coins deducted from user ${userId} for booking ${customBookingId}`);
 
           // Insert booking with custom booking code
-          db.run('INSERT INTO bookings (user_id, movie_id, num_people, food_option, coupon_code, total_price, discount_amount, payment_method, payment_id, payment_amount, selected_seats, admitted_people, remaining_people, booking_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [userId, movie_id, num_people, food_option, coupon_code, total_price, req.body.discount_amount || 0, paymentMethod, paymentId, paymentAmount, JSON.stringify(req.body.selectedSeats || []), 0, num_people, customBookingId], function(err) {
+          db.run('INSERT INTO bookings (user_id, movie_id, num_people, food_option, coupon_code, total_price, discount_amount, payment_method, payment_id, payment_amount, selected_seats, admitted_people, remaining_people, booking_code, coin_amount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [userId, movie_id, num_people, food_option, coupon_code, total_coins, req.body.discount_amount || 0, 'coins', 'COINS_PAYMENT', total_coins, JSON.stringify(req.body.selectedSeats || []), 0, num_people, customBookingId, total_coins], function(err) {
               if (err) return res.status(500).json({ error: err.message });
 
               const databaseId = this.lastID; // Get the auto-generated database ID
@@ -338,7 +358,8 @@ router.post('/', async (req, res) => {
                       booking_id: customBookingId, // Return custom booking ID
                       qr_code: qrDataURL,
                       qr_data: qrData,
-                      total_price,
+                      total_coins,
+                      coins_paid: total_coins,
                       movie: movie.title,
                       date: movie.date,
                       venue: movie.venue,
@@ -347,6 +368,7 @@ router.post('/', async (req, res) => {
                   });
               });
             });
+          }); // End coin balance check
         } catch (error) {
           console.error('Error generating booking ID:', error);
           return res.status(500).json({ error: 'Failed to generate booking ID' });

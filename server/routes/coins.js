@@ -40,7 +40,7 @@ router.post('/grant-signup-bonus', (req, res) => {
   const userId = getUserIdentifier(req);
   if (!userId) return res.status(401).json({ error: 'Authentication required' });
 
-  const BONUS_COINS = 20;
+  const BONUS_COINS = 20; // Default signup bonus
 
   // Check if user already received signup bonus
   db.get(

@@ -171,7 +171,7 @@ router.post('/', (req, res) => {
     return res.status(400).json({ error: 'Validation failed', details: validationErrors });
   }
 
-  const { title, description, date, venue, price, availableFoods, category, duration, imdb_rating, language, is_special, special_message } = body;
+  const { title, description, date, venue, price, availableFoods, category, duration, imdb_rating, language, is_special, special_message, coin_price, booking_limit } = body;
   const poster_url = getUploadUrl(req.file, '/uploads');
 
   // Determine is_upcoming based on date
@@ -191,12 +191,16 @@ router.post('/', (req, res) => {
     }
   }
 
-  const sql = `INSERT INTO movies (title, description, poster_url, date, venue, price, is_upcoming, available_foods, category, duration, imdb_rating, language, is_special, special_message) 
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  // Use coin_price if provided, otherwise convert price to coins (or default to 20)
+  const finalCoinPrice = coin_price !== undefined ? parseInt(coin_price) : 20;
+  const finalBookingLimit = booking_limit !== undefined ? parseInt(booking_limit) : 6;
+
+  const sql = `INSERT INTO movies (title, description, poster_url, date, venue, price, is_upcoming, available_foods, category, duration, imdb_rating, language, is_special, special_message, coin_price, booking_limit) 
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
   const params = [title || '', description || '', poster_url || '', date || '', venue || '', 
     price !== undefined && price !== '' ? parseFloat(price) : 0, 
     isUpcoming, availableFoodsString, category || '', duration || '', imdb_rating || '', language || '',
-    is_special ? parseInt(is_special) : 0, special_message || ''];
+    is_special ? parseInt(is_special) : 0, special_message || '', finalCoinPrice, finalBookingLimit];
 
   console.log('💾 Executing INSERT query...');
   

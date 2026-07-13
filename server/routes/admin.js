@@ -703,12 +703,16 @@ router.delete('/coupons', requireAdmin, (req, res) => {
   });
 });
 
-// Validate coupon (public endpoint for frontend)
+// Validate coupon (public endpoint for frontend) - NOW GIVES COINS INSTEAD OF DISCOUNT
 router.post('/coupons/validate', (req, res) => {
-  const { code, total_amount } = req.body;
+  const { code, user_id } = req.body;
 
   if (!code) {
     return res.status(400).json({ error: 'Coupon code is required' });
+  }
+
+  if (!user_id) {
+    return res.status(400).json({ error: 'User ID is required' });
   }
 
   const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
@@ -723,49 +727,48 @@ router.post('/coupons/validate', (req, res) => {
         return res.status(400).json({ error: 'Coupon usage limit exceeded' });
       }
 
-      // Check minimum purchase
-      if (total_amount < coupon.min_purchase) {
-        return res.status(400).json({
-          error: `Minimum purchase amount of ₹${coupon.min_purchase} required for this coupon`
-        });
+      // Coupons now give coins directly instead of discounts
+      // discount_value represents COINS to give
+      const coinsToGive = Math.floor(coupon.discount_value);
+
+      if (coinsToGive <= 0) {
+        return res.status(400).json({ error: 'Invalid coupon value' });
       }
 
-      // Calculate discount
-      let discount = 0;
-      if (coupon.discount_type === 'percentage') {
-        discount = (total_amount * coupon.discount_value) / 100;
-      } else {
-        discount = coupon.discount_value;
-      }
-
-      // Apply max discount limit for percentage coupons
-      if (coupon.max_discount && discount > coupon.max_discount) {
-        discount = coupon.max_discount;
-      }
-
-      // Ensure discount doesn't exceed total amount
-      discount = Math.min(discount, total_amount);
-
-      // Increment usage count when coupon is validated for use
-      db.run('UPDATE coupons SET used_count = used_count + 1 WHERE id = ?', [coupon.id], function (updateErr) {
+      // Grant coins to user
+      db.run('UPDATE users SET coins = COALESCE(coins, 0) + ? WHERE id = ?', 
+        [coinsToGive, user_id], function (updateErr) {
         if (updateErr) {
-          console.error('Error updating coupon usage count:', updateErr);
-          return res.status(500).json({ error: 'Failed to update coupon usage' });
+          console.error('Error granting coins:', updateErr);
+          return res.status(500).json({ error: 'Failed to grant coins' });
         }
 
-        console.log(`Coupon ${coupon.code} usage count incremented: ${this.changes} rows affected`);
+        // Record coin transaction
+        db.run('INSERT INTO coin_transactions (user_id, amount, type, reason, booking_id) VALUES (?, ?, ?, ?, ?)',
+          [user_id, coinsToGive, 'credit', `coupon_${coupon.code}`, null], function(txnErr) {
+            if (txnErr) console.error('⚠️ Could not record coin transaction:', txnErr.message);
+          });
 
-        res.json({
-          valid: true,
-          coupon: {
-            id: coupon.id,
-            code: coupon.code,
-            description: coupon.description,
-            discount_type: coupon.discount_type,
-            discount_value: coupon.discount_value,
-            discount_amount: discount,
-            final_amount: total_amount - discount
+        // Increment usage count
+        db.run('UPDATE coupons SET used_count = used_count + 1 WHERE id = ?', [coupon.id], function (usageErr) {
+          if (usageErr) {
+            console.error('Error updating coupon usage count:', usageErr);
+            return res.status(500).json({ error: 'Failed to update coupon usage' });
           }
+
+          console.log(`Coupon ${coupon.code} gave ${coinsToGive} coins to user ${user_id}`);
+
+          res.json({
+            valid: true,
+            coins_granted: coinsToGive,
+            coupon: {
+              id: coupon.id,
+              code: coupon.code,
+              description: coupon.description,
+              coins_value: coinsToGive
+            },
+            message: `🪙 ${coinsToGive} coins added to your account!`
+          });
         });
       });
     });

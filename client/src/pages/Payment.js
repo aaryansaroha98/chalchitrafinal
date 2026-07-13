@@ -41,12 +41,13 @@ const Payment = () => {
   const [couponCode, setCouponCode] = useState('');
   const [couponData, setCouponData] = useState(null);
   const [couponError, setCouponError] = useState('');
+  const [couponSuccess, setCouponSuccess] = useState('');
   const [applyingCoupon, setApplyingCoupon] = useState(false);
   const [foodData, setFoodData] = useState({});
-  const [useCoins, setUseCoins] = useState(false);
-  const [coinBalance, setCoinBalance] = useState(0);
+  const [coinBalance, setCoinBalance] = useState(20); // Default 20 coins
 
-  const TICKET_PRICE = parseFloat(movie?.price) || 0;
+  // Use coin_price from movie instead of rupee price
+  const TICKET_COIN_PRICE = parseInt(movie?.coin_price) || 20;
 
   useEffect(() => {
     if (!bookingDetails.selectedSeats || bookingDetails.selectedSeats.length === 0) {
@@ -62,9 +63,9 @@ const Payment = () => {
   const fetchCoinBalance = async () => {
     try {
       const res = await api.get('/api/coins/balance', { withCredentials: true });
-      setCoinBalance(res.data.coins || 0);
+      setCoinBalance(res.data.coins || 20); // Default to 20 if not set
     } catch (err) {
-      setCoinBalance(0);
+      setCoinBalance(20); // Default to 20 on error
     }
   };
 
@@ -101,24 +102,20 @@ const Payment = () => {
   const getFoodTotal = () => {
     return Object.entries(selectedFoods).reduce((total, [foodId, qty]) => {
       const foodItem = foodData[foodId];
-      // If food is free for this movie, price is 0
-      const price = foodItem && foodItem.is_free ? 0 : (foodItem ? foodItem.price : 0);
-      return total + (price * qty);
+      // Food prices are now in coins (convert from rupees by dividing by 10)
+      const priceInCoins = foodItem && foodItem.is_free ? 0 : (foodItem ? Math.ceil(foodItem.price / 10) : 0);
+      return total + (priceInCoins * qty);
     }, 0);
   };
 
   const getSubtotal = () => {
-    const ticketTotal = selectedSeats.length * TICKET_PRICE;
+    const ticketTotal = selectedSeats.length * TICKET_COIN_PRICE;
     const foodTotal = getFoodTotal();
     return ticketTotal + foodTotal;
   };
 
-  const getTotalPrice = () => {
-    return couponData ? couponData.final_amount : getSubtotal();
-  };
-
-  const getDiscount = () => {
-    return couponData ? couponData.discount_amount : 0;
+  const getTotalCoins = () => {
+    return getSubtotal(); // No more discounts, just total coins needed
   };
 
   if (loading) {
@@ -278,7 +275,7 @@ const Payment = () => {
           </div>
         </div>
 
-        {/* Coupon Section */}
+        {/* Coupon Section - NOW GIVES COINS */}
         <div className="coupon-card">
           <h3 className="coupon-heading">Have a coupon?</h3>
           <div className="coupon-form">
@@ -298,17 +295,26 @@ const Payment = () => {
                   return;
                 }
 
+                if (!user || !user.id) {
+                  setCouponError('Please log in to use coupons');
+                  return;
+                }
+
                 setApplyingCoupon(true);
                 setCouponError('');
+                setCouponSuccess('');
 
                 try {
                   const res = await api.post('/api/admin/coupons/validate', {
                     code: couponCode,
-                    total_amount: getTotalPrice()
+                    user_id: user.id
                   });
 
-                  setCouponData(res.data.coupon);
+                  setCouponData(res.data);
+                  setCouponSuccess(res.data.message || `🪙 ${res.data.coins_granted} coins added!`);
                   setCouponError('');
+                  // Refresh coin balance
+                  await fetchCoinBalance();
                 } catch (err) {
                   setCouponError(err.response?.data?.error || 'Invalid coupon');
                 } finally {
@@ -325,24 +331,25 @@ const Payment = () => {
             <p className="error-msg">{couponError}</p>
           )}
 
-          {couponData && (
+          {couponSuccess && (
             <div className="coupon-success">
               <span className="success-check">✓</span>
-              <span className="success-text">Coupon applied!</span>
+              <span className="success-text">{couponSuccess}</span>
               <span className="remove-link" onClick={() => {
                 setCouponCode('');
                 setCouponData(null);
                 setCouponError('');
-              }}>Remove</span>
+                setCouponSuccess('');
+              }}>OK</span>
             </div>
           )}
         </div>
         
 
-        {/* Coin Payment Option */}
-        {user && getTotalPrice() > 0 && (
+        {/* Coin Balance Display */}
+        {user && (
           <div className="coupon-card" style={{marginTop: '16px'}}>
-            <h3 className="coupon-heading">🪙 Pay with Coins</h3>
+            <h3 className="coupon-heading">🪙 Your Coin Balance</h3>
             <div style={{
               display: 'flex',
               alignItems: 'center',
@@ -350,7 +357,7 @@ const Payment = () => {
               padding: '12px 16px',
               background: 'rgba(255, 215, 0, 0.05)',
               borderRadius: '12px',
-              border: useCoins ? '2px solid #ffd700' : '1px solid rgba(255,255,255,0.1)',
+              border: coinBalance >= getTotalCoins() ? '2px solid #ffd700' : '1px solid rgba(255,255,255,0.1)',
               cursor: coinBalance >= getTotalPrice() ? 'pointer' : 'not-allowed',
               opacity: coinBalance >= getTotalPrice() ? 1 : 0.5
             }}

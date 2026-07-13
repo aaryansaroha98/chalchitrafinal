@@ -148,6 +148,8 @@ if (usePostgres) {
         booking_stopped INTEGER DEFAULT 0,
         is_special INTEGER DEFAULT 0,
         special_message TEXT,
+        coin_price INTEGER DEFAULT 0,
+        booking_limit INTEGER DEFAULT 6,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`,
       `CREATE TABLE IF NOT EXISTS bookings (
@@ -172,6 +174,7 @@ if (usePostgres) {
         ticket_html TEXT,
         booking_code TEXT UNIQUE,
         is_used INTEGER DEFAULT 0,
+        coin_amount INTEGER DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`,
       `CREATE TABLE IF NOT EXISTS feedback (
@@ -374,10 +377,18 @@ if (usePostgres) {
 
     // Ensure users.coins column exists for older databases
     try {
-      await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS coins INTEGER DEFAULT 0');
+      await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS coins INTEGER DEFAULT 20');
       console.log('✅ users.coins column ensured');
     } catch (err) {
       console.log('users.coins ensure warning:', err.message);
+    }
+
+    // Ensure bookings.coin_amount column exists for older databases
+    try {
+      await pool.query('ALTER TABLE bookings ADD COLUMN IF NOT EXISTS coin_amount INTEGER DEFAULT 0');
+      console.log('✅ bookings.coin_amount column ensured');
+    } catch (err) {
+      console.log('bookings.coin_amount ensure warning:', err.message);
     }
 
     // Ensure email_history.booking_id column exists for older databases
@@ -509,6 +520,8 @@ if (usePostgres) {
         booking_stopped INTEGER DEFAULT 0,
         is_special INTEGER DEFAULT 0,
         special_message TEXT,
+        coin_price INTEGER DEFAULT 0,
+        booking_limit INTEGER DEFAULT 6,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )`,
       `CREATE TABLE IF NOT EXISTS bookings (
@@ -533,6 +546,7 @@ if (usePostgres) {
         ticket_html TEXT,
         booking_code TEXT UNIQUE,
         is_used INTEGER DEFAULT 0,
+        coin_amount INTEGER DEFAULT 0,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )`,
       `CREATE TABLE IF NOT EXISTS feedback (
@@ -702,6 +716,7 @@ if (usePostgres) {
           ensureCouponWinnerColumns();
           ensureMovieFoodIsFreeColumn();
           ensureUserCoinsColumn();
+          ensureBookingCoinAmountColumn();
           createDefaultData();
         }
       });
@@ -779,16 +794,36 @@ if (usePostgres) {
 
       const hasCoins = Array.isArray(columns) && columns.some((col) => col.name === 'coins');
       if (!hasCoins) {
-        db.run('ALTER TABLE users ADD COLUMN coins INTEGER DEFAULT 0', (alterErr) => {
+        db.run('ALTER TABLE users ADD COLUMN coins INTEGER DEFAULT 20', (alterErr) => {
           if (alterErr) {
             console.log('⚠️  Could not add users.coins:', alterErr.message);
             return;
           }
-          db.run('UPDATE users SET coins = 0 WHERE coins IS NULL');
-          console.log('✅ users.coins column added');
+          db.run('UPDATE users SET coins = 20 WHERE coins IS NULL');
+          console.log('✅ users.coins column added with default 20');
         });
       } else {
-        db.run('UPDATE users SET coins = 0 WHERE coins IS NULL');
+        db.run('UPDATE users SET coins = 20 WHERE coins IS NULL');
+      }
+    });
+  }
+
+  function ensureBookingCoinAmountColumn() {
+    db.all('PRAGMA table_info(bookings)', [], (err, columns) => {
+      if (err) {
+        console.log('⚠️  Could not inspect bookings table columns:', err.message);
+        return;
+      }
+
+      const hasCoinAmount = Array.isArray(columns) && columns.some((col) => col.name === 'coin_amount');
+      if (!hasCoinAmount) {
+        db.run('ALTER TABLE bookings ADD COLUMN coin_amount INTEGER DEFAULT 0', (alterErr) => {
+          if (alterErr) {
+            console.log('⚠️  Could not add bookings.coin_amount:', alterErr.message);
+            return;
+          }
+          console.log('✅ bookings.coin_amount column added');
+        });
       }
     });
   }
@@ -932,7 +967,9 @@ if (usePostgres) {
 
       const hasDisplayOrder = Array.isArray(columns) && columns.some((col) => col.name === 'display_order');
       if (!hasDisplayOrder) {
-        db.run('ALTER TABLE team ADD COLUMN display_order INTEGER DEFAULT 0', (alterErr) => {
+        db.run('ALTER TABLE movies ADD COLUMN coin_price INTEGER DEFAULT 0', (alterErr) => { if (alterErr) console.log('coin_price:', alterErr.message); else console.log('✅ movies.coin_price added'); });
+      db.run('ALTER TABLE movies ADD COLUMN booking_limit INTEGER DEFAULT 6', (alterErr) => { if (alterErr) console.log('booking_limit:', alterErr.message); else console.log('✅ movies.booking_limit added'); });
+      db.run('ALTER TABLE team ADD COLUMN display_order INTEGER DEFAULT 0', (alterErr) => {
           if (alterErr) {
             console.log('⚠️  Could not add team.display_order:', alterErr.message);
           } else {
