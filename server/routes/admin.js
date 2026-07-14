@@ -213,47 +213,29 @@ router.get('/revenue-stats', requireAdmin, (req, res) => {
       }
     }
 
-    // 1. Total Revenue from bookings
+    // 1. Total Coins Spent from bookings
     db.get('SELECT COALESCE(SUM(total_price), 0) as total FROM bookings', [], (err, row) => {
       handleResult('total_revenue', err, row ? row.total : 0);
     });
 
-    // 2. Total Food Revenue
-    db.get(`
-      SELECT COALESCE(SUM(fo.price * fo.quantity), 0) as total 
-      FROM food_orders fo
-      JOIN bookings b ON fo.booking_id = b.id
-    `, [], (err, row) => {
-      handleResult('food_revenue', err, row ? row.total : 0);
-    });
-
-    // 3. Total Discounts Given (from coupons used)
-    db.get(`
-      SELECT COALESCE(SUM(b.discount_amount), 0) as total 
-      FROM bookings b 
-      WHERE b.discount_amount > 0
-    `, [], (err, row) => {
-      handleResult('total_discounts', err, row ? row.total : 0);
-    });
-
-    // 4. Total Bookings Count
+    // 2. Total Bookings Count
     db.get('SELECT COUNT(*) as count FROM bookings', [], (err, row) => {
       handleResult('total_bookings', err, row ? row.count : 0);
     });
 
-    // 5. Revenue by Movie (top 10)
+    // 3. Coins by Movie (top 10)
     db.all(`
-      SELECT m.title, m.date, COUNT(b.id) as booking_count, COALESCE(SUM(b.total_price), 0) as revenue
+      SELECT m.title, m.date, COUNT(b.id) as booking_count, COALESCE(SUM(b.total_price), 0) as total_coins
       FROM movies m
       LEFT JOIN bookings b ON m.id = b.movie_id
       GROUP BY m.id
-      ORDER BY revenue DESC
+      ORDER BY total_coins DESC
       LIMIT 10
     `, [], (err, rows) => {
       handleResult('revenue_by_movie', err, rows || []);
     });
 
-    // 6. Recent Transactions (last 20)
+    // 4. Recent Transactions (last 20)
     db.all(`
       SELECT b.*, u.name as user_name, u.email as user_email, m.title as movie_title
       FROM bookings b
@@ -265,12 +247,12 @@ router.get('/revenue-stats', requireAdmin, (req, res) => {
       handleResult('recent_transactions', err, rows || []);
     });
 
-    // 7. Monthly Revenue Breakdown (last 6 months)
+    // 5. Monthly Coin Usage (last 6 months)
     db.all(`
       SELECT 
         strftime('%Y-%m', created_at) as month,
         COUNT(*) as bookings,
-        COALESCE(SUM(total_price), 0) as revenue
+        COALESCE(SUM(total_price), 0) as total_coins
       FROM bookings
       WHERE created_at >= datetime('now', '-6 months')
       GROUP BY month
@@ -279,9 +261,9 @@ router.get('/revenue-stats', requireAdmin, (req, res) => {
       handleResult('monthly_revenue', err, rows || []);
     });
 
-    // 8. Payment Method Breakdown
+    // 6. Payment Method Breakdown
     db.all(`
-      SELECT payment_method, COUNT(*) as count, COALESCE(SUM(total_price), 0) as total
+      SELECT payment_method, COUNT(*) as count, COALESCE(SUM(total_price), 0) as total_coins
       FROM bookings
       GROUP BY payment_method
     `, [], (err, rows) => {
@@ -1739,7 +1721,7 @@ router.post('/coupon-winners/send', requireAdmin, (req, res) => {
             }
 
             // Code is unique, create coupon
-            const couponDescription = `Individual discount for ${user.name} - ${discount_type === 'percentage' ? discountValue + '% off' : '₹' + discountValue + ' off'}`;
+            const couponDescription = `Coin reward for ${user.name} - ${discountValue} coins`;
 
             db.run(`INSERT INTO coupons (code, description, discount_type, discount_value, min_purchase, max_discount, usage_limit, expiry_date)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -1788,7 +1770,7 @@ router.post('/coupon-winners/send', requireAdmin, (req, res) => {
                               <h3 style="color: #28a745; margin: 0; font-size: 18px;">Your Exclusive Coupon Code</h3>
                               <div style="font-size: 24px; font-weight: bold; color: #007bff; margin: 10px 0; letter-spacing: 2px;">${couponCode}</div>
                               <p style="color: #666; margin: 10px 0 0 0;">
-                                <strong>Discount:</strong> ${discount_type === 'percentage' ? discount_amount + '% off' : '₹' + discount_amount + ' off'}<br>
+                                <strong>Coins:</strong> ${discount_amount} 🪙<br>
                                 <strong>Valid until:</strong> ${expiryDate.toLocaleDateString('en-IN')}
                               </p>
                             </div>
@@ -2107,7 +2089,7 @@ Tickets: ${booking.num_people || 1}
 
 Booking ID: ${booking.booking_code || booking.id}
 
-Amount Paid: ₹${booking.total_price || 0}
+Coins Paid: 🪙${booking.total_price || 0}
 
 ${'='.repeat(50)}
 

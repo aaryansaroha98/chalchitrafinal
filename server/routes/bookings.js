@@ -807,26 +807,24 @@ router.post('/scan', (req, res) => {
               return res.status(500).json({ error: 'Failed to update booking status' });
             }
 
-            // If this booking was paid with coins, refund them on full admission
-            if (isFullyUsed && booking.payment_method === 'coins') {
-              const refundAmount = booking.total_price || booking.payment_amount || 0;
-              if (refundAmount > 0) {
-                db.run(
-                  'INSERT INTO coin_transactions (user_id, amount, type, reason, booking_id) VALUES (?, ?, ?, ?, ?)',
-                  [booking.user_id, refundAmount, 'credit', 'attendance_refund', booking.booking_code],
-                  function(refundErr) {
-                    if (refundErr) console.error('⚠️ Coin refund error:', refundErr.message);
-                  }
-                );
-                db.run(
-                  'UPDATE users SET coins = COALESCE(coins, 0) + ? WHERE id = ?',
-                  [refundAmount, booking.user_id],
-                  function(refundUpdateErr) {
-                    if (refundUpdateErr) console.error('⚠️ Coin refund update error:', refundUpdateErr.message);
-                    else console.log(`✅ ${refundAmount} coins refunded to user ${booking.user_id} for booking ${booking.booking_code}`);
-                  }
-                );
-              }
+            // REFUND COINS IMMEDIATELY on ANY ticket scan/admission (not just on full admission)
+            const refundAmount = booking.coin_amount || booking.total_price || booking.payment_amount || 0;
+            if (refundAmount > 0) {
+              db.run(
+                'INSERT INTO coin_transactions (user_id, amount, type, reason, booking_id) VALUES (?, ?, ?, ?, ?)',
+                [booking.user_id, refundAmount, 'credit', 'attendance_refund', booking.booking_code],
+                function(refundErr) {
+                  if (refundErr) console.error('⚠️ Coin refund error:', refundErr.message);
+                }
+              );
+              db.run(
+                'UPDATE users SET coins = COALESCE(coins, 0) + ? WHERE id = ?',
+                [refundAmount, booking.user_id],
+                function(refundUpdateErr) {
+                  if (refundUpdateErr) console.error('⚠️ Coin refund update error:', refundUpdateErr.message);
+                  else console.log(`✅ ${refundAmount} coins refunded to user ${booking.user_id} for booking ${booking.booking_code}`);
+                }
+              );
             }
 
             console.log('📤 Sending scan response with food_orders:', Object.keys(foodOrders).length > 0 ? foodOrders : null);
