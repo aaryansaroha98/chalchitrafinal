@@ -261,6 +261,8 @@ const AdminPanel = () => {
     date: '',
     venue: '',
     price: '',
+    coin_price: 20,
+    booking_limit: 6,
     category: '',
     duration: '',
     imdb_rating: '',
@@ -2322,7 +2324,7 @@ const AdminPanel = () => {
                               {movie.title}
                             </h6>
                             <p className="text-muted mb-1" style={{ fontSize: '0.85rem', margin: 0 }}>
-                              ₹{movie.price}
+                              🪙{movie.coin_price || 20}
                             </p>
                           </div>
                         </td>
@@ -6319,16 +6321,55 @@ const AdminPanel = () => {
               <Row>
                 <Col md={6}>
                   <Form.Group className="mb-3">
-                    <Form.Label>Ticket Price (₹)</Form.Label>
+                    <Form.Label>Ticket Price (₹) - Reference Only</Form.Label>
                     <Form.Control
                       type="number"
                       value={movieForm.price}
                       onChange={(e) => setMovieForm({ ...movieForm, price: e.target.value })}
-                      placeholder="Enter ticket price"
+                      placeholder="Enter ticket price (for reference)"
                       min="0"
+                      step="1"
+                    />
+                    <Form.Text className="text-muted">
+                      Note: Actual booking uses coin price below.
+                    </Form.Text>
+                  </Form.Group>
+                </Col>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>🪙 Coin Price (Required) *</Form.Label>
+                    <Form.Control
+                      type="number"
+                      value={movieForm.coin_price || 20}
+                      onChange={(e) => setMovieForm({ ...movieForm, coin_price: e.target.value })}
+                      placeholder="Enter ticket price in coins"
+                      min="1"
                       step="1"
                       required
                     />
+                    <Form.Text className="text-muted">
+                      How many coins each ticket costs. Default: 20 coins.
+                    </Form.Text>
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>👥 Booking Limit Per User *</Form.Label>
+                    <Form.Control
+                      type="number"
+                      value={movieForm.booking_limit || 6}
+                      onChange={(e) => setMovieForm({ ...movieForm, booking_limit: e.target.value })}
+                      placeholder="Maximum seats per booking"
+                      min="1"
+                      max="20"
+                      step="1"
+                      required
+                    />
+                    <Form.Text className="text-muted">
+                      Maximum seats a user can book for this movie. Default: 6.
+                    </Form.Text>
                   </Form.Group>
                 </Col>
                 <Col md={6}>
