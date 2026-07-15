@@ -601,10 +601,14 @@ router.post('/coupons', requireAdmin, (req, res) => {
     return res.status(400).json({ error: 'Discount value must be positive' });
   }
 
-  // Check if coupon code already exists
-  db.get('SELECT id FROM coupons WHERE code = ?', [code.toUpperCase()], (err, existing) => {
+  // Check if coupon code already exists in coupons or coupon_winners tables
+  db.get('SELECT id, code FROM coupons WHERE code = ? UNION SELECT id, coupon_code as code FROM coupon_winners WHERE coupon_code = ? LIMIT 1', 
+    [code.toUpperCase(), code.toUpperCase()], (err, existing) => {
     if (err) return res.status(500).json({ error: err.message });
-    if (existing) return res.status(400).json({ error: 'Coupon code already exists' });
+    if (existing) return res.status(400).json({ 
+      error: `Coupon code "${existing.code}" already exists`,
+      existing_code: existing.code 
+    });
 
     const finalUsageLimit = usage_limit === '' || usage_limit === null ? -1 : parseInt(usage_limit);
     const finalMinPurchase = min_purchase || 0;
@@ -652,9 +656,10 @@ router.put('/coupons/:id', requireAdmin, (req, res) => {
   }
 
   // Check if coupon code already exists (excluding current coupon)
-  db.get('SELECT id FROM coupons WHERE code = ? AND id != ?', [code.toUpperCase(), req.params.id], (err, existing) => {
+  db.get('SELECT id FROM coupons WHERE code = ? AND id != ? UNION SELECT id FROM coupon_winners WHERE coupon_code = ? LIMIT 1', 
+    [code.toUpperCase(), req.params.id, code.toUpperCase()], (err, existing) => {
     if (err) return res.status(500).json({ error: err.message });
-    if (existing) return res.status(400).json({ error: 'Coupon code already exists' });
+    if (existing) return res.status(400).json({ error: `Coupon code "${code.toUpperCase()}" already exists` });
 
     const finalUsageLimit = usage_limit === '' || usage_limit === null ? -1 : parseInt(usage_limit);
     const finalMinPurchase = min_purchase || 0;
