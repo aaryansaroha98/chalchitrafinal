@@ -1,0 +1,510 @@
+/* ============================================
+   QUANTIFY-INSPIRED THEME
+   Design reference: https://www.quantifyterminal.com
+   - Space Grotesk font
+   - Dark professional palette (#030404 base)
+   - Amber/orange accent (#f0a028)
+   - Zero border-radius (sharp corners)
+   - Minimal, muted, professional
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+  --qt-bg: #030404;
+  --qt-surface: #080909;
+  --qt-panel: #0d0e0e;
+  --qt-panel-raised: #131312;
+  --qt-line: #292722;
+  --qt-line-soft: #171717;
+  --qt-text: #f7f4ed;
+  --qt-muted: #b4afa6;
+  --qt-quiet: #7c776d;
+  --qt-accent: #f0a028;
+  --qt-accent-soft: #f6b453;
+  --qt-shadow: 0 26px 70px rgba(0, 0, 0, 0.42);
+}
+
+* {
+  border-radius: 0 !important;
+}
+
+html {
+  background: var(--qt-bg);
+}
+
+body {
+  font-family: 'Space Grotesk', ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Arial, sans-serif;
+  background: var(--qt-bg);
+  color: var(--qt-text);
+  letter-spacing: -0.011em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--qt-text);
+}
+
+p, .text-muted, .lead, small {
+  color: var(--qt-muted);
+}
+
+/* ============================================
+   NAVBAR
+   ============================================ */
+.navbar, nav:not(.hero-topnav) {
+  background: rgba(3, 4, 4, 0.72) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--qt-line-soft);
+  box-shadow: none;
+}
+
+.navbar .nav-link, .navbar .navbar-brand, .navbar a {
+  color: var(--qt-muted) !important;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.01em;
+  transition: color 180ms ease;
+}
+
+.navbar .nav-link:hover, .navbar a:hover {
+  color: var(--qt-text) !important;
+}
+
+.navbar .navbar-brand {
+  color: var(--qt-text) !important;
+  font-weight: 800;
+  font-size: 17px;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+.btn {
+  border-radius: 0 !important;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.btn-primary, .btn.btn-primary {
+  background: var(--qt-accent) !important;
+  border-color: var(--qt-accent) !important;
+  color: #0b0803;
+}
+
+.btn-primary:hover, .btn.btn-primary:hover {
+  background: var(--qt-accent-soft) !important;
+  border-color: var(--qt-accent-soft) !important;
+}
+
+.btn-secondary, .btn.btn-secondary {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: var(--qt-text);
+}
+
+.btn-secondary:hover, .btn.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.btn-outline-primary, .btn.btn-outline-primary {
+  background: transparent;
+  border-color: var(--qt-accent);
+  color: var(--qt-accent);
+}
+
+.btn-outline-primary:hover, .btn.btn-outline-primary:hover {
+  background: var(--qt-accent);
+  color: #0b0803;
+}
+
+.btn-danger, .btn.btn-danger {
+  background: rgba(255, 101, 101, 0.1);
+  border-color: rgba(255, 101, 101, 0.3);
+  color: #ff6565;
+}
+
+.btn-success, .btn.btn-success {
+  background: rgba(47, 209, 137, 0.1);
+  border-color: rgba(47, 209, 137, 0.3);
+  color: #2fd189;
+}
+
+.btn-info, .btn.btn-info {
+  background: rgba(92, 199, 232, 0.1);
+  border-color: rgba(92, 199, 232, 0.3);
+  color: #5cc7e8;
+}
+
+/* ============================================
+   CARDS
+   ============================================ */
+.card {
+  background: var(--qt-panel);
+  border: 1px solid var(--qt-line-soft);
+  border-radius: 0 !important;
+  box-shadow: none;
+  transition: border-color 200ms ease;
+}
+
+.card:hover {
+  border-color: var(--qt-line);
+  box-shadow: none;
+  transform: none;
+}
+
+.card-header {
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--qt-line-soft);
+  padding: 1rem 1.25rem;
+}
+
+.card-body {
+  padding: 1.25rem;
+}
+
+.card-footer {
+  background: rgba(255, 255, 255, 0.03);
+  border-top: 1px solid var(--qt-line-soft);
+}
+
+/* ============================================
+   FORMS
+   ============================================ */
+.form-control, .form-select, input, select, textarea {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--qt-line-soft);
+  border-radius: 0 !important;
+  color: var(--qt-text);
+  font-family: 'Space Grotesk', sans-serif;
+  padding: 0.625rem 0.875rem;
+  transition: border-color 180ms ease;
+}
+
+.form-control:focus, .form-select:focus, input:focus, select:focus, textarea:focus {
+  background: rgba(0, 0, 0, 0.5);
+  border-color: var(--qt-line);
+  color: var(--qt-text);
+  box-shadow: none;
+}
+
+.form-control::placeholder, input::placeholder, textarea::placeholder {
+  color: var(--qt-quiet);
+}
+
+.form-label, label {
+  color: var(--qt-muted);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+
+/* ============================================
+   MODALS
+   ============================================ */
+.modal-content {
+  background: var(--qt-surface);
+  border: 1px solid var(--qt-line-soft);
+  border-radius: 0 !important;
+  box-shadow: var(--qt-shadow);
+}
+
+.modal-header {
+  border-bottom: 1px solid var(--qt-line-soft);
+  padding: 1.25rem;
+}
+
+.modal-body {
+  padding: 1.25rem;
+}
+
+.modal-footer {
+  border-top: 1px solid var(--qt-line-soft);
+  padding: 1.25rem;
+}
+
+.modal-header .btn-close {
+  filter: invert(0.8);
+}
+
+/* ============================================
+   TABLES
+   ============================================ */
+.table {
+  color: var(--qt-text);
+  border-color: var(--qt-line-soft);
+}
+
+.table thead th {
+  border-bottom: 1px solid var(--qt-line);
+  color: var(--qt-quiet);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.table td, .table th {
+  border-color: var(--qt-line-soft);
+  vertical-align: middle;
+}
+
+.table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* ============================================
+   BADGES
+   ============================================ */
+.badge, .badge-pill {
+  border-radius: 0 !important;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 4px 10px;
+}
+
+/* ============================================
+   ALERTS
+   ============================================ */
+.alert {
+  border-radius: 0 !important;
+  border: 1px solid;
+}
+
+.alert-danger {
+  background: rgba(255, 101, 101, 0.08);
+  border-color: rgba(255, 101, 101, 0.2);
+  color: #ff6565;
+}
+
+.alert-success {
+  background: rgba(47, 209, 137, 0.08);
+  border-color: rgba(47, 209, 137, 0.2);
+  color: #2fd189;
+}
+
+.alert-warning {
+  background: rgba(240, 160, 40, 0.08);
+  border-color: rgba(240, 160, 40, 0.2);
+  color: var(--qt-accent);
+}
+
+.alert-info {
+  background: rgba(92, 199, 232, 0.08);
+  border-color: rgba(92, 199, 232, 0.2);
+  color: #5cc7e8;
+}
+
+/* ============================================
+   TABS
+   ============================================ */
+.nav-tabs {
+  border-bottom: 1px solid var(--qt-line-soft);
+}
+
+.nav-tabs .nav-link {
+  border: none;
+  border-radius: 0 !important;
+  color: var(--qt-muted);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 0.75rem 1.25rem;
+  transition: color 180ms ease, background 180ms ease;
+}
+
+.nav-tabs .nav-link:hover {
+  color: var(--qt-text);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--qt-text);
+  background: transparent;
+  border-bottom: 2px solid var(--qt-accent);
+}
+
+/* ============================================
+   NAVBAR (Bootstrap override)
+   ============================================ */
+.navbar {
+  padding: 0.75rem 1rem;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+  color: var(--qt-muted);
+}
+
+.navbar-dark .navbar-nav .nav-link:hover,
+.navbar-dark .navbar-nav .nav-link:focus {
+  color: var(--qt-text);
+}
+
+.dropdown-menu {
+  background: var(--qt-surface);
+  border: 1px solid var(--qt-line-soft);
+  border-radius: 0 !important;
+  box-shadow: var(--qt-shadow);
+}
+
+.dropdown-item {
+  color: var(--qt-muted);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+}
+
+.dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--qt-text);
+}
+
+.dropdown-divider {
+  border-color: var(--qt-line-soft);
+}
+
+/* ============================================
+   PAGINATION
+   ============================================ */
+.page-link {
+  background: var(--qt-panel);
+  border-color: var(--qt-line-soft);
+  color: var(--qt-muted);
+  font-family: 'Space Grotesk', sans-serif;
+  border-radius: 0 !important;
+}
+
+.page-link:hover {
+  background: var(--qt-panel-raised);
+  border-color: var(--qt-line);
+  color: var(--qt-text);
+}
+
+.page-item.active .page-link {
+  background: var(--qt-accent);
+  border-color: var(--qt-accent);
+  color: #0b0803;
+}
+
+/* ============================================
+   PROGRESS BARS
+   ============================================ */
+.progress {
+  background: var(--qt-line-soft);
+  border-radius: 0 !important;
+}
+
+.progress-bar {
+  background: var(--qt-accent);
+}
+
+/* ============================================
+   LIST GROUPS
+   ============================================ */
+.list-group-item {
+  background: var(--qt-panel);
+  border-color: var(--qt-line-soft);
+  color: var(--qt-text);
+}
+
+/* ============================================
+   SCROLLBAR
+   ============================================ */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--qt-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--qt-line);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--qt-line-soft);
+}
+
+/* ============================================
+   HOME MOVIE CARDS
+   ============================================ */
+.home-movie-card {
+  background: var(--qt-panel) !important;
+  border: 1px solid var(--qt-line-soft) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  transition: border-color 200ms ease;
+}
+
+.home-movie-card:hover {
+  border-color: var(--qt-line) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* ============================================
+   BOOKING PAGE
+   ============================================ */
+.booking-header-card {
+  background: var(--qt-panel) !important;
+  border: 1px solid var(--qt-line-soft) !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+/* ============================================
+   PAYMENT PAGE
+   ============================================ */
+.payment-card, .coupon-card, .success-card, .notice-card {
+  background: var(--qt-panel) !important;
+  border: 1px solid var(--qt-line-soft) !important;
+}
+
+.payment-page, .payment-success-page {
+  background: var(--qt-bg) !important;
+}
+
+.pay-btn, .action-btn {
+  border-radius: 0 !important;
+  border: 1px solid var(--qt-line) !important;
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+footer, .footer {
+  border-top: 1px solid var(--qt-line-soft);
+  background: var(--qt-bg);
+  color: var(--qt-quiet);
+}
+
+/* ============================================
+   TOAST / NOTIFICATION
+   ============================================ */
+.toast {
+  background: var(--qt-surface);
+  border: 1px solid var(--qt-line-soft);
+  border-radius: 0 !important;
+}
+
+/* ============================================
+   SPINNER / LOADER
+   ============================================ */
+.loading-spinner, .spinner-border {
+  color: var(--qt-accent);
+}
+
+/* ============================================
+   CINZEL FONT OVERRIDE
+   ============================================ */
+.font-cinzel, [class*="cinzel"] {
+  font-family: 'Space Grotesk', sans-serif !important;
+}
