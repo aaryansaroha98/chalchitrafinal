@@ -45,6 +45,7 @@ const Payment = () => {
   const [applyingCoupon, setApplyingCoupon] = useState(false);
   const [foodData, setFoodData] = useState({});
   const [coinBalance, setCoinBalance] = useState(20); // Default 20 coins
+  const [useCoins, setUseCoins] = useState(true);
 
   // Use coin_price from movie instead of rupee price
   const TICKET_COIN_PRICE = parseInt(movie?.coin_price) || 20;
@@ -72,7 +73,7 @@ const Payment = () => {
   const fetchMovie = async () => {
     try {
       const movieIdToUse = movieIdFromState || movieId;
-      const res = await api.get(`/api/movies/${movieIdToUse}`);
+      const res = await api.get(`/api/movies/${movieIdToUse}?booking=true`);
       console.log('Fetched movie data:', res.data);
       console.log('Movie price:', res.data.price, 'Type:', typeof res.data.price);
       setMovie(res.data);
@@ -452,7 +453,7 @@ const Payment = () => {
                   return;
                 }
 
-                // Handle coin payments directly
+                // Handle coin payments
                 if (useCoins) {
                   try {
                     const movieIdToUse = movieIdFromState || movieId;
@@ -499,32 +500,11 @@ const Payment = () => {
                   return;
                 }
 
-                // For paid bookings, use Cashfree
-                try {
-                  const movieIdToUse = movieIdFromState || movieId;
-                  const orderRes = await api.post('/api/payments/order', {
-                    movie_id: movieIdToUse,
-                    selectedSeats: selectedSeats,
-                    food_orders: selectedFoods,
-                    coupon_code: couponCode,
-                    customer_id: user?.id || 'guest',
-                    customer_email: customerDetails.email,
-                    customer_phone: customerDetails.phone
-                  });
-
-                  if (orderRes.data && orderRes.data.payment_link) {
-                    window.location.href = orderRes.data.payment_link;
-                  } else {
-                    setProcessing(false);
-                    setError('Failed to create Cashfree payment order.');
-                  }
-                } catch (err) {
-                  setProcessing(false);
-                  setError('Payment gateway failed. Please try again.');
-                }
+                setProcessing(false);
+                setError('Please select a payment method.');
               } catch (err) {
                 setProcessing(false);
-                setError('Payment gateway failed. Please try again.');
+                setError('An error occurred. Please try again.');
               }
             }}
           >

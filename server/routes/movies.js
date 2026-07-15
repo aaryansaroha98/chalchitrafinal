@@ -110,14 +110,21 @@ router.get('/:id', (req, res) => {
   if (isNaN(movieId)) {
     return res.status(400).json({ error: 'Invalid movie ID' });
   }
-  
-  db.get('SELECT * FROM movies WHERE id = ?', [movieId], (err, movie) => {
+
+  // If this is a booking request (not admin), only return upcoming movies
+  const isBookingRequest = req.query.booking === 'true';
+
+  const query = isBookingRequest
+    ? 'SELECT * FROM movies WHERE id = ? AND is_upcoming = 1'
+    : 'SELECT * FROM movies WHERE id = ?';
+
+  db.get(query, [movieId], (err, movie) => {
     if (err) {
       console.error('❌ Database error in GET /:id:', err);
       return res.status(500).json({ error: 'Failed to fetch movie' });
     }
     if (!movie) {
-      return res.status(404).json({ error: 'Movie not found' });
+      return res.status(404).json({ error: 'Movie not found or not available' });
     }
     res.json(movie);
   });

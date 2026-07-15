@@ -83,7 +83,7 @@ const Booking = () => {
 
   const fetchMovie = async () => {
     try {
-      const res = await api.get(`/api/movies/${movieId}`);
+      const res = await api.get(`/api/movies/${movieId}?booking=true`);
       setMovie(res.data);
       setLoading(false);
     } catch (err) {
