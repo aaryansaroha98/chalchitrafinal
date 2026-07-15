@@ -70,8 +70,12 @@ router.post('/', requireAdmin, upload.single('image'), (req, res) => {
   const { name, description, price, category } = req.body;
   const image_url = getUploadUrl(req.file, '/uploads');
 
-  if (!name || !price) {
-    return res.status(400).json({ error: 'Name and price are required' });
+  if (!name || typeof name !== 'string' || name.trim() === '') {
+    return res.status(400).json({ error: 'Food name is required and must be a non-empty string' });
+  }
+
+  if (price === undefined || price === '' || price === null || isNaN(parseFloat(price)) || parseFloat(price) <= 0) {
+    return res.status(400).json({ error: 'Price is required and must be a positive number' });
   }
 
   // Set default category if not provided
@@ -96,6 +100,17 @@ router.put('/:id', requireAdmin, upload.single('image'), (req, res) => {
   const { id } = req.params;
   const { name, description, price, category, is_available } = req.body;
   const image_url = getUploadUrl(req.file, '/uploads');
+
+  if (name !== undefined && (typeof name !== 'string' || name.trim() === '')) {
+    return res.status(400).json({ error: 'Food name must be a non-empty string' });
+  }
+
+  if (price !== undefined && price !== '' && price !== null) {
+    const parsedPrice = parseFloat(price);
+    if (isNaN(parsedPrice) || parsedPrice <= 0) {
+      return res.status(400).json({ error: 'Price must be a positive number' });
+    }
+  }
 
   let query, params;
 

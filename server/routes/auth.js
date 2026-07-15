@@ -140,15 +140,23 @@ function initializeGoogleStrategy() {
   });
 }
 
-// TEMPORARY LOGIN: Allow admin login without OAuth for testing (restricted to IIT Jammu emails)
+// Email-based login (development only - bypasses OAuth)
 router.post('/login', (req, res) => {
+  if (process.env.NODE_ENV === 'production') {
+    return res.status(403).json({ error: 'Email login is not available in production. Use Google OAuth.' });
+  }
+
   const { email } = req.body;
+
+  if (!email || typeof email !== 'string' || email.trim() === '') {
+    return res.status(400).json({ error: 'Email is required' });
+  }
 
   // Super admin email that gets full access
   const SUPER_ADMIN_EMAIL = '2025uee0154@iitjammu.ac.in';
 
   // Only allow IIT Jammu student emails
-  if (email && email.endsWith('@iitjammu.ac.in')) {
+  if (email.endsWith('@iitjammu.ac.in')) {
     // First, find or create the user in the database with admin privileges
     db.get('SELECT * FROM users WHERE email = ?', [email], (err, existingUser) => {
       if (err) {

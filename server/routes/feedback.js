@@ -5,15 +5,15 @@ const router = express.Router();
 
 // Submit feedback
 router.post('/', (req, res) => {
-  // Temporarily allow feedback without authentication for testing
-  // if (!req.user) return res.status(401).json({ error: 'Authentication required' });
+  if (!req.user) return res.status(401).json({ error: 'Authentication required' });
 
   const { movie_id, rating, comment } = req.body;
 
-  if (rating < 1 || rating > 5) return res.status(400).json({ error: 'Rating must be between 1 and 5' });
+  if (rating === undefined || rating === null || typeof rating !== 'number' || rating < 1 || rating > 5) {
+    return res.status(400).json({ error: 'Rating must be a number between 1 and 5' });
+  }
 
-  // Use dummy user ID if not authenticated
-  const userId = req.user ? req.user.id : 1;
+  const userId = req.user.id;
 
   db.run('INSERT INTO feedback (user_id, movie_id, rating, comment) VALUES (?, ?, ?, ?)',
     [userId, movie_id, rating, comment], function(err) {

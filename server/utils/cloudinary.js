@@ -64,14 +64,33 @@ function createLocalStorage(subDir) {
   });
 }
 
+const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/avif', 'video/mp4', 'video/webm'];
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+function fileFilter(req, file, cb) {
+  if (ALLOWED_MIME_TYPES.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error('Invalid file type. Only JPEG, PNG, GIF, WebP, AVIF, MP4, and WebM are allowed.'), false);
+  }
+}
+
 // Get the appropriate multer upload middleware
 // folder: Cloudinary folder name (e.g., 'posters', 'team', 'gallery')
 // localDir: local directory path (e.g., 'uploads', 'public/team', 'public/gallery')
 function getUpload(folder, localDir) {
   if (isCloudinaryConfigured) {
-    return multer({ storage: createCloudinaryStorage(folder) });
+    return multer({
+      storage: createCloudinaryStorage(folder),
+      fileFilter,
+      limits: { fileSize: MAX_FILE_SIZE }
+    });
   }
-  return multer({ storage: createLocalStorage(localDir) });
+  return multer({
+    storage: createLocalStorage(localDir),
+    fileFilter,
+    limits: { fileSize: MAX_FILE_SIZE }
+  });
 }
 
 // Get the URL for an uploaded file

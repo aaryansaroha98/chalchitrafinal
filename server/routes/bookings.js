@@ -139,8 +139,7 @@ router.get('/occupied/:movieId', (req, res) => {
 
 // Create booking
 router.post('/', async (req, res) => {
-  // Temporarily allow booking without authentication for testing
-  // if (!req.user) return res.status(401).json({ error: 'Authentication required' });
+  if (!req.user) return res.status(401).json({ error: 'Authentication required' });
 
   const { movie_id, selectedSeats, food_option, coupon_code } = req.body;
   const num_people = selectedSeats ? selectedSeats.length : 0;
@@ -214,31 +213,25 @@ router.post('/', async (req, res) => {
 
       const total_coins = ticketCoinCost + food_cost;
 
-      // Get user details for QR code (use dummy data if not authenticated)
-      const userId = req.user ? req.user.id : 1; // Default to user ID 1 for testing
-      let studentName = 'Test Student';
-      let studentEmail = 'test@iitjammu.ac.in';
+      const userId = req.user.id;
+      let studentName = '';
+      let studentEmail = '';
 
-      if (req.user) {
-        // Get user details for QR code
-        db.get('SELECT name, email FROM users WHERE id = ?', [req.user.id], (err, user) => {
-          if (err) return res.status(500).json({ error: err.message });
+      db.get('SELECT name, email FROM users WHERE id = ?', [req.user.id], (err, user) => {
+        if (err) return res.status(500).json({ error: err.message });
 
-          if (user) {
-            studentName = user.name;
-            if (!studentName || studentName.trim() === '') {
-              const emailParts = user.email.split('@');
-              studentName = emailParts[0] || 'Student';
-              studentName = studentName.charAt(0).toUpperCase() + studentName.slice(1);
-            }
-            studentEmail = user.email;
+        if (user) {
+          studentName = user.name;
+          if (!studentName || studentName.trim() === '') {
+            const emailParts = user.email.split('@');
+            studentName = emailParts[0] || 'Student';
+            studentName = studentName.charAt(0).toUpperCase() + studentName.slice(1);
           }
+          studentEmail = user.email;
+        }
 
-          createBooking();
-        });
-      } else {
         createBooking();
-      }
+      });
 
       async function createBooking() {
         try {
@@ -381,11 +374,8 @@ router.post('/', async (req, res) => {
 
 // Get user bookings
 router.get('/my', (req, res) => {
-  // Temporarily allow fetching bookings without authentication for testing
-  // if (!req.user) return res.status(401).json({ error: 'Authentication required' });
-
-  // Use dummy user ID for testing (same as used in booking creation)
-  const userId = req.user ? req.user.id : 1;
+  if (!req.user) return res.status(401).json({ error: 'Authentication required' });
+  const userId = req.user.id;
 
   db.all('SELECT b.*, b.qr_code, b.selected_seats, b.ticket_html, m.title, m.date, m.venue, m.poster_url, m.price FROM bookings b JOIN movies m ON b.movie_id = m.id WHERE b.user_id = ? ORDER BY b.created_at DESC',
     [userId], (err, bookings) => {
@@ -396,6 +386,10 @@ router.get('/my', (req, res) => {
 
 // Scanner dashboard overview (all-time totals)
 router.get('/scanner-overview', (req, res) => {
+  if (!req.user) return res.status(401).json({ error: 'Authentication required' });
+  const hasScannerAccess = req.user.is_admin || req.user.code_scanner ||
+    (req.user.team_scanner !== undefined ? req.user.team_scanner : false);
+  if (!hasScannerAccess) return res.status(403).json({ error: 'Scanner access required' });
   const scannerStatsQuery = `
     SELECT
       COUNT(*) AS total_bookings,
@@ -435,15 +429,10 @@ router.get('/scanner-overview', (req, res) => {
 
 // Scan QR code (scanner access required)
 router.post('/scan', (req, res) => {
-  // Temporarily allow scanning without full authentication for testing
-  // if (!req.user) return res.status(401).json({ error: 'Authentication required' });
-
-  // Check if user has scanner access (admin, code_scanner, or team_scanner)
-  // Temporarily allow scanning for testing
-  // const hasScannerAccess = req.user.is_admin || req.user.code_scanner ||
-  //   (req.user.team_scanner !== undefined ? req.user.team_scanner : false);
-
-  // if (!hasScannerAccess) return res.status(403).json({ error: 'Scanner access required' });
+  if (!req.user) return res.status(401).json({ error: 'Authentication required' });
+  const hasScannerAccess = req.user.is_admin || req.user.code_scanner ||
+    (req.user.team_scanner !== undefined ? req.user.team_scanner : false);
+  if (!hasScannerAccess) return res.status(403).json({ error: 'Scanner access required' });
 
   const { qr_code, num_people } = req.body;
   console.log('Received scan request:', { qr_code, num_people });
@@ -892,10 +881,9 @@ router.post('/scan', (req, res) => {
   }
 });
 
-// Get all bookings (admin) - temporarily allow for debugging
+// Get all bookings (admin only)
 router.get('/', (req, res) => {
-  // Temporarily allow access for debugging
-  // if (!req.user || !req.user.is_admin) return res.status(403).json({ error: 'Admin access required' });
+  if (!req.user || !req.user.is_admin) return res.status(403).json({ error: 'Admin access required' });
 
   db.all('SELECT b.*, u.name, u.email, m.title FROM bookings b LEFT JOIN users u ON b.user_id = u.id LEFT JOIN movies m ON b.movie_id = m.id ORDER BY b.created_at DESC',
     [], (err, bookings) => {
@@ -905,8 +893,9 @@ router.get('/', (req, res) => {
     });
 });
 
-// Test QR scan with manual data
+// Test QR scan with manual data (admin only)
 router.post('/test-scan', (req, res) => {
+  if (!req.user || !req.user.is_admin) return res.status(403).json({ error: 'Admin access required' });
   const { qr_code } = req.body;
   console.log('Test scan received:', qr_code);
 
@@ -947,8 +936,9 @@ router.post('/test-scan', (req, res) => {
 });
 
 
-// Update ticket HTML for a booking
+// Update ticket HTML for a booking (admin only)
 router.put('/:id/ticket-html', (req, res) => {
+  if (!req.user || !req.user.is_admin) return res.status(403).json({ error: 'Admin access required' });
   const bookingId = req.params.id;
   const { ticket_html } = req.body;
 
@@ -965,18 +955,16 @@ router.put('/:id/ticket-html', (req, res) => {
 
 // Delete booking (user can only delete their own bookings)
 router.delete('/:id', (req, res) => {
-  // Temporarily allow deletion without authentication for testing
-  // if (!req.user) return res.status(401).json({ error: 'Authentication required' });
+  if (!req.user) return res.status(401).json({ error: 'Authentication required' });
 
   const bookingId = req.params.id;
 
-  // First check if the booking belongs to the authenticated user (skip for testing)
+  // Check if the booking belongs to the authenticated user
   db.get('SELECT user_id FROM bookings WHERE id = ?', [bookingId], (err, booking) => {
     if (err) return res.status(500).json({ error: err.message });
     if (!booking) return res.status(404).json({ error: 'Booking not found' });
 
-    // Temporarily skip ownership check for testing
-    // if (booking.user_id !== req.user.id) return res.status(403).json({ error: 'You can only delete your own bookings' });
+    if (booking.user_id !== req.user.id) return res.status(403).json({ error: 'You can only delete your own bookings' });
 
     // Delete the booking
     db.run('DELETE FROM bookings WHERE id = ?', [bookingId], function(err) {
@@ -988,25 +976,31 @@ router.delete('/:id', (req, res) => {
 
 // Generate PDF ticket endpoint
 router.post('/generate-pdf', (req, res) => {
+  if (!req.user) return res.status(401).json({ error: 'Authentication required' });
+
   try {
     const { booking_id, movie_title, movie_date, venue, selected_seats, qr_code_url } = req.body;
 
-    // Get movie name for filename
-    let movieName = 'Movie';
-    
-    // Try to get movie name from booking
+    // Verify the booking belongs to the authenticated user
     const numericPdfId = parseInt(booking_id);
-    db.get('SELECT m.title FROM bookings b JOIN movies m ON b.movie_id = m.id WHERE b.booking_code = ? OR b.id = ?',
-      [String(booking_id), isNaN(numericPdfId) ? -1 : numericPdfId], (err, movieRow) => {
+    const safeId = isNaN(numericPdfId) ? -1 : numericPdfId;
+    db.get('SELECT b.user_id, m.title FROM bookings b JOIN movies m ON b.movie_id = m.id WHERE (b.booking_code = ? OR b.id = ?)',
+      [String(booking_id), safeId], (err, bookingRow) => {
         if (err) {
           console.error('Error fetching movie name:', err);
           console.log('Error details:', err.message);
-        } else if (movieRow && movieRow.title) {
-          movieName = movieRow.title;
+        } else if (bookingRow && bookingRow.user_id) {
+          if (bookingRow.user_id !== req.user.id) {
+            return res.status(403).json({ error: 'You can only download your own tickets' });
+          }
+          movieName = bookingRow.title;
+          console.log('Successfully fetched movie name:', movieName);
+        } else if (bookingRow && bookingRow.title) {
+          movieName = bookingRow.title;
           console.log('Successfully fetched movie name:', movieName);
         } else {
           console.log('No movie name found for booking:', booking_id);
-          console.log('Movie row result:', movieRow);
+          console.log('Movie row result:', bookingRow);
         }
 
         // Clean movie name for filename (remove special characters)
@@ -1183,6 +1177,8 @@ router.post('/generate-pdf', (req, res) => {
 
 // Send ticket email with PDF attachment
 router.post('/send-ticket-email', async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: 'Authentication required' });
+
   const { booking_id, pdf_base64 } = req.body;
 
   if (!booking_id || !pdf_base64) {
@@ -1200,7 +1196,7 @@ router.post('/send-ticket-email', async (req, res) => {
        FROM bookings b
        LEFT JOIN users u ON b.user_id = u.id
        LEFT JOIN movies m ON b.movie_id = m.id
-       WHERE b.id = ? OR b.booking_code = ?`,
+       WHERE (b.id = ? OR b.booking_code = ?)`,
       [safeNumericId, String(booking_id)],
       async (err, booking) => {
         if (err) {
@@ -1210,6 +1206,11 @@ router.post('/send-ticket-email', async (req, res) => {
 
         if (!booking) {
           return res.status(404).json({ error: 'Booking not found' });
+        }
+
+        // Ownership check: only the booking owner or admin can send email
+        if (booking.user_id !== req.user.id && !req.user.is_admin) {
+          return res.status(403).json({ error: 'You can only email your own tickets' });
         }
 
         const allowResend = req.body.allow_resend === true || req.body.allow_resend === 'true';
@@ -1373,8 +1374,8 @@ router.post('/send-ticket-email', async (req, res) => {
 router.get('/check/:movieId', (req, res) => {
   const movieId = req.params.movieId;
   
-  // Use dummy user ID for testing if not authenticated
-  const userId = req.user ? req.user.id : 1;
+  if (!req.user) return res.status(401).json({ error: 'Authentication required' });
+  const userId = req.user.id;
 
   // Check if user has any booking for this movie
   db.get(

@@ -1088,13 +1088,13 @@ router.post('/email/single', requireAdmin, async (req, res) => {
           console.log('[Email] ✅ Single email sent to', user.email, '— messageId:', data?.messageId);
           db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
                   VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            ['single', user.email, user.name, subject, message, req.user?.id || 1, 'sent']);
+            ['single', user.email, user.name, subject, message, req.user?.id || (req.session && req.session.adminUser && req.session.adminUser.id), 'sent']);
           res.json({ message: 'Email sent successfully!', messageId: data?.messageId });
         } catch (emailError) {
           console.error('[Email] ❌ Single email failed to', user.email, ':', emailError.message);
           db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status, error_message)
                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-            ['single', user.email, user.name, subject, message, req.user?.id || 1, 'failed', emailError.message]);
+            ['single', user.email, user.name, subject, message, req.user?.id || (req.session && req.session.adminUser && req.session.adminUser.id), 'failed', emailError.message]);
           res.status(500).json({ error: 'Failed to send email: ' + emailError.message });
         }
       } catch (setupError) {
@@ -1124,7 +1124,7 @@ router.post('/email/bulk', requireAdmin, async (req, res) => {
       if (err) return res.status(500).json({ error: 'Failed to get user details: ' + err.message });
       if (!users || users.length === 0) return res.status(404).json({ error: 'No valid users found' });
 
-      const adminId = req.user?.id || 1;
+      const adminId = req.user?.id || (req.session && req.session.adminUser && req.session.adminUser.id);
 
       // Respond immediately - emails will be sent in background
       res.json({
@@ -1251,13 +1251,13 @@ router.post('/email/custom', requireAdmin, async (req, res) => {
       console.log('[Email] ✅ Custom email sent to:', email, '— messageId:', data?.messageId);
       db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
               VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        ['custom', email, recipient_name || 'Valued Guest', subject, message, req.user?.id || 1, 'sent']);
+        ['custom', email, recipient_name || 'Valued Guest', subject, message, req.user?.id || (req.session && req.session.adminUser && req.session.adminUser.id), 'sent']);
       res.json({ message: 'Email sent successfully!', messageId: data?.messageId });
     } catch (sendErr) {
       console.error('[Email] ❌ Custom email failed to', email, ':', sendErr.message);
       db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status, error_message)
               VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        ['custom', email, recipient_name || 'Valued Guest', subject, message, req.user?.id || 1, 'failed', sendErr.message]);
+        ['custom', email, recipient_name || 'Valued Guest', subject, message, req.user?.id || (req.session && req.session.adminUser && req.session.adminUser.id), 'failed', sendErr.message]);
       res.status(500).json({ error: 'Failed to send email: ' + sendErr.message });
     }
   } catch (error) {
@@ -1305,7 +1305,7 @@ router.post('/email/feedback-request', requireAdmin, async (req, res) => {
         return res.status(404).json({ error: emptyMessage });
       }
 
-      const adminId = req.user?.id || 1;
+      const adminId = req.user?.id || (req.session && req.session.adminUser && req.session.adminUser.id);
       const subject = `How was your ${selectedMovie.title} experience?`;
 
       // Respond immediately - emails will be sent in background
@@ -1633,7 +1633,7 @@ router.post('/coupon-winners/send', requireAdmin, (req, res) => {
 
   const expiryDate = new Date();
   expiryDate.setDate(expiryDate.getDate() + parseInt(expiryDaysValue));
-  const adminId = req.user?.id || 1;
+  const adminId = req.user?.id || (req.session && req.session.adminUser && req.session.adminUser.id);
 
   // Get user details
   const placeholders = userIds.map(() => '?').join(',');
@@ -2011,7 +2011,7 @@ router.post('/email/ticket', async (req, res) => {
     // Log email history
     db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
             VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      ['ticket', customer_email, customer_name, mailOptions.subject, 'Ticket details sent', req.user?.id || 1, 'sent'],
+      ['ticket', customer_email, customer_name, mailOptions.subject, 'Ticket details sent', req.user?.id || (req.session && req.session.adminUser && req.session.adminUser.id), 'sent'],
       function(err) {
         if (err) console.error('Error logging ticket email history:', err);
       });
@@ -2025,7 +2025,7 @@ router.post('/email/ticket', async (req, res) => {
     // Log failed email
     db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
             VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      ['ticket', customer_email, customer_name, `🎫 Your Movie Ticket - ${movie_title}`, 'Ticket details failed to send', req.user?.id || 1, 'failed'],
+      ['ticket', customer_email, customer_name, `🎫 Your Movie Ticket - ${movie_title}`, 'Ticket details failed to send', req.user?.id || (req.session && req.session.adminUser && req.session.adminUser.id), 'failed'],
       function(err) {
         if (err) console.error('Error logging failed ticket email:', err);
       });

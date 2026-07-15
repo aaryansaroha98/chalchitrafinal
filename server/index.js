@@ -11,6 +11,8 @@ const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
 const bodyParser = require('body-parser');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const appDb = require('./database');
 const DatabaseSessionStore = require('./sessionStore');
 
@@ -20,6 +22,31 @@ const SESSION_MAX_AGE_MS = Number(process.env.SESSION_MAX_AGE_MS) || (30 * 24 * 
 
 // Trust proxy - required when behind Vercel/Render proxies for secure cookies
 app.set('trust proxy', 1);
+
+// Security headers
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  contentSecurityPolicy: false,
+}));
+
+// Rate limiting
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 300,
+  message: { error: 'Too many requests, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api', apiLimiter);
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: { error: 'Too many login attempts, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api/auth', authLimiter);
 
 // Database setup - SQLite only for localhost
 const dbPath = path.join(__dirname, '..', 'database.db');
@@ -48,7 +75,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
 // Make db available globally
 global.db = db;
 
-// CORS configuration for production
+// CORS configuration
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 const allowedOrigins = [
   'http://localhost:3000',
@@ -59,28 +86,24 @@ const allowedOrigins = [
 
 console.log('Allowed CORS origins:', allowedOrigins);
 
-// Middleware
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  // Allow if origin is in list, or if no origin (same-origin/server request)
-  if (allowedOrigins.includes(origin)) {
+  if (origin && allowedOrigins.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Credentials', 'true');
   } else if (!origin) {
-    // For same-origin requests or server-to-server
     res.header('Access-Control-Allow-Origin', '*');
   }
-  res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   res.header('Vary', 'Origin');
   if (req.method === 'OPTIONS') {
-    res.sendStatus(200);
-  } else {
-    next();
+    return res.sendStatus(200);
   }
+  next();
 });
-app.use(bodyParser.json({ limit: '50mb' }));
-app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 const sessionStore = new DatabaseSessionStore(appDb, {
   ttlMs: SESSION_MAX_AGE_MS,
   cleanupIntervalMs: 15 * 60 * 1000
@@ -197,7 +220,7 @@ app.use((req, res, next) => {
 // Global error handler for multer/upload errors
 app.use((err, req, res, next) => {
   console.error('Global error handler:', err.message || err);
-  if (err.name === 'MulterError' || err.code === 'LIMIT_FILE_SIZE') {
+  if (err.name === 'MulterError' || err.code?.startsWith('LIMIT_') || err.message?.includes('Invalid file type')) {
     return res.status(400).json({ error: 'File upload error: ' + err.message });
   }
   res.status(500).json({ error: 'Internal server error: ' + (err.message || 'Unknown error') });
