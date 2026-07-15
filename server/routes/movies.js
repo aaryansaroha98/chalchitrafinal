@@ -82,6 +82,11 @@ router.get('/past', (req, res) => {
 
 // Get all movies (fallback for admin panel)
 router.get('/all', (req, res) => {
+  const isAdmin = (req.user && req.user.is_admin) ||
+                 (req.session && req.session.adminUser && req.session.adminUser.is_admin) ||
+                 (req.session && req.session.user && req.session.user.is_admin);
+  if (!isAdmin) return res.status(403).json({ error: 'Admin access required' });
+
   console.log('🔍 GET /api/movies/all - Fetching all movies');
   db.all('SELECT * FROM movies ORDER BY date DESC', [], (err, movies) => {
     if (err) {

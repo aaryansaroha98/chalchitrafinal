@@ -687,14 +687,17 @@ router.delete('/coupons', requireAdmin, (req, res) => {
 
 // Validate coupon (public endpoint for frontend) - NOW GIVES COINS INSTEAD OF DISCOUNT
 router.post('/coupons/validate', (req, res) => {
-  const { code, user_id } = req.body;
+  if (!req.user) return res.status(401).json({ error: 'Authentication required' });
+
+  const { code } = req.body;
+  const userId = req.user.id;
 
   if (!code) {
     return res.status(400).json({ error: 'Coupon code is required' });
   }
 
-  if (!user_id) {
-    return res.status(400).json({ error: 'User ID is required' });
+  if (!userId) {
+    return res.status(400).json({ error: 'User not identified' });
   }
 
   const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
@@ -719,7 +722,7 @@ router.post('/coupons/validate', (req, res) => {
 
       // Grant coins to user
       db.run('UPDATE users SET coins = COALESCE(coins, 0) + ? WHERE id = ?', 
-        [coinsToGive, user_id], function (updateErr) {
+        [coinsToGive, userId], function (updateErr) {
         if (updateErr) {
           console.error('Error granting coins:', updateErr);
           return res.status(500).json({ error: 'Failed to grant coins' });
@@ -727,7 +730,7 @@ router.post('/coupons/validate', (req, res) => {
 
         // Record coin transaction
         db.run('INSERT INTO coin_transactions (user_id, amount, type, reason, booking_id) VALUES (?, ?, ?, ?, ?)',
-          [user_id, coinsToGive, 'credit', `coupon_${coupon.code}`, null], function(txnErr) {
+          [userId, coinsToGive, 'credit', `coupon_${coupon.code}`, null], function(txnErr) {
             if (txnErr) console.error('⚠️ Could not record coin transaction:', txnErr.message);
           });
 
@@ -738,7 +741,7 @@ router.post('/coupons/validate', (req, res) => {
             return res.status(500).json({ error: 'Failed to update coupon usage' });
           }
 
-          console.log(`Coupon ${coupon.code} gave ${coinsToGive} coins to user ${user_id}`);
+          console.log(`Coupon ${coupon.code} gave ${coinsToGive} coins to user ${userId}`);
 
           res.json({
             valid: true,
@@ -1841,7 +1844,10 @@ router.post('/coupon-winners/send', requireAdmin, (req, res) => {
 
 // Validate coupon winner code during booking
 router.post('/validate-coupon-winner', (req, res) => {
-  const { code, user_id } = req.body;
+  if (!req.user) return res.status(401).json({ error: 'Authentication required' });
+
+  const { code } = req.body;
+  const user_id = req.user.id;
 
   if (!code) {
     return res.status(400).json({ error: 'Coupon code is required' });

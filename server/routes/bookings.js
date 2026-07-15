@@ -1427,8 +1427,9 @@ router.get('/check/:movieId', (req, res) => {
 });
 
 
-// Diagnostic: Check email configuration (no auth required - returns sanitized info only)
+// Diagnostic: Check email configuration (admin only)
 router.get('/email-config-check', async (req, res) => {
+  if (!req.user || !req.user.is_admin) return res.status(403).json({ error: 'Admin access required' });
   try {
     const apiKey = process.env.BREVO_API_KEY;
     const fromEmail = process.env.BREVO_FROM_EMAIL || 'chalchitra@iitjammu.ac.in';

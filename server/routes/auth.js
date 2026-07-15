@@ -297,7 +297,7 @@ router.get('/current_user', (req, res) => {
   // Super admin email that gets full access
   const SUPER_ADMIN_EMAIL = '2025uee0154@iitjammu.ac.in';
 
-  // TEMPORARY BYPASS: Check if user is logged in via session first
+  // Check if user is logged in via session first
   if (req.user) {
     // Ensure super admin has is_admin = 1
     if (req.user.email === SUPER_ADMIN_EMAIL) {
@@ -334,7 +334,7 @@ router.get('/current_user', (req, res) => {
       });
     });
   } else {
-    // TEMPORARY: Allow admin user to login without OAuth for testing
+    // Allow admin user to login without OAuth for testing (development only)
     if (req.session && req.session.adminUser) {
       // Ensure super admin has is_admin = 1 in session
       if (req.session.adminUser.email === SUPER_ADMIN_EMAIL) {
