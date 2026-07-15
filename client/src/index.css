@@ -1478,8 +1478,8 @@ a:hover {
   color: #ffffff;
 }
 
-/* Coin Balance Card */
-.coin-card {
+/* Coupon Card */
+.coupon-card {
   background: rgba(20, 20, 20, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
@@ -1487,11 +1487,63 @@ a:hover {
   margin-bottom: 1rem;
 }
 
-.coin-heading {
+.coupon-heading {
   font-size: 0.95rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.7);
   margin: 0 0 1rem 0;
+}
+
+.coupon-form {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.coupon-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+}
+
+.coupon-input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.coupon-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.coupon-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.coupon-btn {
+  padding: 0.75rem 1.25rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  min-width: 80px;
+}
+
+.coupon-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.coupon-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* Messages */
@@ -1641,6 +1693,14 @@ a:hover {
 
   .movie-title {
     font-size: 1.2rem;
+  }
+
+  .coupon-form {
+    flex-direction: column;
+  }
+
+  .coupon-btn {
+    width: 100%;
   }
 
   .pay-btn {

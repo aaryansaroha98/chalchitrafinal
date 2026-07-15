@@ -140,6 +140,7 @@ const Booking = () => {
     const ticketPrice = selectedSeats.length * TICKET_PRICE;
     const foodPrice = Object.entries(selectedFoods).reduce((total, [foodId, quantity]) => {
       const food = availableFoods.find(f => f.id === parseInt(foodId));
+      // If food is free for this movie, price is 0
       const price = food && food.is_free ? 0 : (food ? Math.ceil(food.price / 10) : 0);
       return total + (price * quantity);
     }, 0);
@@ -446,7 +447,7 @@ const Booking = () => {
                         availableFoods.map(food => (
                           <span key={food.id} className="booking-food-pill">
                             {food.name} - {food.is_free ? 'FREE' : `🪙 ${Math.ceil(food.price / 10)} Coins`}
-                            </span>
+                          </span>
                         ))
                       ) : (
                         <span className="booking-info-empty">No food available</span>

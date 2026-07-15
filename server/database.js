@@ -158,7 +158,9 @@ if (usePostgres) {
         movie_id INTEGER,
         num_people INTEGER,
         food_option TEXT,
+        coupon_code TEXT,
         total_price DOUBLE PRECISION,
+        discount_amount DOUBLE PRECISION,
         payment_method TEXT,
         payment_id TEXT,
         payment_amount DOUBLE PRECISION,
@@ -211,6 +213,21 @@ if (usePostgres) {
         contact_head_name TEXT,
         contact_head_email TEXT
       )`,
+      `CREATE TABLE IF NOT EXISTS coupons (
+        id SERIAL PRIMARY KEY,
+        code TEXT UNIQUE,
+        description TEXT,
+        discount_type TEXT,
+        discount_value DOUBLE PRECISION,
+        min_purchase DOUBLE PRECISION DEFAULT 0,
+        max_discount DOUBLE PRECISION,
+        usage_limit INTEGER,
+        used_count INTEGER DEFAULT 0,
+        expiry_date TIMESTAMP,
+        is_active INTEGER DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )`,
       `CREATE TABLE IF NOT EXISTS foods (
         id SERIAL PRIMARY KEY,
         name TEXT NOT NULL,
@@ -232,6 +249,20 @@ if (usePostgres) {
         status TEXT DEFAULT 'sent',
         error_message TEXT,
         booking_id TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )`,
+      `CREATE TABLE IF NOT EXISTS coupon_winners (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        coupon_code TEXT NOT NULL,
+        discount_amount DOUBLE PRECISION NOT NULL,
+        discount_type TEXT DEFAULT 'fixed',
+        max_discount DOUBLE PRECISION,
+        expiry_date TIMESTAMP,
+        is_used INTEGER DEFAULT 0,
+        used_at TIMESTAMP,
+        sent_by INTEGER,
+        shared_coupon_id INTEGER,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`,
       `CREATE TABLE IF NOT EXISTS movie_foods (
@@ -265,7 +296,7 @@ if (usePostgres) {
       `CREATE TABLE IF NOT EXISTS admin_permissions (
         id SERIAL PRIMARY KEY,
         admin_user_id INTEGER NOT NULL UNIQUE,
-        allowed_tabs TEXT NOT NULL DEFAULT '{"dashboard": true, "movies": true, "bookings": true, "foods": true, "team": true, "gallery": true, "feedback": true, "mail": true, "settings": true, "config": true}',
+        allowed_tabs TEXT NOT NULL DEFAULT '{"dashboard": true, "movies": true, "bookings": true, "foods": true, "team": true, "gallery": true, "coupons": true, "coupon-winners": true, "feedback": true, "mail": true, "settings": true, "config": true}',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         created_by INTEGER
@@ -288,7 +319,7 @@ if (usePostgres) {
         reason TEXT NOT NULL,
         booking_id TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )      `
+      )`
     ];
 
     for (const sql of tables) {
@@ -492,7 +523,9 @@ if (usePostgres) {
         movie_id INTEGER,
         num_people INTEGER,
         food_option TEXT,
+        coupon_code TEXT,
         total_price REAL,
+        discount_amount REAL,
         payment_method TEXT,
         payment_id TEXT,
         payment_amount REAL,
@@ -545,6 +578,21 @@ if (usePostgres) {
         contact_head_name TEXT,
         contact_head_email TEXT
       )`,
+      `CREATE TABLE IF NOT EXISTS coupons (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        code TEXT UNIQUE,
+        description TEXT,
+        discount_type TEXT,
+        discount_value REAL,
+        min_purchase REAL DEFAULT 0,
+        max_discount REAL,
+        usage_limit INTEGER,
+        used_count INTEGER DEFAULT 0,
+        expiry_date DATETIME,
+        is_active INTEGER DEFAULT 1,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )`,
       `CREATE TABLE IF NOT EXISTS foods (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -566,6 +614,20 @@ if (usePostgres) {
         status TEXT DEFAULT 'sent',
         error_message TEXT,
         booking_id TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )`,
+      `CREATE TABLE IF NOT EXISTS coupon_winners (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        coupon_code TEXT NOT NULL,
+        discount_amount REAL NOT NULL,
+        discount_type TEXT DEFAULT 'fixed',
+        max_discount REAL,
+        expiry_date DATETIME,
+        is_used INTEGER DEFAULT 0,
+        used_at DATETIME,
+        sent_by INTEGER,
+        shared_coupon_id INTEGER,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )`,
       `CREATE TABLE IF NOT EXISTS movie_foods (
@@ -592,7 +654,7 @@ if (usePostgres) {
       `CREATE TABLE IF NOT EXISTS admin_permissions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         admin_user_id INTEGER NOT NULL UNIQUE,
-        allowed_tabs TEXT NOT NULL DEFAULT '{"dashboard": true, "movies": true, "bookings": true, "foods": true, "team": true, "gallery": true, "feedback": true, "mail": true, "settings": true, "config": true}',
+        allowed_tabs TEXT NOT NULL DEFAULT '{"dashboard": true, "movies": true, "bookings": true, "foods": true, "team": true, "gallery": true, "coupons": true, "coupon-winners": true, "feedback": true, "mail": true, "settings": true, "config": true}',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         created_by INTEGER
@@ -615,7 +677,7 @@ if (usePostgres) {
         reason TEXT NOT NULL,
         booking_id TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )      `
+      )`
     ];
 
     let completed = 0;
@@ -637,6 +699,7 @@ if (usePostgres) {
           ensureGalleryEventDateColumn();
           ensureEmailHistoryBookingId();
           ensureMovieSpecialColumns();
+          ensureCouponWinnerColumns();
           ensureMovieFoodIsFreeColumn();
           ensureUserCoinsColumn();
           ensureBookingCoinAmountColumn();
@@ -717,16 +780,16 @@ if (usePostgres) {
 
       const hasCoins = Array.isArray(columns) && columns.some((col) => col.name === 'coins');
       if (!hasCoins) {
-        db.run('ALTER TABLE users ADD COLUMN coins INTEGER DEFAULT 50', (alterErr) => {
+        db.run('ALTER TABLE users ADD COLUMN coins INTEGER DEFAULT 20', (alterErr) => {
           if (alterErr) {
             console.log('⚠️  Could not add users.coins:', alterErr.message);
             return;
           }
-          db.run('UPDATE users SET coins = 50 WHERE coins IS NULL');
-          console.log('✅ users.coins column added with default 50');
+          db.run('UPDATE users SET coins = 20 WHERE coins IS NULL');
+          console.log('✅ users.coins column added with default 20');
         });
       } else {
-        db.run('UPDATE users SET coins = 50 WHERE coins IS NULL');
+        db.run('UPDATE users SET coins = 20 WHERE coins IS NULL');
       }
     });
   }
@@ -849,6 +912,35 @@ if (usePostgres) {
           }
         });
       }
+    });
+  }
+
+  // Ensure coupon_winners has latest columns used by winner email flow
+  function ensureCouponWinnerColumns() {
+    db.all('PRAGMA table_info(coupon_winners)', [], (err, columns) => {
+      if (err) {
+        console.log('⚠️  Could not inspect coupon_winners table columns:', err.message);
+        return;
+      }
+
+      const colNames = Array.isArray(columns) ? columns.map((c) => c.name) : [];
+      const addColumn = (name, sql) => {
+        if (!colNames.includes(name)) {
+          db.run(sql, (alterErr) => {
+            if (alterErr) {
+              console.log(`⚠️  Could not add coupon_winners.${name}:`, alterErr.message);
+            } else {
+              console.log(`✅ coupon_winners.${name} column added`);
+            }
+          });
+        }
+      };
+
+      addColumn('max_discount', 'ALTER TABLE coupon_winners ADD COLUMN max_discount DOUBLE PRECISION');
+      addColumn('expiry_date', 'ALTER TABLE coupon_winners ADD COLUMN expiry_date TIMESTAMP');
+      addColumn('sent_by', 'ALTER TABLE coupon_winners ADD COLUMN sent_by INTEGER');
+      addColumn('shared_coupon_id', 'ALTER TABLE coupon_winners ADD COLUMN shared_coupon_id INTEGER');
+      addColumn('created_at', 'ALTER TABLE coupon_winners ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
     });
   }
 

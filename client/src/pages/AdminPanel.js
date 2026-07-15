@@ -224,7 +224,21 @@ const AdminPanel = () => {
   const [feedback, setFeedback] = useState([]);
   const [team, setTeam] = useState([]);
   const [gallery, setGallery] = useState([]);
+  const [coupons, setCoupons] = useState([]);
+  const [couponWinners, setCouponWinners] = useState([]);
   const [bookingsWithFood, setBookingsWithFood] = useState([]);
+  const [showCouponModal, setShowCouponModal] = useState(false);
+  const [editingCoupon, setEditingCoupon] = useState(null);
+  const [couponForm, setCouponForm] = useState({
+    code: '',
+    description: '',
+    discount_type: 'percentage',
+    discount_value: '',
+    min_purchase: '',
+    max_discount: '',
+    usage_limit: '',
+    expiry_date: ''
+  });
   const [settings, setSettings] = useState({
     tagline: 'Student-led movie screening initiative at IIT Jammu',
     hero_background: '#007bff'
@@ -306,6 +320,20 @@ const AdminPanel = () => {
     subject: '',
     message: ''
   });
+  const [showWinnerModal, setShowWinnerModal] = useState(false);
+  const [selectedWinners, setSelectedWinners] = useState([]);
+  const [winnerForm, setWinnerForm] = useState({
+    discount_amount: '',
+    discount_type: 'fixed',
+    max_discount: '',
+    expiry_days: 30,
+    winner_limit: 5,
+    winner_message: 'You have been selected as a coupon winner!'
+  });
+  const [winnerSearchTerm, setWinnerSearchTerm] = useState('');
+  const [winnerSending, setWinnerSending] = useState(false);
+  const [selectedCoupons, setSelectedCoupons] = useState([]);
+  const [selectAllCoupons, setSelectAllCoupons] = useState(false);
   const normalizedSingleEmailSearch = singleEmailSearch.trim().toLowerCase();
   const filteredEmailUsers = normalizedSingleEmailSearch
     ? (users || []).filter((user) => {
@@ -378,6 +406,18 @@ const AdminPanel = () => {
   const [mailSettingsError, setMailSettingsError] = useState('');
   const [mailSettingsSuccess, setMailSettingsSuccess] = useState('');
 
+  // Razorpay Settings state
+  const [showRazorpaySettings, setShowRazorpaySettings] = useState(false);
+  const [razorpaySettings, setRazorpaySettings] = useState({
+    key_id: '',
+    key_secret: '',
+    has_secret: false
+  });
+  const [razorpaySettingsLoading, setRazorpaySettingsLoading] = useState(false);
+  const [razorpaySettingsSaving, setRazorpaySettingsSaving] = useState(false);
+  const [razorpaySettingsError, setRazorpaySettingsError] = useState('');
+  const [razorpaySettingsSuccess, setRazorpaySettingsSuccess] = useState('');
+
   console.log('✅ AdminPanel state initialized successfully');
 
   useEffect(() => {
@@ -389,6 +429,7 @@ const AdminPanel = () => {
     if (activeTab !== 'config') {
       setShowDatabaseManagement(false);
       setShowMailSettings(false);
+      setShowRazorpaySettings(false);
     }
   }, [activeTab]);
 
@@ -447,7 +488,7 @@ const AdminPanel = () => {
     try {
       console.log('🔄 Starting to fetch all admin data...');
 
-      const [statsRes, allMoviesRes, pastMoviesRes, bookingsRes, usersRes, feedbackRes, teamRes, galleryRes, settingsRes, foodsRes] = await Promise.all([
+      const [statsRes, allMoviesRes, pastMoviesRes, bookingsRes, usersRes, feedbackRes, teamRes, galleryRes, couponsRes, couponWinnersRes, settingsRes, foodsRes] = await Promise.all([
         api.get('/api/admin/stats').catch(err => {
           console.log('❌ Stats API failed:', err.message);
           return {
@@ -489,6 +530,14 @@ const AdminPanel = () => {
         api.get('/api/admin/gallery').catch(err => {
           console.log('❌ Gallery API failed:', err.message);
           return { data: [] };
+        }),
+        api.get('/api/admin/coupons').catch(err => {
+          console.log('❌ Coupons API failed:', err.message);
+          return { data: [] };
+        }),
+        api.get('/api/admin/coupon-winners').catch(err => {
+          console.log('❌ Coupon Winners API failed:', err.message);
+          return { data: { winners: [] } };
         }),
         api.get('/api/admin/settings').catch(err => {
           console.log('❌ Settings API failed:', err.message);
@@ -557,6 +606,7 @@ const AdminPanel = () => {
       setFeedback(Array.isArray(feedbackRes?.data) ? feedbackRes.data : []);
       setTeam(Array.isArray(teamRes?.data) ? teamRes.data : []);
       setGallery(Array.isArray(galleryRes?.data) ? galleryRes.data : []);
+      setCoupons(Array.isArray(couponsRes?.data) ? couponsRes.data : []);
       setFoods(Array.isArray(foodsRes?.data) ? foodsRes.data : []);
       setAvailableFoods(Array.isArray(foodsRes?.data) ? foodsRes.data.filter(f => f.is_available) : []);
 
@@ -576,6 +626,7 @@ const AdminPanel = () => {
         feedback: feedbackRes?.data?.length || 0,
         team: teamRes?.data?.length || 0,
         gallery: galleryRes?.data?.length || 0,
+        coupons: couponsRes?.data?.length || 0,
         foods: foodsRes?.data?.length || 0
       });
 
@@ -676,6 +727,49 @@ const AdminPanel = () => {
       setMailSettingsError(err.response?.data?.error || err.response?.data?.hint || 'Failed to send test email');
     } finally {
       setMailSettingsSaving(false);
+    }
+  };
+
+  // Fetch Razorpay settings
+  const fetchRazorpaySettings = async () => {
+    if (!hasConfigAccess) return;
+
+    setRazorpaySettingsLoading(true);
+    setRazorpaySettingsError('');
+    try {
+      const response = await api.get('/api/admin/razorpay-settings');
+      setRazorpaySettings(response.data || {
+        key_id: '',
+        key_secret: '',
+        has_secret: false
+      });
+      console.log('✅ Razorpay settings loaded');
+    } catch (err) {
+      console.error('❌ Error loading Razorpay settings:', err);
+      const errorMessage = err.response?.data?.error || 'Failed to load Razorpay settings';
+      setRazorpaySettingsError(errorMessage);
+    } finally {
+      setRazorpaySettingsLoading(false);
+    }
+  };
+
+  // Save Razorpay settings
+  const saveRazorpaySettings = async () => {
+    if (!hasConfigAccess) return;
+
+    setRazorpaySettingsSaving(true);
+    setRazorpaySettingsError('');
+    setRazorpaySettingsSuccess('');
+
+    try {
+      await api.put('/api/admin/razorpay-settings', razorpaySettings);
+      setRazorpaySettingsSuccess('Razorpay settings saved successfully!');
+      console.log('✅ Razorpay settings saved');
+    } catch (err) {
+      console.error('❌ Error saving Razorpay settings:', err);
+      setRazorpaySettingsError(err.response?.data?.error || 'Failed to save Razorpay settings');
+    } finally {
+      setRazorpaySettingsSaving(false);
     }
   };
 
@@ -959,6 +1053,62 @@ const AdminPanel = () => {
       || bookingCode.includes(normalizedBookingSearch);
   });
 
+  // Filter users for winner selection based on search term
+  const filteredWinnerUsers = users.filter(user =>
+    user.name.toLowerCase().includes(winnerSearchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(winnerSearchTerm.toLowerCase())
+  );
+
+  // Handle coupon selection
+  const handleSelectCoupon = (couponId, isSelected) => {
+    if (isSelected) {
+      setSelectedCoupons([...selectedCoupons, couponId]);
+    } else {
+      setSelectedCoupons(selectedCoupons.filter(id => id !== couponId));
+    }
+  };
+
+  // Handle select all coupons
+  const handleSelectAllCoupons = (isSelected) => {
+    if (isSelected) {
+      setSelectedCoupons(coupons.map(coupon => coupon.id));
+    } else {
+      setSelectedCoupons([]);
+    }
+    setSelectAllCoupons(isSelected);
+  };
+
+  // Handle bulk delete coupons
+  const handleBulkDeleteCoupons = async () => {
+    if (selectedCoupons.length === 0) return;
+
+    try {
+      await Promise.all(selectedCoupons.map(couponId =>
+        api.delete(`/api/admin/coupons/${couponId}`)
+      ));
+
+      alert(`Successfully deleted ${selectedCoupons.length} coupon(s)!`);
+      setSelectedCoupons([]);
+      setSelectAllCoupons(false);
+      fetchAllData();
+    } catch (err) {
+      console.error('Error bulk deleting coupons:', err);
+      alert('Error deleting coupons: ' + (err.response?.data?.error || err.message));
+    }
+  };
+
+  // Handle single coupon delete
+  const handleDeleteCoupon = async (couponId) => {
+    try {
+      await api.delete(`/api/admin/coupons/${couponId}`);
+      alert('Coupon deleted successfully!');
+      fetchAllData();
+    } catch (err) {
+      console.error('Error deleting coupon:', err);
+      alert('Error deleting coupon: ' + (err.response?.data?.error || err.message));
+    }
+  };
+
   // Handle send feedback emails
   const handleSendFeedbackEmails = async () => {
     try {
@@ -1002,6 +1152,33 @@ const AdminPanel = () => {
     }
   };
 
+  // Handle select all winners
+  const handleSelectAllWinners = (isSelected) => {
+    if (isSelected) {
+      const allWinnerIds = (couponWinners.winners || []).map(winner => winner.id);
+      setSelectedWinners(allWinnerIds);
+    } else {
+      setSelectedWinners([]);
+    }
+  };
+
+  // Handle delete selected winners
+  const handleDeleteSelectedWinners = async () => {
+    if (selectedWinners.length === 0) return;
+
+    try {
+      await api.delete('/api/admin/coupon-winners', {
+        data: { ids: selectedWinners }
+      });
+
+      alert(`Successfully deleted ${selectedWinners.length} winner(s)!`);
+      setSelectedWinners([]);
+      fetchAllData();
+    } catch (err) {
+      console.error('Error deleting winners:', err);
+      alert('Error deleting winners: ' + (err.response?.data?.error || err.message));
+    }
+  };
   // Reset bookings (optionally filtered by selected movie)
   const handleResetBookings = async () => {
     const movieName = selectedMovie && movies ? movies.find(m => m.id == selectedMovie)?.title : null;
@@ -1121,9 +1298,9 @@ const AdminPanel = () => {
           booking.title || booking.movie_title || 'N/A',
           seats,
           foodOrders,
-          `🪙 ${ticketPrice.toFixed(0)}`,
-          `🪙 ${foodCost.toFixed(0)}`,
-          `🪙 ${grandTotal.toFixed(0)}`,
+          `Rs. ${ticketPrice.toFixed(0)}`,
+          `Rs. ${foodCost.toFixed(0)}`,
+          `Rs. ${grandTotal.toFixed(0)}`,
           booking.is_used ? 'Used' : 'Active',
           new Date(booking.created_at).toLocaleDateString('en-IN')
         ];
@@ -1484,7 +1661,7 @@ const AdminPanel = () => {
       // Set default tabs if fetch fails
       setSelectedAdminTabs([
         'dashboard', 'movies', 'foods', 'bookings', 'users',
-        'team', 'gallery', 'feedback', 'mail', 'settings'
+        'team', 'gallery', 'coupons', 'coupon-winners', 'feedback', 'mail', 'settings'
       ]);
       setSelectedAdminScanner(admin.code_scanner === 1 || admin.code_scanner === true);
     } finally {
@@ -1811,6 +1988,8 @@ const AdminPanel = () => {
     { id: 'users', name: 'Users', icon: '👥' },
     { id: 'team', name: 'Team', icon: '👨‍💼' },
     { id: 'gallery', name: 'Gallery', icon: '🖼️' },
+    { id: 'coupons', name: 'Coupons', icon: '🎟️' },
+    { id: 'coupon-winners', name: 'Winners', icon: '🏆' },
     { id: 'feedback', name: 'Feedback', icon: '💬' },
     { id: 'mail', name: 'Mail', icon: '📧' },
     { id: 'settings', name: 'Settings', icon: '⚙️' },
@@ -2901,7 +3080,7 @@ const AdminPanel = () => {
                       )}
                     </td>
                     <td>
-                      <strong>🪙{booking.total_price || booking.price}</strong>
+                      <strong>🪙 {booking.total_price || booking.price}</strong>
                     </td>
                     <td>
                       <Badge bg={booking.is_used ? 'success' : 'warning'}>
@@ -3259,6 +3438,484 @@ const AdminPanel = () => {
                 </Col>
               )}
             </Row>
+          </div>
+        )}
+
+        {activeTab === 'coupons' && (
+          <div className="text-center text-white py-5">
+            <h2>Coupons Management</h2>
+            <p>Create and manage discount coupons.</p>
+
+            {/* Action Buttons */}
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <Button
+                  onClick={() => setShowCouponModal(true)}
+                  style={{
+                    background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    borderRadius: '25px',
+                    color: 'white',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+                    fontWeight: '600',
+                    padding: '12px 24px'
+                  }}
+                >
+                  <i className="fas fa-plus me-2"></i>
+                  Create Coupon
+                </Button>
+              </div>
+
+              <div className="d-flex gap-2">
+                <Button
+                  variant="outline-info"
+                  size="sm"
+                  onClick={() => {
+                    // Refresh coupons data
+                    api.get('/api/admin/coupons')
+                      .then(res => {
+                        setCoupons(Array.isArray(res.data) ? res.data : []);
+                        alert('Coupons list refreshed!');
+                      })
+                      .catch(err => {
+                        console.error('Error refreshing coupons:', err);
+                        alert('Error refreshing coupons list');
+                      });
+                  }}
+                  style={{
+                    borderColor: '#17a2b8',
+                    color: '#17a2b8',
+                    background: 'transparent'
+                  }}
+                >
+                  <i className="fas fa-sync-alt me-2"></i>
+                  Refresh
+                </Button>
+
+                {selectedCoupons.length > 0 && (
+                  <div className="d-flex gap-2">
+                    <span className="text-white align-self-center me-2">
+                      {selectedCoupons.length} selected
+                    </span>
+                    <Button
+                      variant="outline-danger"
+                      onClick={() => {
+                        if (window.confirm(`Are you sure you want to delete ${selectedCoupons.length} selected coupon(s)? This action cannot be undone.`)) {
+                          handleBulkDeleteCoupons();
+                        }
+                      }}
+                      style={{
+                        borderColor: '#dc3545',
+                        color: '#dc3545',
+                        background: 'transparent'
+                      }}
+                    >
+                      <i className="fas fa-trash me-2"></i>
+                      Delete Selected ({selectedCoupons.length})
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <Table striped bordered hover className="mt-4">
+              <thead>
+                <tr>
+                  <th style={{ width: '50px' }}>
+                    <Form.Check
+                      type="checkbox"
+                      checked={selectAllCoupons}
+                      onChange={(e) => handleSelectAllCoupons(e.target.checked)}
+                      style={{ margin: 0 }}
+                    />
+                  </th>
+                  <th>Code</th>
+                  <th>Description</th>
+                  <th>Type</th>
+                  <th>Value</th>
+                  <th>Usage</th>
+                  <th>Status</th>
+                  <th>Expiry</th>
+                  <th style={{ width: '200px' }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {coupons && coupons.length > 0 ? coupons.map(coupon => (
+                  <tr key={coupon.id}>
+                    <td>
+                      <Form.Check
+                        type="checkbox"
+                        checked={selectedCoupons.includes(coupon.id)}
+                        onChange={(e) => handleSelectCoupon(coupon.id, e.target.checked)}
+                        style={{ margin: 0 }}
+                      />
+                    </td>
+                    <td><strong>{coupon.code}</strong></td>
+                    <td>{coupon.description}</td>
+                    <td>
+                      <Badge bg={coupon.discount_type === 'percentage' ? 'info' : 'success'}>
+                        {coupon.discount_type}
+                      </Badge>
+                    </td>
+                    <td>{coupon.discount_type === 'percentage' ? `${coupon.discount_value}%` : `🪙 ${coupon.discount_value} Coins`}</td>
+                    <td>
+                      <div className="d-flex flex-column gap-1">
+                        <div style={{ fontSize: '0.85rem', color: 'black' }}>
+                          {coupon.used_count || 0}/{coupon.usage_limit === -1 ? 'Unlimited' : coupon.usage_limit}
+                        </div>
+                        {coupon.usage_limit > 0 && (
+                          <div className="progress" style={{ height: '6px', borderRadius: '3px' }}>
+                            <div
+                              className="progress-bar"
+                              style={{
+                                width: `${coupon.usage_percentage || 0}%`,
+                                background: coupon.status === 'Expired' ? '#dc3545' :
+                                  coupon.status === 'Low Usage' ? '#ffc107' : '#28a745'
+                              }}
+                            ></div>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td>
+                      <Badge
+                        bg={coupon.status === 'Expired' ? 'danger' :
+                          coupon.status === 'Used' ? 'secondary' :
+                            coupon.status === 'Low Usage' ? 'warning' :
+                              'success'}
+                        style={{ fontSize: '0.8rem', padding: '4px 8px' }}
+                      >
+                        {coupon.status === 'Used' ? 'Used' :
+                          coupon.status === 'Expired' ? 'Expired' :
+                            'Valid'}
+                      </Badge>
+                    </td>
+                    <td>{new Date(coupon.expiry_date).toLocaleDateString()}</td>
+                    <td style={{ textAlign: 'center' }}>
+                      <div className="d-flex gap-2 justify-content-center">
+                        <Button
+                          variant="outline-primary"
+                          size="sm"
+                          onClick={() => {
+                            setEditingCoupon(coupon);
+                            setCouponForm({
+                              code: coupon.code,
+                              description: coupon.description,
+                              discount_type: coupon.discount_type,
+                              discount_value: coupon.discount_value,
+                              min_purchase: coupon.min_purchase || '',
+                              max_discount: coupon.max_discount || '',
+                              usage_limit: coupon.usage_limit || '',
+                              expiry_date: coupon.expiry_date ? new Date(coupon.expiry_date).toISOString().slice(0, 16) : ''
+                            });
+                            setShowCouponModal(true);
+                          }}
+                        >
+                          <i className="fas fa-edit me-1"></i>
+                          Edit
+                        </Button>
+                        <Button
+                          variant="outline-danger"
+                          size="sm"
+                          onClick={() => {
+                            if (window.confirm(`Are you sure you want to delete the coupon "${coupon.code}"? This action cannot be undone.`)) {
+                              handleDeleteCoupon(coupon.id);
+                            }
+                          }}
+                        >
+                          <i className="fas fa-trash me-1"></i>
+                          Delete
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                )) : (
+                  <tr>
+                    <td colSpan="9" className="text-center text-muted py-4">
+                      <i className="fas fa-ticket-alt fa-2x mb-2"></i>
+                      <br />
+                      No coupons created yet
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </Table>
+          </div>
+        )}
+
+        {activeTab === 'coupon-winners' && (
+          <div className="text-center text-white py-5">
+            <h2>Coupon Winners Management</h2>
+            <p>Select users to win coupons and view winner history.</p>
+
+            <Button
+              className="mb-4"
+              onClick={() => setShowWinnerModal(true)}
+              style={{
+                background: 'linear-gradient(145deg, rgba(255, 193, 7, 0.8), rgba(255, 193, 7, 0.6))',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '25px',
+                color: 'white',
+                boxShadow: '0 8px 32px rgba(255, 193, 7, 0.3)',
+                fontWeight: '600',
+                padding: '12px 24px'
+              }}
+            >
+              <i className="fas fa-trophy me-2"></i>
+              Select New Winners
+            </Button>
+
+            {/* Winners Table */}
+            <div style={{
+              background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              borderRadius: '15px',
+              padding: '1.5rem',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+              maxWidth: '1200px',
+              margin: '0 auto'
+            }}>
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <h4 className="text-white mb-0">
+                  <i className="fas fa-users me-2"></i>
+                  All Winners
+                </h4>
+                <div className="d-flex gap-2">
+                  <Button
+                    variant="outline-success"
+                    size="sm"
+                    onClick={() => {
+                      // Export to CSV
+                      const headers = ['User', 'Email', 'Coupon Code', 'Discount', 'Status', 'Won Date'];
+                      const rows = (couponWinners.winners || []).map(winner => [
+                        winner.user_name || 'N/A',
+                        winner.user_email,
+                        winner.coupon_code,
+                        winner.discount_type === 'percentage'
+                          ? `${winner.discount_amount}% off`
+                          : `🪙 ${winner.discount_amount} Coins`,
+                        winner.is_used ? 'Used' : 'Active',
+                        new Date(winner.created_at).toLocaleDateString('en-IN')
+                      ]);
+                      const csvContent = [headers, ...rows].map(row => row.join(',')).join('\n');
+                      const blob = new Blob([csvContent], { type: 'text/csv' });
+                      const url = window.URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `coupon-winners-${new Date().toISOString().split('T')[0]}.csv`;
+                      a.click();
+                    }}
+                  >
+                    <i className="fas fa-file-csv me-2"></i>
+                    Export CSV
+                  </Button>
+                  <Button
+                    variant="outline-info"
+                    size="sm"
+                    onClick={() => {
+                      // Refresh winners data
+                      api.get('/api/admin/coupon-winners')
+                        .then(res => {
+                          setCouponWinners(res.data);
+                          alert('Winners list refreshed!');
+                        })
+                        .catch(err => {
+                          console.error('Error refreshing winners:', err);
+                          alert('Error refreshing winners list');
+                        });
+                    }}
+                  >
+                    <i className="fas fa-sync-alt me-2"></i>
+                    Refresh
+                  </Button>
+                  {selectedWinners.length > 0 && (
+                    <div className="d-flex gap-2">
+                      <span className="text-white align-self-center me-2">
+                        {selectedWinners.length} selected
+                      </span>
+                      <Button
+                        variant="outline-danger"
+                        size="sm"
+                        onClick={() => {
+                          if (window.confirm(`Are you sure you want to delete ${selectedWinners.length} selected winner(s)? This action cannot be undone.`)) {
+                            handleDeleteSelectedWinners();
+                          }
+                        }}
+                        style={{
+                          borderColor: '#dc3545',
+                          color: '#dc3545',
+                          background: 'transparent'
+                        }}
+                      >
+                        <i className="fas fa-trash me-2"></i>
+                        Delete Selected ({selectedWinners.length})
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Select All Checkbox */}
+              {couponWinners.winners && couponWinners.winners.length > 0 && (
+                <div className="mb-3">
+                  <Form.Check
+                    type="checkbox"
+                    id="select-all-winners"
+                    label={`Select All (${couponWinners.winners.length} winners)`}
+                    checked={selectedWinners.length === couponWinners.winners.length && couponWinners.winners.length > 0}
+                    onChange={(e) => handleSelectAllWinners(e.target.checked)}
+                    style={{ color: 'white' }}
+                  />
+                </div>
+              )}
+
+              <Table striped bordered hover responsive style={{ marginBottom: 0 }}>
+                <thead style={{ borderBottom: '2px solid rgba(255,255,255,0.2)' }}>
+                  <tr>
+                    <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'left' }}>User</th>
+                    <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'left' }}>Email</th>
+                    <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'left' }}>Coupon Code</th>
+                    <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'left' }}>Discount</th>
+                    <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'center' }}>Status</th>
+                    <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'left' }}>Won Date</th>
+                    <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'center' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {couponWinners && couponWinners.winners && couponWinners.winners.length > 0 ? couponWinners.winners.map(winner => (
+                    <tr key={winner.id} style={{
+                      borderBottom: '1px solid rgba(255,255,255,0.05)',
+                      background: winner.is_used ? 'rgba(255,255,255,0.02)' : 'transparent'
+                    }}>
+                      <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'left' }}>
+                        <strong>{winner.user_name || 'N/A'}</strong>
+                      </td>
+                      <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'left' }}>
+                        <code style={{ background: 'rgba(0,0,0,0.1)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.85rem' }}>
+                          {winner.user_email}
+                        </code>
+                      </td>
+                      <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'left' }}>
+                        <Badge bg="warning" style={{ fontSize: '0.9rem', padding: '6px 10px' }}>
+                          <strong>{winner.coupon_code}</strong>
+                        </Badge>
+                      </td>
+                      <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'left' }}>
+                        <div style={{ fontWeight: '600' }}>
+                          {winner.discount_type === 'percentage'
+                            ? `${winner.discount_amount}% off`
+                            : `🪙 ${winner.discount_amount} Coins`
+                          }
+                          {winner.discount_type === 'percentage' && winner.max_discount &&
+                            <div style={{ fontSize: '0.8rem', opacity: 0.7 }}>
+                              Max: 🪙 {winner.max_discount}
+                            </div>
+                          }
+                        </div>
+                      </td>
+                      <td style={{ border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'center' }}>
+                        <Badge bg={winner.is_used ? 'success' : 'warning'} style={{ fontSize: '0.8rem' }}>
+                          {winner.is_used ? (
+                            <>
+                              <i className="fas fa-check me-1"></i>
+                              Used
+                            </>
+                          ) : (
+                            <>
+                              <i className="fas fa-clock me-1"></i>
+                              Active
+                            </>
+                          )}
+                        </Badge>
+                      </td>
+                      <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'left' }}>
+                        <div>
+                          <div style={{ fontWeight: '600' }}>
+                            {new Date(winner.created_at).toLocaleDateString('en-IN', {
+                              weekday: 'short',
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric'
+                            })}
+                          </div>
+                          <div style={{ fontSize: '0.8rem', opacity: 0.7 }}>
+                            {new Date(winner.created_at).toLocaleTimeString('en-IN', {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              second: '2-digit',
+                              hour12: true
+                            })}
+                          </div>
+                        </div>
+                      </td>
+                      <td style={{ border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'center' }}>
+                        <div className="d-flex gap-2 justify-content-center">
+                          <Button
+                            variant="outline-secondary"
+                            size="sm"
+                            title="View Details"
+                            onClick={() => {
+                              alert(`Winner Details:\n\nUser: ${winner.user_name || winner.user_email}\nCoupon: ${winner.coupon_code}\nCoins: ${winner.discount_type === 'percentage' ? `${winner.discount_amount}%` : `🪙 ${winner.discount_amount}`}\nExpires: ${new Date(winner.expiry_date).toLocaleDateString()}\nStatus: ${winner.is_used ? 'Used' : 'Active'}`);
+                            }}
+                          >
+                            <i className="fas fa-eye me-2"></i>
+                            View Details
+                          </Button>
+
+                          {!winner.is_used && (
+                            <Button
+                              variant="outline-danger"
+                              size="sm"
+                              title="Delete Winner"
+                              onClick={() => {
+                                if (window.confirm(`Are you sure you want to delete the winner record for "${winner.user_name || winner.user_email}" with coupon "${winner.coupon_code}"? This action cannot be undone.`)) {
+                                  // Delete individual winner
+                                  api.delete('/api/admin/coupon-winners', {
+                                    data: { ids: [winner.id] }
+                                  })
+                                    .then(() => {
+                                      alert(`Winner record deleted successfully!`);
+                                      // Refresh the winners list
+                                      api.get('/api/admin/coupon-winners')
+                                        .then(res => {
+                                          setCouponWinners(res.data);
+                                        })
+                                        .catch(err => {
+                                          console.error('Error refreshing winners:', err);
+                                        });
+                                    })
+                                    .catch(err => {
+                                      console.error('Error deleting winner:', err);
+                                      alert('Error deleting winner: ' + (err.response?.data?.error || err.message));
+                                    });
+                                }
+                              }}
+                            >
+                              <i className="fas fa-trash me-2"></i>
+                              Delete Winner
+                            </Button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )) : (
+                    <tr>
+                      <td colSpan="7" className="text-center py-5" style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
+                        <div className="text-white-50">
+                          <i className="fas fa-trophy fa-3x mb-3"></i>
+                          <h5>No Winners Yet</h5>
+                          <p>Click "Select New Winners" to create winners and send coupon codes!</p>
+                          <small className="text-muted">All winners who receive emails will appear here</small>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </Table>
+            </div>
           </div>
         )}
 
@@ -4040,7 +4697,7 @@ const AdminPanel = () => {
                           Security Settings
                         </Card.Title>
                         <Card.Text style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-                          Configure mail server settings
+                          Configure mail server and payment gateway
                         </Card.Text>
                         <div className="d-flex flex-column gap-2 mt-3">
                           <Button
@@ -4057,6 +4714,21 @@ const AdminPanel = () => {
                           >
                             <i className="fas fa-envelope me-2"></i>
                             Configure Mail
+                          </Button>
+                          <Button
+                            variant="outline-light"
+                            size="sm"
+                            onClick={() => {
+                              setShowRazorpaySettings(true);
+                              fetchRazorpaySettings();
+                            }}
+                            style={{
+                              borderRadius: '20px',
+                              background: 'transparent'
+                            }}
+                          >
+                            <i className="fas fa-credit-card me-2"></i>
+                            Configure Razorpay
                           </Button>
                         </div>
                       </Card.Body>
@@ -4221,7 +4893,7 @@ const AdminPanel = () => {
                           marginBottom: '0.5rem',
                           textShadow: '0 2px 10px rgba(0, 0, 0, 0.5)'
                         }}>
-                          🪙{parseFloat(revenueStats.total_revenue || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                          🪙 {parseFloat(revenueStats.total_revenue || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                         </Card.Title>
                         <Card.Text style={{
                           fontSize: '1rem',
@@ -4255,7 +4927,7 @@ const AdminPanel = () => {
                           marginBottom: '0.5rem',
                           textShadow: '0 2px 10px rgba(0, 0, 0, 0.5)'
                         }}>
-                          🪙{parseFloat(revenueStats.food_revenue || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                          🪙 {parseFloat(revenueStats.food_revenue || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                         </Card.Title>
                         <Card.Text style={{
                           fontSize: '1rem',
@@ -4289,7 +4961,7 @@ const AdminPanel = () => {
                           marginBottom: '0.5rem',
                           textShadow: '0 2px 10px rgba(0, 0, 0, 0.5)'
                         }}>
-                          🪙{parseFloat(revenueStats.total_discounts || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                          🪙 {parseFloat(revenueStats.total_discounts || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                         </Card.Title>
                         <Card.Text style={{
                           fontSize: '1rem',
@@ -4366,7 +5038,7 @@ const AdminPanel = () => {
                           m.title,
                           new Date(m.date).toLocaleDateString('en-IN'),
                           m.booking_count,
-                          `🪙${parseFloat(m.revenue).toLocaleString('en-IN', { maximumFractionDigits: 2 })}`
+                          `🪙{parseFloat(m.revenue).toLocaleString('en-IN', { maximumFractionDigits: 2 })}`
                         ]);
                         const csvContent = [headers, ...rows].map(row => row.join(',')).join('\n');
                         const blob = new Blob([csvContent], { type: 'text/csv' });
@@ -4413,7 +5085,7 @@ const AdminPanel = () => {
                             </td>
                             <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'right' }}>
                               <strong style={{ color: '#28a745' }}>
-                                🪙{parseFloat(movie.revenue || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                                🪙 {parseFloat(movie.revenue || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                               </strong>
                             </td>
                           </tr>
@@ -4484,7 +5156,7 @@ const AdminPanel = () => {
                             </td>
                             <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'right' }}>
                               <strong style={{ color: '#28a745' }}>
-                                🪙{parseFloat(tx.total_price || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                                🪙 {parseFloat(tx.total_price || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                               </strong>
                             </td>
                             <td style={{ border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'center' }}>
@@ -4547,10 +5219,56 @@ const AdminPanel = () => {
                                 {month.month}
                               </Card.Title>
                               <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#28a745' }}>
-                                🪙{parseFloat(month.revenue || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                                🪙 {parseFloat(month.revenue || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                               </div>
                               <small className="text-white-50">
                                 {month.bookings} bookings
+                              </small>
+                            </Card.Body>
+                          </Card>
+                        </Col>
+                      ))}
+                    </Row>
+                  </div>
+                )}
+
+                {/* Payment Methods Section */}
+                {revenueStats.payment_methods && revenueStats.payment_methods.length > 0 && (
+                  <div style={{
+                    background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    borderRadius: '15px',
+                    padding: '1.5rem',
+                    marginTop: '2rem',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+                    maxWidth: '1400px',
+                    margin: '2rem auto 0'
+                  }}>
+                    <h4 className="text-white mb-3">
+                      <i className="fas fa-credit-card me-2"></i>
+                      Payment Methods Breakdown
+                    </h4>
+                    <Row>
+                      {revenueStats.payment_methods.map((pm, index) => (
+                        <Col md={6} key={index} className="mb-3">
+                          <Card style={{
+                            background: 'rgba(255, 255, 255, 0.05)',
+                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                            borderRadius: '10px'
+                          }}>
+                            <Card.Body className="text-center">
+                              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>
+                                {pm.payment_method === 'razorpay' ? '💳' : pm.payment_method === 'upi' ? '📱' : '🏦'}
+                              </div>
+                              <Card.Title style={{ color: 'white', fontSize: '1.1rem' }}>
+                                {pm.payment_method === 'razorpay' ? 'Razorpay' : pm.payment_method === 'upi' ? 'UPI' : pm.payment_method === 'offline' ? 'Offline' : pm.payment_method}
+                              </Card.Title>
+                              <div style={{ fontSize: '1.3rem', fontWeight: '700', color: '#007bff' }}>
+                                🪙 {parseFloat(pm.total || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                              </div>
+                              <small className="text-white-50">
+                                {pm.count} transactions
                               </small>
                             </Card.Body>
                           </Card>
@@ -4827,6 +5545,181 @@ const AdminPanel = () => {
                       <li>Gmail: smtp.gmail.com (Port 587)</li>
                       <li>Outlook: smtp.office365.com (Port 587)</li>
                       <li>Yahoo: smtp.mail.yahoo.com (Port 587)</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Razorpay Settings View - Configure Payment Gateway */}
+        {activeTab === 'config' && showRazorpaySettings && hasConfigAccess && (
+          <div className="text-center text-white py-5">
+            <div className="d-flex justify-content-between align-items-center mb-4" style={{ maxWidth: '900px', margin: '0 auto' }}>
+              <div className="text-start">
+                <h2 style={{ fontSize: '2rem', fontWeight: '600', marginBottom: '0.5rem', color: '#ffffff' }}>
+                  <i className="fas fa-credit-card me-2" style={{ color: '#ffffff' }}></i>
+                  Razorpay Configuration
+                </h2>
+                <p className="text-white-50" style={{ fontSize: '1rem', margin: 0 }}>
+                  Configure payment gateway keys (Super Admin Only)
+                </p>
+              </div>
+              <Button
+                variant="outline-light"
+                onClick={() => setShowRazorpaySettings(false)}
+                style={{
+                  borderRadius: '20px',
+                  background: 'transparent'
+                }}
+              >
+                <i className="fas fa-arrow-left me-2"></i>
+                Back to Config
+              </Button>
+            </div>
+
+            {razorpaySettingsLoading ? (
+              <div className="text-center py-5">
+                <div className="spinner-border text-primary" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+                <p className="mt-3 text-white-50">Loading Razorpay settings...</p>
+              </div>
+            ) : (
+              <div style={{
+                background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                borderRadius: '20px',
+                padding: '2rem',
+                maxWidth: '900px',
+                margin: '0 auto',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+              }}>
+                {/* Success Message */}
+                {razorpaySettingsSuccess && (
+                  <Alert variant="success" className="mb-4" style={{
+                    background: 'rgba(40, 167, 69, 0.2)',
+                    border: '1px solid rgba(40, 167, 69, 0.4)',
+                    borderRadius: '10px'
+                  }}>
+                    <i className="fas fa-check-circle me-2"></i>
+                    {razorpaySettingsSuccess}
+                  </Alert>
+                )}
+
+                {/* Error Message */}
+                {razorpaySettingsError && (
+                  <Alert variant="danger" className="mb-4" style={{
+                    background: 'rgba(220, 53, 69, 0.2)',
+                    border: '1px solid rgba(220, 53, 69, 0.4)',
+                    borderRadius: '10px'
+                  }}>
+                    <i className="fas fa-exclamation-circle me-2"></i>
+                    {razorpaySettingsError}
+                  </Alert>
+                )}
+
+                <Form onSubmit={(e) => { e.preventDefault(); saveRazorpaySettings(); }}>
+                  <Row>
+                    <Col md={12}>
+                      <Form.Group className="mb-3">
+                        <Form.Label style={{ color: 'white', fontWeight: '500' }}>Razorpay Key ID</Form.Label>
+                        <Form.Control
+                          type="text"
+                          value={razorpaySettings.key_id}
+                          onChange={(e) => setRazorpaySettings({ ...razorpaySettings, key_id: e.target.value })}
+                          placeholder="e.g., rzp_live_xxxxxxxxxx or rzp_test_xxxxxxxxxx"
+                          style={{
+                            background: 'rgba(255, 255, 255, 0.1)',
+                            border: '1px solid rgba(255, 255, 255, 0.2)',
+                            borderRadius: '10px',
+                            color: 'white',
+                            padding: '12px'
+                          }}
+                        />
+                        <Form.Text className="text-muted">
+                          Your Razorpay Key ID (starts with rzp_test_ or rzp_live_)
+                        </Form.Text>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+
+                  <Row>
+                    <Col md={12}>
+                      <Form.Group className="mb-3">
+                        <Form.Label style={{ color: 'white', fontWeight: '500' }}>
+                          Razorpay Key Secret
+                          {razorpaySettings.has_secret && razorpaySettings.key_secret === '••••••••' && (
+                            <Badge bg="success" className="ms-2">Saved</Badge>
+                          )}
+                        </Form.Label>
+                        <Form.Control
+                          type="password"
+                          value={razorpaySettings.key_secret}
+                          onChange={(e) => setRazorpaySettings({ ...razorpaySettings, key_secret: e.target.value })}
+                          placeholder="Enter Razorpay Key Secret"
+                          style={{
+                            background: 'rgba(255, 255, 255, 0.1)',
+                            border: '1px solid rgba(255, 255, 255, 0.2)',
+                            borderRadius: '10px',
+                            color: 'white',
+                            padding: '12px'
+                          }}
+                        />
+                        <Form.Text className="text-muted">
+                          Your Razorpay Key Secret (keep this confidential)
+                        </Form.Text>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+
+                  <div className="d-flex justify-content-end gap-3 mt-4">
+                    <Button
+                      variant="primary"
+                      type="submit"
+                      disabled={razorpaySettingsSaving}
+                      style={{
+                        background: 'linear-gradient(145deg, rgba(0, 123, 255, 0.8), rgba(0, 123, 255, 0.6))',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        borderRadius: '25px',
+                        color: 'white',
+                        fontWeight: '600',
+                        padding: '12px 24px'
+                      }}
+                    >
+                      <i className="fas fa-save me-2"></i>
+                      {razorpaySettingsSaving ? 'Saving...' : 'Save Settings'}
+                    </Button>
+                  </div>
+                </Form>
+
+                {/* Help Section */}
+                <div className="mt-5" style={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  borderRadius: '15px',
+                  padding: '1.5rem',
+                  textAlign: 'left'
+                }}>
+                  <h5 style={{ color: 'white', marginBottom: '1rem' }}>
+                    <i className="fas fa-question-circle me-2"></i>
+                    Setup Guide
+                  </h5>
+                  <div style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.9rem', lineHeight: '1.8' }}>
+                    <p className="mb-3"><strong>To get your Razorpay API Keys:</strong></p>
+                    <ol style={{ paddingLeft: '1.5rem' }}>
+                      <li>Login to your Razorpay Dashboard at <a href="https://dashboard.razorpay.com" target="_blank" rel="noopener noreferrer" style={{ color: '#00bfff' }}>dashboard.razorpay.com</a></li>
+                      <li>Go to Settings → API Keys</li>
+                      <li>Generate or view your API keys</li>
+                      <li>Copy the Key ID and Key Secret</li>
+                    </ol>
+                    <p className="mb-2 mt-3"><strong>Important Notes:</strong></p>
+                    <ul style={{ paddingLeft: '1.5rem' }}>
+                      <li><strong>Test Keys:</strong> Use keys starting with <code style={{ color: '#00bfff' }}>rzp_test_</code> for testing</li>
+                      <li><strong>Live Keys:</strong> Use keys starting with <code style={{ color: '#00bfff' }}>rzp_live_</code> for production</li>
+                      <li>Never share your Key Secret publicly</li>
+                      <li>The Key Secret is only shown once when generated - save it securely</li>
                     </ul>
                   </div>
                 </div>
@@ -5580,7 +6473,7 @@ const AdminPanel = () => {
                       <Form.Check
                         type="checkbox"
                         id={`food-${food.id}`}
-                        label={`${food.name} - 🪙${food.price}`}
+                        label={`${food.name} - 🪙 ${Math.ceil(food.price / 10)} Coins`}
                         checked={selectedFoodsForMovie.includes(food.id)}
                         onChange={(e) => {
                           if (e.target.checked) {
@@ -6081,6 +6974,200 @@ const AdminPanel = () => {
           </Form>
         </Modal>
 
+        {/* Coupon Modal */}
+        <Modal show={showCouponModal} onHide={() => {
+          setShowCouponModal(false);
+          setEditingCoupon(null);
+          setCouponForm({
+            code: '',
+            description: '',
+            discount_type: 'percentage',
+            discount_value: '',
+            min_purchase: '',
+            max_discount: '',
+            usage_limit: '',
+            expiry_date: ''
+          });
+        }} size="lg">
+          <Modal.Header closeButton>
+            <Modal.Title>{editingCoupon ? 'Edit Coupon' : 'Create New Coupon'}</Modal.Title>
+          </Modal.Header>
+          <Form onSubmit={async (e) => {
+            e.preventDefault();
+            try {
+              if (editingCoupon) {
+                // Update existing coupon
+                await api.put(`/api/admin/coupons/${editingCoupon.id}`, couponForm);
+                alert('Coupon updated successfully!');
+              } else {
+                // Create new coupon
+                await api.post('/api/admin/coupons', couponForm);
+                alert('Coupon created successfully!');
+              }
+
+              setShowCouponModal(false);
+              setEditingCoupon(null);
+              setCouponForm({
+                code: '',
+                description: '',
+                discount_type: 'percentage',
+                discount_value: '',
+                min_purchase: '',
+                max_discount: '',
+                usage_limit: '',
+                expiry_date: ''
+              });
+              fetchAllData();
+            } catch (err) {
+              console.error('Error saving coupon:', err);
+              alert('Error saving coupon: ' + (err.response?.data?.error || err.message));
+            }
+          }}>
+            <Modal.Body>
+              <Row>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Coupon Code</Form.Label>
+                    <Form.Control
+                      type="text"
+                      value={couponForm.code}
+                      onChange={(e) => setCouponForm({ ...couponForm, code: e.target.value.toUpperCase() })}
+                      placeholder="e.g., SAVE10"
+                      required
+                    />
+                    <Form.Text className="text-muted">
+                      Code will be converted to uppercase
+                    </Form.Text>
+                  </Form.Group>
+                </Col>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Discount Type</Form.Label>
+                    <Form.Select
+                      value={couponForm.discount_type}
+                      onChange={(e) => setCouponForm({ ...couponForm, discount_type: e.target.value })}
+                      required
+                    >
+                      <option value="percentage">Percentage (%)</option>
+                      <option value="fixed">Fixed Amount (🪙 Coins)</option>
+                    </Form.Select>
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              <Row>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Discount Value</Form.Label>
+                    <Form.Control
+                      type="number"
+                      value={couponForm.discount_value}
+                      onChange={(e) => setCouponForm({ ...couponForm, discount_value: e.target.value })}
+                      placeholder={couponForm.discount_type === 'percentage' ? 'e.g., 10' : 'e.g., 50'}
+                      min="0"
+                      step="0.01"
+                      required
+                    />
+                    <Form.Text className="text-muted">
+                      {couponForm.discount_type === 'percentage' ? 'Percentage (0-100%)' : 'Fixed amount in 🪙 Coins'}
+                    </Form.Text>
+                  </Form.Group>
+                </Col>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Minimum Purchase (🪙 Coins)</Form.Label>
+                    <Form.Control
+                      type="number"
+                      value={couponForm.min_purchase}
+                      onChange={(e) => setCouponForm({ ...couponForm, min_purchase: e.target.value })}
+                      placeholder="e.g., 100"
+                      min="0"
+                      step="1"
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              <Row>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Maximum Coins (🪙)</Form.Label>
+                    <Form.Control
+                      type="number"
+                      value={couponForm.max_discount}
+                      onChange={(e) => setCouponForm({ ...couponForm, max_discount: e.target.value })}
+                      placeholder="e.g., 200"
+                      min="0"
+                      step="1"
+                    />
+                    <Form.Text className="text-muted">
+                      Only for percentage discounts
+                    </Form.Text>
+                  </Form.Group>
+                </Col>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Usage Limit</Form.Label>
+                    <Form.Control
+                      type="number"
+                      value={couponForm.usage_limit}
+                      onChange={(e) => setCouponForm({ ...couponForm, usage_limit: e.target.value })}
+                      placeholder="e.g., 100"
+                      min="1"
+                    />
+                    <Form.Text className="text-muted">
+                      Leave empty for unlimited
+                    </Form.Text>
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Expiry Date</Form.Label>
+                <Form.Control
+                  type="datetime-local"
+                  value={couponForm.expiry_date}
+                  onChange={(e) => setCouponForm({ ...couponForm, expiry_date: e.target.value })}
+                  required
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Description</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={3}
+                  value={couponForm.description}
+                  onChange={(e) => setCouponForm({ ...couponForm, description: e.target.value })}
+                  placeholder="Brief description of the coupon"
+                  required
+                />
+              </Form.Group>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={() => {
+                setShowCouponModal(false);
+                setCouponForm({
+                  code: '',
+                  description: '',
+                  discount_type: 'percentage',
+                  discount_value: '',
+                  min_purchase: '',
+                  max_discount: '',
+                  usage_limit: '',
+                  expiry_date: ''
+                });
+              }}>
+                Cancel
+              </Button>
+              <Button variant="primary" type="submit">
+                <i className="fas fa-plus me-2"></i>
+                Create Coupon
+              </Button>
+            </Modal.Footer>
+          </Form>
+        </Modal>
+
         {/* Team Modal */}
         <Modal show={showTeamModal} onHide={() => {
           setShowTeamModal(false);
@@ -6229,6 +7316,296 @@ const AdminPanel = () => {
               <Button variant="primary" type="submit">
                 <i className="fas fa-upload me-2"></i>
                 Upload
+              </Button>
+            </Modal.Footer>
+          </Form>
+        </Modal>
+
+        {/* Winner Selection Modal */}
+        <Modal show={showWinnerModal} onHide={() => {
+          setShowWinnerModal(false);
+          setSelectedWinners([]);
+          setWinnerForm({
+            discount_amount: '',
+            discount_type: 'fixed',
+            max_discount: '',
+            expiry_days: 30,
+            winner_limit: 5
+          });
+        }} size="xl">
+          <Modal.Header closeButton>
+            <Modal.Title>Select Coupon Winners</Modal.Title>
+          </Modal.Header>
+          <Form onSubmit={async (e) => {
+            e.preventDefault();
+            if (winnerSending) return;
+            if (selectedWinners.length === 0) {
+              alert('Please select at least one winner.');
+              return;
+            }
+            if (selectedWinners.length > winnerForm.winner_limit) {
+              alert(`You can select maximum ${winnerForm.winner_limit} winners.`);
+              return;
+            }
+            try {
+              setWinnerSending(true);
+              const result = await api.post('/api/admin/coupon-winners/send', {
+                user_ids: selectedWinners,
+                discount_amount: winnerForm.discount_amount,
+                discount_type: winnerForm.discount_type,
+                max_discount: winnerForm.max_discount,
+                expiry_days: winnerForm.expiry_days,
+                winner_message: winnerForm.winner_message
+              });
+              const data = result.data || {};
+              console.log('Winner email API response:', data);
+
+              const total = data.total_users ?? selectedWinners.length;
+              const sent = data.sent_count ?? (data.success === false ? total - (data.failed_email_count || 0) : total);
+              const failedEmailList = data.failed_emails || [];
+              const failedEmailCount = data.failed_email_count ?? failedEmailList.length ?? 0;
+              const failedRecordCount = data.failed_record_count ?? 0;
+              const results = data.results || [];
+              const emailFailures = results.filter(r => r.status === 'email_failed');
+              const recordFailures = results.filter(r => r.status === 'failed');
+              const message = data.message || `Processed ${total} winners`;
+
+              if (failedEmailCount > 0 || failedRecordCount > 0 || data.success === false) {
+                const lines = [
+                  message,
+                  `Sent: ${sent}/${total}`,
+                  `Email failed: ${failedEmailCount}${failedEmailList.length ? ` (${failedEmailList.join(', ')})` : ''}`,
+                  failedRecordCount ? `Record failed: ${failedRecordCount}` : null,
+                  emailFailures.length ? `Last email error: ${emailFailures[emailFailures.length - 1].email_error}` : null,
+                  recordFailures.length ? `Last record error: ${recordFailures[recordFailures.length - 1].error || recordFailures[recordFailures.length - 1].email_error || 'unknown'}` : null,
+                ].filter(Boolean);
+                alert(lines.join('\n'));
+              } else {
+                alert(message || `Success! ${total} coupon winners selected and emails sent!`);
+              }
+              setShowWinnerModal(false);
+              setSelectedWinners([]);
+              setWinnerForm({
+                discount_amount: '',
+                discount_type: 'fixed',
+                max_discount: '',
+                expiry_days: 30,
+                winner_limit: 5,
+                winner_message: 'You have been selected as a coupon winner!'
+              });
+
+              // Refresh coupon winners data specifically and immediately update state
+              try {
+                const winnersRes = await api.get('/api/admin/coupon-winners');
+                console.log('Refreshed coupon winners data:', winnersRes.data);
+                setCouponWinners(winnersRes.data);
+              } catch (err) {
+                console.error('Error refreshing coupon winners:', err);
+              }
+
+              // Also refresh all data
+              fetchAllData();
+            } catch (err) {
+              console.error('Error selecting winners:', err);
+              alert('Error selecting winners: ' + (err.response?.data?.error || err.message));
+            } finally {
+              setWinnerSending(false);
+            }
+          }}>
+            <Modal.Body>
+              <Row>
+                <Col md={8}>
+                  <div className="border rounded p-3" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                      <h6>Select Winners ({selectedWinners.length} selected)</h6>
+                      <div>
+                        <Button
+                          variant="outline-success"
+                          size="sm"
+                          onClick={() => {
+                            // Only select first user when clicking "Select One"
+                            if (filteredWinnerUsers.length > 0) {
+                              setSelectedWinners([filteredWinnerUsers[0].id]);
+                              alert(`Selected 1 user: ${filteredWinnerUsers[0].name} (${filteredWinnerUsers[0].email})`);
+                            }
+                          }}
+                          className="me-1"
+                        >
+                          Select First User
+                        </Button>
+                        <Button
+                          variant="outline-secondary"
+                          size="sm"
+                          onClick={() => setSelectedWinners([])}
+                        >
+                          Clear All
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Warning about selection */}
+                    {selectedWinners.length > 0 && (
+                      <Alert variant="info" className="mb-3">
+                        <strong>⚠️ Important:</strong> You have selected {selectedWinners.length} user{selectedWinners.length > 1 ? 's' : ''}.
+                        This will create {selectedWinners.length} individual coupon{selectedWinners.length > 1 ? 's' : ''}.
+                        Each selected user will receive their own unique coupon code.
+                      </Alert>
+                    )}
+
+                    {/* Search Input */}
+                    <div className="mb-3">
+                      <Form.Control
+                        type="text"
+                        placeholder="Search users by name or email..."
+                        value={winnerSearchTerm}
+                        onChange={(e) => setWinnerSearchTerm(e.target.value)}
+                        size="sm"
+                      />
+                    </div>
+                    {filteredWinnerUsers && filteredWinnerUsers.length > 0 ? filteredWinnerUsers.map(user => (
+                      <Form.Check
+                        key={user.id}
+                        type="checkbox"
+                        id={`winner-${user.id}`}
+                        label={`${user.name} (${user.email})`}
+                        checked={selectedWinners.includes(user.id)}
+                        disabled={!selectedWinners.includes(user.id) && selectedWinners.length >= winnerForm.winner_limit}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            if (selectedWinners.length < winnerForm.winner_limit) {
+                              setSelectedWinners([...selectedWinners, user.id]);
+                            }
+                          } else {
+                            setSelectedWinners(selectedWinners.filter(id => id !== user.id));
+                          }
+                        }}
+                        className="mb-2"
+                      />
+                    )) : (
+                      <p className="text-muted">{winnerSearchTerm ? 'No users match your search' : 'No users found'}</p>
+                    )}
+                  </div>
+                </Col>
+                <Col md={4}>
+                  <div className="border rounded p-3">
+                    <h6 className="mb-3">Coupon Configuration</h6>
+
+                    <Form.Group className="mb-3">
+                      <Form.Label>Winner Limit</Form.Label>
+                      <Form.Control
+                        type="number"
+                        value={winnerForm.winner_limit}
+                        onChange={(e) => setWinnerForm({ ...winnerForm, winner_limit: parseInt(e.target.value) || 1 })}
+                        min="1"
+                        max="50"
+                      />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3">
+                      <Form.Label>Discount Type</Form.Label>
+                      <Form.Select
+                        value={winnerForm.discount_type}
+                        onChange={(e) => setWinnerForm({ ...winnerForm, discount_type: e.target.value })}
+                      >
+                        <option value="fixed">Fixed Amount (🪙 Coins)</option>
+                        <option value="percentage">Percentage (%)</option>
+                      </Form.Select>
+                    </Form.Group>
+
+                    <Form.Group className="mb-3">
+                      <Form.Label>Discount Amount</Form.Label>
+                      <Form.Control
+                        type="number"
+                        value={winnerForm.discount_amount}
+                        onChange={(e) => setWinnerForm({ ...winnerForm, discount_amount: e.target.value })}
+                        placeholder={winnerForm.discount_type === 'fixed' ? 'e.g., 50' : 'e.g., 20'}
+                        min="0"
+                        step="1"
+                        required
+                      />
+                    </Form.Group>
+
+                    {winnerForm.discount_type === 'percentage' && (
+                      <Form.Group className="mb-3">
+                        <Form.Label>Max Coins (🪙)</Form.Label>
+                        <Form.Control
+                          type="number"
+                          value={winnerForm.max_discount}
+                          onChange={(e) => setWinnerForm({ ...winnerForm, max_discount: e.target.value })}
+                          placeholder="e.g., 200"
+                          min="0"
+                          step="1"
+                        />
+                      </Form.Group>
+                    )}
+
+                    <Form.Group className="mb-3">
+                      <Form.Label>Expiry Days</Form.Label>
+                      <Form.Control
+                        type="number"
+                        value={winnerForm.expiry_days}
+                        onChange={(e) => setWinnerForm({ ...winnerForm, expiry_days: parseInt(e.target.value) || 30 })}
+                        min="1"
+                        max="365"
+                      />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3">
+                      <Form.Label>Winner Message</Form.Label>
+                      <Form.Control
+                        type="text"
+                        value={winnerForm.winner_message}
+                        onChange={(e) => setWinnerForm({ ...winnerForm, winner_message: e.target.value })}
+                        placeholder="e.g., Best Student, Lucky Draw Winner, etc."
+                        maxLength="100"
+                      />
+                      <Form.Text className="text-muted">
+                        Custom message to replace "You have been selected as a coupon winner!"
+                      </Form.Text>
+                    </Form.Group>
+
+                    <div className="mt-3 p-3 bg-light rounded">
+                      <strong>Preview:</strong>
+                      <br />
+                      Each winner will receive a coupon worth{' '}
+                      {winnerForm.discount_type === 'percentage'
+                        ? `${winnerForm.discount_amount}% off`
+                        : `🪙 ${winnerForm.discount_amount} Coins`
+                      }
+                      {winnerForm.discount_type === 'percentage' && winnerForm.max_discount
+                        ? ` (max 🪙 ${winnerForm.max_discount})`
+                        : ''
+                      }
+                      <br />
+                      <small>Valid for {winnerForm.expiry_days} days</small>
+                    </div>
+                  </div>
+                </Col>
+              </Row>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={() => {
+                setShowWinnerModal(false);
+                setSelectedWinners([]);
+                setWinnerForm({
+                  discount_amount: '',
+                  discount_type: 'fixed',
+                  max_discount: '',
+                  expiry_days: 30,
+                  winner_limit: 5
+                });
+              }}>
+                Cancel
+              </Button>
+              <Button
+                variant="success"
+                type="submit"
+                disabled={winnerSending || selectedWinners.length === 0 || !winnerForm.discount_amount}
+              >
+                <i className="fas fa-trophy me-2"></i>
+                {winnerSending
+                  ? 'Sending...'
+                  : `Select ${selectedWinners.length} Winner${selectedWinners.length !== 1 ? 's' : ''} & Send Emails`}
               </Button>
             </Modal.Footer>
           </Form>

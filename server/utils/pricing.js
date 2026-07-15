@@ -1,8 +1,29 @@
+// Legacy fallback price map. Prefer `calculateFoodCostFromDb` for accurate pricing.
+const FOOD_PRICES = {
+  1: 50, // Popcorn
+  2: 30, // Soda
+  3: 80, // Combo Meal
+  4: 60, // Nachos
+  5: 20  // Candy
+};
+
 const normalizeSelectedSeats = (selectedSeats) => {
   if (Array.isArray(selectedSeats)) {
     return selectedSeats;
   }
   return [];
+};
+
+const calculateFoodCost = (foodOrders = {}) => {
+  if (!foodOrders || typeof foodOrders !== 'object') {
+    return 0;
+  }
+
+  return Object.entries(foodOrders).reduce((total, [foodId, quantity]) => {
+    const price = FOOD_PRICES[foodId] || 30;
+    const qty = Number.isFinite(Number(quantity)) ? Number(quantity) : 0;
+    return total + (price * qty);
+  }, 0);
 };
 
 const normalizeFoodOrders = (foodOrders) => {
@@ -71,6 +92,14 @@ const calculateFoodCostFromDb = (db, movieId, foodOrders) => new Promise((resolv
   });
 });
 
+const calculateSubtotal = (moviePrice, selectedSeats, foodOrders) => {
+  const seats = normalizeSelectedSeats(selectedSeats);
+  const numPeople = seats.length;
+  const ticketTotal = (Number(moviePrice) || 0) * numPeople;
+  const foodTotal = calculateFoodCost(foodOrders);
+  return ticketTotal + foodTotal;
+};
+
 const calculateSubtotalFromDb = async (db, movieId, moviePrice, selectedSeats, foodOrders) => {
   const seats = normalizeSelectedSeats(selectedSeats);
   const numPeople = seats.length;
@@ -80,9 +109,63 @@ const calculateSubtotalFromDb = async (db, movieId, moviePrice, selectedSeats, f
   return ticketTotal + foodTotal;
 };
 
+const getCouponDiscount = (db, couponCode, totalAmount) => {
+  return new Promise((resolve, reject) => {
+    if (!couponCode || !couponCode.trim()) {
+      return resolve({ discount: 0, finalAmount: totalAmount, coupon: null });
+    }
+
+    const code = couponCode.trim().toUpperCase();
+    const currentDate = new Date().toISOString().split('T')[0];
+
+    db.get(
+      `SELECT * FROM coupons WHERE code = ? AND is_active = 1 AND (expiry_date IS NULL OR expiry_date >= ?)`,
+      [code, currentDate],
+      (err, coupon) => {
+        if (err) {
+          return reject({ status: 500, message: err.message });
+        }
+
+        if (!coupon) {
+          return reject({ status: 400, message: 'Invalid or expired coupon code' });
+        }
+
+        if (coupon.usage_limit !== -1 && coupon.used_count >= coupon.usage_limit) {
+          return reject({ status: 400, message: 'Coupon usage limit exceeded' });
+        }
+
+        if (totalAmount < coupon.min_purchase) {
+          return reject({
+            status: 400,
+            message: `Minimum purchase of ${coupon.min_purchase} coins required for this coupon`
+          });
+        }
+
+        let discount = 0;
+        if (coupon.discount_type === 'percentage') {
+          discount = (totalAmount * coupon.discount_value) / 100;
+        } else {
+          discount = coupon.discount_value;
+        }
+
+        if (coupon.max_discount && discount > coupon.max_discount) {
+          discount = coupon.max_discount;
+        }
+
+        discount = Math.min(discount, totalAmount);
+
+        const finalAmount = Math.max(0, totalAmount - discount);
+        return resolve({ discount, finalAmount, coupon });
+      }
+    );
+  });
+};
+
 module.exports = {
-  normalizeSelectedSeats,
-  normalizeFoodOrders,
+  FOOD_PRICES,
+  calculateFoodCost,
   calculateFoodCostFromDb,
-  calculateSubtotalFromDb
+  calculateSubtotal,
+  calculateSubtotalFromDb,
+  getCouponDiscount
 };

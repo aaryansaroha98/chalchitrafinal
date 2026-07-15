@@ -116,7 +116,7 @@ const TermsOfService = () => {
                 lineHeight: '1.6',
                 marginBottom: '2rem'
               }}>
-                All ticket prices are listed in 🪙 Coins.
+                Prices for our products and services are listed in INR (Indian Rupees). Payments can be made via credit card, debit card, or other accepted methods at checkout. We reserve the right to change prices or services at any time without notice.
               </p>
 
               <h2 style={{
