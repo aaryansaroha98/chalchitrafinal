@@ -142,7 +142,7 @@ router.post('/', async (req, res) => {
   // Temporarily allow booking without authentication for testing
   // if (!req.user) return res.status(401).json({ error: 'Authentication required' });
 
-  const { movie_id, selectedSeats, food_option, coupon_code } = req.body;
+  const { movie_id, selectedSeats, food_option } = req.body;
   const num_people = selectedSeats ? selectedSeats.length : 0;
 
   // Validate selectedSeats - use movie's booking_limit instead of hardcoded 6
@@ -279,8 +279,8 @@ router.post('/', async (req, res) => {
               console.log(`✅ ${total_coins} coins deducted from user ${userId} for booking ${customBookingId}`);
 
               // Insert booking with custom booking code
-              db.run('INSERT INTO bookings (user_id, movie_id, num_people, food_option, coupon_code, total_price, discount_amount, payment_method, payment_id, payment_amount, selected_seats, admitted_people, remaining_people, booking_code, coin_amount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                [userId, movie_id, num_people, food_option, coupon_code, total_coins, req.body.discount_amount || 0, 'coins', 'COINS_PAYMENT', total_coins, JSON.stringify(req.body.selectedSeats || []), 0, num_people, customBookingId, total_coins], function(err) {
+              db.run('INSERT INTO bookings (user_id, movie_id, num_people, food_option, total_price, payment_method, payment_id, payment_amount, selected_seats, admitted_people, remaining_people, booking_code, coin_amount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                [userId, movie_id, num_people, food_option, total_coins, 'coins', 'COINS_PAYMENT', total_coins, JSON.stringify(req.body.selectedSeats || []), 0, num_people, customBookingId, total_coins], function(err) {
               if (err) return res.status(500).json({ error: err.message });
 
               const databaseId = this.lastID; // Get the auto-generated database ID
@@ -324,34 +324,6 @@ router.post('/', async (req, res) => {
                       }
                     }
 
-                    // Mark coupon usage ONLY when payment is confirmed (payment_id or explicit success flag)
-                    const paymentSuccess = !!req.body.payment_id || req.body.payment_status === 'success' || req.body.payment_success === true;
-                    if (coupon_code) {
-                      if (paymentSuccess) {
-                        console.log('Marking coupon as used after payment success:', coupon_code);
-                        db.run('UPDATE coupons SET used_count = used_count + 1 WHERE code = ?',
-                          [coupon_code.toUpperCase()], function(couponErr) {
-                            if (couponErr) {
-                              console.error('Error updating coupon usage count:', couponErr);
-                            } else {
-                              console.log(`Updated usage count for coupon ${coupon_code}: ${this.changes} rows affected`);
-                            }
-                          });
-
-                        // If this is a winner coupon, mark it as used
-                        db.run('UPDATE coupon_winners SET is_used = 1, used_at = CURRENT_TIMESTAMP WHERE coupon_code = ? AND user_id = ? AND is_used = 0',
-                          [coupon_code.toUpperCase(), userId], function(winnerErr) {
-                            if (winnerErr) {
-                              console.error('Error marking winner coupon as used:', winnerErr);
-                            } else if (this.changes > 0) {
-                              console.log(`Marked winner coupon ${coupon_code} as used for user ${userId}`);
-                            }
-                          });
-                      } else {
-                        console.log('Skipping coupon usage mark because payment not confirmed yet');
-                      }
-                    }
-
                     // Coupon usage tracking removed - email system disabled
 
                     res.json({
@@ -387,7 +359,7 @@ router.get('/my', (req, res) => {
   // Use dummy user ID for testing (same as used in booking creation)
   const userId = req.user ? req.user.id : 1;
 
-  db.all('SELECT b.*, b.qr_code, b.selected_seats, b.ticket_html, m.title, m.date, m.venue, m.poster_url, m.price FROM bookings b JOIN movies m ON b.movie_id = m.id WHERE b.user_id = ? ORDER BY b.created_at DESC',
+  db.all('SELECT b.*, b.qr_code, b.selected_seats, b.ticket_html, m.title, m.date, m.venue, m.poster_url FROM bookings b JOIN movies m ON b.movie_id = m.id WHERE b.user_id = ? ORDER BY b.created_at DESC',
     [userId], (err, bookings) => {
       if (err) return res.status(500).json({ error: err.message });
       res.json(bookings);

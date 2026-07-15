@@ -101,7 +101,7 @@ const Booking = () => {
     }
   };
 
-  const TICKET_PRICE = parseFloat(movie?.price) || 0;
+  const TICKET_PRICE = parseInt(movie?.coin_price) || 20;
 
   const handleSeatClick = (seatId) => {
     if (occupiedSeats.includes(seatId)) return;
@@ -140,8 +140,7 @@ const Booking = () => {
     const ticketPrice = selectedSeats.length * TICKET_PRICE;
     const foodPrice = Object.entries(selectedFoods).reduce((total, [foodId, quantity]) => {
       const food = availableFoods.find(f => f.id === parseInt(foodId));
-      // If food is free for this movie, price is 0
-      const price = food && food.is_free ? 0 : (food ? food.price : 0);
+      const price = food && food.is_free ? 0 : (food ? Math.ceil(food.price / 10) : 0);
       return total + (price * quantity);
     }, 0);
     return ticketPrice + foodPrice;
@@ -446,8 +445,8 @@ const Booking = () => {
                       {availableFoods && availableFoods.length > 0 ? (
                         availableFoods.map(food => (
                           <span key={food.id} className="booking-food-pill">
-                            {food.name} - {food.is_free ? 'FREE' : `₹${food.price}`}
-                          </span>
+                            {food.name} - {food.is_free ? 'FREE' : `🪙 ${Math.ceil(food.price / 10)} Coins`}
+                            </span>
                         ))
                       ) : (
                         <span className="booking-info-empty">No food available</span>
@@ -1214,7 +1213,7 @@ const Booking = () => {
                           fontSize: '16px',
                           fontWeight: 'bold'
                         }}>
-                          {food.is_free ? 'FREE' : `₹${food.price}`}
+                          {food.is_free ? 'FREE' : `🪙 ${Math.ceil(food.price / 10)} Coins`}
                         </p>
                       </div>
                     </div>
@@ -1475,7 +1474,7 @@ const Booking = () => {
                               fontWeight: 'bold',
                               fontFamily: 'Arial, sans-serif'
                             }}>
-                              {food.is_free ? 'FREE' : `₹${food.price * quantity}`}
+                              {food.is_free ? 'FREE' : `🪙 ${Math.ceil(food.price / 10) * quantity}`}
                             </span>
                           </div>
                         );
@@ -1511,7 +1510,7 @@ const Booking = () => {
                     }}>
                       Total Amount
                     </span>
-                    ₹{getTotalPrice()}
+                    🪙 {getTotalPrice()}
                   </div>
 
                   <button

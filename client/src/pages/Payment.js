@@ -38,13 +38,8 @@ const Payment = () => {
     phone: user?.phone || initialCustomerDetails.phone || ''
   };
 
-  const [couponCode, setCouponCode] = useState('');
-  const [couponData, setCouponData] = useState(null);
-  const [couponError, setCouponError] = useState('');
-  const [couponSuccess, setCouponSuccess] = useState('');
-  const [applyingCoupon, setApplyingCoupon] = useState(false);
   const [foodData, setFoodData] = useState({});
-  const [coinBalance, setCoinBalance] = useState(20); // Default 20 coins
+  const [coinBalance, setCoinBalance] = useState(50); // Default 50 coins (signup bonus)
 
   // Use coin_price from movie instead of rupee price
   const TICKET_COIN_PRICE = parseInt(movie?.coin_price) || 20;
@@ -63,9 +58,9 @@ const Payment = () => {
   const fetchCoinBalance = async () => {
     try {
       const res = await api.get('/api/coins/balance', { withCredentials: true });
-      setCoinBalance(res.data.coins || 20); // Default to 20 if not set
+      setCoinBalance(res.data.coins || 50); // Default to 50 if not set
     } catch (err) {
-      setCoinBalance(20); // Default to 20 on error
+      setCoinBalance(50); // Default to 50 on error
     }
   };
 
@@ -74,7 +69,6 @@ const Payment = () => {
       const movieIdToUse = movieIdFromState || movieId;
       const res = await api.get(`/api/movies/${movieIdToUse}`);
       console.log('Fetched movie data:', res.data);
-      console.log('Movie price:', res.data.price, 'Type:', typeof res.data.price);
       setMovie(res.data);
     } catch (err) {
       setError('Movie not found');
@@ -102,7 +96,7 @@ const Payment = () => {
   const getFoodTotal = () => {
     return Object.entries(selectedFoods).reduce((total, [foodId, qty]) => {
       const foodItem = foodData[foodId];
-      // Food prices are now in coins (convert from rupees by dividing by 10)
+      // Food prices stored in DB as rupees, convert to coins by dividing by 10
       const priceInCoins = foodItem && foodItem.is_free ? 0 : (foodItem ? Math.ceil(foodItem.price / 10) : 0);
       return total + (priceInCoins * qty);
     }, 0);
@@ -263,268 +257,103 @@ const Payment = () => {
           </div>
         </div>
 
-        {/* Coupon Section - NOW GIVES COINS */}
-        <div className="coupon-card">
-          <h3 className="coupon-heading">Have a coupon?</h3>
-          <div className="coupon-form">
-            <input
-              type="text"
-              placeholder="Enter code"
-              value={couponCode}
-              onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-              className="coupon-input"
-              disabled={couponData !== null}
-            />
-            <button
-              className="coupon-btn"
-              onClick={async () => {
-                if (!couponCode.trim()) {
-                  setCouponError('Please enter a coupon code');
-                  return;
-                }
-
-                if (!user || !user.id) {
-                  setCouponError('Please log in to use coupons');
-                  return;
-                }
-
-                setApplyingCoupon(true);
-                setCouponError('');
-                setCouponSuccess('');
-
-                try {
-                  const res = await api.post('/api/admin/coupons/validate', {
-                    code: couponCode,
-                    user_id: user.id
-                  });
-
-                  setCouponData(res.data);
-                  setCouponSuccess(res.data.message || `🪙 ${res.data.coins_granted} coins added!`);
-                  setCouponError('');
-                  // Refresh coin balance
-                  await fetchCoinBalance();
-                } catch (err) {
-                  setCouponError(err.response?.data?.error || 'Invalid coupon');
-                } finally {
-                  setApplyingCoupon(false);
-                }
-              }}
-              disabled={applyingCoupon || couponData !== null}
-            >
-              {applyingCoupon ? '...' : couponData ? '✓' : 'Apply'}
-            </button>
-          </div>
-
-          {couponError && (
-            <p className="error-msg">{couponError}</p>
-          )}
-
-          {couponSuccess && (
-            <div className="coupon-success">
-              <span className="success-check">✓</span>
-              <span className="success-text">{couponSuccess}</span>
-              <span className="remove-link" onClick={() => {
-                setCouponCode('');
-                setCouponData(null);
-                setCouponError('');
-                setCouponSuccess('');
-              }}>OK</span>
-            </div>
-          )}
-        </div>
         
 
         {/* Coin Balance Display */}
         {user && (
-          <div className="coupon-card" style={{marginTop: '16px'}}>
-            <h3 className="coupon-heading">🪙 Your Coin Balance</h3>
+          <div className="coin-card" style={{marginTop: '16px'}}>
+            <h3 className="coin-heading">🪙 Your Coin Balance</h3>
             <div style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               padding: '12px 16px',
-              background: 'rgba(255, 215, 0, 0.05)',
+              background: coinBalance >= getTotalCoins() ? 'rgba(255, 215, 0, 0.1)' : 'rgba(255, 100, 100, 0.1)',
               borderRadius: '12px',
-              border: coinBalance >= getTotalCoins() ? '2px solid #ffd700' : '1px solid rgba(255,255,255,0.1)',
-              cursor: coinBalance >= getTotalCoins() ? 'pointer' : 'not-allowed',
-              opacity: coinBalance >= getTotalCoins() ? 1 : 0.5
-            }}
-            onClick={() => {
-              if (coinBalance >= getTotalCoins()) {
-                setUseCoins(!useCoins);
-              }
-            }}
-            >
+              border: coinBalance >= getTotalCoins() ? '2px solid #ffd700' : '2px solid rgba(255,100,100,0.5)'
+            }}>
               <div>
-                <div style={{color: '#ffd700', fontWeight: '600', fontSize: '14px'}}>
-                  Your Balance: 🪙 {coinBalance}
+                <div style={{color: '#ffd700', fontWeight: '600', fontSize: '18px'}}>
+                  Balance: 🪙 {coinBalance}
                 </div>
-                <div style={{color: 'rgba(255,255,255,0.6)', fontSize: '12px', marginTop: '4px'}}>
+                <div style={{color: 'rgba(255,255,255,0.7)', fontSize: '13px', marginTop: '4px'}}>
                   {coinBalance >= getTotalCoins() 
-                    ? `Enough coins to cover this booking` 
-                    : `Need ${getTotalCoins() - coinBalance} more coins`}
+                    ? `✓ Enough coins to complete booking` 
+                    : `⚠️ Need ${getTotalCoins() - coinBalance} more coins`}
                 </div>
-              </div>
-              <div style={{
-                width: '24px',
-                height: '24px',
-                borderRadius: '4px',
-                border: '2px solid #ffd700',
-                background: useCoins ? '#ffd700' : 'transparent',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                {useCoins && <span style={{color: '#000', fontSize: '14px', fontWeight: 'bold'}}>✓</span>}
               </div>
             </div>
-            {useCoins && (
-              <div style={{
-                marginTop: '8px',
-                padding: '8px 12px',
-                background: 'rgba(255, 215, 0, 0.1)',
-                borderRadius: '8px',
-                fontSize: '12px',
-                color: '#ffd700',
-                textAlign: 'center'
-              }}>
-                🪙 You will pay {getTotalCoins()} coins now. Coins will be refunded after you attend the movie!
-              </div>
-            )}
+            <div style={{
+              marginTop: '8px',
+              padding: '8px 12px',
+              background: 'rgba(255, 215, 0, 0.05)',
+              borderRadius: '8px',
+              fontSize: '12px',
+              color: 'rgba(255, 215, 0, 0.8)',
+              textAlign: 'center'
+            }}>
+              💡 Coins will be refunded after you attend the movie!
+            </div>
           </div>
         )}
 
-        {/* Pay Button */}
+        {/* Pay Button - COIN ONLY */}
         <div className="pay-section">
           <button
             className="pay-btn"
-            disabled={processing}
+            disabled={processing || coinBalance < getTotalCoins()}
             onClick={async () => {
+              // Check if user has enough coins
+              if (coinBalance < getTotalCoins()) {
+                setError(`Insufficient coins! You need ${getTotalCoins() - coinBalance} more coins.`);
+                return;
+              }
+
               setProcessing(true);
+              setError('');
 
               try {
-                const totalAmount = getTotalCoins();
+                const totalCoins = getTotalCoins();
+                const movieIdToUse = movieIdFromState || movieId;
 
-                // Handle free bookings (total = 0) directly without Razorpay
-                if (totalAmount === 0) {
-                  try {
-                    const movieIdToUse = movieIdFromState || movieId;
-                    const bookingRes = await api.post('/api/bookings', {
-                      movie_id: movieIdToUse,
-                      selectedSeats: selectedSeats,
-                      quantity: quantity,
-                      payment_id: 'FREE_BOOKING',
-                      customer_details: customerDetails,
-                      food_orders: selectedFoods
-                    });
+                // ALL payments are now coin-based
+                const bookingRes = await api.post('/api/bookings', {
+                  movie_id: movieIdToUse,
+                  selectedSeats: selectedSeats,
+                  quantity: quantity,
+                  food_orders: selectedFoods,
+                  use_coins: true,
+                  customer_details: customerDetails
+                });
 
-                    const successPayload = {
-                      ticket: bookingRes.data,
-                      movie: movie,
-                      payment: {
-                        transaction_id: 'FREE_BOOKING',
-                        amount: 0,
-                        method: 'free'
-                      },
-                      selectedSeats: selectedSeats,
-                      customerDetails: customerDetails
-                    };
+                const successPayload = {
+                  ticket: bookingRes.data,
+                  movie: movie,
+                  payment: {
+                    transaction_id: totalCoins === 0 ? 'FREE_BOOKING' : 'COINS_PAYMENT',
+                    amount: totalCoins,
+                    method: totalCoins === 0 ? 'free' : 'coins'
+                  },
+                  selectedSeats: selectedSeats,
+                  customerDetails: customerDetails
+                };
 
-                    try {
-                      sessionStorage.setItem('payment_success', JSON.stringify(successPayload));
-                    } catch (storageErr) {
-                      console.warn('Failed to store payment success payload:', storageErr);
-                    }
-
-                    navigate('/payment-success', { state: successPayload, replace: true });
-
-                    // Fallback: if navigation fails, force redirect
-                    setTimeout(() => {
-                      if (window.location.pathname === '/payment') {
-                        window.location.href = '/payment-success';
-                      }
-                    }, 300);
-                  } catch (err) {
-                    setError('Booking failed. Please try again.');
-                  } finally {
-                    setProcessing(false);
-                  }
-                  return;
-                }
-
-                // Handle coin payments directly
-                if (useCoins) {
-                  try {
-                    const movieIdToUse = movieIdFromState || movieId;
-                    const bookingRes = await api.post('/api/bookings', {
-                      movie_id: movieIdToUse,
-                      selectedSeats: selectedSeats,
-                      quantity: quantity,
-                      food_orders: selectedFoods,
-                      coupon_code: couponCode,
-                      use_coins: true,
-                      customer_details: customerDetails
-                    });
-
-                    const successPayload = {
-                      ticket: bookingRes.data,
-                      movie: movie,
-                      payment: {
-                        transaction_id: 'COINS_PAYMENT',
-                        amount: getTotalCoins(),
-                        method: 'coins'
-                      },
-                      selectedSeats: selectedSeats,
-                      customerDetails: customerDetails
-                    };
-
-                    try {
-                      sessionStorage.setItem('payment_success', JSON.stringify(successPayload));
-                    } catch (storageErr) {
-                      console.warn('Failed to store payment success payload:', storageErr);
-                    }
-
-                    navigate('/payment-success', { state: successPayload, replace: true });
-
-                    setTimeout(() => {
-                      if (window.location.pathname === '/payment') {
-                        window.location.href = '/payment-success';
-                      }
-                    }, 300);
-                  } catch (err) {
-                    setError(err.response?.data?.error || 'Coin payment failed. Please try again.');
-                  } finally {
-                    setProcessing(false);
-                  }
-                  return;
-                }
-
-                // For paid bookings, use Cashfree
                 try {
-                  const movieIdToUse = movieIdFromState || movieId;
-                  const orderRes = await api.post('/api/payments/order', {
-                    movie_id: movieIdToUse,
-                    selectedSeats: selectedSeats,
-                    food_orders: selectedFoods,
-                    coupon_code: couponCode,
-                    customer_id: user?.id || 'guest',
-                    customer_email: customerDetails.email,
-                    customer_phone: customerDetails.phone
-                  });
-
-                  if (orderRes.data && orderRes.data.payment_link) {
-                    window.location.href = orderRes.data.payment_link;
-                  } else {
-                    setProcessing(false);
-                    setError('Failed to create Cashfree payment order.');
-                  }
-                } catch (err) {
-                  setProcessing(false);
-                  setError('Payment gateway failed. Please try again.');
+                  sessionStorage.setItem('payment_success', JSON.stringify(successPayload));
+                } catch (storageErr) {
+                  console.warn('Failed to store payment success payload:', storageErr);
                 }
+
+                navigate('/payment-success', { state: successPayload, replace: true });
+
+                setTimeout(() => {
+                  if (window.location.pathname === '/payment') {
+                    window.location.href = '/payment-success';
+                  }
+                }, 300);
               } catch (err) {
+                setError(err.response?.data?.error || 'Booking failed. Please try again.');
                 setProcessing(false);
-                setError('Payment gateway failed. Please try again.');
               }
             }}
           >
@@ -535,10 +364,29 @@ const Payment = () => {
               </span>
             ) : (
               <span className="btn-content">
-                {getTotalCoins() === 0 ? 'CONFIRM TICKET' : `Pay 🪙${getTotalCoins()}`}
+                {coinBalance < getTotalCoins() 
+                  ? `Need ${getTotalCoins() - coinBalance} More Coins` 
+                  : getTotalCoins() === 0 
+                    ? 'CONFIRM FREE TICKET' 
+                    : `Confirm & Pay 🪙 ${getTotalCoins()} Coins`}
               </span>
             )}
           </button>
+
+          {error && (
+            <div style={{
+              marginTop: '12px',
+              padding: '12px',
+              background: 'rgba(255, 100, 100, 0.1)',
+              border: '1px solid rgba(255, 100, 100, 0.3)',
+              borderRadius: '8px',
+              color: '#ff6b6b',
+              fontSize: '14px',
+              textAlign: 'center'
+            }}>
+              {error}
+            </div>
+          )}
         </div>
 
         {/* Special Movie Message */}

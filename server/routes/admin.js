@@ -538,224 +538,6 @@ router.delete('/feedback/reset', requireAdmin, (req, res) => {
   });
 });
 
-// Get all coupons with usage tracking
-router.get('/coupons', requireAdmin, (req, res) => {
-  db.all('SELECT * FROM coupons ORDER BY created_at DESC', [], (err, coupons) => {
-    if (err) return res.status(500).json({ error: err.message });
-
-    // Add usage percentage and status to each coupon
-    const couponsWithUsage = coupons.map(coupon => {
-      let usagePercentage = 0;
-      let status = 'Active';
-
-      if (coupon.usage_limit > 0) {
-        usagePercentage = Math.round((coupon.used_count / coupon.usage_limit) * 100);
-
-        if (coupon.used_count >= coupon.usage_limit) {
-          status = 'Expired';
-        } else if (usagePercentage >= 80) {
-          status = 'Low Usage';
-        }
-      } else {
-        usagePercentage = 0;
-        status = 'Unlimited';
-      }
-
-      // Expiry check: if expiry_date set and in the past, mark expired
-      if (coupon.expiry_date) {
-        const now = new Date();
-        const expiry = new Date(coupon.expiry_date);
-        if (!isNaN(expiry.getTime()) && expiry < now) {
-          status = 'Expired';
-        }
-      }
-
-      return {
-        ...coupon,
-        usage_percentage: usagePercentage,
-        status: status
-      };
-    });
-
-    res.json(couponsWithUsage);
-  });
-});
-
-// Create new coupon
-router.post('/coupons', requireAdmin, (req, res) => {
-  const { code, description, discount_type, discount_value, min_purchase, max_discount, usage_limit, expiry_date } = req.body;
-
-  if (!code || !description || !discount_type || discount_value === undefined) {
-    return res.status(400).json({ error: 'Code, description, discount_type, and discount_value are required' });
-  }
-
-  if (!['percentage', 'fixed'].includes(discount_type)) {
-    return res.status(400).json({ error: 'discount_type must be either "percentage" or "fixed"' });
-  }
-
-  if (discount_type === 'percentage' && (discount_value < 0 || discount_value > 100)) {
-    return res.status(400).json({ error: 'Percentage discount must be between 0 and 100' });
-  }
-
-  if (discount_value < 0) {
-    return res.status(400).json({ error: 'Discount value must be positive' });
-  }
-
-  // Check if coupon code already exists
-  db.get('SELECT id FROM coupons WHERE code = ?', [code.toUpperCase()], (err, existing) => {
-    if (err) return res.status(500).json({ error: err.message });
-    if (existing) return res.status(400).json({ error: 'Coupon code already exists' });
-
-    const finalUsageLimit = usage_limit === '' || usage_limit === null ? -1 : parseInt(usage_limit);
-    const finalMinPurchase = min_purchase || 0;
-    const finalMaxDiscount = max_discount || null;
-
-    db.run(`INSERT INTO coupons (code, description, discount_type, discount_value, min_purchase, max_discount, usage_limit, expiry_date)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [code.toUpperCase(), description, discount_type, discount_value, finalMinPurchase, finalMaxDiscount, finalUsageLimit, expiry_date],
-      function (err) {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json({ id: this.lastID, message: 'Coupon created successfully' });
-      });
-  });
-});
-
-
-
-// Delete coupon
-router.delete('/coupons/:id', requireAdmin, (req, res) => {
-  db.run('DELETE FROM coupons WHERE id = ?', [req.params.id], function (err) {
-    if (err) return res.status(500).json({ error: err.message });
-    if (this.changes === 0) return res.status(404).json({ error: 'Coupon not found' });
-    res.json({ message: 'Coupon deleted successfully' });
-  });
-});
-
-// Update coupon
-router.put('/coupons/:id', requireAdmin, (req, res) => {
-  const { code, description, discount_type, discount_value, min_purchase, max_discount, usage_limit, expiry_date } = req.body;
-
-  if (!code || !description || !discount_type || discount_value === undefined) {
-    return res.status(400).json({ error: 'Code, description, discount_type, and discount_value are required' });
-  }
-
-  if (!['percentage', 'fixed'].includes(discount_type)) {
-    return res.status(400).json({ error: 'discount_type must be either "percentage" or "fixed"' });
-  }
-
-  if (discount_type === 'percentage' && (discount_value < 0 || discount_value > 100)) {
-    return res.status(400).json({ error: 'Percentage discount must be between 0 and 100' });
-  }
-
-  if (discount_value < 0) {
-    return res.status(400).json({ error: 'Discount value must be positive' });
-  }
-
-  // Check if coupon code already exists (excluding current coupon)
-  db.get('SELECT id FROM coupons WHERE code = ? AND id != ?', [code.toUpperCase(), req.params.id], (err, existing) => {
-    if (err) return res.status(500).json({ error: err.message });
-    if (existing) return res.status(400).json({ error: 'Coupon code already exists' });
-
-    const finalUsageLimit = usage_limit === '' || usage_limit === null ? -1 : parseInt(usage_limit);
-    const finalMinPurchase = min_purchase || 0;
-    const finalMaxDiscount = max_discount || null;
-
-    db.run(`UPDATE coupons SET code = ?, description = ?, discount_type = ?, discount_value = ?, min_purchase = ?, max_discount = ?, usage_limit = ?, expiry_date = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
-      [code.toUpperCase(), description, discount_type, discount_value, finalMinPurchase, finalMaxDiscount, finalUsageLimit, expiry_date, req.params.id],
-      function (err) {
-        if (err) return res.status(500).json({ error: err.message });
-        if (this.changes === 0) return res.status(404).json({ error: 'Coupon not found' });
-        res.json({ message: 'Coupon updated successfully' });
-      });
-  });
-});
-
-// Bulk delete coupons
-router.delete('/coupons', requireAdmin, (req, res) => {
-  const { ids } = req.body;
-
-  if (!ids || !Array.isArray(ids) || ids.length === 0) {
-    return res.status(400).json({ error: 'Coupon IDs array is required' });
-  }
-
-  const placeholders = ids.map(() => '?').join(',');
-  db.run(`DELETE FROM coupons WHERE id IN (${placeholders})`, ids, function (err) {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ message: `${this.changes} coupon(s) deleted successfully` });
-  });
-});
-
-// Validate coupon (public endpoint for frontend) - NOW GIVES COINS INSTEAD OF DISCOUNT
-router.post('/coupons/validate', (req, res) => {
-  const { code, user_id } = req.body;
-
-  if (!code) {
-    return res.status(400).json({ error: 'Coupon code is required' });
-  }
-
-  if (!user_id) {
-    return res.status(400).json({ error: 'User ID is required' });
-  }
-
-  const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
-
-  db.get(`SELECT * FROM coupons WHERE code = ? AND is_active = 1 AND (expiry_date IS NULL OR expiry_date >= ?)`,
-    [code.toUpperCase(), currentDate], (err, coupon) => {
-      if (err) return res.status(500).json({ error: err.message });
-      if (!coupon) return res.status(400).json({ error: 'Invalid or expired coupon code' });
-
-      // Check usage limit
-      if (coupon.usage_limit !== -1 && coupon.used_count >= coupon.usage_limit) {
-        return res.status(400).json({ error: 'Coupon usage limit exceeded' });
-      }
-
-      // Coupons now give coins directly instead of discounts
-      // discount_value represents COINS to give
-      const coinsToGive = Math.floor(coupon.discount_value);
-
-      if (coinsToGive <= 0) {
-        return res.status(400).json({ error: 'Invalid coupon value' });
-      }
-
-      // Grant coins to user
-      db.run('UPDATE users SET coins = COALESCE(coins, 0) + ? WHERE id = ?', 
-        [coinsToGive, user_id], function (updateErr) {
-        if (updateErr) {
-          console.error('Error granting coins:', updateErr);
-          return res.status(500).json({ error: 'Failed to grant coins' });
-        }
-
-        // Record coin transaction
-        db.run('INSERT INTO coin_transactions (user_id, amount, type, reason, booking_id) VALUES (?, ?, ?, ?, ?)',
-          [user_id, coinsToGive, 'credit', `coupon_${coupon.code}`, null], function(txnErr) {
-            if (txnErr) console.error('⚠️ Could not record coin transaction:', txnErr.message);
-          });
-
-        // Increment usage count
-        db.run('UPDATE coupons SET used_count = used_count + 1 WHERE id = ?', [coupon.id], function (usageErr) {
-          if (usageErr) {
-            console.error('Error updating coupon usage count:', usageErr);
-            return res.status(500).json({ error: 'Failed to update coupon usage' });
-          }
-
-          console.log(`Coupon ${coupon.code} gave ${coinsToGive} coins to user ${user_id}`);
-
-          res.json({
-            valid: true,
-            coins_granted: coinsToGive,
-            coupon: {
-              id: coupon.id,
-              code: coupon.code,
-              description: coupon.description,
-              coins_value: coinsToGive
-            },
-            message: `🪙 ${coinsToGive} coins added to your account!`
-          });
-        });
-      });
-    });
-});
-
 // Get gallery images (public)
 router.get('/gallery', (req, res) => {
   db.all('SELECT * FROM gallery ORDER BY uploaded_at DESC', [], (err, images) => {
@@ -1474,410 +1256,6 @@ router.get('/email/stats', requireAdmin, (req, res) => {
   });
 });
 
-// Coupon Winners System
-
-// Generate unique coupon code
-function generateCouponCode() {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let result = '';
-
-  // Generate 8-character code (e.g., SAVE2025)
-  for (let i = 0; i < 8; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-
-  return result;
-}
-
-// Ensure coupon code is unique
-async function generateUniqueCouponCode() {
-  let couponCode;
-  let attempts = 0;
-
-  do {
-    couponCode = generateCouponCode();
-    attempts++;
-
-    if (attempts > 100) {
-      // Add timestamp to ensure uniqueness
-      couponCode = 'CHL' + Date.now().toString().slice(-4) + couponCode.slice(0, 4);
-    }
-
-    // Check if code exists in coupon_winners table
-    const existing = await new Promise((resolve) => {
-      db.get('SELECT id FROM coupon_winners WHERE coupon_code = ?', [couponCode], (err, row) => {
-        resolve(row);
-      });
-    });
-
-    if (!existing) {
-      // Also check coupons table
-      const existingCoupon = await new Promise((resolve) => {
-        db.get('SELECT id FROM coupons WHERE code = ?', [couponCode], (err, row) => {
-          resolve(row);
-        });
-      });
-
-      if (!existingCoupon) {
-        return couponCode;
-      }
-    }
-  } while (attempts < 200);
-
-  // Final fallback
-  return 'CHL' + Date.now().toString().slice(-6);
-}
-
-// Get coupon winners
-router.get('/coupon-winners', requireAdmin, (req, res) => {
-  const { limit = 50, offset = 0 } = req.query;
-
-  console.log('Fetching coupon winners, limit:', limit, 'offset:', offset);
-
-  db.all(`SELECT cw.*, u.name as user_name, u.email as user_email, s.name as sent_by_name
-          FROM coupon_winners cw
-          LEFT JOIN users u ON cw.user_id = u.id
-          LEFT JOIN users s ON cw.sent_by = s.id
-          ORDER BY cw.created_at DESC
-          LIMIT ? OFFSET ?`,
-    [parseInt(limit), parseInt(offset)], (err, winners) => {
-      if (err) {
-        console.error('Error fetching coupon winners:', err);
-        return res.status(500).json({ error: err.message });
-      }
-
-      console.log('Found', winners.length, 'coupon winners');
-
-      // Get total count
-      db.get('SELECT COUNT(*) as total FROM coupon_winners', [], (countErr, countResult) => {
-        if (countErr) {
-          console.error('Error getting coupon winners count:', countErr);
-          return res.status(500).json({ error: countErr.message });
-        }
-
-        console.log('Total coupon winners count:', countResult.total);
-
-        res.json({
-          winners: winners,
-          total: countResult.total,
-          limit: parseInt(limit),
-          offset: parseInt(offset)
-        });
-      });
-    });
-});
-
-// Send coupon codes to winners - MEMORY OPTIMIZED VERSION
-router.post('/coupon-winners/send', requireAdmin, (req, res) => {
-  const { user_ids: rawUserIds, discount_amount, discount_type = 'fixed', max_discount, expiry_days = 30, winner_message = 'You have been selected as a coupon winner!' } = req.body;
-  let userIds = Array.isArray(rawUserIds) ? [...rawUserIds] : [];
-
-  // Normalize numeric inputs to avoid "" -> double precision errors
-  const discountValue = Number(discount_amount);
-  const maxDiscountValue = max_discount === '' || max_discount === undefined || max_discount === null
-    ? null
-    : Number(max_discount);
-  const expiryDaysValue = Number(expiry_days) || 30;
-
-  console.log('🎯 Received winner_message:', winner_message);
-  console.log('🎯 Full request body:', req.body);
-
-  console.log('Coupon winners request received:', { user_ids: userIds?.length, discount_amount, discount_type });
-
-  if (!process.env.BREVO_API_KEY) {
-    console.error('❌ BREVO_API_KEY is not set. Cannot send winner emails.');
-    return res.status(500).json({
-      error: 'Email is not configured. Set BREVO_API_KEY (Brevo SMTP API key) and try again.',
-      hint: 'Add BREVO_API_KEY and BREVO_FROM_EMAIL to your environment or Render/Neon secrets.'
-    });
-  }
-
-  // Validate input
-  if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
-    return res.status(400).json({ error: 'User IDs array is required' });
-  }
-
-  if (!discountValue || discountValue <= 0 || Number.isNaN(discountValue)) {
-    return res.status(400).json({ error: 'Valid discount amount is required' });
-  }
-
-  if (!['fixed', 'percentage'].includes(discount_type)) {
-    return res.status(400).json({ error: 'Discount type must be "fixed" or "percentage"' });
-  }
-
-  if (discount_type === 'percentage' && (discountValue < 0 || discountValue > 100)) {
-    return res.status(400).json({ error: 'Percentage discount must be between 0 and 100' });
-  }
-
-  // Limit to prevent memory issues - reduce to 5 max
-  if (userIds.length > 5) {
-    return res.status(400).json({ error: 'Cannot process more than 5 users at once. Please select fewer users.' });
-  }
-
-  console.log('🚀 Starting coupon winner creation for', userIds.length, 'users:', userIds);
-
-  // Validate that user_ids array contains unique IDs only
-  const uniqueUserIds = [...new Set(userIds)];
-  if (uniqueUserIds.length !== userIds.length) {
-    console.warn('⚠️ Duplicate user IDs detected, removing duplicates');
-    userIds = uniqueUserIds;
-  }
-
-  // Double check the limit
-  if (userIds.length > 5) {
-    console.error('❌ Too many users selected:', userIds.length);
-    return res.status(400).json({ error: 'Cannot process more than 5 users at once. Please select fewer users.' });
-  }
-
-  console.log('✅ Final user list for processing:', userIds.length, 'users');
-
-  const expiryDate = new Date();
-  expiryDate.setDate(expiryDate.getDate() + parseInt(expiryDaysValue));
-  const adminId = req.user?.id || 1;
-
-  // Get user details
-  const placeholders = userIds.map(() => '?').join(',');
-  db.all(`SELECT id, name, email FROM users WHERE id IN (${placeholders})`, userIds, (err, users) => {
-    if (err) {
-      console.error('Error getting users:', err);
-      return res.status(500).json({ error: 'Failed to get user details: ' + err.message });
-    }
-
-    if (!users || users.length === 0) {
-      return res.status(404).json({ error: 'No valid users found' });
-    }
-
-    const results = [];
-    const generatedCodes = [];
-
-    // Process each user synchronously to avoid memory issues
-    const processUser = (userIndex) => {
-      if (userIndex >= users.length) {
-        // All done
-        console.log('All coupon winners processed successfully');
-
-        const sentCount = results.filter(r => r.status === 'sent').length;
-        const failedEmails = results.filter(r => r.status === 'email_failed');
-        const failedRecords = results.filter(r => r.status === 'failed');
-        const isSuccess = failedEmails.length === 0 && failedRecords.length === 0;
-
-        const responsePayload = {
-          success: isSuccess,
-          message: isSuccess
-            ? `Emails sent to all ${users.length} winner${users.length > 1 ? 's' : ''}.`
-            : `Emails sent to ${sentCount}/${users.length} winner${users.length > 1 ? 's' : ''}.`,
-          total_users: users.length,
-          sent_count: sentCount,
-          failed_email_count: failedEmails.length,
-          failed_record_count: failedRecords.length,
-          failed_record_errors: failedRecords.map(r => r.error).filter(Boolean),
-          results: results,
-          discount_amount: discount_amount,
-          discount_type: discount_type,
-          expiry_date: expiryDate.toISOString(),
-          generated_codes: generatedCodes,
-          note: 'Codes are stored in database and can be viewed in history.'
-        };
-
-        if (!isSuccess) {
-          responsePayload.error = 'Some winner emails failed to send.';
-          responsePayload.failed_emails = failedEmails.map(r => r.email);
-        }
-
-        return res.status(isSuccess ? 200 : 207).json(responsePayload);
-      }
-
-      const user = users[userIndex];
-
-      // Generate unique coupon code synchronously
-      const generateCode = () => {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        let code = '';
-        for (let i = 0; i < 8; i++) {
-          code += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return code;
-      };
-
-      let attempts = 0;
-      const checkAndCreate = () => {
-        attempts++;
-        const couponCode = attempts > 50 ? 'CHL' + Date.now().toString().slice(-6) : generateCode();
-
-        // Check if code exists
-        db.get('SELECT id FROM coupons WHERE code = ? UNION SELECT id FROM coupon_winners WHERE coupon_code = ?',
-          [couponCode, couponCode], (checkErr, existing) => {
-            if (checkErr) {
-              console.error('Error checking coupon code:', checkErr);
-              results.push({ user: user.name, email: user.email, status: 'failed', error: 'Database error' });
-              processUser(userIndex + 1);
-              return;
-            }
-
-            if (existing && attempts < 100) {
-              // Code exists, try again
-              checkAndCreate();
-              return;
-            }
-
-            // Code is unique, create coupon
-            const couponDescription = `Coin reward for ${user.name} - ${discountValue} coins`;
-
-            db.run(`INSERT INTO coupons (code, description, discount_type, discount_value, min_purchase, max_discount, usage_limit, expiry_date)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-              [couponCode, couponDescription, discount_type, discountValue, 0, maxDiscountValue, 1, expiryDate.toISOString()],
-              function (couponErr) {
-                if (couponErr) {
-                  console.error('Error creating coupon:', couponErr);
-                  results.push({ user: user.name, email: user.email, status: 'failed', error: couponErr.message || 'Database error' });
-                  processUser(userIndex + 1);
-                  return;
-                }
-
-                const couponId = this.lastID;
-                generatedCodes.push(couponCode);
-
-                // Create winner record
-                console.log('📝 Creating winner record for user:', user.email, 'coupon code:', couponCode);
-                db.run(`INSERT INTO coupon_winners (user_id, coupon_code, discount_amount, discount_type, max_discount, expiry_date, sent_by, shared_coupon_id)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-                  [user.id, couponCode, discountValue, discount_type, maxDiscountValue, expiryDate.toISOString(), adminId, couponId],
-                  function (winnerErr) {
-                    console.log('🏆 Winner record callback executed for:', user.email);
-                    if (winnerErr) {
-                      console.error('❌ Error creating winner record:', winnerErr);
-                      results.push({ user: user.name, email: user.email, coupon_code: couponCode, status: 'failed', error: winnerErr.message || 'Database error' });
-                      processUser(userIndex + 1);
-                    } else {
-                      console.log('✅ Created coupon winner for:', user.email, 'Code:', couponCode);
-                      const resultEntry = { user: user.name, email: user.email, coupon_code: couponCode, status: 'recorded' };
-                      results.push(resultEntry);
-
-                      // Send email to user via Brevo
-                      console.log('📧 Sending coupon email via Brevo...');
-
-                      const emailHtml = `
-                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                          <div style="background: white; border: 1px solid #e9ecef; padding: 30px; text-align: center; border-radius: 15px 15px 0 0;">
-                            <h1 style="color: black; margin: 0; font-size: 24px;">Chalchitra Series</h1>
-                            <p style="color: #6c757d; margin: 10px 0 0 0;">Indian Institute of Technology Jammu</p>
-                          </div>
-                          <div style="background: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                            <h2 style="color: #333; margin-top: 0;">Congratulations ${user.name}!</h2>
-                            <p style="color: #555; font-size: 16px; margin: 20px 0;">${winner_message}</p>
-
-                            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0; text-align: center;">
-                              <h3 style="color: #28a745; margin: 0; font-size: 18px;">Your Exclusive Coupon Code</h3>
-                              <div style="font-size: 24px; font-weight: bold; color: #007bff; margin: 10px 0; letter-spacing: 2px;">${couponCode}</div>
-                              <p style="color: #666; margin: 10px 0 0 0;">
-                                <strong>Coins:</strong> ${discount_amount} 🪙<br>
-                                <strong>Valid until:</strong> ${expiryDate.toLocaleDateString('en-IN')}
-                              </p>
-                            </div>
-
-                            <p style="color: #555; line-height: 1.6;">
-                              Use this coupon code during movie ticket booking on our website to avail your discount.
-                              This code is unique to you and cannot be shared.
-                            </p>
-
-                            <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-                            <p style="color: #666; font-size: 14px; margin: 0;">
-                              Best regards,<br>
-                              <strong>Chalchitra Team</strong><br>
-                              Indian Institute of Technology Jammu
-                            </p>
-                          </div>
-                        </div>
-                      `;
-
-                      sendEmailWithRetry({
-                        sender: getBrevoSender(),
-                        to: [{ email: user.email, name: user.name }],
-                        subject: 'Your Exclusive Chalchitra Coupon Code!',
-                        htmlContent: emailHtml
-                      }, 2).then((data) => {
-                        console.log('✅ Email sent successfully to:', user.email, 'messageId:', data?.messageId);
-                        resultEntry.status = 'sent';
-                        resultEntry.messageId = data?.messageId;
-
-                        db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status)
-                                VALUES (?, ?, ?, ?, ?, ?, ?)`,
-                          ['winner', user.email, user.name, 'Your Exclusive Chalchitra Coupon Code!', winner_message, adminId, 'sent'],
-                          (logErr) => { if (logErr) console.error('Error logging winner email success:', logErr); });
-
-                        processUser(userIndex + 1);
-                      }).catch(sendError => {
-                        console.error('❌ FAILED to send coupon email to', user.email, ':', sendError.message);
-                        resultEntry.status = 'email_failed';
-                        resultEntry.email_error = sendError.message;
-
-                        db.run(`INSERT INTO email_history (email_type, recipient_email, recipient_name, subject, message, sent_by, status, error_message)
-                                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-                          ['winner', user.email, user.name, 'Your Exclusive Chalchitra Coupon Code!', winner_message, adminId, 'failed', sendError.message],
-                          (logErr) => { if (logErr) console.error('Error logging winner email failure:', logErr); });
-
-                        // Delete the coupon and winner record since email failed
-                        db.run('DELETE FROM coupons WHERE id = ?', [couponId], (deleteCouponErr) => {
-                          if (deleteCouponErr) console.error('Error deleting failed coupon:', deleteCouponErr);
-                        });
-                        db.run('DELETE FROM coupon_winners WHERE user_id = ? AND coupon_code = ?', [user.id, couponCode], (deleteWinnerErr) => {
-                          if (deleteWinnerErr) console.error('Error deleting failed winner:', deleteWinnerErr);
-                        });
-                        processUser(userIndex + 1);
-                      });
-                    }
-                  });
-              });
-          });
-      };
-
-      checkAndCreate();
-    };
-
-    // Start processing
-    processUser(0);
-  });
-});
-
-// Validate coupon winner code during booking
-router.post('/validate-coupon-winner', (req, res) => {
-  const { code, user_id } = req.body;
-
-  if (!code) {
-    return res.status(400).json({ error: 'Coupon code is required' });
-  }
-
-  db.get(`SELECT * FROM coupon_winners
-          WHERE coupon_code = ? AND user_id = ? AND is_used = 0
-          AND (expiry_date IS NULL OR expiry_date > datetime('now'))`,
-    [code.toUpperCase(), user_id], (err, coupon) => {
-      if (err) return res.status(500).json({ error: err.message });
-      if (!coupon) return res.status(400).json({ error: 'Invalid, expired, or already used coupon code' });
-
-      // Calculate discount
-      let discount = 0;
-      if (coupon.discount_type === 'percentage') {
-        // This will be calculated on frontend with total amount
-        discount = coupon.discount_amount; // percentage
-      } else {
-        discount = coupon.discount_amount; // fixed amount
-      }
-
-      res.json({
-        valid: true,
-        coupon: {
-          id: coupon.id,
-          code: coupon.coupon_code,
-          discount_type: coupon.discount_type,
-          discount_amount: coupon.discount_amount,
-          max_discount: coupon.max_discount,
-          discount: discount,
-          expiry_date: coupon.expiry_date
-        }
-      });
-    });
-});
-
 // Send ticket email to customer (DISABLED - no longer used)
 /*
 router.post('/email/ticket', async (req, res) => {
@@ -2185,7 +1563,7 @@ router.get('/permissions/:adminId', requireAdmin, (req, res) => {
       // Return default permissions (all tabs except config)
       const defaultTabs = [
         'dashboard', 'movies', 'foods', 'bookings', 'users',
-        'team', 'gallery', 'coupons', 'coupon-winners', 'feedback', 'mail', 'settings'
+        'team', 'gallery', 'feedback', 'mail', 'settings'
       ];
       return res.json({
         admin_user_id: adminId,
@@ -2211,7 +1589,7 @@ router.put('/permissions/:adminId', requireAdmin, (req, res) => {
   }
 
   // Validate all tabs are valid
-  const validTabs = ['dashboard', 'movies', 'foods', 'bookings', 'users', 'team', 'gallery', 'coupons', 'coupon-winners', 'feedback', 'mail', 'settings', 'config'];
+  const validTabs = ['dashboard', 'movies', 'foods', 'bookings', 'users', 'team', 'gallery', 'feedback', 'mail', 'settings', 'config'];
   const invalidTabs = allowed_tabs.filter(tab => !validTabs.includes(tab));
 
   if (invalidTabs.length > 0) {
@@ -2291,7 +1669,7 @@ router.get('/my-permissions', requireAdmin, (req, res) => {
     if (user.email === '2025uee0154@iitjammu.ac.in') {
       const allTabs = [
         'dashboard', 'movies', 'foods', 'bookings', 'users',
-        'team', 'gallery', 'coupons', 'coupon-winners', 'feedback', 'mail', 'settings', 'config'
+        'team', 'gallery', 'feedback', 'mail', 'settings', 'config'
       ];
       return res.json({
         is_super_admin: true,
@@ -2308,7 +1686,7 @@ router.get('/my-permissions', requireAdmin, (req, res) => {
         // No custom permissions, give default access (all tabs except config)
         const defaultTabs = [
           'dashboard', 'movies', 'foods', 'bookings', 'users',
-          'team', 'gallery', 'coupons', 'coupon-winners', 'feedback', 'mail', 'settings'
+          'team', 'gallery', 'feedback', 'mail', 'settings'
         ];
         return res.json({
           is_super_admin: false,
@@ -2336,8 +1714,6 @@ router.get('/available-tabs', requireAdmin, (req, res) => {
     { id: 'users', name: 'Users', icon: '👥', description: 'Manage user accounts' },
     { id: 'team', name: 'Team', icon: '👨‍💼', description: 'Manage team members' },
     { id: 'gallery', name: 'Gallery', icon: '🖼️', description: 'Manage gallery images' },
-    { id: 'coupons', name: 'Coupons', icon: '🎟️', description: 'Manage discount coupons' },
-    { id: 'coupon-winners', name: 'Winners', icon: '🏆', description: 'Manage coupon winners' },
     { id: 'feedback', name: 'Feedback', icon: '💬', description: 'View user feedback' },
     { id: 'mail', name: 'Mail', icon: '📧', description: 'Send emails to users' },
     { id: 'settings', name: 'Settings', icon: '⚙️', description: 'Website settings' },
@@ -2345,22 +1721,6 @@ router.get('/available-tabs', requireAdmin, (req, res) => {
   ];
 
   res.json(tabs);
-});
-
-// Delete coupon winners
-router.delete('/coupon-winners', requireAdmin, (req, res) => {
-  const { ids } = req.body;
-
-  if (!ids || !Array.isArray(ids) || ids.length === 0) {
-    return res.status(400).json({ error: 'Winner IDs array is required' });
-  }
-
-  // Don't allow deleting super admin's winners
-  const placeholders = ids.map(() => '?').join(',');
-  db.run(`DELETE FROM coupon_winners WHERE id IN (${placeholders})`, ids, function (err) {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ message: `${this.changes} winner(s) deleted successfully` });
-  });
 });
 
 // Reset permissions to default for an admin
@@ -2560,109 +1920,50 @@ router.post('/mail-settings/test', requireAdmin, async (req, res) => {
   });
 });
 
-// ===== RAZORPAY SETTINGS =====
+// ===== COIN TRANSFER (Admin) =====
 
-// Get Razorpay settings
-router.get('/razorpay-settings', requireAdmin, (req, res) => {
-  // First check if this is the super admin
-  db.get('SELECT email FROM users WHERE id = ?', [req.user?.id || req.session?.adminUser?.id], (err, user) => {
+// Send coins to a user (admin only)
+router.post('/send-coins', requireAdmin, (req, res) => {
+  const { user_id, amount, reason } = req.body;
+
+  if (!user_id || !amount || amount <= 0) {
+    return res.status(400).json({ error: 'User ID and positive amount are required' });
+  }
+
+  const coinsToGive = Math.floor(Number(amount));
+  if (coinsToGive <= 0) {
+    return res.status(400).json({ error: 'Amount must be a positive number' });
+  }
+
+  // Check if user exists
+  db.get('SELECT id, name, email FROM users WHERE id = ?', [user_id], (err, user) => {
     if (err) return res.status(500).json({ error: err.message });
+    if (!user) return res.status(404).json({ error: 'User not found' });
 
-    // Only super admin can access razorpay settings
-    if (!user || user.email !== '2025uee0154@iitjammu.ac.in') {
-      return res.status(403).json({ error: 'Access denied. Super admin only.' });
-    }
-
-    // Create table if not exists
-    db.run(`CREATE TABLE IF NOT EXISTS razorpay_settings (
-      id INTEGER PRIMARY KEY,
-      key_id TEXT,
-      key_secret TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`, (tableErr) => {
-      if (tableErr) return res.status(500).json({ error: tableErr.message });
-
-      db.get('SELECT * FROM razorpay_settings WHERE id = 1', (getErr, settings) => {
-        if (getErr) return res.status(500).json({ error: getErr.message });
-
-        if (!settings) {
-          // Return environment variables as default or fallback values
-          return res.json({
-            id: 1,
-            key_id: process.env.RAZORPAY_KEY_ID || '',
-            key_secret: process.env.RAZORPAY_KEY_SECRET ? '••••••••' : '',
-            has_secret: !!process.env.RAZORPAY_KEY_SECRET
-          });
+    // Grant coins
+    db.run('UPDATE users SET coins = COALESCE(coins, 0) + ? WHERE id = ?',
+      [coinsToGive, user_id], function (updateErr) {
+        if (updateErr) {
+          console.error('Error granting coins:', updateErr);
+          return res.status(500).json({ error: 'Failed to grant coins' });
         }
 
-        // Don't return the actual secret for security - mask it
+        // Record transaction
+        const reasonText = reason ? `admin_grant: ${reason}` : 'admin_grant';
+        db.run('INSERT INTO coin_transactions (user_id, amount, type, reason) VALUES (?, ?, ?, ?)',
+          [user_id, coinsToGive, 'credit', reasonText], function (txnErr) {
+            if (txnErr) console.error('⚠️ Could not record coin transaction:', txnErr.message);
+          });
+
+        console.log(`✅ Admin granted ${coinsToGive} coins to user ${user.name} (${user.email})`);
+
         res.json({
-          id: settings.id,
-          key_id: settings.key_id || '',
-          key_secret: settings.key_secret ? '••••••••' : '',
-          has_secret: !!settings.key_secret
+          success: true,
+          message: `${coinsToGive} coins sent to ${user.name} (${user.email})`,
+          user: { id: user.id, name: user.name, email: user.email },
+          coins_granted: coinsToGive
         });
       });
-    });
-  });
-});
-
-// Update Razorpay settings
-router.put('/razorpay-settings', requireAdmin, (req, res) => {
-  // First check if this is the super admin
-  db.get('SELECT email FROM users WHERE id = ?', [req.user?.id || req.session?.adminUser?.id], (err, user) => {
-    if (err) return res.status(500).json({ error: err.message });
-
-    // Only super admin can update razorpay settings
-    if (!user || user.email !== '2025uee0154@iitjammu.ac.in') {
-      return res.status(403).json({ error: 'Access denied. Super admin only.' });
-    }
-
-    const { key_id, key_secret } = req.body;
-
-    // Create table if not exists
-    db.run(`CREATE TABLE IF NOT EXISTS razorpay_settings (
-      id INTEGER PRIMARY KEY,
-      key_id TEXT,
-      key_secret TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`, (tableErr) => {
-      if (tableErr) return res.status(500).json({ error: tableErr.message });
-
-      db.get('SELECT id, key_secret FROM razorpay_settings WHERE id = 1', (checkErr, existing) => {
-        if (checkErr) return res.status(500).json({ error: checkErr.message });
-
-        if (existing) {
-          // Update existing settings
-          // Only update secret if it's not the masked value
-          let query = 'UPDATE razorpay_settings SET key_id = ?, updated_at = CURRENT_TIMESTAMP';
-          let params = [key_id];
-
-          if (key_secret && key_secret !== '••••••••') {
-            query = 'UPDATE razorpay_settings SET key_id = ?, key_secret = ?, updated_at = CURRENT_TIMESTAMP WHERE id = 1';
-            params = [key_id, key_secret];
-          } else {
-            query += ' WHERE id = 1';
-          }
-
-          db.run(query, params, function (updateErr) {
-            if (updateErr) return res.status(500).json({ error: updateErr.message });
-            res.json({ message: 'Razorpay settings updated successfully', changes: this.changes });
-          });
-        } else {
-          db.run(`INSERT INTO razorpay_settings (id, key_id, key_secret)
-                  VALUES (1, ?, ?)`,
-            [key_id, key_secret !== '••••••••' ? key_secret : ''],
-            function (insertErr) {
-              if (insertErr) return res.status(500).json({ error: insertErr.message });
-              res.json({ message: 'Razorpay settings created successfully', id: this.lastID });
-            }
-          );
-        }
-      });
-    });
   });
 });
 

@@ -267,7 +267,7 @@ router.put('/:id', (req, res) => {
     hasPoster: !!req.file
   });
 
-  const { title, description, date, venue, price, availableFoods, category, duration, imdb_rating, language, is_special, special_message } = body;
+  const { title, description, date, venue, price, coin_price, availableFoods, category, duration, imdb_rating, language, is_special, special_message } = body;
   
   // Validate required fields
   const validationErrors = validateMovieData(body);
@@ -318,12 +318,13 @@ router.put('/:id', (req, res) => {
 
   const sql = `UPDATE movies SET 
                title = ?, description = ?, poster_url = ?, date = ?, venue = ?, price = ?, 
-               is_upcoming = ?, available_foods = ?, category = ?, duration = ?, 
+               coin_price = ?, is_upcoming = ?, available_foods = ?, category = ?, duration = ?, 
                imdb_rating = ?, language = ?, is_special = ?, special_message = ? 
                WHERE id = ?`;
   const params = [
     title || '', description || '', poster_url || '', date || '', venue || '', 
     price !== undefined && price !== '' ? parseFloat(price) : 0, 
+    coin_price !== undefined && coin_price !== '' ? parseInt(coin_price) : 20,
     finalIsUpcoming, availableFoodsString, category || '', duration || '', 
     imdb_rating || '', language || '', is_special ? parseInt(is_special) : 0, 
     special_message || '', movieId

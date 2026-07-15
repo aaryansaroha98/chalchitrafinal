@@ -153,8 +153,6 @@ app.use('/api/movies', require('./routes/movies'));
 console.log('✅ Movies routes loaded');
 app.use('/api/bookings', require('./routes/bookings'));
 console.log('✅ Bookings routes loaded');
-app.use('/api/payments', require('./routes/payments'));
-console.log('✅ Payments routes loaded');
 app.use('/api/admin', require('./routes/admin'));
 console.log('✅ Admin routes loaded');
 app.use('/api/feedback', require('./routes/feedback'));

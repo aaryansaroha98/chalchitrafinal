@@ -109,7 +109,7 @@ function initializeGoogleStrategy() {
                 }
                 const newUserId = this.lastID;
                 // Grant signup bonus coins for new users
-                const BONUS_COINS = 20;
+                const BONUS_COINS = 50;
                 db.run('INSERT INTO coin_transactions (user_id, amount, type, reason) VALUES (?, ?, ?, ?)',
                   [newUserId, BONUS_COINS, 'credit', 'signup_bonus'], function(coinErr) {
                     if (coinErr) console.error('⚠️ Could not grant signup bonus coins:', coinErr.message);
