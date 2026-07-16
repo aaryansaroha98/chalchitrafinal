@@ -682,11 +682,9 @@ footer, .footer {
 }
 .qt-nav-inner {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  min-height: 58px;
+  height: 58px;
   padding: 0 clamp(16px, 4vw, 40px) !important;
-  gap: 0.25rem;
 }
 
 /* Brand */
@@ -711,14 +709,14 @@ footer, .footer {
 
 /* Center + right clusters */
 .qt-nav-center {
-  display: flex;
-  align-items: center;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 .qt-nav-right {
   margin-left: auto;
   align-items: center;
   gap: 0.5rem;
-  display: flex;
 }
 .qt-nav-links {
   display: flex;
@@ -776,12 +774,11 @@ footer, .footer {
   white-space: nowrap;
 }
 
-/* Mobile cluster */
 .qt-nav-mobile {
+  margin-left: auto;
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  margin-left: 8px;
 }
 .qt-icon-btn {
   background: transparent;
@@ -796,8 +793,12 @@ footer, .footer {
 .qt-mobile-login-icon { width: 22px; height: 22px; }
 
 /* =====================================================================
-   NAV BURGER + OVERLAY MENU — visible on all sizes
+   MOBILE NAV — hamburger button + full-screen menu (Quantify-style)
    ===================================================================== */
+.nav-burger { display: none; }
+.mobile-menu { display: none; }
+
+@media (max-width: 991px) {
 .nav-burger {
   display: inline-flex;
   align-items: center;
@@ -926,6 +927,7 @@ body.menu-open { overflow: hidden; }
 }
 
 .mobile-menu-legal a:hover { color: var(--qt-text) !important; }
+}
 
 /* Footer heading/link resets (kill old gradient text) */
 footer h1, footer h2, footer h3, footer h4,
