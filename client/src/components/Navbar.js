@@ -90,6 +90,7 @@ const NavigationBar = () => {
   ];
 
   return (
+    <>
     <Navbar className="qt-nav" style={shellStyle} sticky="top" expand={false}>
       <Container fluid className="qt-nav-inner">
         {/* Logo — left */}
@@ -146,41 +147,42 @@ const NavigationBar = () => {
             aria-controls="mobile-menu"
           ><span></span></button>
         </div>
-
-        {/* Mobile menu (full-screen overlay like Quantify) */}
-        <div className={`mobile-menu${menuOpen ? ' is-open' : ''}`} id="mobile-menu" aria-label="Mobile navigation">
-          {mainLinks.map((l) => (
-            <Link key={l.to} to={l.to} onClick={closeMenu} className="mobile-menu-link">{l.label}</Link>
-          ))}
-
-          <span className="mobile-menu-sep" />
-
-          {user ? (
-            <>
-              <span className="mobile-menu-greeting">Hi, {user?.name?.split(' ')[0] || 'User'}</span>
-              <Link to="/my-bookings" onClick={closeMenu} className="mobile-menu-link">My Bookings</Link>
-              {!!(user.code_scanner || user.team_scanner) && (
-                <Link to="/scanner" onClick={closeMenu} className="mobile-menu-link">Scanner</Link>
-              )}
-              {!!user.is_admin && (
-                <Link to="/admin" onClick={closeMenu} className="mobile-menu-link">Admin</Link>
-              )}
-              <button onClick={() => { logout(); closeMenu(); }} className="mobile-menu-logout">Logout</button>
-            </>
-          ) : (
-            <Link to="/login" onClick={closeMenu} className="mobile-menu-link mobile-menu-login-link">
-              <img src="/logos/google-logo-icon-PNG-Transparent-Background.png" alt="" className="qt-google-icon" />
-              Login
-            </Link>
-          )}
-
-          <div className="mobile-menu-legal">
-            <Link to="/privacy-policy" onClick={closeMenu}>Privacy Policy</Link>
-            <Link to="/terms-of-service" onClick={closeMenu}>Terms of Service</Link>
-          </div>
-        </div>
       </Container>
     </Navbar>
+
+    {/* Mobile menu (full-screen overlay — OUTSIDE Navbar to avoid transform breaking position:fixed) */}
+    <div className={`mobile-menu${menuOpen ? ' is-open' : ''}`} id="mobile-menu" aria-label="Mobile navigation">
+      {mainLinks.map((l) => (
+        <Link key={l.to} to={l.to} onClick={closeMenu} className="mobile-menu-link">{l.label}</Link>
+      ))}
+
+      <span className="mobile-menu-sep" />
+
+      {user ? (
+        <>
+          <span className="mobile-menu-greeting">Hi, {user?.name?.split(' ')[0] || 'User'}</span>
+          <Link to="/my-bookings" onClick={closeMenu} className="mobile-menu-link">My Bookings</Link>
+          {!!(user.code_scanner || user.team_scanner) && (
+            <Link to="/scanner" onClick={closeMenu} className="mobile-menu-link">Scanner</Link>
+          )}
+          {!!user.is_admin && (
+            <Link to="/admin" onClick={closeMenu} className="mobile-menu-link">Admin</Link>
+          )}
+          <button onClick={() => { logout(); closeMenu(); }} className="mobile-menu-logout">Logout</button>
+        </>
+      ) : (
+        <Link to="/login" onClick={closeMenu} className="mobile-menu-link mobile-menu-login-link">
+          <img src="/logos/google-logo-icon-PNG-Transparent-Background.png" alt="" className="qt-google-icon" />
+          Login
+        </Link>
+      )}
+
+      <div className="mobile-menu-legal">
+        <Link to="/privacy-policy" onClick={closeMenu}>Privacy Policy</Link>
+        <Link to="/terms-of-service" onClick={closeMenu}>Terms of Service</Link>
+      </div>
+    </div>
+    </>
   );
 };
 
