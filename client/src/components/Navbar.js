@@ -99,8 +99,8 @@ const NavigationBar = () => {
           <span className="qt-brand-name">CHALCHITRA</span>
         </Navbar.Brand>
 
-        {/* Desktop: center nav */}
-        <div className="d-none d-lg-flex qt-nav-center">
+        {/* Center nav — visible on all sizes, wraps on mobile */}
+        <div className="qt-nav-center">
           <Nav className="qt-nav-links">
             {mainLinks.map((l) => (
               <Nav.Link key={l.to} as={Link} to={l.to} className="qt-nav-link">{l.label}</Nav.Link>
@@ -108,8 +108,8 @@ const NavigationBar = () => {
           </Nav>
         </div>
 
-        {/* Desktop: right cluster */}
-        <div className="d-none d-lg-flex qt-nav-right">
+        {/* Right cluster — visible on all sizes */}
+        <div className="qt-nav-right">
           <Nav className="qt-nav-links">
             {user ? (
               <>
@@ -136,8 +136,8 @@ const NavigationBar = () => {
           )}
         </div>
 
-        {/* Mobile: hamburger */}
-        <div className="d-lg-none qt-nav-mobile">
+        {/* Hamburger for full overlay menu */}
+        <div className="qt-nav-mobile">
           <button
             onClick={toggleMenu}
             className={`nav-burger${menuOpen ? ' is-open' : ''}`}
