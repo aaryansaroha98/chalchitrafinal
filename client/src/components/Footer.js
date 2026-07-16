@@ -9,6 +9,7 @@ const Footer = () => {
         <div className="qt-footer-copy">© 2026 Chalchitra Series. All rights reserved.</div>
         <div className="qt-footer-legal">
           <Link to="/privacy-policy">Privacy Policy</Link>
+          <Link to="/terms-of-service">Terms of Service</Link>
         </div>
         <div className="qt-footer-social" aria-label="Social links">
           <a href="https://www.instagram.com/chalchitra.iitjammu/" aria-label="Instagram" target="_blank" rel="noreferrer">
