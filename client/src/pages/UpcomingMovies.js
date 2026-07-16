@@ -6,6 +6,7 @@ import api from '../api/axios';
 import Loader from '../components/Loader';
 import { useAuth } from '../contexts/AuthContext';
 import { isUpcomingMovie, compareMovieDatesAsc } from '../utils/movieStatus';
+import Icon from '../components/Icon';
 
 const UpcomingMovies = () => {
   const navigate = useNavigate();
@@ -295,7 +296,7 @@ const UpcomingMovies = () => {
             padding: '1rem 1.5rem',
             marginBottom: '2rem'
           }}>
-            <i className="fas fa-exclamation-triangle" style={{marginRight: '0.5rem'}}></i>
+            <Icon name="exclamation-triangle" style={{marginRight: '0.5rem'}} />
             {error}
           </Alert>
         )}
@@ -307,12 +308,12 @@ const UpcomingMovies = () => {
             background: '#ffffff',
             border: '1px solid #e5e7eb'
           }}>
-            <i className="fas fa-film" style={{
+            <Icon name="film" style={{
               fontSize: '4rem',
               color: '#8b909c',
               marginBottom: '1.5rem',
               display: 'block'
-            }}></i>
+            }} />
             <p style={{
               fontFamily: '"Times New Roman", Times, Georgia, serif',
               fontSize: '1.5rem',
@@ -369,10 +370,10 @@ const UpcomingMovies = () => {
                         alignItems: 'center',
                         justifyContent: 'center'
                       }}>
-                        <i className="fas fa-film" style={{
+                        <Icon name="film" style={{
                           fontSize: '3rem',
                           color: '#adb5bd'
-                        }}></i>
+                        }} />
                       </div>
                     )}
 
@@ -388,7 +389,7 @@ const UpcomingMovies = () => {
                       fontSize: '0.75rem',
                       fontWeight: '600'
                     }}>
-                      <i className="fas fa-calendar" style={{marginRight: '0.25rem'}}></i>
+                      <Icon name="calendar" style={{marginRight: '0.25rem'}} />
                       {new Date(movie.date).toLocaleDateString('en-IN', {
                         month: 'short',
                         day: 'numeric'
@@ -444,12 +445,12 @@ const UpcomingMovies = () => {
                           alignItems: 'center',
                           marginLeft: '0px'
                         }}>
-                          <i className="fas fa-map-marker-alt" style={{
+                          <Icon name="map-marker-alt" style={{
                             color: '#8b909c',
                             fontSize: '0.7rem',
                             marginRight: '0.5rem',
                             minWidth: '14px'
-                          }}></i>
+                          }} />
                         <div>
                           <div className="upcoming-label" style={{
                             fontSize: '0.6rem',
@@ -473,12 +474,12 @@ const UpcomingMovies = () => {
                           position: 'absolute',
                           right: '0'
                         }}>
-                          <i className="fas fa-clock" style={{
+                          <Icon name="clock" style={{
                             color: '#8b909c',
                             fontSize: '0.7rem',
                             marginRight: '0.5rem',
                             minWidth: '14px'
-                          }}></i>
+                          }} />
                           <div>
                             <div className="upcoming-label" style={{
                               fontSize: '0.6rem',
@@ -626,7 +627,7 @@ const UpcomingMovies = () => {
                   e.target.style.color = '#ffffff';
                 }}
               >
-                <i className="fas fa-sign-in-alt" style={{marginRight: '10px'}}></i>
+                <Icon name="sign-in-alt" style={{marginRight: '10px'}} />
                 Login with IIT Jammu Mail
               </button>
 

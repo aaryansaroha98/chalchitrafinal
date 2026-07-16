@@ -6,6 +6,7 @@ import html2canvas from 'html2canvas';
 import autoTable from 'jspdf-autotable';
 import Loader from '../components/Loader';
 import { getMovieStatus } from '../utils/movieStatus';
+import Icon from '../components/Icon';
 
 // Configure axios to send cookies with requests
 api.defaults.withCredentials = true;
@@ -2129,11 +2130,11 @@ const AdminPanel = () => {
             <div className="d-flex justify-content-between align-items-center mb-4">
               <div>
                 <h3 className="text-white mb-0">
-                  <i className="fas fa-film me-2"></i>
+                  <Icon name="film" className="me-2" />
                   Movie Management
                 </h3>
                 <small className="text-success">
-                  <i className="fas fa-check-circle me-1"></i>
+                  <Icon name="check-circle" className="me-1" />
                   Fixed: Movies will stay visible after editing
                 </small>
               </div>
@@ -2167,7 +2168,7 @@ const AdminPanel = () => {
                   padding: '12px 24px'
                 }}
               >
-                <i className="fas fa-plus me-2"></i>
+                <Icon name="plus" className="me-2" />
                 Add New Movie
               </Button>
             </div>
@@ -2325,7 +2326,7 @@ const AdminPanel = () => {
                               })}
                             </div>
                             <div className="text-info mt-1" style={{ fontSize: '0.8rem' }}>
-                              <i className="fas fa-map-marker-alt me-1"></i>
+                              <Icon name="map-marker-alt" className="me-1" />
                               {movie.venue}
                             </div>
                           </div>
@@ -2414,7 +2415,7 @@ const AdminPanel = () => {
                                   fontSize: '0.75rem'
                                 }}
                               >
-                                <i className="fas fa-edit me-1"></i>
+                                <Icon name="edit" className="me-1" />
                                 Edit
                               </Button>
 
@@ -2441,7 +2442,7 @@ const AdminPanel = () => {
                                   fontSize: '0.75rem'
                                 }}
                               >
-                                <i className="fas fa-clock me-1"></i>
+                                <Icon name="clock" className="me-1" />
                                 To Past
                               </Button>
 
@@ -2485,7 +2486,7 @@ const AdminPanel = () => {
                                   fontSize: '0.75rem'
                                 }}
                               >
-                                <i className={`fas ${isBookingStopped ? 'fa-play' : 'fa-ban'} me-1`}></i>
+                                 {isBookingStopped ? <Icon name="play" className="me-1" /> : <Icon name="ban" className="me-1" />}
                                 {isBookingStopped ? 'Start Booking' : 'Stop Booking'}
                               </Button>
 
@@ -2512,7 +2513,7 @@ const AdminPanel = () => {
                                   fontSize: '0.75rem'
                                 }}
                               >
-                                <i className="fas fa-trash me-1"></i>
+                                <Icon name="trash" className="me-1" />
                                 Delete
                               </Button>
                             </div>
@@ -2524,7 +2525,7 @@ const AdminPanel = () => {
                       <tr>
                         <td colSpan="4" className="text-center py-5">
                           <div className="text-muted">
-                            <i className="fas fa-film fa-3x mb-3"></i>
+                            <Icon name="film" className="mb-3" />
                             <h5>No Movies Found</h5>
                             <p>Click "Add New Movie" to create your first movie.</p>
                           </div>
@@ -2541,7 +2542,7 @@ const AdminPanel = () => {
         {activeTab === 'dashboard' && (
           <div className="text-center py-5">
             <h2 className="text-white mb-4" style={{ fontSize: '2rem', fontWeight: '600' }}>
-              <i className="fas fa-tachometer-alt me-2"></i>
+              <Icon name="tachometer-alt" className="me-2" />
               Admin Dashboard
             </h2>
             <p className="text-white-50 mb-5" style={{ fontSize: '1.1rem' }}>Overview of your movie screening platform</p>
@@ -2720,7 +2721,7 @@ const AdminPanel = () => {
                 padding: '12px 24px'
               }}
             >
-              <i className="fas fa-plus me-2"></i>
+              <Icon name="plus" className="me-2" />
               Add Food Item
             </Button>
             <Table striped bordered hover>
@@ -2835,7 +2836,7 @@ const AdminPanel = () => {
                 )) : (
                   <tr>
                     <td colSpan="3" className="text-center text-muted py-4">
-                      <i className="fas fa-utensils fa-2x mb-2"></i>
+                      <Icon name="utensils" className="mb-2" />
                       <br />
                       No food items found
                     </td>
@@ -2981,7 +2982,7 @@ const AdminPanel = () => {
                     color: '#0b0e17'
                   }}
                 >
-                  <i className="fas fa-file-pdf me-2"></i>
+                  <Icon name="file-pdf" className="me-2" />
                   Export PDF ({filteredBookings.length})
                 </Button>
                 <Button
@@ -2994,7 +2995,7 @@ const AdminPanel = () => {
                     whiteSpace: 'nowrap'
                   }}
                 >
-                  <i className="fas fa-trash-alt me-2"></i>
+                  <Icon name="trash-alt" className="me-2" />
                   Reset {selectedMovie ? 'Movie' : 'All'}
                 </Button>
               </Col>
@@ -3076,7 +3077,7 @@ const AdminPanel = () => {
                 )) : (
                   <tr>
                     <td colSpan="9" className="text-center text-muted py-4">
-                      <i className="fas fa-ticket-alt fa-2x mb-2"></i>
+                      <Icon name="ticket-alt" className="mb-2" />
                       <br />
                       {(selectedMovie || bookingSearchTerm.trim()) ? 'No bookings found for selected filters' : 'No bookings found'}
                     </td>
@@ -3128,7 +3129,7 @@ const AdminPanel = () => {
 
             {/* Search Users Section */}
             <h4 className="text-white mt-5 mb-4 text-start">
-              <i className="fas fa-users me-2"></i>
+              <Icon name="users" className="me-2" />
               All Users
             </h4>
             <div className="mb-3">
@@ -3165,7 +3166,7 @@ const AdminPanel = () => {
                 )) : (
                   <tr>
                     <td colSpan="4" className="text-center text-muted py-4">
-                      <i className="fas fa-users fa-2x mb-2"></i>
+                      <Icon name="users" className="mb-2" />
                       <br />
                       No users found
                     </td>
@@ -3193,7 +3194,7 @@ const AdminPanel = () => {
                 padding: '12px 24px'
               }}
             >
-              <i className="fas fa-plus me-2"></i>
+              <Icon name="plus" className="me-2" />
               Add Team Member
             </Button>
             <Table striped bordered hover className="mt-4">
@@ -3309,7 +3310,7 @@ const AdminPanel = () => {
                 )) : (
                   <tr>
                     <td colSpan="5" className="text-center text-muted py-4">
-                      <i className="fas fa-users fa-2x mb-2"></i>
+                      <Icon name="users" className="mb-2" />
                       <br />
                       No team members found
                     </td>
@@ -3337,7 +3338,7 @@ const AdminPanel = () => {
                   padding: '12px 24px'
                 }}
               >
-                <i className="fas fa-plus me-2"></i>
+                <Icon name="plus" className="me-2" />
                 Add New Event
               </Button>
             </div>
@@ -3361,7 +3362,7 @@ const AdminPanel = () => {
                       <Card.Title className="text-truncate" style={{ color: '#0b0e17' }}>{image.event_name || 'Gallery Image'}</Card.Title>
                       <div style={{ marginBottom: '1rem' }}>
                         <small style={{ color: 'var(--gray-600)', fontWeight: '500' }}>
-                          <i className="fas fa-calendar me-1"></i>
+                          <Icon name="calendar" className="me-1" />
                           {formatGalleryDisplayDate(image.event_date || image.uploaded_at)}
                         </small>
                       </div>
@@ -3379,7 +3380,7 @@ const AdminPanel = () => {
                           }
                         }}
                       >
-                        <i className="fas fa-trash me-1"></i>Delete
+                        <Icon name="trash" className="me-1" />Delete
                       </Button>
                     </Card.Body>
                   </Card>
@@ -3387,7 +3388,7 @@ const AdminPanel = () => {
               )) : (
                 <Col>
                   <div className="text-muted py-5">
-                    <i className="fas fa-images fa-3x mb-3"></i>
+                    <Icon name="images" className="mb-3" />
                     <p>No gallery images found</p>
                   </div>
                 </Col>
@@ -3416,7 +3417,7 @@ const AdminPanel = () => {
                     padding: '12px 24px'
                   }}
                 >
-                  <i className="fas fa-plus me-2"></i>
+                  <Icon name="plus" className="me-2" />
                   Create Coupon
                 </Button>
               </div>
@@ -3443,7 +3444,7 @@ const AdminPanel = () => {
                     background: 'transparent'
                   }}
                 >
-                  <i className="fas fa-sync-alt me-2"></i>
+                  <Icon name="sync-alt" className="me-2" />
                   Refresh
                 </Button>
 
@@ -3465,7 +3466,7 @@ const AdminPanel = () => {
                         background: 'transparent'
                       }}
                     >
-                      <i className="fas fa-trash me-2"></i>
+                      <Icon name="trash" className="me-2" />
                       Delete Selected ({selectedCoupons.length})
                     </Button>
                   </div>
@@ -3566,7 +3567,7 @@ const AdminPanel = () => {
                             setShowCouponModal(true);
                           }}
                         >
-                          <i className="fas fa-edit me-1"></i>
+                          <Icon name="edit" className="me-1" />
                           Edit
                         </Button>
                         <Button
@@ -3578,7 +3579,7 @@ const AdminPanel = () => {
                             }
                           }}
                         >
-                          <i className="fas fa-trash me-1"></i>
+                          <Icon name="trash" className="me-1" />
                           Delete
                         </Button>
                       </div>
@@ -3587,7 +3588,7 @@ const AdminPanel = () => {
                 )) : (
                   <tr>
                     <td colSpan="9" className="text-center text-muted py-4">
-                      <i className="fas fa-ticket-alt fa-2x mb-2"></i>
+                      <Icon name="ticket-alt" className="mb-2" />
                       <br />
                       No coupons created yet
                     </td>
@@ -3616,7 +3617,7 @@ const AdminPanel = () => {
                 padding: '12px 24px'
               }}
             >
-              <i className="fas fa-trophy me-2"></i>
+              <Icon name="trophy" className="me-2" />
               Select New Winners
             </Button>
 
@@ -3632,7 +3633,7 @@ const AdminPanel = () => {
             }}>
               <div className="d-flex justify-content-between align-items-center mb-3">
                 <h4 className="text-white mb-0">
-                  <i className="fas fa-users me-2"></i>
+                  <Icon name="users" className="me-2" />
                   All Winners
                 </h4>
                 <div className="d-flex gap-2">
@@ -3661,7 +3662,7 @@ const AdminPanel = () => {
                       a.click();
                     }}
                   >
-                    <i className="fas fa-file-csv me-2"></i>
+                    <Icon name="file-csv" className="me-2" />
                     Export CSV
                   </Button>
                   <Button
@@ -3680,7 +3681,7 @@ const AdminPanel = () => {
                         });
                     }}
                   >
-                    <i className="fas fa-sync-alt me-2"></i>
+                    <Icon name="sync-alt" className="me-2" />
                     Refresh
                   </Button>
                   {selectedWinners.length > 0 && (
@@ -3702,7 +3703,7 @@ const AdminPanel = () => {
                           background: 'transparent'
                         }}
                       >
-                        <i className="fas fa-trash me-2"></i>
+                        <Icon name="trash" className="me-2" />
                         Delete Selected ({selectedWinners.length})
                       </Button>
                     </div>
@@ -3772,12 +3773,12 @@ const AdminPanel = () => {
                         <Badge bg={winner.is_used ? 'success' : 'warning'} style={{ fontSize: '0.8rem' }}>
                           {winner.is_used ? (
                             <>
-                              <i className="fas fa-check me-1"></i>
+                              <Icon name="check" className="me-1" />
                               Used
                             </>
                           ) : (
                             <>
-                              <i className="fas fa-clock me-1"></i>
+                              <Icon name="clock" className="me-1" />
                               Active
                             </>
                           )}
@@ -3813,7 +3814,7 @@ const AdminPanel = () => {
                               alert(`Winner Details:\n\nUser: ${winner.user_name || winner.user_email}\nCoupon: ${winner.coupon_code}\nCoins: ${winner.discount_type === 'percentage' ? `${winner.discount_amount}%` : `🪙 ${winner.discount_amount}`}\nExpires: ${new Date(winner.expiry_date).toLocaleDateString()}\nStatus: ${winner.is_used ? 'Used' : 'Active'}`);
                             }}
                           >
-                            <i className="fas fa-eye me-2"></i>
+                            <Icon name="eye" className="me-2" />
                             View Details
                           </Button>
 
@@ -3846,7 +3847,7 @@ const AdminPanel = () => {
                                 }
                               }}
                             >
-                              <i className="fas fa-trash me-2"></i>
+                              <Icon name="trash" className="me-2" />
                               Delete Winner
                             </Button>
                           )}
@@ -3857,7 +3858,7 @@ const AdminPanel = () => {
                     <tr>
                       <td colSpan="7" className="text-center py-5" style={{ border: '1px solid #e5e7eb' }}>
                         <div className="text-white-50">
-                          <i className="fas fa-trophy fa-3x mb-3"></i>
+                          <Icon name="trophy" className="mb-3" />
                           <h5>No Winners Yet</h5>
                           <p>Click "Select New Winners" to create winners and send coupon codes!</p>
                           <small className="text-muted">All winners who receive emails will appear here</small>
@@ -3886,7 +3887,7 @@ const AdminPanel = () => {
                   border: 'none'
                 }}
               >
-                <i className="fas fa-trash-alt me-2"></i> Reset All Ratings
+                <Icon name="trash-alt" className="me-2" /> Reset All Ratings
               </Button>
             </div>
 
@@ -3900,7 +3901,7 @@ const AdminPanel = () => {
                   color: '#0b0e17'
                 }}>
                   <Card.Body className="text-center">
-                    <i className="fas fa-star fa-2x mb-2" style={{ color: '#0b0e17' }}></i>
+                    <Icon name="star" className="mb-2" style={{ color: '#0b0e17' }} />
                     <h3 style={{ fontSize: '2rem', fontWeight: '700', color: '#0b0e17' }}>
                       {feedback && feedback.length > 0
                         ? (feedback.reduce((sum, f) => sum + (f.rating || 0), 0) / feedback.length).toFixed(1)
@@ -3918,7 +3919,7 @@ const AdminPanel = () => {
                   color: '#0b0e17'
                 }}>
                   <Card.Body className="text-center">
-                    <i className="fas fa-comments fa-2x mb-2" style={{ color: '#0f9d63' }}></i>
+                    <Icon name="comments" className="mb-2" style={{ color: '#0f9d63' }} />
                     <h3 style={{ fontSize: '2rem', fontWeight: '700', color: '#0b0e17' }}>
                       {feedback ? feedback.length : 0}
                     </h3>
@@ -3934,7 +3935,7 @@ const AdminPanel = () => {
                   color: '#0b0e17'
                 }}>
                   <Card.Body className="text-center">
-                    <i className="fas fa-thumbs-up fa-2x mb-2" style={{ color: '#2f6fd0' }}></i>
+                    <Icon name="thumbs-up" className="mb-2" style={{ color: '#2f6fd0' }} />
                     <h3 style={{ fontSize: '2rem', fontWeight: '700', color: '#0b0e17' }}>
                       {feedback ? feedback.filter(f => f.rating >= 4).length : 0}
                     </h3>
@@ -3950,7 +3951,7 @@ const AdminPanel = () => {
                   color: '#0b0e17'
                 }}>
                   <Card.Body className="text-center">
-                    <i className="fas fa-film fa-2x mb-2" style={{ color: '#0b0e17' }}></i>
+                    <Icon name="film" className="mb-2" style={{ color: '#0b0e17' }} />
                     <h3 style={{ fontSize: '2rem', fontWeight: '700', color: '#0b0e17' }}>
                       {feedback ? [...new Set(feedback.map(f => f.movie_id))].length : 0}
                     </h3>
@@ -3974,7 +3975,7 @@ const AdminPanel = () => {
                 fontWeight: '600',
                 fontSize: '1.1rem'
               }}>
-                <i className="fas fa-chart-bar me-2"></i>
+                <Icon name="chart-bar" className="me-2" />
                 Feedback by Movie
               </Card.Header>
               <Card.Body style={{ padding: '1rem' }}>
@@ -4108,7 +4109,7 @@ const AdminPanel = () => {
                   </Row>
                 ) : (
                   <div className="text-center py-4" style={{ color: '#5c6270' }}>
-                    <i className="fas fa-chart-bar fa-2x mb-2"></i>
+                    <Icon name="chart-bar" className="mb-2" />
                     <p>No feedback data to analyze</p>
                   </div>
                 )}
@@ -4128,7 +4129,7 @@ const AdminPanel = () => {
                 fontWeight: '600',
                 fontSize: '1.1rem'
               }}>
-                <i className="fas fa-list me-2"></i>
+                <Icon name="list" className="me-2" />
                 All Feedback Responses
               </Card.Header>
               <Card.Body style={{ padding: 0 }}>
@@ -4191,7 +4192,7 @@ const AdminPanel = () => {
                     )) : (
                       <tr>
                         <td colSpan="5" className="text-center py-4" style={{ color: '#5c6270' }}>
-                          <i className="fas fa-comments fa-2x mb-2"></i>
+                          <Icon name="comments" className="mb-2" />
                           <br />
                           No feedback received yet
                         </td>
@@ -4238,7 +4239,7 @@ const AdminPanel = () => {
                         padding: '12px 24px'
                       }}
                     >
-                      <i className="fas fa-envelope me-2"></i>
+                      <Icon name="envelope" className="me-2" />
                       Send Email
                     </Button>
                   </Card.Body>
@@ -4272,7 +4273,7 @@ const AdminPanel = () => {
                         padding: '12px 24px'
                       }}
                     >
-                      <i className="fas fa-users me-2"></i>
+                      <Icon name="users" className="me-2" />
                       Bulk Email
                     </Button>
                   </Card.Body>
@@ -4332,7 +4333,7 @@ const AdminPanel = () => {
                         padding: '12px 24px'
                       }}
                     >
-                      <i className="fas fa-comments me-2"></i>
+                      <Icon name="comments" className="me-2" />
                       Request Feedback
                     </Button>
                   </Card.Body>
@@ -4380,7 +4381,7 @@ const AdminPanel = () => {
                           padding: '8px 16px'
                         }}
                       >
-                        <i className="fas fa-envelope me-2"></i>
+                        <Icon name="envelope" className="me-2" />
                         Email
                       </Button>
                     </td>
@@ -4389,7 +4390,7 @@ const AdminPanel = () => {
                   <tr>
                     <td colSpan="4" className="text-center py-4" style={{ border: '1px solid #e5e7eb' }}>
                       <div style={{ color: '#0b0e17' }}>
-                        <i className="fas fa-users fa-2x mb-2"></i>
+                        <Icon name="users" className="mb-2" />
                         <br />
                         No users found
                       </div>
@@ -4418,7 +4419,7 @@ const AdminPanel = () => {
               <tbody>
                 <tr>
                   <td colSpan="5" className="text-center text-muted py-4">
-                    <i className="fas fa-envelope fa-2x mb-2"></i>
+                    <Icon name="envelope" className="mb-2" />
                     <br />
                     Email history will be displayed here
                   </td>
@@ -4531,7 +4532,7 @@ const AdminPanel = () => {
               </Form.Group>
 
               <Button variant="primary" type="submit" size="lg">
-                <i className="fas fa-save me-2"></i>
+                <Icon name="save" className="me-2" />
                 Save Settings
               </Button>
             </Form>
@@ -4594,7 +4595,7 @@ const AdminPanel = () => {
                   marginBottom: '0.5rem',
                   color: '#0b0e17'
                 }}>
-                  <i className="fas fa-cogs me-2" style={{ color: '#0b0e17' }}></i>
+                  <Icon name="cogs" className="me-2" style={{ color: '#0b0e17' }} />
                   Configuration Panel
                 </h2>
                 <p className="text-white-50 mb-5" style={{ fontSize: '1.1rem' }}>
@@ -4611,7 +4612,7 @@ const AdminPanel = () => {
                   display: 'inline-block'
                 }}>
                   <Badge bg="success" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
-                    <i className="fas fa-check-circle me-1"></i>
+                    <Icon name="check-circle" className="me-1" />
                     Super Admin Access Granted
                   </Badge>
                 </div>
@@ -4652,7 +4653,7 @@ const AdminPanel = () => {
                               background: 'transparent'
                             }}
                           >
-                            <i className="fas fa-envelope me-2"></i>
+                            <Icon name="envelope" className="me-2" />
                             Configure Mail
                           </Button>
                           <Button
@@ -4667,7 +4668,7 @@ const AdminPanel = () => {
                               background: 'transparent'
                             }}
                           >
-                            <i className="fas fa-credit-card me-2"></i>
+                            <Icon name="credit-card" className="me-2" />
                             Configure Razorpay
                           </Button>
                         </div>
@@ -4709,7 +4710,7 @@ const AdminPanel = () => {
                             background: 'transparent'
                           }}
                         >
-                          <i className="fas fa-database me-2"></i>
+                          <Icon name="database" className="me-2" />
                           View Data
                         </Button>
                       </Card.Body>
@@ -4762,7 +4763,7 @@ const AdminPanel = () => {
                   color: '#0b0e17'
                 }}>
                   <Alert.Heading style={{ color: '#b7791f' }}>
-                    <i className="fas fa-exclamation-triangle me-2"></i>
+                    <Icon name="exclamation-triangle" className="me-2" />
                     Super Admin Privileges
                   </Alert.Heading>
                   <p className="mb-0">
@@ -4781,7 +4782,7 @@ const AdminPanel = () => {
             <div className="d-flex justify-content-between align-items-center mb-4" style={{ maxWidth: '1400px', margin: '0 auto' }}>
               <div className="text-start">
                 <h2 style={{ fontSize: '2rem', fontWeight: '600', marginBottom: '0.5rem', color: '#0f9d63' }}>
-                  <i className="fas fa-database me-2" style={{ color: '#0f9d63' }}></i>
+                  <Icon name="database" className="me-2" style={{ color: '#0f9d63' }} />
                   Database Management
                 </h2>
                 <p className="text-white-50" style={{ fontSize: '1rem', margin: 0 }}>
@@ -4796,7 +4797,7 @@ const AdminPanel = () => {
                   background: 'transparent'
                 }}
               >
-                <i className="fas fa-arrow-left me-2"></i>
+                <Icon name="arrow-left" className="me-2" />
                 Back to Config
               </Button>
             </div>
@@ -4950,7 +4951,7 @@ const AdminPanel = () => {
                 }}>
                   <div className="d-flex justify-content-between align-items-center mb-3">
                     <h4 className="text-white mb-0">
-                      <i className="fas fa-film me-2"></i>
+                      <Icon name="film" className="me-2" />
                       Revenue by Movie
                     </h4>
                     <Button
@@ -4974,7 +4975,7 @@ const AdminPanel = () => {
                         a.click();
                       }}
                     >
-                      <i className="fas fa-file-csv me-2"></i>
+                      <Icon name="file-csv" className="me-2" />
                       Export CSV
                     </Button>
                   </div>
@@ -5019,7 +5020,7 @@ const AdminPanel = () => {
                         <tr>
                           <td colSpan="4" className="text-center py-4" style={{ border: '1px solid #e5e7eb' }}>
                             <div className="text-white-50">
-                              <i className="fas fa-film fa-2x mb-2"></i>
+                              <Icon name="film" className="mb-2" />
                               <p className="mb-0">No movie revenue data available</p>
                             </div>
                           </td>
@@ -5040,7 +5041,7 @@ const AdminPanel = () => {
                   margin: '0 auto'
                 }}>
                   <h4 className="text-white mb-3">
-                    <i className="fas fa-history me-2"></i>
+                    <Icon name="history" className="me-2" />
                     Recent Transactions
                   </h4>
                   <Table striped bordered hover responsive style={{ marginBottom: 0 }}>
@@ -5103,7 +5104,7 @@ const AdminPanel = () => {
                         <tr>
                           <td colSpan="7" className="text-center py-4" style={{ border: '1px solid #e5e7eb' }}>
                             <div className="text-white-50">
-                              <i className="fas fa-receipt fa-2x mb-2"></i>
+                              <Icon name="receipt" className="mb-2" />
                               <p className="mb-0">No recent transactions</p>
                             </div>
                           </td>
@@ -5126,7 +5127,7 @@ const AdminPanel = () => {
                     margin: '2rem auto 0'
                   }}>
                     <h4 className="text-white mb-3">
-                      <i className="fas fa-chart-line me-2"></i>
+                      <Icon name="chart-line" className="me-2" />
                       Monthly Revenue (Last 6 Months)
                     </h4>
                     <Row>
@@ -5168,7 +5169,7 @@ const AdminPanel = () => {
                     margin: '2rem auto 0'
                   }}>
                     <h4 className="text-white mb-3">
-                      <i className="fas fa-credit-card me-2"></i>
+                      <Icon name="credit-card" className="me-2" />
                       Payment Methods Breakdown
                     </h4>
                     <Row>
@@ -5210,7 +5211,7 @@ const AdminPanel = () => {
                   margin: '0 auto'
                 }}>
                   <Alert.Heading style={{ color: '#d64545' }}>
-                    <i className="fas fa-exclamation-triangle me-2"></i>
+                    <Icon name="exclamation-triangle" className="me-2" />
                     Sensitive Data Warning
                   </Alert.Heading>
                   <p className="mb-0">
@@ -5229,7 +5230,7 @@ const AdminPanel = () => {
             <div className="d-flex justify-content-between align-items-center mb-4" style={{ maxWidth: '900px', margin: '0 auto' }}>
               <div className="text-start">
                 <h2 style={{ fontSize: '2rem', fontWeight: '600', marginBottom: '0.5rem', color: '#0b0e17' }}>
-                  <i className="fas fa-envelope me-2" style={{ color: '#0b0e17' }}></i>
+                  <Icon name="envelope" className="me-2" style={{ color: '#0b0e17' }} />
                   Mail Server Configuration
                 </h2>
                 <p className="text-white-50" style={{ fontSize: '1rem', margin: 0 }}>
@@ -5244,7 +5245,7 @@ const AdminPanel = () => {
                   background: 'transparent'
                 }}
               >
-                <i className="fas fa-arrow-left me-2"></i>
+                <Icon name="arrow-left" className="me-2" />
                 Back to Config
               </Button>
             </div>
@@ -5273,7 +5274,7 @@ const AdminPanel = () => {
                     border: '1px solid #e5e7eb',
                     borderRadius: '0'
                   }}>
-                    <i className="fas fa-check-circle me-2"></i>
+                    <Icon name="check-circle" className="me-2" />
                     {mailSettingsSuccess}
                   </Alert>
                 )}
@@ -5285,7 +5286,7 @@ const AdminPanel = () => {
                     border: '1px solid #e5e7eb',
                     borderRadius: '0'
                   }}>
-                    <i className="fas fa-exclamation-circle me-2"></i>
+                    <Icon name="exclamation-circle" className="me-2" />
                     {mailSettingsError}
                   </Alert>
                 )}
@@ -5419,7 +5420,7 @@ const AdminPanel = () => {
                         padding: '12px 24px'
                       }}
                     >
-                      <i className="fas fa-paper-plane me-2"></i>
+                      <Icon name="paper-plane" className="me-2" />
                       {mailSettingsSaving ? 'Sending...' : 'Test Configuration'}
                     </Button>
                     <Button
@@ -5435,7 +5436,7 @@ const AdminPanel = () => {
                         padding: '12px 24px'
                       }}
                     >
-                      <i className="fas fa-save me-2"></i>
+                      <Icon name="save" className="me-2" />
                       Save Settings
                     </Button>
                   </div>
@@ -5449,7 +5450,7 @@ const AdminPanel = () => {
                   textAlign: 'left'
                 }}>
                   <h5 style={{ color: '#0b0e17', marginBottom: '1rem' }}>
-                    <i className="fas fa-question-circle me-2"></i>
+                    <Icon name="question-circle" className="me-2" />
                     Setup Guide
                   </h5>
                   <div style={{ color: '#5c6270', fontSize: '0.9rem', lineHeight: '1.8' }}>
@@ -5480,7 +5481,7 @@ const AdminPanel = () => {
             <div className="d-flex justify-content-between align-items-center mb-4" style={{ maxWidth: '900px', margin: '0 auto' }}>
               <div className="text-start">
                 <h2 style={{ fontSize: '2rem', fontWeight: '600', marginBottom: '0.5rem', color: '#0b0e17' }}>
-                  <i className="fas fa-credit-card me-2" style={{ color: '#0b0e17' }}></i>
+                  <Icon name="credit-card" className="me-2" style={{ color: '#0b0e17' }} />
                   Razorpay Configuration
                 </h2>
                 <p className="text-white-50" style={{ fontSize: '1rem', margin: 0 }}>
@@ -5495,7 +5496,7 @@ const AdminPanel = () => {
                   background: 'transparent'
                 }}
               >
-                <i className="fas fa-arrow-left me-2"></i>
+                <Icon name="arrow-left" className="me-2" />
                 Back to Config
               </Button>
             </div>
@@ -5524,7 +5525,7 @@ const AdminPanel = () => {
                     border: '1px solid #e5e7eb',
                     borderRadius: '0'
                   }}>
-                    <i className="fas fa-check-circle me-2"></i>
+                    <Icon name="check-circle" className="me-2" />
                     {razorpaySettingsSuccess}
                   </Alert>
                 )}
@@ -5536,7 +5537,7 @@ const AdminPanel = () => {
                     border: '1px solid #e5e7eb',
                     borderRadius: '0'
                   }}>
-                    <i className="fas fa-exclamation-circle me-2"></i>
+                    <Icon name="exclamation-circle" className="me-2" />
                     {razorpaySettingsError}
                   </Alert>
                 )}
@@ -5609,7 +5610,7 @@ const AdminPanel = () => {
                         padding: '12px 24px'
                       }}
                     >
-                      <i className="fas fa-save me-2"></i>
+                      <Icon name="save" className="me-2" />
                       {razorpaySettingsSaving ? 'Saving...' : 'Save Settings'}
                     </Button>
                   </div>
@@ -5623,7 +5624,7 @@ const AdminPanel = () => {
                   textAlign: 'left'
                 }}>
                   <h5 style={{ color: '#0b0e17', marginBottom: '1rem' }}>
-                    <i className="fas fa-question-circle me-2"></i>
+                    <Icon name="question-circle" className="me-2" />
                     Setup Guide
                   </h5>
                   <div style={{ color: '#5c6270', fontSize: '0.9rem', lineHeight: '1.8' }}>
@@ -5654,7 +5655,7 @@ const AdminPanel = () => {
             <div className="d-flex justify-content-between align-items-center mb-4" style={{ maxWidth: '1200px', margin: '0 auto' }}>
               <div className="text-start">
                 <h2 style={{ fontSize: '2rem', fontWeight: '600', marginBottom: '0.5rem' }}>
-                  <i className="fas fa-users-cog me-2" style={{ color: '#0b0e17' }}></i>
+                  <Icon name="users-cog" className="me-2" style={{ color: '#0b0e17' }} />
                   Manage Admin Permissions
                 </h2>
                 <p className="text-white-50" style={{ fontSize: '1rem', margin: 0 }}>
@@ -5680,7 +5681,7 @@ const AdminPanel = () => {
                     color: '#0b0e17'
                   }}
                 >
-                  <i className="fas fa-sync-alt me-2"></i>
+                  <Icon name="sync-alt" className="me-2" />
                   Refresh List
                 </Button>
                 <Button
@@ -5696,7 +5697,7 @@ const AdminPanel = () => {
                     padding: '10px 20px'
                   }}
                 >
-                  <i className="fas fa-user-shield me-2"></i>
+                  <Icon name="user-shield" className="me-2" />
                   Manage Access
                 </Button>
                 <Button
@@ -5707,7 +5708,7 @@ const AdminPanel = () => {
                     background: 'transparent'
                   }}
                 >
-                  <i className="fas fa-arrow-left me-2"></i>
+                  <Icon name="arrow-left" className="me-2" />
                   Back
                 </Button>
               </div>
@@ -5723,7 +5724,7 @@ const AdminPanel = () => {
               textAlign: 'left'
             }}>
               <Alert.Heading style={{ color: '#0b0e17' }}>
-                <i className="fas fa-info-circle me-2"></i>
+                <Icon name="info-circle" className="me-2" />
                 How Admin Permissions Work
               </Alert.Heading>
               <ul style={{ marginBottom: 0, paddingLeft: '1.5rem' }}>
@@ -5755,7 +5756,7 @@ const AdminPanel = () => {
                     onClick={toggleSelectAllRemovableAdmins}
                     disabled={removableAdmins.length === 0}
                   >
-                    <i className={`fas ${allRemovableAdminsSelected ? 'fa-square-minus' : 'fa-check-square'} me-1`}></i>
+                    {allRemovableAdminsSelected ? <Icon name="square-minus" className="me-1" /> : <Icon name="check-square" className="me-1" />}
                     {allRemovableAdminsSelected ? 'Unselect All' : 'Select All'}
                   </Button>
                   <Button
@@ -5764,7 +5765,7 @@ const AdminPanel = () => {
                     onClick={() => setSelectedAdminIdsForBulkRemove([])}
                     disabled={selectedRemovableAdminIds.length === 0}
                   >
-                    <i className="fas fa-eraser me-1"></i>
+                    <Icon name="eraser" className="me-1" />
                     Clear
                   </Button>
                   <Button
@@ -5773,7 +5774,7 @@ const AdminPanel = () => {
                     onClick={bulkRemoveAdminAccess}
                     disabled={selectedRemovableAdminIds.length === 0 || bulkRemovingAdmins}
                   >
-                    <i className="fas fa-user-minus me-1"></i>
+                    <Icon name="user-minus" className="me-1" />
                     {bulkRemovingAdmins ? 'Removing...' : 'Remove Selected Admin Access'}
                   </Button>
                 </div>
@@ -5807,7 +5808,7 @@ const AdminPanel = () => {
                     }}>
                       <td style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>
                         {admin.email === SUPER_ADMIN_EMAIL ? (
-                          <i className="fas fa-lock" style={{ color: '#b7791f' }} title="Super admin cannot be selected"></i>
+                          <Icon name="lock" style={{ color: '#b7791f' }} title="Super admin cannot be selected" />
                         ) : (
                           <Form.Check
                             type="checkbox"
@@ -5839,12 +5840,12 @@ const AdminPanel = () => {
                         <Badge bg={admin.code_scanner ? 'success' : 'secondary'} style={{ fontSize: '0.75rem', padding: '4px 8px' }}>
                           {admin.code_scanner ? (
                             <>
-                              <i className="fas fa-check-circle me-1"></i>
+                              <Icon name="check-circle" className="me-1" />
                               Enabled
                             </>
                           ) : (
                             <>
-                              <i className="fas fa-times-circle me-1"></i>
+                              <Icon name="times-circle" className="me-1" />
                               Disabled
                             </>
                           )}
@@ -5881,7 +5882,7 @@ const AdminPanel = () => {
                               size="sm"
                               onClick={() => openPermissionModal(admin)}
                             >
-                              <i className="fas fa-edit me-1"></i>
+                              <Icon name="edit" className="me-1" />
                               Edit
                             </Button>
                             <Button
@@ -5889,7 +5890,7 @@ const AdminPanel = () => {
                               size="sm"
                               onClick={() => updateAdminTag(admin.id, admin.admin_tag)}
                             >
-                              <i className="fas fa-tag me-1"></i>
+                              <Icon name="tag" className="me-1" />
                               Tag
                             </Button>
                             <Button
@@ -5897,7 +5898,7 @@ const AdminPanel = () => {
                               size="sm"
                               onClick={() => resetAdminPermissions(admin.id)}
                             >
-                              <i className="fas fa-undo me-1"></i>
+                              <Icon name="undo" className="me-1" />
                               Reset
                             </Button>
                           </>
@@ -5908,7 +5909,7 @@ const AdminPanel = () => {
                     <tr>
                       <td colSpan="7" className="text-center py-5" style={{ border: '1px solid #e5e7eb' }}>
                         <div className="text-white-50">
-                          <i className="fas fa-users fa-3x mb-3"></i>
+                          <Icon name="users" className="mb-3" />
                           <h5>No Admin Users Found</h5>
                           <p>Only admin users will appear here</p>
                         </div>
@@ -5930,7 +5931,7 @@ const AdminPanel = () => {
             }}>
               <div className="d-flex justify-content-between align-items-center mb-3">
                 <h5 style={{ color: '#0b0e17', margin: 0, fontWeight: '600' }}>
-                  <i className="fas fa-qrcode me-2"></i>
+                  <Icon name="qrcode" className="me-2" />
                   Scanner-Only Users
                 </h5>
                 <Badge bg="info" style={{ fontSize: '0.8rem' }}>
@@ -5961,7 +5962,7 @@ const AdminPanel = () => {
                         </td>
                         <td style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>
                           <Badge bg="info" style={{ fontSize: '0.75rem' }}>
-                            <i className="fas fa-check-circle me-1"></i>
+                            <Icon name="check-circle" className="me-1" />
                             Scanner Only
                           </Badge>
                         </td>
@@ -5972,7 +5973,7 @@ const AdminPanel = () => {
                               size="sm"
                               onClick={() => removeScannerOnlyAccess(user.id, user.name)}
                             >
-                              <i className="fas fa-ban me-1"></i>
+                              <Icon name="ban" className="me-1" />
                               Remove Scanner
                             </Button>
                             <Button
@@ -5984,7 +5985,7 @@ const AdminPanel = () => {
                                 }
                               }}
                             >
-                              <i className="fas fa-user-shield me-1"></i>
+                              <Icon name="user-shield" className="me-1" />
                               Make Admin
                             </Button>
                           </div>
@@ -5998,7 +5999,7 @@ const AdminPanel = () => {
                   background: '#ffffff',
                   borderRadius: '0'
                 }}>
-                  <i className="fas fa-user-slash fa-2x mb-3 text-muted"></i>
+                  <Icon name="user-slash" className="mb-3 text-muted" />
                   <p className="text-muted mb-0">No scanner-only users right now.</p>
                 </div>
               )}
@@ -6019,7 +6020,7 @@ const AdminPanel = () => {
         >
           <Modal.Header closeButton>
             <Modal.Title>
-              <i className="fas fa-user-shield me-2"></i>
+              <Icon name="user-shield" className="me-2" />
               Manage Permissions for {selectedAdminForPermission?.name}
             </Modal.Title>
           </Modal.Header>
@@ -6166,7 +6167,7 @@ const AdminPanel = () => {
               onClick={saveAdminPermissions}
               disabled={permissionLoading}
             >
-              <i className="fas fa-save me-2"></i>
+              <Icon name="save" className="me-2" />
               Save Permissions
             </Button>
           </Modal.Footer>
@@ -6750,7 +6751,7 @@ const AdminPanel = () => {
                 Cancel
               </Button>
               <Button variant="primary" type="submit">
-                <i className="fas fa-paper-plane me-2"></i>
+                <Icon name="paper-plane" className="me-2" />
                 Send Email
               </Button>
             </Modal.Footer>
@@ -6883,7 +6884,7 @@ const AdminPanel = () => {
                 type="submit"
                 disabled={selectedUsers.length === 0}
               >
-                <i className="fas fa-paper-plane me-2"></i>
+                <Icon name="paper-plane" className="me-2" />
                 Send to {selectedUsers.length} User{selectedUsers.length !== 1 ? 's' : ''}
               </Button>
             </Modal.Footer>
@@ -7077,7 +7078,7 @@ const AdminPanel = () => {
                 Cancel
               </Button>
               <Button variant="primary" type="submit">
-                <i className="fas fa-plus me-2"></i>
+                <Icon name="plus" className="me-2" />
                 Create Coupon
               </Button>
             </Modal.Footer>
@@ -7230,7 +7231,7 @@ const AdminPanel = () => {
                 Cancel
               </Button>
               <Button variant="primary" type="submit">
-                <i className="fas fa-upload me-2"></i>
+                <Icon name="upload" className="me-2" />
                 Upload
               </Button>
             </Modal.Footer>
@@ -7518,7 +7519,7 @@ const AdminPanel = () => {
                 type="submit"
                 disabled={winnerSending || selectedWinners.length === 0 || !winnerForm.discount_amount}
               >
-                <i className="fas fa-trophy me-2"></i>
+                <Icon name="trophy" className="me-2" />
                 {winnerSending
                   ? 'Sending...'
                   : `Select ${selectedWinners.length} Winner${selectedWinners.length !== 1 ? 's' : ''} & Send Emails`}
@@ -7539,7 +7540,7 @@ const AdminPanel = () => {
         >
           <Modal.Header closeButton>
             <Modal.Title>
-              <i className="fas fa-user-shield me-2"></i>
+              <Icon name="user-shield" className="me-2" />
               Manage User Access
             </Modal.Title>
           </Modal.Header>
@@ -7584,7 +7585,7 @@ const AdminPanel = () => {
                 background: '#ffffff',
                 borderRadius: '0'
               }}>
-                <i className="fas fa-search fa-2x mb-3 text-muted"></i>
+                <Icon name="search" className="mb-3 text-muted" />
                 <p className="text-muted mb-0">
                   {userSearchTerm.trim()
                     ? `No users found matching "${userSearchTerm}"`
@@ -7623,7 +7624,7 @@ const AdminPanel = () => {
                       {user.is_admin ? (
                         <>
                           <Badge bg="warning" style={{ fontSize: '0.75rem', color: '#0b0e17' }}>
-                            <i className="fas fa-shield-alt me-1"></i>
+                            <Icon name="shield-alt" className="me-1" />
                             Admin
                           </Badge>
                           {user.email !== '2025uee0154@iitjammu.ac.in' && (
@@ -7636,7 +7637,7 @@ const AdminPanel = () => {
                                 background: 'transparent'
                               }}
                             >
-                              <i className="fas fa-times me-1"></i>
+                              <Icon name="times" className="me-1" />
                               Remove Admin
                             </Button>
                           )}
@@ -7644,7 +7645,7 @@ const AdminPanel = () => {
                       ) : (
                         <>
                           <Badge bg={user.code_scanner ? 'info' : 'secondary'} style={{ fontSize: '0.75rem' }}>
-                            <i className={`fas ${user.code_scanner ? 'fa-qrcode' : 'fa-user'} me-1`}></i>
+                            {user.code_scanner ? <Icon name="qrcode" className="me-1" /> : <Icon name="user" className="me-1" />}
                             {user.code_scanner ? 'Scanner Only' : 'User'}
                           </Badge>
 
@@ -7658,7 +7659,7 @@ const AdminPanel = () => {
                                 background: 'transparent'
                               }}
                             >
-                              <i className="fas fa-ban me-1"></i>
+                              <Icon name="ban" className="me-1" />
                               Remove Scanner
                             </Button>
                           ) : (
@@ -7671,7 +7672,7 @@ const AdminPanel = () => {
                                 background: 'transparent'
                               }}
                             >
-                              <i className="fas fa-qrcode me-1"></i>
+                              <Icon name="qrcode" className="me-1" />
                               Give Scanner Access
                             </Button>
                           )}
@@ -7690,7 +7691,7 @@ const AdminPanel = () => {
                               borderRadius: '0'
                             }}
                           >
-                            <i className="fas fa-check me-1"></i>
+                            <Icon name="check" className="me-1" />
                             Make Admin
                           </Button>
                         </>

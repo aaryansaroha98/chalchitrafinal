@@ -6,6 +6,7 @@ import api from '../api/axios';
 import Loader from '../components/Loader';
 import { useAuth } from '../contexts/AuthContext';
 import { isPastMovie, compareMovieDatesDesc } from '../utils/movieStatus';
+import Icon from '../components/Icon';
 
 const PastMovies = () => {
   const navigate = useNavigate();
@@ -85,7 +86,7 @@ const PastMovies = () => {
             padding: '1rem 1.5rem',
             marginBottom: '2rem'
           }}>
-            <i className="fas fa-exclamation-triangle" style={{marginRight: '0.5rem'}}></i>
+            <Icon name="exclamation-triangle" style={{marginRight: '0.5rem'}} />
             {error}
           </Alert>
         )}
@@ -97,12 +98,12 @@ const PastMovies = () => {
             background: '#ffffff',
             border: '1px solid #e5e7eb'
           }}>
-            <i className="fas fa-film" style={{
+            <Icon name="film" style={{
               fontSize: '4rem',
               color: '#8b909c',
               marginBottom: '1.5rem',
               display: 'block'
-            }}></i>
+            }} />
             <p style={{
               fontFamily: '"Times New Roman", Times, Georgia, serif',
               fontSize: '1.5rem',
@@ -161,10 +162,10 @@ const PastMovies = () => {
                         alignItems: 'center',
                         justifyContent: 'center'
                       }}>
-                        <i className="fas fa-film" style={{
+                        <Icon name="film" style={{
                           fontSize: '3rem',
                           color: '#adb5bd'
-                        }}></i>
+                        }} />
                       </div>
                     )}
 

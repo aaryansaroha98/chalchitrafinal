@@ -6,6 +6,7 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { useAuth } from '../contexts/AuthContext';
 import Loader from '../components/Loader';
+import Icon from '../components/Icon';
 
 const Booking = () => {
   const { movieId } = useParams();
@@ -1114,7 +1115,7 @@ const Booking = () => {
                         >
                           {selectedFoods[food.id] ? (
                             <>
-                              <i className="fas fa-check" style={{fontSize: '10px'}}></i>
+                              <Icon name="check" style={{fontSize: '10px'}} />
                               INCLUDED
                             </>
                           ) : (
@@ -1381,7 +1382,7 @@ const Booking = () => {
                       e.target.style.border = '1px solid #0b0e17';
                     }}
                   >
-                    <i className="fas fa-ticket-alt me-2" style={{fontSize: '14px'}}></i>
+                    <Icon name="ticket-alt" className="me-2" style={{fontSize: '14px'}} />
                     Book Ticket{selectedSeats.length > 1 ? 's' : ''}
                   </button>
                 </div>
@@ -1560,7 +1561,7 @@ const Booking = () => {
                     e.target.style.background = '#0b0e17';
                   }}
                 >
-                  <i className="fas fa-list-alt" style={{marginRight: '8px'}}></i>
+                  <Icon name="list-alt" style={{marginRight: '8px'}} />
                   View My Bookings
                 </motion.button>
 
@@ -1594,7 +1595,7 @@ const Booking = () => {
                     e.target.style.color = '#5c6270';
                   }}
                 >
-                  <i className="fas fa-times" style={{marginRight: '8px'}}></i>
+                  <Icon name="times" style={{marginRight: '8px'}} />
                   Close
                 </motion.button>
               </motion.div>

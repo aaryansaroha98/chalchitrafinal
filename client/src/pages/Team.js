@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Alert } from 'react-bootstrap';
 import api from '../api/axios';
 import Loader from '../components/Loader';
+import Icon from '../components/Icon';
 
 const Team = () => {
   const [team, setTeam] = useState([]);
@@ -66,12 +67,12 @@ const Team = () => {
             textAlign: 'center',
             marginBottom: '3rem'
           }}>
-            <i className="fas fa-exclamation-triangle" style={{
+            <Icon name="exclamation-triangle" style={{
               fontSize: '2rem',
               color: '#d64545',
               marginBottom: '1rem',
               display: 'block'
-            }}></i>
+            }} />
             <h4 style={{color: '#d64545', marginBottom: '0.5rem'}}>Unable to Load Team</h4>
             <p style={{color: '#5c6270', margin: 0}}>{error}</p>
           </div>
@@ -98,10 +99,10 @@ const Team = () => {
                   padding: '0.35rem 0.75rem',
                   border: '1px solid #e5e7eb'
                 }}>
-                  <i className={`team-section-icon ${icon}`} style={{
+                  <Icon name={icon} className="team-section-icon" style={{
                     fontSize: '0.85rem',
                     color: '#5c6270'
-                  }}></i>
+                  }} />
                   <h2 className="team-section-title" style={{
                     fontSize: '1.1rem',
                     fontWeight: '600',
@@ -120,12 +121,12 @@ const Team = () => {
                   padding: '3rem 2rem',
                   textAlign: 'center'
                 }}>
-                  <i className={icon} style={{
+                  <Icon name={icon} style={{
                     fontSize: '3rem',
                     color: '#8b909c',
                     marginBottom: '1rem',
                     display: 'block'
-                  }}></i>
+                  }} />
                   <h4 style={{color: '#0b0e17', marginBottom: '0.5rem'}}>
                     {sectionTitle} - Coming Soon
                   </h4>
@@ -208,21 +209,21 @@ const getImageUrl = (url) => {
               {renderTeamSection(
                 "Founding Team",
                 foundationTeam,
-                "fas fa-crown",
+                "crown",
                 "linear-gradient(135deg, #FFD700, #FFA500)"
               )}
 
               {renderTeamSection(
                 "Current Team",
                 currentTeam,
-                "fas fa-users",
+                "users",
                 "linear-gradient(135deg, #667EEA, #764BA2)"
               )}
 
               {renderTeamSection(
                 "Database & Backend Management",
                 backendTeam,
-                "fas fa-server",
+                "server",
                 "linear-gradient(135deg, #11998E, #38EF7D)"
               )}
             </>

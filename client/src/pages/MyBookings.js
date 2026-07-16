@@ -5,6 +5,7 @@ import api from '../api/axios';
 import Loader from '../components/Loader';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import Icon from '../components/Icon';
 
 // Derive API base URL to build absolute URLs for poster assets
 const apiBaseUrl = process.env.REACT_APP_API_URL ||
@@ -399,12 +400,12 @@ const MyBookings = () => {
             color: '#0b0e17'
           }}>
             <Card.Body>
-              <i className="fas fa-ticket-alt" style={{
+              <Icon name="ticket-alt" style={{
                 fontSize: '4rem',
                 color: '#8b909c',
                 marginBottom: '1.5rem',
                 display: 'block'
-              }}></i>
+              }} />
               <h3 style={{
                 fontSize: '1.8rem',
                 fontWeight: '600',
@@ -472,7 +473,7 @@ const MyBookings = () => {
                         e.target.style.borderColor = '#e5e7eb';
                       }}
                     >
-                      <i className="fas fa-check-double me-1"></i>
+                      <Icon name="check-double" className="me-1" />
                       Select All
                     </Button>
                     <Button
@@ -495,7 +496,7 @@ const MyBookings = () => {
                         e.target.style.borderColor = '#e5e7eb';
                       }}
                     >
-                      <i className="fas fa-times me-1"></i>
+                      <Icon name="times" className="me-1" />
                       Deselect All
                     </Button>
                   </div>
@@ -527,7 +528,7 @@ const MyBookings = () => {
                     e.target.style.color = '#d64545';
                   }}
                 >
-                  <i className="fas fa-trash me-1"></i>
+                  <Icon name="trash" className="me-1" />
                   Delete Selected ({selectedBookings.size})
                 </Button>
               </div>
@@ -589,9 +590,9 @@ const MyBookings = () => {
                     }}
                   >
                     {selectedBookings.has(booking.id) ? (
-                      <i className="fas fa-check" style={{color: '#ffffff', fontSize: '0.65rem', fontWeight: 'bold'}}></i>
+                      <Icon name="check" style={{color: '#ffffff'}} />
                     ) : (
-                      <i className="far fa-check" style={{color: '#8b909c', fontSize: '0.65rem'}}></i>
+                      <Icon name="check" style={{color: '#8b909c'}} />
                     )}
                   </div>
 
@@ -641,10 +642,10 @@ const MyBookings = () => {
                             alignItems: 'center',
                             justifyContent: 'center'
                           }}>
-                            <i className="fas fa-film" style={{
+                            <Icon name="film" style={{
                               fontSize: '1.2rem',
                               color: '#8b909c'
-                            }}></i>
+                            }} />
                           </div>
                         )}
                       </div>
@@ -674,8 +675,7 @@ const MyBookings = () => {
                             '1px solid #0f9d63',
                           color: booking.is_used ? '#d64545' : '#0f9d63'
                         }}>
-                          <i className={`fas ${booking.is_used ? 'fa-times-circle' : 'fa-check-circle'} me-1`}
-                             style={{fontSize: '0.6rem'}}></i>
+                          {booking.is_used ? <Icon name="times-circle" className="me-1" /> : <Icon name="check-circle" className="me-1" />}
                           {booking.is_used ? 'Used' : 'Valid'}
                         </div>
                       </div>
@@ -696,12 +696,12 @@ const MyBookings = () => {
                           alignItems: 'center',
                           justifyContent: 'center'
                         }}>
-                          <i className="fas fa-calendar" style={{
+                          <Icon name="calendar" style={{
                             color: '#5c6270',
                             marginBottom: '0.2rem',
                             fontSize: '0.8rem',
                             display: 'block'
-                          }}></i>
+                          }} />
                           <span style={{color: '#0b0e17', fontSize: '0.8rem', fontWeight: '600'}}>
                             {new Date(booking.date).toLocaleDateString('en-IN', {
                               month: 'short',
@@ -723,12 +723,12 @@ const MyBookings = () => {
                           alignItems: 'center',
                           justifyContent: 'center'
                         }}>
-                          <i className="fas fa-clock" style={{
+                          <Icon name="clock" style={{
                             color: '#5c6270',
                             marginBottom: '0.2rem',
                             fontSize: '0.8rem',
                             display: 'block'
-                          }}></i>
+                          }} />
                           <span style={{color: '#0b0e17', fontSize: '0.75rem', fontWeight: '600'}}>
                             {new Date(booking.date).toLocaleTimeString('en-IN', {
                               hour: '2-digit',
@@ -750,12 +750,12 @@ const MyBookings = () => {
                           alignItems: 'center',
                           justifyContent: 'center'
                         }}>
-                          <i className="fas fa-map-marker-alt" style={{
+                          <Icon name="map-marker-alt" style={{
                             color: '#5c6270',
                             marginBottom: '0.2rem',
                             fontSize: '0.8rem',
                             display: 'block'
-                          }}></i>
+                          }} />
                           <span style={{
                             color: '#0b0e17',
                             fontSize: '0.7rem',
@@ -798,7 +798,7 @@ const MyBookings = () => {
                               setShowFeedback(true);
                             }}
                           >
-                            <i className="fas fa-star me-1"></i>
+                            <Icon name="star" className="me-1" />
                             Feedback
                           </Button>
 
@@ -823,7 +823,7 @@ const MyBookings = () => {
                             }}
                             onClick={() => handleDeleteBooking(booking.id)}
                           >
-                            <i className="fas fa-trash me-1"></i>
+                            <Icon name="trash" className="me-1" />
                             Delete
                           </Button>
                         </>
@@ -861,7 +861,7 @@ const MyBookings = () => {
                               </>
                             ) : (
                               <>
-                                <i className="fas fa-download me-1"></i>
+                                <Icon name="download" className="me-1" />
                                 Download
                               </>
                             )}
@@ -888,7 +888,7 @@ const MyBookings = () => {
                             }}
                             onClick={() => handleDeleteBooking(booking.id)}
                           >
-                            <i className="fas fa-trash me-1"></i>
+                            <Icon name="trash" className="me-1" />
                             Delete
                           </Button>
                         </>
@@ -1241,7 +1241,7 @@ const MyBookings = () => {
                 }}
                 onClick={handleSubmitFeedback}
               >
-                <i className="fas fa-paper-plane" style={{marginRight: '0.5rem'}}></i>
+                <Icon name="paper-plane" style={{marginRight: '0.5rem'}} />
                 Submit
               </Button>
             </Modal.Footer>

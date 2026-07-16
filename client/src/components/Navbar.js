@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Navbar, Nav, Container } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import Icon from './Icon';
 
 const NavigationBar = () => {
   const navigate = useNavigate();
@@ -113,12 +114,12 @@ const NavigationBar = () => {
           <Nav className="qt-nav-links">
             {user ? (
               <>
-                <Nav.Link as={Link} to="/my-bookings" className="qt-nav-link"><i className="fas fa-ticket-alt me-1" />My Bookings</Nav.Link>
+                <Nav.Link as={Link} to="/my-bookings" className="qt-nav-link"><Icon name="ticket-alt" className="me-1" />My Bookings</Nav.Link>
                 {!!(user.code_scanner || user.team_scanner) && (
-                  <Nav.Link as={Link} to="/scanner" className="qt-nav-link"><i className="fas fa-qrcode me-1" />Scanner</Nav.Link>
+                  <Nav.Link as={Link} to="/scanner" className="qt-nav-link"><Icon name="qrcode" className="me-1" />Scanner</Nav.Link>
                 )}
                 {!!user.is_admin && (
-                  <Nav.Link as={Link} to="/admin" className="qt-nav-link qt-nav-link-strong"><i className="fas fa-cog me-1" />{user.admin_tag || 'Admin'}</Nav.Link>
+                  <Nav.Link as={Link} to="/admin" className="qt-nav-link qt-nav-link-strong"><Icon name="cog" className="me-1" />{user.admin_tag || 'Admin'}</Nav.Link>
                 )}
                 <Nav.Link onClick={() => logout()} className="qt-nav-link" style={{ cursor: 'pointer' }}>Logout</Nav.Link>
               </>
@@ -172,10 +173,12 @@ const NavigationBar = () => {
         </>
       )}
 
-      <Link to="/login" onClick={closeMenu} className="mobile-menu-link mobile-menu-login-link">
-        <img src="/logos/google-logo-icon-PNG-Transparent-Background.png" alt="" className="qt-google-icon" />
-        Login
-      </Link>
+      {!user && (
+        <Link to="/login" onClick={closeMenu} className="mobile-menu-link mobile-menu-login-link">
+          <img src="/logos/google-logo-icon-PNG-Transparent-Background.png" alt="" className="qt-google-icon" />
+          Login
+        </Link>
+      )}
 
       <div className="mobile-menu-legal">
         <Link to="/privacy-policy" onClick={closeMenu}>Privacy Policy</Link>

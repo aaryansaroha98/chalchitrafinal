@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Modal, Button, Alert, Card, Spinner, Badge } from 'react-bootstrap';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import api from '../api/axios';
+import Icon from '../components/Icon';
 
 const QRScanner = ({ onScan, onClose }) => {
   const [isScanning, setIsScanning] = useState(true);
@@ -189,7 +190,7 @@ const QRScanner = ({ onScan, onClose }) => {
     <Modal show={true} onHide={onClose} size="lg" centered>
       <Modal.Header closeButton>
         <Modal.Title className="text-center w-100">
-          <i className="fas fa-qrcode me-2"></i>
+          <Icon name="qrcode" className="me-2" />
           QR Code Scanner
         </Modal.Title>
       </Modal.Header>
@@ -215,18 +216,18 @@ const QRScanner = ({ onScan, onClose }) => {
             </div>
 
             <div className="mb-3">
-              <i className="fas fa-mobile-alt fa-2x text-primary mb-3"></i>
+              <Icon name="mobile-alt" className="text-primary mb-3" />
               <h5>Scan Student Ticket</h5>
               <p className="text-muted">Point camera at QR code on ticket</p>
             </div>
 
             <div className="d-flex gap-2 justify-content-center flex-wrap">
               <Button onClick={handleManualInput} variant="outline-secondary">
-                <i className="fas fa-keyboard me-2"></i>
+                <Icon name="keyboard" className="me-2" />
                 Manual Input
               </Button>
               <Button onClick={resetScanner} variant="outline-primary">
-                <i className="fas fa-redo me-2"></i>
+                <Icon name="redo" className="me-2" />
                 Reset Scanner
               </Button>
             </div>
@@ -241,12 +242,12 @@ const QRScanner = ({ onScan, onClose }) => {
               <div className="mb-3">
                 {scanResult.status === 'valid' ? (
                   <>
-                    <i className="fas fa-check-circle fa-3x text-success mb-2"></i>
+                    <Icon name="check-circle" className="text-success mb-2" />
                     <h3 className="mb-1">✓ VALID TICKET</h3>
                   </>
                 ) : (
                   <>
-                    <i className="fas fa-times-circle fa-3x text-danger mb-2"></i>
+                    <Icon name="times-circle" className="text-danger mb-2" />
                     <h3 className="mb-1">✗ INVALID TICKET</h3>
                   </>
                 )}
@@ -280,7 +281,7 @@ const QRScanner = ({ onScan, onClose }) => {
 
             <div className="d-flex gap-2 justify-content-center flex-wrap mt-3">
               <Button onClick={resetScanner} variant="outline-primary">
-                <i className="fas fa-redo me-2"></i>
+                <Icon name="redo" className="me-2" />
                 Scan Another
               </Button>
             </div>
@@ -290,7 +291,7 @@ const QRScanner = ({ onScan, onClose }) => {
         {/* Error Display */}
         {error && (
           <Alert variant="danger" className="mt-3">
-            <i className="fas fa-exclamation-triangle me-2"></i>
+            <Icon name="exclamation-triangle" className="me-2" />
             {error}
           </Alert>
         )}
@@ -322,7 +323,7 @@ const FoodMarkingComponent = ({ bookingId, foodStatus, foodStatusLoaded, onGive,
   return (
     <div className="text-start">
       <h5 className="mb-3">
-        <i className="fas fa-utensils me-2 text-warning"></i>
+        <Icon name="utensils" className="me-2 text-warning" />
         Food Orders
       </h5>
       <div className="d-flex flex-column gap-2">
