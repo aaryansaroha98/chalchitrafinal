@@ -845,3 +845,234 @@ footer h1, footer h2, footer h3, footer h4,
 }
 footer a, .footer a { color: var(--qt-muted) !important; }
 footer a:hover, .footer a:hover { color: var(--qt-text) !important; }
+
+/* ============================================================
+   FOOTER (light, editorial) — full definitions
+   ============================================================ */
+.qt-footer {
+  background: var(--qt-bg);
+  border-top: 1px solid var(--qt-line);
+  color: var(--qt-muted);
+  padding: 56px 0 32px;
+  position: relative;
+  z-index: 10;
+}
+.qt-footer-brand {
+  font-family: var(--qt-font);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--qt-text) !important;
+  -webkit-text-fill-color: var(--qt-text) !important;
+  background: none !important;
+  margin: 0 0 14px;
+}
+.qt-footer-rule {
+  width: 42px;
+  height: 2px;
+  background: var(--qt-text);
+  margin: 0 0 18px;
+}
+.qt-footer-desc {
+  color: var(--qt-muted);
+  font-size: 14px;
+  line-height: 1.65;
+  max-width: 320px;
+  margin: 0 0 20px;
+}
+.qt-footer-social {
+  display: flex;
+  gap: 10px;
+}
+.qt-footer-social a {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--qt-line);
+  color: var(--qt-muted) !important;
+  font-size: 16px;
+  transition: border-color 160ms ease, color 160ms ease;
+}
+.qt-footer-social a:hover {
+  border-color: var(--qt-text);
+  color: var(--qt-text) !important;
+}
+.qt-footer-head {
+  font-family: var(--qt-font);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--qt-quiet);
+  margin: 0 0 18px;
+}
+.qt-footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.qt-footer-links a {
+  color: var(--qt-muted) !important;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 160ms ease;
+  width: fit-content;
+}
+.qt-footer-links a:hover { color: var(--qt-text) !important; }
+.qt-footer-contact p {
+  color: var(--qt-muted);
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0 0 6px;
+}
+.qt-footer-contact strong { color: var(--qt-text); font-weight: 600; }
+.qt-footer-contact a { color: var(--qt-muted) !important; }
+.qt-footer-contact a:hover { color: var(--qt-text) !important; }
+.qt-footer-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 40px;
+  padding-top: 22px;
+  border-top: 1px solid var(--qt-line);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--qt-quiet);
+}
+
+/* ============================================================
+   PAYMENT PAGE (authoritative light — overrides index.css)
+   ============================================================ */
+.payment-page {
+  min-height: 100vh;
+  background: var(--qt-bg) !important;
+  padding: 3rem 1rem !important;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+.payment-container {
+  width: 100%;
+  max-width: 520px;
+  position: relative;
+  z-index: 1;
+}
+.payment-card {
+  background: #fff !important;
+  border: 1px solid var(--qt-line) !important;
+  box-shadow: none !important;
+  overflow: hidden;
+}
+.payment-header {
+  background: var(--qt-ink) !important;
+  padding: 1.1rem 1.4rem !important;
+}
+.header-title {
+  color: #fff !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+}
+.payment-body { padding: 1.6rem 1.4rem !important; }
+.movie-section { display: flex; gap: 1rem; margin-bottom: 1.4rem; }
+.movie-poster {
+  width: 84px; height: 124px; object-fit: cover;
+  border: 1px solid var(--qt-line) !important;
+}
+.movie-title {
+  color: var(--qt-text) !important;
+  font-size: 1.15rem !important; font-weight: 700 !important;
+  margin: 0 0 0.6rem 0 !important; letter-spacing: -0.01em;
+}
+.info-item { display: flex; gap: 0.5rem; margin-bottom: 0.4rem; font-size: 0.85rem; }
+.info-label { color: var(--qt-quiet) !important; min-width: 58px; }
+.info-value { color: var(--qt-text) !important; font-weight: 600 !important; }
+.divider { height: 1px; background: var(--qt-line) !important; margin: 1.3rem 0; border: 0; }
+.section-heading {
+  color: var(--qt-text) !important;
+  font-size: 12px !important; font-weight: 600 !important;
+  letter-spacing: 0.08em !important; text-transform: uppercase !important;
+  margin: 0 0 0.85rem 0 !important;
+}
+.detail-item, .total-row {
+  display: flex; justify-content: space-between;
+  margin-bottom: 0.55rem; font-size: 0.9rem; color: var(--qt-muted) !important;
+}
+.detail-label, .total-label { color: var(--qt-muted) !important; }
+.detail-value, .total-value { color: var(--qt-text) !important; font-weight: 600 !important; }
+.totals-section { margin: 1rem 0; }
+.total-row.grand-total {
+  border-top: 1px solid var(--qt-line) !important;
+  padding-top: 0.85rem; margin-top: 0.85rem;
+}
+.total-row.grand-total .total-label,
+.total-row.grand-total .total-value {
+  color: var(--qt-text) !important; font-size: 1.05rem !important; font-weight: 700 !important;
+}
+.total-row.discount .total-value { color: var(--qt-green) !important; }
+
+/* Coupon */
+.coupon-card {
+  background: var(--qt-panel-soft) !important;
+  border: 1px solid var(--qt-line) !important;
+  padding: 1rem !important; margin: 1.1rem 0 !important;
+}
+.coupon-heading {
+  color: var(--qt-text) !important;
+  font-size: 12px !important; font-weight: 600 !important;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  margin: 0 0 0.75rem 0 !important;
+}
+.coupon-form { display: flex; gap: 0.5rem; }
+.coupon-input {
+  flex: 1; padding: 0.65rem 0.85rem !important;
+  border: 1px solid var(--qt-line) !important; background: #fff !important;
+  color: var(--qt-text) !important; font-size: 0.9rem; outline: none;
+  font-family: var(--qt-font);
+}
+.coupon-input:focus { border-color: var(--qt-text) !important; }
+.coupon-input::placeholder { color: var(--qt-quiet) !important; }
+.coupon-input:disabled { background: var(--qt-panel-soft) !important; cursor: not-allowed; }
+.coupon-btn {
+  padding: 0.65rem 1.25rem !important;
+  background: var(--qt-ink) !important; color: #fff !important;
+  border: 1px solid var(--qt-ink) !important; font-weight: 600 !important;
+  font-size: 11px !important; letter-spacing: 0.08em; text-transform: uppercase;
+  cursor: pointer;
+}
+.coupon-btn:hover:not(:disabled) { background: var(--qt-ink-hover) !important; }
+.coupon-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.error-msg { color: var(--qt-red) !important; font-size: 0.85rem; margin-top: 0.5rem; }
+.coupon-success { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; }
+.success-check, .success-text { color: var(--qt-green) !important; font-size: 0.85rem; }
+.remove-link { color: var(--qt-red) !important; cursor: pointer; font-size: 0.85rem; margin-left: auto; }
+.remove-link:hover { text-decoration: underline; }
+
+/* Pay button */
+.pay-section { margin-top: 1.5rem; }
+.pay-btn {
+  width: 100%; padding: 0.95rem !important;
+  background: var(--qt-ink) !important; color: #fff !important;
+  border: 1px solid var(--qt-ink) !important;
+  font-size: 12px !important; font-weight: 600 !important;
+  letter-spacing: 0.1em !important; text-transform: uppercase !important;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+}
+.pay-btn:hover:not(:disabled) { background: var(--qt-ink-hover) !important; transform: none !important; box-shadow: none !important; }
+.pay-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-spinner {
+  width: 18px; height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff; border-radius: 50% !important;
+  animation: spin 0.8s linear infinite;
+}
+.error-card {
+  background: #fff !important; border: 1px solid var(--qt-line) !important;
+  padding: 2.5rem !important; text-align: center;
+}
+.error-card p { color: var(--qt-red) !important; font-size: 1rem !important; margin: 0; }
