@@ -28,120 +28,8 @@ const Team = () => {
   }
 
   return (
-    <div className="bg-void" style={{minHeight: '100vh', position: 'relative', overflow: 'hidden'}}>
-      {/* Classic Simple Animated Background */}
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        pointerEvents: 'none',
-        zIndex: 1,
-        overflow: 'hidden'
-      }}>
-        {/* Pure black background */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: '#000000'
-        }}></div>
-
-        {/* White animated particles */}
-        {Array.from({ length: 15 }, (_, i) => (
-          <div
-            key={i}
-            style={{
-              position: 'absolute',
-              width: Math.random() * 3 + 1 + 'px',
-              height: Math.random() * 3 + 1 + 'px',
-              backgroundColor: 'rgba(255, 255, 255, 0.6)',
-              borderRadius: '50%',
-              left: Math.random() * 100 + '%',
-              top: Math.random() * 100 + '%',
-              animation: `randomFloat${i % 4} ${10 + Math.random() * 20}s linear infinite`,
-              animationDelay: Math.random() * 10 + 's',
-              boxShadow: '0 0 6px rgba(255, 255, 255, 0.3)',
-              opacity: Math.random() * 0.4 + 0.2,
-              zIndex: 2
-            }}
-          />
-        ))}
-
-        {/* Gentle moving waves */}
-        <div style={{
-          position: 'absolute',
-          top: '30%',
-          left: 0,
-          right: 0,
-          height: '2px',
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%)',
-          animation: 'gentleWave 20s ease-in-out infinite',
-          opacity: 0.3
-        }}></div>
-
-        <div style={{
-          position: 'absolute',
-          top: '70%',
-          left: 0,
-          right: 0,
-          height: '2px',
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.08) 50%, transparent 100%)',
-          animation: 'gentleWave 25s ease-in-out infinite',
-          animationDelay: '5s',
-          opacity: 0.2
-        }}></div>
-
-        {/* Subtle geometric shapes */}
-        <div style={{
-          position: 'absolute',
-          top: '20%',
-          right: '10%',
-          width: '100px',
-          height: '100px',
-          border: '1px solid rgba(255, 255, 255, 0.05)',
-          borderRadius: '50%',
-          animation: 'slowRotate 60s linear infinite',
-          opacity: 0.2
-        }}></div>
-
-        <div style={{
-          position: 'absolute',
-          bottom: '15%',
-          left: '15%',
-          width: '80px',
-          height: '80px',
-          border: '1px solid rgba(255, 255, 255, 0.03)',
-          borderRadius: '50%',
-          animation: 'slowRotateReverse 45s linear infinite',
-          opacity: 0.15
-        }}></div>
-      </div>
-
-      {/* Animated Background Grid */}
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundImage: `
-          radial-gradient(circle at 25% 25%, var(--primary-color) 1px, transparent 1px),
-          radial-gradient(circle at 75% 75%, var(--secondary-color) 1px, transparent 1px),
-          radial-gradient(circle at 50% 50%, var(--accent-color) 1px, transparent 1px)
-        `,
-        backgroundSize: '100px 100px, 150px 150px, 200px 200px',
-        backgroundPosition: '0 0, 50px 50px, 25px 25px',
-        opacity: 0.03,
-        animation: 'gridMove 20s linear infinite'
-      }}></div>
-
-
-
-      <Container className="team-container" style={{padding: '6rem 2rem 4rem', position: 'relative', zIndex: 2}}>
+    <div className="bg-void" style={{minHeight: '100vh'}}>
+      <Container className="team-container" style={{padding: '6rem 2rem 4rem'}}>
         {/* Professional Header */}
         <div className="team-header" style={{
           textAlign: 'center',
@@ -152,7 +40,7 @@ const Team = () => {
           <h1 className="team-title" style={{
             fontSize: '2.5rem',
             fontWeight: '600',
-            color: 'white',
+            color: '#0b0e17',
             marginBottom: '1rem',
             letterSpacing: '-0.025em'
           }}>
@@ -160,7 +48,7 @@ const Team = () => {
           </h1>
           <p className="team-subtitle" style={{
             fontSize: '1.1rem',
-            color: '#6c757d',
+            color: '#5c6270',
             maxWidth: '600px',
             margin: '0 auto',
             lineHeight: '1.6',
@@ -172,23 +60,20 @@ const Team = () => {
 
         {error && (
           <div style={{
-            background: 'rgba(220, 53, 69, 0.1)',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(220, 53, 69, 0.2)',
-            borderRadius: '15px',
+            background: '#ffffff',
+            border: '1px solid #e5e7eb',
             padding: '2rem',
             textAlign: 'center',
-            marginBottom: '3rem',
-            boxShadow: '0 8px 32px rgba(220, 53, 69, 0.1)'
+            marginBottom: '3rem'
           }}>
             <i className="fas fa-exclamation-triangle" style={{
               fontSize: '2rem',
-              color: '#dc3545',
+              color: '#d64545',
               marginBottom: '1rem',
               display: 'block'
             }}></i>
-            <h4 style={{color: '#dc3545', marginBottom: '0.5rem'}}>Unable to Load Team</h4>
-            <p style={{color: 'var(--gray-600)', margin: 0}}>{error}</p>
+            <h4 style={{color: '#d64545', marginBottom: '0.5rem'}}>Unable to Load Team</h4>
+            <p style={{color: '#5c6270', margin: 0}}>{error}</p>
           </div>
         )}
 
@@ -209,19 +94,18 @@ const Team = () => {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '0.35rem',
-                  background: 'rgba(255, 255, 255, 0.08)',
+                  background: '#ffffff',
                   padding: '0.35rem 0.75rem',
-                  borderRadius: '15px',
-                  border: '1px solid rgba(255, 255, 255, 0.15)'
+                  border: '1px solid #e5e7eb'
                 }}>
                   <i className={`team-section-icon ${icon}`} style={{
                     fontSize: '0.85rem',
-                    color: 'var(--gray-600)'
+                    color: '#5c6270'
                   }}></i>
                   <h2 className="team-section-title" style={{
                     fontSize: '1.1rem',
                     fontWeight: '600',
-                    color: '#ffffff',
+                    color: '#0b0e17',
                     margin: 0
                   }}>
                     {sectionTitle}
@@ -231,24 +115,21 @@ const Team = () => {
 
               {sectionMembers.length === 0 ? (
                 <div style={{
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  borderRadius: '20px',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
                   padding: '3rem 2rem',
-                  textAlign: 'center',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+                  textAlign: 'center'
                 }}>
                   <i className={icon} style={{
                     fontSize: '3rem',
-                    color: 'var(--gray-400)',
+                    color: '#8b909c',
                     marginBottom: '1rem',
                     display: 'block'
                   }}></i>
-                  <h4 style={{color: 'var(--gray-600)', marginBottom: '0.5rem'}}>
+                  <h4 style={{color: '#0b0e17', marginBottom: '0.5rem'}}>
                     {sectionTitle} - Coming Soon
                   </h4>
-                  <p style={{color: 'var(--gray-500)', margin: 0}}>
+                  <p style={{color: '#5c6270', margin: 0}}>
                     We're building an amazing team for this section.
                   </p>
                 </div>
@@ -295,7 +176,7 @@ const getImageUrl = (url) => {
                           fontSize: nameFontSize,
                           fontWeight: '500',
                           marginBottom: '0.5rem',
-                          color: 'white',
+                          color: '#0b0e17',
                           lineHeight: '1.2',
                           wordBreak: 'break-word',
                           overflowWrap: 'anywhere'
@@ -304,7 +185,7 @@ const getImageUrl = (url) => {
                         </h4>
                         <p className="team-member-role" style={{
                           fontSize: '0.9rem',
-                          color: '#38bdf8',
+                          color: '#5c6270',
                           fontWeight: '600',
                           marginBottom: '0.25rem',
                           textTransform: 'uppercase',

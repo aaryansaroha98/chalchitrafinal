@@ -62,7 +62,7 @@ const UpcomingMovies = () => {
 
 
   return (
-    <div className="bg-void" style={{minHeight: '100vh', position: 'relative', overflow: 'hidden'}}>
+    <div className="bg-void" style={{ minHeight: '100vh' }}>
       <style>
         {`
           .home-featured-info {
@@ -176,9 +176,9 @@ const UpcomingMovies = () => {
               left: 6px !important;
               padding: clamp(2px, 2vw, 5px) clamp(6px, 3.5vw, 10px) !important;
               font-size: clamp(0.65rem, 3vw, 0.85rem) !important;
-              border-radius: 6px !important;
-              box-shadow: 0 2px 10px rgba(0,0,0,0.5) !important;
-              background-color: rgba(0, 0, 0, 0.8) !important;
+              background-color: #ffffff !important;
+              color: #0b0e17 !important;
+              border: 1px solid #e5e7eb !important;
             }
 
             .upcoming-btn {
@@ -241,8 +241,9 @@ const UpcomingMovies = () => {
               padding: clamp(2px, 2vw, 5px) clamp(6px, 3.5vw, 10px) !important;
               font-size: clamp(0.65rem, 3vw, 0.85rem) !important;
               border-radius: 6px !important;
-              box-shadow: 0 2px 10px rgba(0,0,0,0.5) !important;
-              background-color: rgba(0, 0, 0, 0.8) !important;
+              border: 1px solid #e5e7eb !important;
+              background-color: #ffffff !important;
+              color: #0b0e17 !important;
             }
 
             .home-featured-btn {
@@ -253,119 +254,7 @@ const UpcomingMovies = () => {
           }
         `}
       </style>
-      {/* Classic Simple Animated Background */}
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        pointerEvents: 'none',
-        zIndex: 1,
-        overflow: 'hidden'
-      }}>
-        {/* Pure black background */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: '#000000'
-        }}></div>
-
-        {/* White animated particles */}
-        {Array.from({ length: 15 }, (_, i) => (
-          <div
-            key={i}
-            style={{
-              position: 'absolute',
-              width: Math.random() * 3 + 1 + 'px',
-              height: Math.random() * 3 + 1 + 'px',
-              backgroundColor: 'rgba(255, 255, 255, 0.6)',
-              borderRadius: '50%',
-              left: Math.random() * 100 + '%',
-              top: Math.random() * 100 + '%',
-              animation: `randomFloat${i % 4} ${10 + Math.random() * 20}s linear infinite`,
-              animationDelay: Math.random() * 10 + 's',
-              boxShadow: '0 0 6px rgba(255, 255, 255, 0.3)',
-              opacity: Math.random() * 0.4 + 0.2,
-              zIndex: 2
-            }}
-          />
-        ))}
-
-        {/* Gentle moving waves */}
-        <div style={{
-          position: 'absolute',
-          top: '30%',
-          left: 0,
-          right: 0,
-          height: '2px',
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%)',
-          animation: 'gentleWave 20s ease-in-out infinite',
-          opacity: 0.3
-        }}></div>
-
-        <div style={{
-          position: 'absolute',
-          top: '70%',
-          left: 0,
-          right: 0,
-          height: '2px',
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.08) 50%, transparent 100%)',
-          animation: 'gentleWave 25s ease-in-out infinite',
-          animationDelay: '5s',
-          opacity: 0.2
-        }}></div>
-
-        {/* Subtle geometric shapes */}
-        <div style={{
-          position: 'absolute',
-          top: '20%',
-          right: '10%',
-          width: '100px',
-          height: '100px',
-          border: '1px solid rgba(255, 255, 255, 0.05)',
-          borderRadius: '50%',
-          animation: 'slowRotate 60s linear infinite',
-          opacity: 0.2
-        }}></div>
-
-        <div style={{
-          position: 'absolute',
-          bottom: '15%',
-          left: '15%',
-          width: '80px',
-          height: '80px',
-          border: '1px solid rgba(255, 255, 255, 0.03)',
-          borderRadius: '50%',
-          animation: 'slowRotateReverse 45s linear infinite',
-          opacity: 0.15
-        }}></div>
-      </div>
-
-      {/* Animated Background Grid */}
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundImage: `
-          radial-gradient(circle at 25% 25%, var(--primary-color) 1px, transparent 1px),
-          radial-gradient(circle at 75% 75%, var(--secondary-color) 1px, transparent 1px),
-          radial-gradient(circle at 50% 50%, var(--accent-color) 1px, transparent 1px)
-        `,
-        backgroundSize: '100px 100px, 150px 150px, 200px 200px',
-        backgroundPosition: '0 0, 50px 50px, 25px 25px',
-        opacity: 0.03,
-        animation: 'gridMove 20s linear infinite'
-      }}></div>
-
-
-
-      <Container className="upcoming-container" style={{padding: '6rem 2rem 4rem', position: 'relative', zIndex: 2}}>
+      <Container className="upcoming-container" style={{padding: '6rem 2rem 4rem'}}>
         {/* Clean Header */}
         <div className="upcoming-header" style={{
           textAlign: 'center',
@@ -376,12 +265,12 @@ const UpcomingMovies = () => {
           <h1 className="upcoming-heading" style={{
             fontSize: '2.5rem',
             fontWeight: '600',
-            color: 'white',
+            color: '#0b0e17',
             marginBottom: '1rem',
             letterSpacing: '-0.025em'
           }}>
             <i className="fas fa-calendar-alt" style={{
-              color: '#007bff',
+              color: '#0b0e17',
               marginRight: '0.75rem',
               fontSize: '2rem'
             }}></i>
@@ -389,7 +278,7 @@ const UpcomingMovies = () => {
           </h1>
           <p className="upcoming-subtitle" style={{
             fontSize: '1.1rem',
-            color: '#6c757d',
+            color: '#5c6270',
             maxWidth: '600px',
             margin: '0 auto',
             lineHeight: '1.6',
@@ -417,31 +306,22 @@ const UpcomingMovies = () => {
           <div style={{
             textAlign: 'center',
             padding: '4rem 2rem',
-            background: 'rgba(255, 255, 255, 0.08)',
-            backdropFilter: 'blur(25px) saturate(180%)',
-            border: '1px solid rgba(255, 255, 255, 0.18)',
-            borderRadius: '24px',
-            boxShadow: `
-              0 8px 32px rgba(0, 0, 0, 0.12),
-              0 2px 8px rgba(0, 0, 0, 0.08),
-              inset 0 1px 0 rgba(255, 255, 255, 0.1),
-              0 0 0 1px rgba(255, 255, 255, 0.05)
-            `
+            background: '#ffffff',
+            border: '1px solid #e5e7eb'
           }}>
             <i className="fas fa-film" style={{
               fontSize: '4rem',
-              color: 'rgba(255, 255, 255, 0.6)',
+              color: '#8b909c',
               marginBottom: '1.5rem',
               display: 'block'
             }}></i>
             <p style={{
               fontFamily: '"Times New Roman", Times, Georgia, serif',
               fontSize: '1.5rem',
-              color: 'white',
+              color: '#0b0e17',
               fontStyle: 'italic',
               margin: 0,
-              lineHeight: '1.6',
-              textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
+              lineHeight: '1.6'
             }}>
               Stay tuned—we'll be back with amazing stories very soon!
             </p>
@@ -451,52 +331,26 @@ const UpcomingMovies = () => {
             {upcomingMovies.map((movie) => (
               <Col xl={4} lg={4} md={4} sm={6} xs={6} key={movie.id} style={{ alignSelf: 'flex-start' }}>
                 <div className="upcoming-card" style={{
-                  background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
-                  backdropFilter: 'blur(25px) saturate(180%)',
-                  border: '1px solid rgba(255, 255, 255, 0.18)',
-                  borderRadius: '16px',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
                   overflow: 'hidden',
-                  boxShadow: `
-                    0 8px 32px rgba(0, 0, 0, 0.12),
-                    0 2px 8px rgba(0, 0, 0, 0.08),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                    0 0 0 1px rgba(255, 255, 255, 0.05)
-                  `,
-                  transition: 'all 0.5s cubic-bezier(0.23, 1, 0.32, 1)',
+                  transition: 'border-color 0.2s ease',
                   position: 'relative',
-                  transform: 'perspective(1000px) rotateX(0deg)',
-                  willChange: 'transform',
                   cursor: 'pointer'
                 }}
                 onClick={() => handleMovieCardClick(movie)}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'perspective(1000px) rotateX(-2deg) translateY(-8px) scale(1.02)';
-                  e.currentTarget.style.boxShadow = `
-                    0 20px 60px rgba(0, 0, 0, 0.2),
-                    0 8px 32px rgba(0, 255, 255, 0.15),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.15),
-                    0 0 0 1px rgba(255, 255, 255, 0.1)
-                  `;
-                  e.currentTarget.style.background = 'linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06))';
-                  e.currentTarget.style.borderColor = 'rgba(0, 255, 255, 0.3)';
+                  e.currentTarget.style.borderColor = '#0b0e17';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'perspective(1000px) rotateX(0deg) translateY(0) scale(1)';
-                  e.currentTarget.style.boxShadow = `
-                    0 8px 32px rgba(0, 0, 0, 0.12),
-                    0 2px 8px rgba(0, 0, 0, 0.08),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                    0 0 0 1px rgba(255, 255, 255, 0.05)
-                  `;
-                  e.currentTarget.style.background = 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))';
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.18)';
+                  e.currentTarget.style.borderColor = '#e5e7eb';
                 }}
                 >
                   {/* Movie Poster */}
                   <div style={{
                     position: 'relative',
-                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+                    backgroundColor: '#f6f6f7',
+                    borderBottom: '1px solid #eef0f2'
                   }}>
                   {movie.poster_url ? (
                     <img
@@ -529,10 +383,10 @@ const UpcomingMovies = () => {
                       position: 'absolute',
                       top: '12px',
                       left: '12px',
-                      backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                      color: 'white',
+                      backgroundColor: '#ffffff',
+                      color: '#0b0e17',
+                      border: '1px solid #e5e7eb',
                       padding: '4px 8px',
-                      borderRadius: '6px',
                       fontSize: '0.75rem',
                       fontWeight: '600'
                     }}>
@@ -555,11 +409,7 @@ const UpcomingMovies = () => {
                     fontSize: '1.05rem',
                     fontWeight: '600',
                     marginBottom: '0.25rem',
-                    color: 'white',
-
-
-
-
+                    color: '#0b0e17',
                     lineHeight: '1.2',
                     display: '-webkit-box',
                     WebkitLineClamp: 1,
@@ -571,7 +421,7 @@ const UpcomingMovies = () => {
 
                     {/* Description */}
                     <p className="upcoming-desc" style={{
-                      color: 'var(--gray-600)',
+                      color: '#5c6270',
                       fontSize: '0.65rem',
                       marginBottom: '0.4rem',
                       lineHeight: '1.3',
@@ -597,7 +447,7 @@ const UpcomingMovies = () => {
                           marginLeft: '0px'
                         }}>
                           <i className="fas fa-map-marker-alt" style={{
-                            color: 'var(--gray-500)',
+                            color: '#8b909c',
                             fontSize: '0.7rem',
                             marginRight: '0.5rem',
                             minWidth: '14px'
@@ -605,7 +455,7 @@ const UpcomingMovies = () => {
                         <div>
                           <div className="upcoming-label" style={{
                             fontSize: '0.6rem',
-                            color: 'white',
+                            color: '#8b909c',
                             fontWeight: '500',
                             textTransform: 'uppercase',
                             letterSpacing: '0.5px',
@@ -613,7 +463,7 @@ const UpcomingMovies = () => {
                           }}>Venue</div>
                           <div className="upcoming-value" style={{
                             fontSize: '0.85rem',
-                            color: 'white',
+                            color: '#0b0e17',
                             fontWeight: '500'
                           }}>{movie.venue}</div>
                         </div>
@@ -626,7 +476,7 @@ const UpcomingMovies = () => {
                           right: '0'
                         }}>
                           <i className="fas fa-clock" style={{
-                            color: 'var(--gray-500)',
+                            color: '#8b909c',
                             fontSize: '0.7rem',
                             marginRight: '0.5rem',
                             minWidth: '14px'
@@ -634,7 +484,7 @@ const UpcomingMovies = () => {
                           <div>
                             <div className="upcoming-label" style={{
                               fontSize: '0.6rem',
-                              color: 'white',
+                              color: '#8b909c',
                               fontWeight: '500',
                               textTransform: 'uppercase',
                               letterSpacing: '0.5px',
@@ -642,7 +492,7 @@ const UpcomingMovies = () => {
                             }}>Show Time</div>
                             <div className="upcoming-value" style={{
                               fontSize: '0.85rem',
-                              color: 'white',
+                              color: '#0b0e17',
                               fontWeight: '500'
                             }}>{new Date(movie.date).toLocaleTimeString('en-IN', {
                               hour: '2-digit',
@@ -675,8 +525,7 @@ const UpcomingMovies = () => {
               left: 0,
               right: 0,
               bottom: 0,
-              background: 'rgba(0, 0, 0, 0.8)',
-              backdropFilter: 'blur(20px)',
+              background: 'rgba(11, 14, 23, 0.4)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -689,10 +538,8 @@ const UpcomingMovies = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               style={{
-                background: 'rgba(255, 255, 255, 0.1)',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                borderRadius: '24px',
+                background: '#ffffff',
+                border: '1px solid #e5e7eb',
                 padding: '24px',
                 maxWidth: '360px',
                 textAlign: 'center',
@@ -707,15 +554,14 @@ const UpcomingMovies = () => {
                   position: 'absolute',
                   top: '14px',
                   right: '14px',
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  border: 'none',
-                  borderRadius: '50%',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
                   width: '32px',
                   height: '32px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: 'white',
+                  color: '#0b0e17',
                   cursor: 'pointer',
                   fontSize: '16px'
                 }}
@@ -738,22 +584,21 @@ const UpcomingMovies = () => {
 
               {/* Main message */}
               <h2 style={{
-                color: '#ffffff',
+                color: '#0b0e17',
                 fontSize: '22px',
                 fontWeight: 'bold',
-                marginBottom: '12px',
-                fontFamily: 'Arial, sans-serif'
+                marginBottom: '12px'
               }}>
                 Login Required
               </h2>
 
               <p style={{
-                color: 'rgba(255, 255, 255, 0.8)',
+                color: '#5c6270',
                 fontSize: '14px',
                 marginBottom: '20px',
                 lineHeight: '1.6'
               }}>
-                Please login with your <strong style={{color: '#FFD700'}}>IIT Jammu email</strong> to book movie tickets.
+                Please login with your <strong style={{color: '#0b0e17'}}>IIT Jammu email</strong> to book movie tickets.
               </p>
 
               {/* Login button */}
@@ -763,31 +608,24 @@ const UpcomingMovies = () => {
                   navigate('/login');
                 }}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                  borderRadius: '12px',
-                  color: 'white',
-                  fontSize: '14px',
+                  background: '#0b0e17',
+                  border: '1px solid #0b0e17',
+                  color: '#ffffff',
+                  fontSize: '12px',
                   fontWeight: 'bold',
+                  letterSpacing: '0.09em',
+                  textTransform: 'uppercase',
                   padding: '10px 24px',
                   cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  boxShadow: '0 6px 20px rgba(255, 255, 255, 0.18)',
-                  fontFamily: 'Arial, sans-serif',
-                  textShadow: '0 1px 2px rgba(0,0,0,0.5)'
+                  transition: 'all 0.2s ease'
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.transform = 'translateY(-2px)';
-                  e.target.style.background = 'rgba(255, 255, 255, 0.2)';
-                  e.target.style.boxShadow = '0 12px 40px rgba(255, 255, 255, 0.3)';
-                  e.target.style.borderColor = 'rgba(0, 255, 255, 0.4)';
+                  e.target.style.background = '#ffffff';
+                  e.target.style.color = '#0b0e17';
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.transform = 'translateY(0)';
-                  e.target.style.background = 'rgba(255, 255, 255, 0.1)';
-                  e.target.style.boxShadow = '0 8px 32px rgba(255, 255, 255, 0.2)';
-                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                  e.target.style.background = '#0b0e17';
+                  e.target.style.color = '#ffffff';
                 }}
               >
                 <i className="fas fa-sign-in-alt" style={{marginRight: '10px'}}></i>
@@ -796,7 +634,7 @@ const UpcomingMovies = () => {
 
               {/* Additional info */}
               <p style={{
-                color: 'rgba(255, 255, 255, 0.6)',
+                color: '#8b909c',
                 fontSize: '12px',
                 marginTop: '14px',
                 lineHeight: '1.5'
@@ -822,8 +660,7 @@ const UpcomingMovies = () => {
               left: 0,
               right: 0,
               bottom: 0,
-              background: 'rgba(0, 0, 0, 0.8)',
-              backdropFilter: 'blur(20px)',
+              background: 'rgba(11, 14, 23, 0.4)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -836,10 +673,8 @@ const UpcomingMovies = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               style={{
-                background: 'rgba(255, 255, 255, 0.1)',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                borderRadius: '24px',
+                background: '#ffffff',
+                border: '1px solid #e5e7eb',
                 padding: '24px',
                 maxWidth: '360px',
                 textAlign: 'center',
@@ -853,15 +688,14 @@ const UpcomingMovies = () => {
                   position: 'absolute',
                   top: '14px',
                   right: '14px',
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  border: 'none',
-                  borderRadius: '50%',
+                  background: '#f6f6f7',
+                  border: '1px solid #e5e7eb',
                   width: '32px',
                   height: '32px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: 'white',
+                  color: '#0b0e17',
                   cursor: 'pointer',
                   fontSize: '16px'
                 }}
@@ -870,39 +704,36 @@ const UpcomingMovies = () => {
               </button>
 
               <h2 style={{
-                color: '#ffffff',
+                color: '#0b0e17',
                 fontSize: '22px',
                 fontWeight: 'bold',
-                marginBottom: '12px',
-                fontFamily: 'Arial, sans-serif'
+                marginBottom: '12px'
               }}>
                 Booking Closed
               </h2>
 
               <p style={{
-                color: 'rgba(255, 255, 255, 0.8)',
+                color: '#5c6270',
                 fontSize: '14px',
                 marginBottom: '20px',
                 lineHeight: '1.6'
               }}>
-                Movie booking time is complete for <strong style={{ color: '#FFD700' }}>{bookingClosedMovieTitle}</strong>.
+                Movie booking time is complete for <strong style={{ color: '#0b0e17' }}>{bookingClosedMovieTitle}</strong>.
               </p>
 
               <button
                 onClick={() => setShowBookingClosedModal(false)}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                  borderRadius: '12px',
-                  color: 'white',
-                  fontSize: '14px',
+                  background: '#0b0e17',
+                  border: '1px solid #0b0e17',
+                  color: '#ffffff',
+                  fontSize: '12px',
                   fontWeight: 'bold',
+                  letterSpacing: '0.09em',
+                  textTransform: 'uppercase',
                   padding: '10px 24px',
                   cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  boxShadow: '0 6px 20px rgba(255, 255, 255, 0.18)',
-                  fontFamily: 'Arial, sans-serif'
+                  transition: 'all 0.2s ease'
                 }}
               >
                 OK

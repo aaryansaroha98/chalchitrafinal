@@ -49,4 +49,3 @@ jest.mock('./pages/Scanner', () => () => <div>Scanner</div>);
 jest.mock('./pages/Login', () => () => <div>Login</div>);
 jest.mock('./pages/PrivacyPolicy', () => () => <div>Privacy Policy</div>);
 jest.mock('./pages/TermsOfService', () => () => <div>Terms of Service</div>);
-jest.mock('./pages/RefundPolicy', () => () => <div>Refund Policy</div>);

@@ -1,15 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { Navbar, Nav, Container, Offcanvas, CloseButton } from 'react-bootstrap';
+import React, { useEffect, useState, useRef } from 'react';
+import { Navbar, Nav, Container, Offcanvas } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { useRef } from 'react';
 
 const NavigationBar = () => {
   const navigate = useNavigate();
   const { user, logout, loading, coinBalance, coinBalanceLoading } = useAuth();
   const [navHidden, setNavHidden] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const mountTimeRef = useRef(Date.now());
 
   useEffect(() => {
@@ -49,169 +47,127 @@ const NavigationBar = () => {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const handleLoginClick = () => {
-    navigate('/login');
-  };
-
-  const handleMouseEnter = (e) => {
-    e.target.style.background = 'rgba(255, 255, 255, 0.15)';
-    e.target.style.transform = 'translateY(-1px)';
-  };
-
-  const handleMouseLeave = (e) => {
-    e.target.style.background = 'rgba(255, 255, 255, 0.05)';
-    e.target.style.transform = 'translateY(0)';
+  const shellStyle = {
+    transform: navHidden ? 'translateY(-100%)' : 'translateY(0)',
+    transition: 'transform 0.25s ease',
   };
 
   if (loading) {
     return (
-      <Navbar style={{ backgroundColor: '#1a1a1a', transform: navHidden ? 'translateY(-100%)' : 'translateY(0)', transition: 'transform 0.25s ease' }} variant="dark" sticky="top">
-        <Container fluid style={{ display: 'flex', alignItems: 'center' }}>
-          <Navbar.Brand as={Link} to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'white', textDecoration: 'none' }}>
-            <img src="/logos/logo-removebg-preview.png" alt="Logo" style={{ height: '38px' }} />
-            <span style={{ fontSize: '1.45rem', fontWeight: '600', letterSpacing: '1px' }}>CHALCHITRA</span>
+      <Navbar className="qt-nav" style={shellStyle} sticky="top">
+        <Container fluid className="qt-nav-inner">
+          <Navbar.Brand as={Link} to="/" className="qt-brand">
+            <img src="/logos/logo-removebg-preview.png" alt="Chalchitra" className="qt-brand-logo" />
+            <span className="qt-brand-name">CHALCHITRA</span>
           </Navbar.Brand>
-          {!user && <button onClick={handleLoginClick} style={{ background: 'transparent', border: 'none', padding: '0.5rem', cursor: 'pointer', marginLeft: 'auto' }}><img src="/logos/login_b_inverted.png" alt="Login" style={{ width: '24px', height: '24px' }} /></button>}
         </Container>
       </Navbar>
     );
   }
 
+  const mainLinks = [
+    { to: '/', label: 'Home' },
+    { to: '/upcoming-movies', label: 'Upcoming' },
+    { to: '/past-movies', label: 'Past Movies' },
+    { to: '/gallery', label: 'Gallery' },
+    { to: '/team', label: 'Team' },
+  ];
+
   return (
-    <Navbar style={{ backgroundColor: '#1a1a1a', transform: navHidden ? 'translateY(-100%)' : 'translateY(0)', transition: 'transform 0.25s ease', padding: '0', height: isMobile ? '45px' : '45px' }} variant="dark" sticky="top">
-      <Container fluid style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-        {/* Logo - Left */}
-        <Navbar.Brand as={Link} to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'white', textDecoration: 'none' }}>
-          <img src="/logos/logo-removebg-preview.png" alt="Logo" style={{ height: '38px' }} />
-          <span style={{ fontSize: '1.45rem', fontWeight: '600', letterSpacing: '1px' }}>CHALCHITRA</span>
+    <Navbar className="qt-nav" style={shellStyle} sticky="top" expand={false}>
+      <Container fluid className="qt-nav-inner">
+        {/* Logo — left */}
+        <Navbar.Brand as={Link} to="/" className="qt-brand">
+          <img src="/logos/logo-removebg-preview.png" alt="Chalchitra" className="qt-brand-logo" />
+          <span className="qt-brand-name">CHALCHITRA</span>
         </Navbar.Brand>
 
-        {/* Desktop: Main nav links - Center */}
-        <div className="d-none d-lg-flex" style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
-          <Nav style={{ display: 'flex', gap: '0.35rem' }}>
-            <Nav.Link as={Link} to="/" style={{ padding: '0.1rem 0.5rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '0.85rem', letterSpacing: '-0.5px' }} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>Home</Nav.Link>
-            <Nav.Link as={Link} to="/upcoming-movies" style={{ padding: '0.1rem 0.5rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '0.85rem', letterSpacing: '-0.5px' }} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>Upcoming</Nav.Link>
-            <Nav.Link as={Link} to="/past-movies" style={{ padding: '0.1rem 0.5rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '0.85rem', letterSpacing: '-0.5px' }} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>Past Movies</Nav.Link>
-            <Nav.Link as={Link} to="/gallery" style={{ padding: '0.1rem 0.5rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '0.85rem', letterSpacing: '-0.5px' }} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>Gallery</Nav.Link>
-            <Nav.Link as={Link} to="/team" style={{ padding: '0.1rem 0.5rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '0.85rem', letterSpacing: '-0.5px' }} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>Team</Nav.Link>
+        {/* Desktop: center nav */}
+        <div className="d-none d-lg-flex qt-nav-center">
+          <Nav className="qt-nav-links">
+            {mainLinks.map((l) => (
+              <Nav.Link key={l.to} as={Link} to={l.to} className="qt-nav-link">{l.label}</Nav.Link>
+            ))}
           </Nav>
         </div>
 
-        {/* Desktop: User nav links - Right */}
-        <div className="d-none d-lg-flex" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginLeft: 'auto' }}>
-          <Nav style={{ display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
+        {/* Desktop: right cluster */}
+        <div className="d-none d-lg-flex qt-nav-right">
+          <Nav className="qt-nav-links">
             {user ? (
               <>
-                <Nav.Link as={Link} to="/my-bookings" style={{ padding: '0.1rem 0.5rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '0.85rem', letterSpacing: '-0.5px' }} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}><i className="fas fa-ticket-alt me-1"></i>MY BOOKINGS</Nav.Link>
-                  {!!(user.code_scanner || user.team_scanner) && <Nav.Link as={Link} to="/scanner" style={{ padding: '0.1rem 0.5rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '0.85rem', letterSpacing: '-0.5px' }} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}><i className="fas fa-qrcode me-1"></i>Scanner</Nav.Link>}
-                {!!user.is_admin && <Nav.Link as={Link} to="/admin" style={{ padding: '0.1rem 0.5rem', borderRadius: '15px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.3)', color: 'white', textDecoration: 'none', fontWeight: '500', fontSize: '0.85rem', letterSpacing: '-0.5px' }} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}><i className="fas fa-cog me-1"></i>{user.admin_tag || 'Admin'}</Nav.Link>}
-                <Nav.Link onClick={() => logout()} style={{ padding: '0.1rem 0.5rem', color: 'white', textDecoration: 'none', fontWeight: '500', fontSize: '0.85rem', letterSpacing: '-0.5px', cursor: 'pointer' }}>Logout</Nav.Link>
+                <Nav.Link as={Link} to="/my-bookings" className="qt-nav-link"><i className="fas fa-ticket-alt me-1" />My Bookings</Nav.Link>
+                {!!(user.code_scanner || user.team_scanner) && (
+                  <Nav.Link as={Link} to="/scanner" className="qt-nav-link"><i className="fas fa-qrcode me-1" />Scanner</Nav.Link>
+                )}
+                {!!user.is_admin && (
+                  <Nav.Link as={Link} to="/admin" className="qt-nav-link qt-nav-link-strong"><i className="fas fa-cog me-1" />{user.admin_tag || 'Admin'}</Nav.Link>
+                )}
+                <Nav.Link onClick={() => logout()} className="qt-nav-link" style={{ cursor: 'pointer' }}>Logout</Nav.Link>
               </>
             ) : (
-              <Nav.Link as={Link} to="/login" style={{ padding: '0.1rem 0.5rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '0.85rem', letterSpacing: '-0.5px', display: 'flex', alignItems: 'center', gap: '0.25rem' }} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-                <img src="/logos/google-logo-icon-PNG-Transparent-Background.png" alt="" style={{ width: '18px', height: '18px' }} />Login
+              <Nav.Link as={Link} to="/login" className="qt-nav-link qt-nav-link-login">
+                <img src="/logos/google-logo-icon-PNG-Transparent-Background.png" alt="" className="qt-google-icon" />Login
               </Nav.Link>
             )}
           </Nav>
           {user && (
-            <>
-              <span style={{ color: '#ffd700', fontSize: '0.85rem', fontWeight: '500', marginLeft: '0.5rem', letterSpacing: '-0.5px' }}>Hi, {user?.name?.split(' ')[0] || 'User'}</span>
-              <span style={{ color: '#ffd700', fontSize: '0.8rem', fontWeight: '600', marginLeft: '0.4rem', background: 'rgba(255, 215, 0, 0.15)', padding: '0.1rem 0.5rem', borderRadius: '12px', border: '1px solid rgba(255, 215, 0, 0.3)', display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
-                🪙 {coinBalanceLoading ? '...' : coinBalance}
-              </span>
-            </>
+            <div className="qt-user-cluster">
+              <span className="qt-user-name">Hi, {user?.name?.split(' ')[0] || 'User'}</span>
+              <span className="qt-coin-badge">🪙 {coinBalanceLoading ? '...' : coinBalance}</span>
+            </div>
           )}
         </div>
 
-        {/* Mobile: Login + Hamburger - Right */}
-        <div className="d-lg-none" style={{ display: 'flex', alignItems: 'center', marginLeft: 'auto' }}>
-          {!user && <button onClick={handleLoginClick} style={{ background: 'transparent', border: 'none', padding: '0.5rem', cursor: 'pointer' }}><img src="/logos/login_b_inverted.png" alt="Login" style={{ width: '24px', height: '24px' }} /></button>}
-          <button onClick={() => setMenuOpen(!menuOpen)} style={{ background: 'transparent', border: 'none', padding: '0.5rem', cursor: 'pointer', marginLeft: '0.25rem' }}>
-            <span style={{ color: 'white', fontSize: '2rem' }}>☰</span>
+        {/* Mobile: login + hamburger */}
+        <div className="d-lg-none qt-nav-mobile">
+          {!user && (
+            <button onClick={() => navigate('/login')} className="qt-icon-btn" aria-label="Login">
+              <img src="/logos/login_b_inverted.png" alt="Login" className="qt-mobile-login-icon" />
+            </button>
+          )}
+          <button onClick={() => setMenuOpen(!menuOpen)} className="qt-icon-btn qt-burger" aria-label="Open menu">
+            <span>☰</span>
           </button>
         </div>
 
-        {/* Mobile Offcanvas Menu */}
-        <Offcanvas
-          show={menuOpen}
-          onHide={() => setMenuOpen(false)}
-          placement="end"
-          style={{ backgroundColor: '#1a1a1a', display: 'flex', flexDirection: 'column', width: '70%' }}
-        >
-          {/* Keep close button, remove heading, tighten spacing so links sit higher */}
-          <Offcanvas.Header
-            closeButton
-            closeVariant="white"
-            style={{ padding: '0.5rem 0.75rem 0.25rem', borderBottom: 'none', minHeight: 'auto' }}
-          />
-          <Offcanvas.Body style={{ display: 'flex', flexDirection: 'column', flex: 1, paddingTop: '0.25rem' }}>
-            {/* Main Navigation Links - Top */}
-            <Nav className="flex-column" style={{ gap: '0.5rem' }}>
-              <Nav.Link as={Link} to="/" onClick={() => setMenuOpen(false)} style={{ padding: '0.1rem 1rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '1rem' }}>Home</Nav.Link>
-              <Nav.Link as={Link} to="/upcoming-movies" onClick={() => setMenuOpen(false)} style={{ padding: '0.1rem 1rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '1rem' }}>Upcoming</Nav.Link>
-              <Nav.Link as={Link} to="/past-movies" onClick={() => setMenuOpen(false)} style={{ padding: '0.1rem 1rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '1rem' }}>Past Movies</Nav.Link>
-              <Nav.Link as={Link} to="/gallery" onClick={() => setMenuOpen(false)} style={{ padding: '0.1rem 1rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '1rem' }}>Gallery</Nav.Link>
-              <Nav.Link as={Link} to="/team" onClick={() => setMenuOpen(false)} style={{ padding: '0.1rem 1rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '1rem' }}>Team</Nav.Link>
+        {/* Mobile offcanvas */}
+        <Offcanvas show={menuOpen} onHide={() => setMenuOpen(false)} placement="end" className="qt-offcanvas">
+          <Offcanvas.Header closeButton className="qt-offcanvas-head" />
+          <Offcanvas.Body className="qt-offcanvas-body">
+            <Nav className="flex-column qt-mobile-links">
+              {mainLinks.map((l) => (
+                <Nav.Link key={l.to} as={Link} to={l.to} onClick={() => setMenuOpen(false)} className="qt-mobile-link">{l.label}</Nav.Link>
+              ))}
             </Nav>
 
-            {/* Spacer to push user section down */}
-            <div style={{ flex: 1 }}></div>
+            <div style={{ flex: 1 }} />
 
-            {/* User Section - Bottom */}
             {user ? (
-              <Nav className="flex-column" style={{ gap: '0.5rem', marginTop: 'auto' }}>
-                <div style={{ color: '#ffd700', fontSize: '1.1rem', fontWeight: '600', padding: '0.35rem 0.75rem 0.25rem', borderTop: '1px solid rgba(255,255,255,0.1)', marginTop: '1rem' }}>
-                  Hi, {user?.name?.split(' ')[0] || 'User'}
-                </div>
-
+              <Nav className="flex-column qt-mobile-links qt-mobile-user">
+                <div className="qt-mobile-greeting">Hi, {user?.name?.split(' ')[0] || 'User'}</div>
                 {!!user.is_admin && (
-                  <Nav.Link
-                    as={Link}
-                    to="/admin"
-                    onClick={() => setMenuOpen(false)}
-                    style={{ padding: '0.1rem 1rem', borderRadius: '15px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.3)', color: 'white', textDecoration: 'none', fontWeight: '500', fontSize: '1rem', marginTop: '0.1rem' }}
-                  >
-                    <i className="fas fa-cog me-1"></i>{user.admin_tag || 'Admin'}
+                  <Nav.Link as={Link} to="/admin" onClick={() => setMenuOpen(false)} className="qt-mobile-link qt-mobile-link-strong">
+                    <i className="fas fa-cog me-1" />{user.admin_tag || 'Admin'}
                   </Nav.Link>
                 )}
-
-                  <Nav.Link
-                    as={Link}
-                    to="/my-bookings"
-                    onClick={() => setMenuOpen(false)}
-                    style={{ padding: '0.1rem 1rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '1rem' }}
-                  >
-                    <i className="fas fa-ticket-alt me-1"></i>MY BOOKINGS
-                  </Nav.Link>
-
+                <Nav.Link as={Link} to="/my-bookings" onClick={() => setMenuOpen(false)} className="qt-mobile-link">
+                  <i className="fas fa-ticket-alt me-1" />My Bookings
+                </Nav.Link>
                 {!!(user.code_scanner || user.team_scanner) && (
-                  <Nav.Link
-                    as={Link}
-                    to="/scanner"
-                    onClick={() => setMenuOpen(false)}
-                    style={{ padding: '0.1rem 1rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '1rem' }}
-                  >
-                    <i className="fas fa-qrcode me-1"></i>Scanner
+                  <Nav.Link as={Link} to="/scanner" onClick={() => setMenuOpen(false)} className="qt-mobile-link">
+                    <i className="fas fa-qrcode me-1" />Scanner
                   </Nav.Link>
                 )}
-
-                <button
-                  onClick={() => { logout(); setMenuOpen(false); }}
-                  style={{ padding: '0.1rem 1rem', borderRadius: '15px', background: 'transparent', border: 'none', color: '#ff6b6b', textDecoration: 'none', fontWeight: '500', fontSize: '1rem', cursor: 'pointer', textAlign: 'left', width: '100%' }}
-                >
-                  Logout
-                </button>
+                <button onClick={() => { logout(); setMenuOpen(false); }} className="qt-mobile-logout">Logout</button>
               </Nav>
             ) : (
-              <Nav className="flex-column" style={{ gap: '0.5rem', marginTop: 'auto' }}>
-                <Nav.Link as={Link} to="/login" onClick={() => setMenuOpen(false)} style={{ padding: '0.1rem 1rem', borderRadius: '15px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontWeight: '500', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                  <img src="/logos/google-logo-icon-PNG-Transparent-Background.png" alt="" style={{ width: '16px', height: '16px' }} />Login
+              <Nav className="flex-column qt-mobile-links qt-mobile-user">
+                <Nav.Link as={Link} to="/login" onClick={() => setMenuOpen(false)} className="qt-mobile-link qt-mobile-link-login">
+                  <img src="/logos/google-logo-icon-PNG-Transparent-Background.png" alt="" className="qt-google-icon" />Login
                 </Nav.Link>
               </Nav>
             )}
-
-
-
           </Offcanvas.Body>
         </Offcanvas>
       </Container>

@@ -19,7 +19,7 @@ const PrivacyPolicy = () => {
   return (
     <div style={{
       minHeight: '100vh',
-      backgroundColor: '#000000',
+      backgroundColor: '#ffffff',
       padding: '2rem 0'
     }}>
       <Container>
@@ -28,7 +28,7 @@ const PrivacyPolicy = () => {
             {/* Header */}
             <div className="policy-header privacy-header" style={{ textAlign: 'center', marginBottom: '1.5rem', marginTop: '0', padding: '0 1rem' }}>
               <h1 className="policy-title privacy-title" style={{
-                color: '#ffffff',
+                color: '#0b0e17',
                 fontSize: '2.5rem',
                 fontWeight: '600',
                 marginBottom: '1rem',
@@ -40,14 +40,13 @@ const PrivacyPolicy = () => {
 
             {/* Content */}
             <div style={{
-              backgroundColor: '#1a1a1a',
-              border: '1px solid #333',
-              borderRadius: '8px',
+              backgroundColor: '#ffffff',
+              border: '1px solid #e5e7eb',
               padding: '2rem',
               marginBottom: '2rem'
             }}>
               <h2 style={{
-                color: '#ffffff',
+                color: '#0b0e17',
                 fontSize: '1.5rem',
                 fontWeight: 'bold',
                 marginBottom: '1rem'
@@ -55,7 +54,7 @@ const PrivacyPolicy = () => {
                 Introduction
               </h2>
               <p style={{
-                color: '#cccccc',
+                color: '#5c6270',
                 lineHeight: '1.6',
                 marginBottom: '2rem'
               }}>
@@ -63,7 +62,7 @@ const PrivacyPolicy = () => {
               </p>
 
               <h2 style={{
-                color: '#ffffff',
+                color: '#0b0e17',
                 fontSize: '1.5rem',
                 fontWeight: 'bold',
                 marginBottom: '1rem'
@@ -71,7 +70,7 @@ const PrivacyPolicy = () => {
                 Products and Services
               </h2>
               <p style={{
-                color: '#cccccc',
+                color: '#5c6270',
                 lineHeight: '1.6',
                 marginBottom: '2rem'
               }}>
@@ -79,7 +78,7 @@ const PrivacyPolicy = () => {
               </p>
 
               <h2 style={{
-                color: '#ffffff',
+                color: '#0b0e17',
                 fontSize: '1.5rem',
                 fontWeight: 'bold',
                 marginBottom: '1rem'
@@ -87,7 +86,7 @@ const PrivacyPolicy = () => {
                 Information We Collect
               </h2>
               <p style={{
-                color: '#cccccc',
+                color: '#5c6270',
                 lineHeight: '1.6',
                 marginBottom: '2rem'
               }}>
@@ -95,7 +94,7 @@ const PrivacyPolicy = () => {
               </p>
 
               <h2 style={{
-                color: '#ffffff',
+                color: '#0b0e17',
                 fontSize: '1.5rem',
                 fontWeight: 'bold',
                 marginBottom: '1rem'
@@ -103,7 +102,7 @@ const PrivacyPolicy = () => {
                 How We Use Your Information
               </h2>
               <p style={{
-                color: '#cccccc',
+                color: '#5c6270',
                 lineHeight: '1.6',
                 marginBottom: '2rem'
               }}>
@@ -111,7 +110,7 @@ const PrivacyPolicy = () => {
               </p>
 
               <h2 style={{
-                color: '#ffffff',
+                color: '#0b0e17',
                 fontSize: '1.5rem',
                 fontWeight: 'bold',
                 marginBottom: '1rem'
@@ -119,7 +118,7 @@ const PrivacyPolicy = () => {
                 Data Security
               </h2>
               <p style={{
-                color: '#cccccc',
+                color: '#5c6270',
                 lineHeight: '1.6',
                 marginBottom: '2rem'
               }}>
@@ -127,7 +126,7 @@ const PrivacyPolicy = () => {
               </p>
 
               <h2 style={{
-                color: '#ffffff',
+                color: '#0b0e17',
                 fontSize: '1.5rem',
                 fontWeight: 'bold',
                 marginBottom: '1rem'
@@ -135,19 +134,19 @@ const PrivacyPolicy = () => {
                 Contact Us
               </h2>
               <p style={{
-                color: '#cccccc',
+                color: '#5c6270',
                 lineHeight: '1.6',
                 marginBottom: '1rem'
               }}>
                 If you have any questions about this privacy policy, please contact us at:
               </p>
               <div style={{
-                color: '#cccccc',
+                color: '#5c6270',
                 lineHeight: '1.6'
               }}>
-                <p style={{margin: '0.5rem 0', color: '#cccccc'}}><strong>Email:</strong> chalchitra@iitjammu.ac.in</p>
-                <p style={{margin: '0.5rem 0', color: '#cccccc'}}><strong>Phone:</strong> +91 9569579671</p>
-                <p style={{margin: '0.5rem 0', color: '#cccccc'}}>
+                <p style={{margin: '0.5rem 0', color: '#5c6270'}}><strong>Email:</strong> chalchitra@iitjammu.ac.in</p>
+                <p style={{margin: '0.5rem 0', color: '#5c6270'}}><strong>Phone:</strong> +91 9569579671</p>
+                <p style={{margin: '0.5rem 0', color: '#5c6270'}}>
                   <strong>Address:</strong> Indian Institute of Technology Jammu, Jagti, PO Nagrota, NH-44, Jammu - 181221, J&K, India.
                 </p>
               </div>

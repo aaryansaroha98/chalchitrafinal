@@ -35,118 +35,21 @@ const Login = () => {
   }
 
   return (
-    <div className="bg-void" style={{minHeight: '100vh', position: 'relative', overflow: 'hidden'}}>
-      {/* Classic Simple Animated Background */}
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        pointerEvents: 'none',
-        zIndex: 1,
-        overflow: 'hidden'
-      }}>
-        {/* Pure black background */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: '100px', /* Shift black space down by 100px */
-          background: '#000000'
-        }}></div>
-
-        {/* White animated particles */}
-        {Array.from({ length: 15 }, (_, i) => (
-          <div
-            key={i}
-            style={{
-              position: 'absolute',
-              width: Math.random() * 3 + 1 + 'px',
-              height: Math.random() * 3 + 1 + 'px',
-              backgroundColor: 'rgba(255, 255, 255, 0.6)',
-              borderRadius: '50%',
-              left: Math.random() * 100 + '%',
-              top: Math.random() * 100 + '%',
-              animation: `randomFloat${i % 4} ${10 + Math.random() * 20}s linear infinite`,
-              animationDelay: Math.random() * 10 + 's',
-              boxShadow: '0 0 6px rgba(255, 255, 255, 0.3)',
-              opacity: Math.random() * 0.4 + 0.2,
-              zIndex: 2
-            }}
-          />
-        ))}
-
-        {/* Gentle moving waves */}
-        <div style={{
-          position: 'absolute',
-          top: '30%',
-          left: 0,
-          right: 0,
-          height: '2px',
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%)',
-          animation: 'gentleWave 20s ease-in-out infinite',
-          opacity: 0.3
-        }}></div>
-
-        <div style={{
-          position: 'absolute',
-          top: '70%',
-          left: 0,
-          right: 0,
-          height: '2px',
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.08) 50%, transparent 100%)',
-          animation: 'gentleWave 25s ease-in-out infinite',
-          animationDelay: '5s',
-          opacity: 0.2
-        }}></div>
-
-        {/* Subtle geometric shapes */}
-        <div style={{
-          position: 'absolute',
-          top: '20%',
-          right: '10%',
-          width: '100px',
-          height: '100px',
-          border: '1px solid rgba(255, 255, 255, 0.05)',
-          borderRadius: '50%',
-          animation: 'slowRotate 60s linear infinite',
-          opacity: 0.2
-        }}></div>
-
-        <div style={{
-          position: 'absolute',
-          bottom: '15%',
-          left: '15%',
-          width: '80px',
-          height: '80px',
-          border: '1px solid rgba(255, 255, 255, 0.03)',
-          borderRadius: '50%',
-          animation: 'slowRotateReverse 45s linear infinite',
-          opacity: 0.15
-        }}></div>
-      </div>
-
-
-
+    <div className="bg-void" style={{minHeight: '100vh'}}>
       {/* Main Container */}
-      <Container fluid style={{padding: '2rem', position: 'relative', zIndex: 10}}>
+      <Container fluid style={{padding: '2rem'}}>
         <Row className="justify-content-center align-items-center" style={{minHeight: '80vh'}}>
           <Col xs={12} lg={9} xl={7}>
             <div className="login-card-container" style={{
-              background: 'rgba(255, 255, 255, 0.02)',
-              backdropFilter: 'blur(40px) saturate(180%)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              borderRadius: '32px',
+              background: '#ffffff',
+              border: '1px solid #e5e7eb',
               overflow: 'hidden',
-              boxShadow: '0 25px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.02)',
               minHeight: '400px'
             }}>
               <Row className="g-0 h-100">
                 {/* Left Side - Animated Image Section */}
                 <Col lg={6} className="d-none d-lg-flex align-items-center justify-content-center" style={{
-                  background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(20, 20, 20, 0.9) 100%)',
+                  background: '#f6f6f7',
                   position: 'relative',
                   overflow: 'hidden'
                 }}>
@@ -157,7 +60,7 @@ const Login = () => {
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    opacity: 0.1
+                    opacity: 0.8
                   }}>
                     <div style={{
                       position: 'absolute',
@@ -166,7 +69,7 @@ const Login = () => {
                       transform: 'translate(-50%, -50%)',
                       width: '300px',
                       height: '300px',
-                      border: '2px solid rgba(255, 255, 255, 0.1)',
+                      border: '2px solid #e5e7eb',
                       borderRadius: '50%',
                       animation: 'spin 20s linear infinite'
                     }}></div>
@@ -177,7 +80,7 @@ const Login = () => {
                       transform: 'translate(-50%, -50%)',
                       width: '200px',
                       height: '200px',
-                      border: '2px solid rgba(255, 255, 255, 0.08)',
+                      border: '2px solid #e5e7eb',
                       borderRadius: '50%',
                       animation: 'spinReverse 15s linear infinite'
                     }}></div>
@@ -200,7 +103,7 @@ const Login = () => {
                             style={{
                               width: '4px',
                               height: '40px',
-                              background: i % 2 === 0 ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.4)',
+                              background: i % 2 === 0 ? '#0b0e17' : '#8b909c',
                               borderRadius: '2px',
                               animation: `filmStrip ${2 + i * 0.3}s ease-in-out infinite`,
                               animationDelay: `${i * 0.2}s`
@@ -216,14 +119,11 @@ const Login = () => {
                         width: '120px',
                         height: '120px',
                         margin: '0 auto',
-                        background: 'rgba(255, 255, 255, 0.1)',
-                        backdropFilter: 'blur(20px)',
-                        border: '1px solid rgba(255, 255, 255, 0.15)',
-                        borderRadius: '20px',
+                        background: '#ffffff',
+                        border: '1px solid #e5e7eb',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
                         animation: 'gentleFloat 4s ease-in-out infinite'
                       }}>
                         <img
@@ -233,7 +133,7 @@ const Login = () => {
                             width: '90px',
                             height: 'auto',
                             objectFit: 'contain',
-                            filter: 'brightness(0) invert(1)',
+                            filter: 'brightness(0)',
                             opacity: 0.9
                           }}
                         />
@@ -242,17 +142,16 @@ const Login = () => {
 
                     {/* Animated text */}
                     <h3 style={{
-                      color: 'rgba(255, 255, 255, 0.9)',
+                      color: '#0b0e17',
                       fontSize: '2rem',
                       fontWeight: '300',
                       marginBottom: '1rem',
-                      letterSpacing: '1px',
-                      textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
+                      letterSpacing: '1px'
                     }}>
                       Welcome to Chalchitra
                     </h3>
                     <p style={{
-                      color: 'rgba(255, 255, 255, 0.7)',
+                      color: '#5c6270',
                       fontSize: '1.1rem',
                       margin: 0,
                       fontWeight: '300',
@@ -274,7 +173,7 @@ const Login = () => {
                       marginBottom: '1.5rem'
                     }}>
                     <h1 style={{
-                      color: 'white',
+                      color: '#0b0e17',
                       fontSize: '2.6rem',
                       fontWeight: '600',
                       marginBottom: '0.35rem',
@@ -285,19 +184,16 @@ const Login = () => {
                       <div style={{
                         width: '52px',
                         height: '1.5px',
-                        background: 'linear-gradient(90deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.3))',
-                        margin: '0 auto',
-                        borderRadius: '1px'
+                        background: '#0b0e17',
+                        margin: '0 auto'
                       }}></div>
                     </div>
 
                     {/* Welcome Info (Desktop) */}
                     <div className="login-iit-info" style={{
                       width: '100%',
-                      background: 'rgba(255, 255, 255, 0.03)',
-                      backdropFilter: 'blur(20px)',
-                      border: '1px solid rgba(255, 255, 255, 0.08)',
-                      borderRadius: '16px',
+                      background: '#f6f6f7',
+                      border: '1px solid #e5e7eb',
                       padding: '0.75rem 0.75rem',
                       marginBottom: '1rem',
                       textAlign: 'center'
@@ -305,7 +201,7 @@ const Login = () => {
                       <div className="login-welcome-title" style={{
                         fontSize: '1.35rem',
                         fontWeight: '600',
-                        color: 'rgba(255, 255, 255, 0.95)',
+                        color: '#0b0e17',
                         marginBottom: '0.2rem'
                       }}>
                         Welcome Back!
@@ -313,13 +209,13 @@ const Login = () => {
                       <div className="login-welcome-subtitle" style={{
                         fontSize: '0.95rem',
                         fontWeight: '400',
-                        color: 'rgba(255, 255, 255, 0.7)',
+                        color: '#5c6270',
                         marginBottom: '0.6rem'
                       }}>
                         Please Login to continue
                       </div>
                       <p className="login-only-email" style={{
-                        color: 'rgba(255, 255, 255, 0.7)',
+                        color: '#5c6270',
                         fontSize: '0.75rem',
                         margin: 0,
                         lineHeight: '1.5'
@@ -331,10 +227,8 @@ const Login = () => {
                     {/* Welcome Info (Mobile) */}
                     <div className="login-welcome-mobile" style={{
                       width: '100%',
-                      background: 'rgba(255, 255, 255, 0.03)',
-                      backdropFilter: 'blur(20px)',
-                      border: '1px solid rgba(255, 255, 255, 0.08)',
-                      borderRadius: '16px',
+                      background: '#f6f6f7',
+                      border: '1px solid #e5e7eb',
                       padding: '0.75rem 0.75rem',
                       marginBottom: '1rem',
                       textAlign: 'center'
@@ -342,7 +236,7 @@ const Login = () => {
                       <div className="login-welcome-title" style={{
                         fontSize: '1.2rem',
                         fontWeight: '600',
-                        color: 'rgba(255, 255, 255, 0.95)',
+                        color: '#0b0e17',
                         marginBottom: '0.2rem'
                       }}>
                         Welcome Back!
@@ -350,13 +244,13 @@ const Login = () => {
                       <div className="login-welcome-subtitle" style={{
                         fontSize: '0.9rem',
                         fontWeight: '400',
-                        color: 'rgba(255, 255, 255, 0.7)',
+                        color: '#5c6270',
                         marginBottom: '0.6rem'
                       }}>
                         Please Login to continue
                       </div>
                       <p className="login-only-email" style={{
-                        color: 'rgba(255, 255, 255, 0.8)',
+                        color: '#5c6270',
                         fontSize: '0.9rem',
                         margin: 0,
                         lineHeight: '1.5'
@@ -371,36 +265,30 @@ const Login = () => {
                       disabled={isLoading}
                       style={{
                         width: '100%',
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        backdropFilter: 'blur(20px)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        borderRadius: '16px',
+                        background: '#0b0e17',
+                        border: '1px solid #0b0e17',
                         padding: 'clamp(0.38rem, 2vw, 0.55rem) 1.6rem',
-                        fontSize: '0.9rem',
-                        fontWeight: '400',
-                        color: 'white',
-                        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                        textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)',
+                        fontSize: '12px',
+                        fontWeight: '500',
+                        letterSpacing: '0.09em',
+                        textTransform: 'uppercase',
+                        color: '#ffffff',
+                        transition: 'all 0.2s ease',
                         marginBottom: '1rem'
                       }}
                       onMouseEnter={(e) => {
-                        e.target.style.transform = 'translateY(-2px)';
-                        e.target.style.background = 'rgba(255, 255, 255, 0.08)';
-                        e.target.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.15)';
-                        e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                        e.currentTarget.style.background = '#ffffff';
+                        e.currentTarget.style.color = '#0b0e17';
                       }}
                       onMouseLeave={(e) => {
-                        e.target.style.transform = 'translateY(0)';
-                        e.target.style.background = 'rgba(255, 255, 255, 0.05)';
-                        e.target.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.2)';
-                        e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                        e.currentTarget.style.background = '#0b0e17';
+                        e.currentTarget.style.color = '#ffffff';
                       }}
                     >
                       <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px'}}>
                         {isLoading ? (
                           <>
-                            <Spinner animation="border" size="sm" style={{color: 'white'}} />
+                            <Spinner animation="border" size="sm" style={{color: '#ffffff'}} />
                             <span>Connecting...</span>
                           </>
                         ) : (
@@ -420,7 +308,7 @@ const Login = () => {
                     <div style={{textAlign: 'center'}}>
                       <p className="login-terms" style={{
                         fontSize: '0.82rem',
-                        color: 'rgba(255, 255, 255, 0.6)',
+                        color: '#5c6270',
                         margin: 0,
                         lineHeight: '1.5'
                       }}>
@@ -428,16 +316,16 @@ const Login = () => {
                         <span
                           onClick={handleTermsOfServiceClick}
                           style={{
-                            color: 'rgba(255, 255, 255, 0.8)',
+                            color: '#0b0e17',
                             cursor: 'pointer',
                             textDecoration: 'underline',
                             fontWeight: '400'
                           }}
                           onMouseEnter={(e) => {
-                            e.target.style.color = 'rgba(255, 255, 255, 1)';
+                            e.target.style.color = '#5c6270';
                           }}
                           onMouseLeave={(e) => {
-                            e.target.style.color = 'rgba(255, 255, 255, 0.8)';
+                            e.target.style.color = '#0b0e17';
                           }}
                         >
                           Terms of Service
@@ -446,16 +334,16 @@ const Login = () => {
                         <span
                           onClick={handlePrivacyPolicyClick}
                           style={{
-                            color: 'rgba(255, 255, 255, 0.8)',
+                            color: '#0b0e17',
                             cursor: 'pointer',
                             textDecoration: 'underline',
                             fontWeight: '400'
                           }}
                           onMouseEnter={(e) => {
-                            e.target.style.color = 'rgba(255, 255, 255, 1)';
+                            e.target.style.color = '#5c6270';
                           }}
                           onMouseLeave={(e) => {
-                            e.target.style.color = 'rgba(255, 255, 255, 0.8)';
+                            e.target.style.color = '#0b0e17';
                           }}
                         >
                           Privacy Policy
@@ -468,19 +356,18 @@ const Login = () => {
                       marginTop: '1.25rem',
                       padding: '0.75rem 0.85rem',
                       width: '100%',
-                      background: 'rgba(255, 255, 255, 0.02)',
-                      borderRadius: '10px',
-                      border: '1px solid rgba(255, 255, 255, 0.05)'
+                      background: '#f6f6f7',
+                      border: '1px solid #e5e7eb'
                     }}>
                       <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '0.5rem'}}>
-                        <i className="fas fa-shield-alt login-secure-icon" style={{color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.9rem'}}></i>
-                        <small className="login-secure-title" style={{color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.75rem', fontWeight: '600'}}>
+                        <i className="fas fa-shield-alt login-secure-icon" style={{color: '#5c6270', fontSize: '0.9rem'}}></i>
+                        <small className="login-secure-title" style={{color: '#5c6270', fontSize: '0.75rem', fontWeight: '600'}}>
                           SECURE & PRIVATE
                         </small>
                       </div>
                       <p className="login-secure-text" style={{
                         fontSize: '0.75rem',
-                        color: 'rgba(255, 255, 255, 0.5)',
+                        color: '#8b909c',
                         margin: 0,
                         textAlign: 'center',
                         lineHeight: '1.4'
@@ -648,9 +535,9 @@ const Login = () => {
 
             .login-welcome-mobile {
               display: block !important;
-              background: rgba(255, 255, 255, 0.05) !important;
+              background: #f6f6f7 !important;
+              border: 1px solid #e5e7eb !important;
               padding: 1rem 0.75rem !important;
-              border-radius: 20px !important;
               margin-bottom: 1.5rem !important;
             }
 

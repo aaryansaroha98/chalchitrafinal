@@ -67,174 +67,56 @@ const Gallery = () => {
   }
 
   return (
-    <div className="bg-void" style={{ minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
-      {/* Classic Simple Animated Background */}
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        pointerEvents: 'none',
-        zIndex: 1,
-        overflow: 'hidden'
-      }}>
-        {/* Pure black background */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: '#000000'
-        }}></div>
-
-        {/* White animated particles */}
-        {Array.from({ length: 15 }, (_, i) => (
-          <div
-            key={i}
-            style={{
-              position: 'absolute',
-              width: Math.random() * 3 + 1 + 'px',
-              height: Math.random() * 3 + 1 + 'px',
-              backgroundColor: 'rgba(255, 255, 255, 0.6)',
-              borderRadius: '50%',
-              left: Math.random() * 100 + '%',
-              top: Math.random() * 100 + '%',
-              animation: `randomFloat${i % 4} ${10 + Math.random() * 20}s linear infinite`,
-              animationDelay: Math.random() * 10 + 's',
-              boxShadow: '0 0 6px rgba(255, 255, 255, 0.3)',
-              opacity: Math.random() * 0.4 + 0.2,
-              zIndex: 2
-            }}
-          />
-        ))}
-
-        {/* Gentle moving waves */}
-        <div style={{
-          position: 'absolute',
-          top: '30%',
-          left: 0,
-          right: 0,
-          height: '2px',
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%)',
-          animation: 'gentleWave 20s ease-in-out infinite',
-          opacity: 0.3
-        }}></div>
-
-        <div style={{
-          position: 'absolute',
-          top: '70%',
-          left: 0,
-          right: 0,
-          height: '2px',
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.08) 50%, transparent 100%)',
-          animation: 'gentleWave 25s ease-in-out infinite',
-          animationDelay: '5s',
-          opacity: 0.2
-        }}></div>
-
-        {/* Subtle geometric shapes */}
-        <div style={{
-          position: 'absolute',
-          top: '20%',
-          right: '10%',
-          width: '100px',
-          height: '100px',
-          border: '1px solid rgba(255, 255, 255, 0.05)',
-          borderRadius: '50%',
-          animation: 'slowRotate 60s linear infinite',
-          opacity: 0.2
-        }}></div>
-
-        <div style={{
-          position: 'absolute',
-          bottom: '15%',
-          left: '15%',
-          width: '80px',
-          height: '80px',
-          border: '1px solid rgba(255, 255, 255, 0.03)',
-          borderRadius: '50%',
-          animation: 'slowRotateReverse 45s linear infinite',
-          opacity: 0.15
-        }}></div>
-      </div>
-
-      {/* Animated Background Grid */}
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundImage: `
-          radial-gradient(circle at 25% 25%, var(--primary-color) 1px, transparent 1px),
-          radial-gradient(circle at 75% 75%, var(--secondary-color) 1px, transparent 1px),
-          radial-gradient(circle at 50% 50%, var(--accent-color) 1px, transparent 1px)
-        `,
-        backgroundSize: '100px 100px, 150px 150px, 200px 200px',
-        backgroundPosition: '0 0, 50px 50px, 25px 25px',
-        opacity: 0.03,
-        animation: 'gridMove 20s linear infinite'
-      }}></div>
-
-
-
-      <Container className="gallery-container" style={{ padding: '6rem 2rem 4rem', position: 'relative', zIndex: 2 }}>
+    <div className="bg-void" style={{ minHeight: '100vh' }}>
+      <Container className="gallery-container" style={{ padding: '6rem 2rem 4rem' }}>
         {/* Professional Header */}
         <div className="gallery-header" style={{ textAlign: 'center', marginBottom: '1.5rem', marginTop: '-5rem', padding: '0 1rem' }}>
-          <h1 className="gallery-title" style={{ fontSize: '2.5rem', fontWeight: '600', color: 'white', marginBottom: '1rem', letterSpacing: '-0.025em' }}>
-            <i className="fas fa-images me-3 gallery-title-icon" style={{ fontSize: '2rem', color: '#007bff', marginRight: '0.75rem' }}></i>
+          <h1 className="gallery-title" style={{ fontSize: '2.5rem', fontWeight: '600', color: '#0b0e17', marginBottom: '1rem', letterSpacing: '-0.025em' }}>
+            <i className="fas fa-images me-3 gallery-title-icon" style={{ fontSize: '2rem', color: '#0b0e17', marginRight: '0.75rem' }}></i>
             EVENT GALLERY
           </h1>
-          <p className="gallery-subtitle" style={{ fontSize: '1.1rem', color: '#6c757d', maxWidth: '600px', margin: '0 auto', lineHeight: '1.6', fontWeight: '400' }}>
+          <p className="gallery-subtitle" style={{ fontSize: '1.1rem', color: '#5c6270', maxWidth: '600px', margin: '0 auto', lineHeight: '1.6', fontWeight: '400' }}>
             Relive the magical moments from our cinematic events
           </p>
         </div>
 
         {error && (
           <div style={{
-            background: 'rgba(220, 53, 69, 0.1)',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(220, 53, 69, 0.2)',
-            borderRadius: '15px',
+            background: '#ffffff',
+            border: '1px solid #e5e7eb',
             padding: '2rem',
             textAlign: 'center',
-            marginBottom: '3rem',
-            boxShadow: '0 8px 32px rgba(220, 53, 69, 0.1)'
+            marginBottom: '3rem'
           }}>
             <i className="fas fa-exclamation-triangle" style={{
               fontSize: '2rem',
-              color: '#dc3545',
+              color: '#d64545',
               marginBottom: '1rem',
               display: 'block'
             }}></i>
-            <h4 style={{ color: '#dc3545', marginBottom: '0.5rem' }}>Unable to Load Gallery</h4>
-            <p style={{ color: 'var(--gray-600)', margin: 0 }}>{error}</p>
+            <h4 style={{ color: '#d64545', marginBottom: '0.5rem' }}>Unable to Load Gallery</h4>
+            <p style={{ color: '#5c6270', margin: 0 }}>{error}</p>
           </div>
         )}
 
         {gallery.length === 0 && !error ? (
           <div style={{
-            background: 'rgba(255, 255, 255, 0.08)',
-            backdropFilter: 'blur(25px)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            borderRadius: '25px',
+            background: '#ffffff',
+            border: '1px solid #e5e7eb',
             padding: '4rem 2rem',
-            textAlign: 'center',
-            boxShadow: '0 8px 32px rgba(0, 255, 255, 0.1)'
+            textAlign: 'center'
           }}>
             <i className="fas fa-camera" style={{
               fontSize: '4rem',
-              color: 'var(--gray-400)',
+              color: '#8b909c',
               marginBottom: '1.5rem',
               display: 'block'
             }}></i>
-            <h3 style={{ color: 'var(--gray-700)', marginBottom: '1rem', fontWeight: '600' }}>
+            <h3 style={{ color: '#0b0e17', marginBottom: '1rem', fontWeight: '600' }}>
               Gallery Coming Soon
             </h3>
             <p style={{
-              color: 'var(--gray-600)',
+              color: '#5c6270',
               margin: 0,
               fontSize: '1.1rem',
               maxWidth: '400px',
@@ -248,43 +130,17 @@ const Gallery = () => {
             {gallery.map((image, index) => (
               <Col xl={4} lg={6} md={6} sm={12} key={image.id} className="mb-4" style={{ alignSelf: 'flex-start' }}>
                 <div className="gallery-card" style={{
-                  background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
-                  backdropFilter: 'blur(25px) saturate(180%)',
-                  border: '1px solid rgba(255, 255, 255, 0.18)',
-                  borderRadius: '24px',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
                   overflow: 'hidden',
-                  boxShadow: `
-                    0 8px 32px rgba(0, 0, 0, 0.12),
-                    0 2px 8px rgba(0, 0, 0, 0.08),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                    0 0 0 1px rgba(255, 255, 255, 0.05)
-                  `,
-                  transition: 'all 0.5s cubic-bezier(0.23, 1, 0.32, 1)',
-                  position: 'relative',
-                  transform: 'perspective(1000px) rotateX(0deg)',
-                  willChange: 'transform'
+                  transition: 'all 0.2s ease',
+                  position: 'relative'
                 }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'perspective(1000px) rotateX(-2deg) translateY(-8px) scale(1.02)';
-                    e.currentTarget.style.boxShadow = `
-                    0 20px 60px rgba(0, 0, 0, 0.2),
-                    0 8px 32px rgba(0, 255, 255, 0.15),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.15),
-                    0 0 0 1px rgba(255, 255, 255, 0.1)
-                  `;
-                    e.currentTarget.style.background = 'linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06))';
-                    e.currentTarget.style.borderColor = 'rgba(0, 255, 255, 0.3)';
+                    e.currentTarget.style.borderColor = '#0b0e17';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'perspective(1000px) rotateX(0deg) translateY(0) scale(1)';
-                    e.currentTarget.style.boxShadow = `
-                    0 8px 32px rgba(0, 0, 0, 0.12),
-                    0 2px 8px rgba(0, 0, 0, 0.08),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                    0 0 0 1px rgba(255, 255, 255, 0.05)
-                  `;
-                    e.currentTarget.style.background = 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))';
-                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.18)';
+                    e.currentTarget.style.borderColor = '#e5e7eb';
                   }}
                 >
                   {/* Gallery Image */}
@@ -312,14 +168,14 @@ const Gallery = () => {
                       fontSize: '1rem',
                       fontWeight: '700',
                       marginBottom: '0.5rem',
-                      color: '#ffffff',
+                      color: '#0b0e17',
                       lineHeight: '1.3'
                     }}>
                       {image.event_name || 'Gallery Image'}
                     </h5>
                     <p className="gallery-card-date" style={{
                       fontSize: '0.8rem',
-                      color: 'rgba(255, 255, 255, 0.8)',
+                      color: '#5c6270',
                       margin: 0,
                       fontWeight: '500'
                     }}>
@@ -343,9 +199,8 @@ const Gallery = () => {
         style={{ zIndex: 9999 }}
       >
         <Modal.Body style={{
-          background: 'linear-gradient(135deg, var(--gray-900), var(--gray-800))',
+          background: '#ffffff',
           padding: '2rem',
-          borderRadius: '20px',
           textAlign: 'center'
         }}>
           {selectedImage && (
@@ -357,14 +212,12 @@ const Gallery = () => {
                   maxWidth: '100%',
                   maxHeight: '70vh',
                   objectFit: 'contain',
-                  borderRadius: '15px',
-                  boxShadow: '0 20px 60px rgba(0, 255, 255, 0.3)',
-                  border: '2px solid rgba(0, 255, 255, 0.2)'
+                  border: '1px solid #e5e7eb'
                 }}
               />
               <div style={{ marginTop: '2rem' }}>
                 <h3 style={{
-                  color: 'var(--gray-100)',
+                  color: '#0b0e17',
                   marginBottom: '0.5rem',
                   fontSize: '1.8rem',
                   fontWeight: '700'
@@ -372,7 +225,7 @@ const Gallery = () => {
                   {selectedImage.event_name || 'Gallery Image'}
                 </h3>
                 <p style={{
-                  color: 'var(--gray-400)',
+                  color: '#5c6270',
                   margin: 0,
                   fontSize: '1.1rem'
                 }}>

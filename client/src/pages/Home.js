@@ -19,7 +19,7 @@ const Home = () => {
   const [bookingClosedMovieTitle, setBookingClosedMovieTitle] = useState('');
   const [settings, setSettings] = useState({
     tagline: 'Student-led movie screening initiative at IIT Jammu',
-    hero_background: '#007bff',
+    hero_background: '#ffffff',
     about_text: 'Chalchitra Series is a student-led initiative at IIT Jammu dedicated to bringing quality movie screenings to our campus community. We organize regular movie screenings featuring a diverse range of films, from classics to contemporary hits.\n\nOur mission is to create a vibrant cultural atmosphere on campus while providing students with affordable entertainment options.',
     about_image: '/about/about-image.jpg'
   });
@@ -55,7 +55,7 @@ const Home = () => {
       // Set default settings if API fails
       setSettings({
         tagline: 'Student-led movie screening initiative at IIT Jammu',
-        hero_background: '#007bff',
+        hero_background: '#ffffff',
         about_text: 'Chalchitra Series is a pioneering student-led initiative at IIT Jammu dedicated to bringing world-class cinematic experiences to our vibrant campus community. Founded with the vision to create a cultural hub on campus, we organize premium movie screenings featuring a diverse collection of films - from timeless classics to contemporary blockbusters, independent gems to international masterpieces. Our mission goes beyond entertainment; we strive to foster a thriving cultural atmosphere that enriches the lives of IIT Jammu students, providing affordable access to quality cinema while creating memorable experiences that bring our community together. Through innovation, dedication, and a passion for storytelling, Chalchitra Series continues to be the heartbeat of cinematic culture at IIT Jammu, creating lasting memories one screening at a time.',
         about_image: '/about/about-image.jpg'
       });
@@ -99,100 +99,7 @@ const Home = () => {
   }
 
   return (
-    <div className="bg-void" style={{minHeight: '100vh', position: 'relative', overflow: 'hidden'}}>
-      {/* Classic Simple Animated Background */}
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        pointerEvents: 'none',
-        zIndex: 1,
-        overflow: 'hidden'
-      }}>
-        {/* Pure black background */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: '100px', /* Shift black space down by 100px */
-          background: '#000000'
-        }}></div>
-
-        {/* White animated particles */}
-        {Array.from({ length: 15 }, (_, i) => (
-          <div
-            key={i}
-            style={{
-              position: 'absolute',
-              width: Math.random() * 3 + 1 + 'px',
-              height: Math.random() * 3 + 1 + 'px',
-              backgroundColor: 'rgba(255, 255, 255, 0.6)',
-              borderRadius: '50%',
-              left: Math.random() * 100 + '%',
-              top: Math.random() * 100 + '%',
-              animation: `randomFloat${i % 4} ${10 + Math.random() * 20}s linear infinite`,
-              animationDelay: Math.random() * 10 + 's',
-              boxShadow: '0 0 6px rgba(255, 255, 255, 0.3)',
-              opacity: Math.random() * 0.4 + 0.2,
-              zIndex: 2
-            }}
-          />
-        ))}
-
-        {/* Gentle moving waves */}
-        <div style={{
-          position: 'absolute',
-          top: '30%',
-          left: 0,
-          right: 0,
-          height: '2px',
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%)',
-          animation: 'gentleWave 20s ease-in-out infinite',
-          opacity: 0.3
-        }}></div>
-
-        <div style={{
-          position: 'absolute',
-          top: '70%',
-          left: 0,
-          right: 0,
-          height: '2px',
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.08) 50%, transparent 100%)',
-          animation: 'gentleWave 25s ease-in-out infinite',
-          animationDelay: '5s',
-          opacity: 0.2
-        }}></div>
-
-        {/* Subtle geometric shapes */}
-        <div style={{
-          position: 'absolute',
-          top: '20%',
-          right: '10%',
-          width: '100px',
-          height: '100px',
-          border: '1px solid rgba(255, 255, 255, 0.05)',
-          borderRadius: '50%',
-          animation: 'slowRotate 60s linear infinite',
-          opacity: 0.2
-        }}></div>
-
-        <div style={{
-          position: 'absolute',
-          bottom: '15%',
-          left: '15%',
-          width: '80px',
-          height: '80px',
-          border: '1px solid rgba(255, 255, 255, 0.03)',
-          borderRadius: '50%',
-          animation: 'slowRotateReverse 45s linear infinite',
-          opacity: 0.15
-        }}></div>
-      </div>
-
-
+    <div className="bg-void" style={{ minHeight: '100vh' }}>
         {/* Hero Video Background Section */}
       <section style={{
         position: 'relative',
@@ -200,8 +107,7 @@ const Home = () => {
         marginTop: '0px', // Start from very top
         overflow: 'hidden',
         left: 0,
-        right: 0,
-        zIndex: 1
+        right: 0
       }}
       className="video-section">
         {/* Background Video with Normal Opacity */}
@@ -270,7 +176,7 @@ const Home = () => {
               left: 0,
               width: '100%',
               height: '100%',
-              backgroundColor: settings.hero_background || '#007bff',
+              backgroundColor: settings.hero_background || '#ffffff',
               zIndex: 1,
               opacity: 1
             }}
@@ -291,32 +197,11 @@ const Home = () => {
           alignItems: 'center',
           textAlign: 'center',
           padding: '2rem',
-          paddingBottom: '8rem', // Extra padding to shift text up from bottom
-          background: 'rgba(0, 0, 0, 0.3)' // Dark overlay for text readability
+          paddingBottom: '8rem' // Extra padding to shift text up from bottom
         }}>
           {/* Text removed as requested */}
         </div>
       </section>
-
-      {/* Animated Background Grid */}
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundImage: `
-          radial-gradient(circle at 25% 25%, var(--primary-color) 1px, transparent 1px),
-          radial-gradient(circle at 75% 75%, var(--secondary-color) 1px, transparent 1px),
-          radial-gradient(circle at 50% 50%, var(--accent-color) 1px, transparent 1px)
-        `,
-        backgroundSize: '100px 100px, 150px 150px, 200px 200px',
-        backgroundPosition: '0 0, 50px 50px, 25px 25px',
-        opacity: 0.03,
-        animation: 'gridMove 20s linear infinite'
-      }}></div>
-
-
 
 
 
@@ -340,12 +225,12 @@ const Home = () => {
           <h1 style={{
             fontSize: '2.5rem',
             fontWeight: '700',
-            color: 'white',
+            color: '#0b0e17',
             marginBottom: '0.3rem',
             letterSpacing: '0.02em'
           }}>
             <i className="fas fa-home" style={{
-              color: '#007bff',
+              color: '#0b0e17',
               marginRight: '0.75rem',
               fontSize: '2rem'
             }}></i>
@@ -353,7 +238,7 @@ const Home = () => {
           </h1>
           <p style={{
             fontSize: 'clamp(1.1rem, 2.6vw, 1.4rem)',
-            color: '#6c757d',
+            color: '#5c6270',
             maxWidth: 'none',
             width: '100%',
             margin: 0,
@@ -371,7 +256,7 @@ const Home = () => {
             margin: '0 auto 1.25rem',
             fontSize: '1.65rem',
             fontWeight: '600',
-            color: 'white',
+            color: '#0b0e17',
             letterSpacing: '0.02em',
             display: 'none'
           }}
@@ -385,7 +270,7 @@ const Home = () => {
             margin: '0 auto 1.25rem',
             fontSize: '1.18rem',
             lineHeight: '1.4',
-            color: '#6c757d',
+            color: '#5c6270',
             display: 'none'
           }}
         >
@@ -411,52 +296,26 @@ const Home = () => {
           {upcomingMovies.slice(0, 3).map((movie) => (
             <Col xl={4} lg={4} md={4} sm={6} xs={6} key={movie.id} style={{ alignSelf: 'flex-start' }} className="home-featured-col">
               <div className="home-featured-card" style={{
-                background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
-                backdropFilter: 'blur(25px) saturate(180%)',
-                border: '1px solid rgba(255, 255, 255, 0.18)',
-                borderRadius: '16px',
+                background: '#ffffff',
+                border: '1px solid #e5e7eb',
                 overflow: 'hidden',
-                boxShadow: `
-                  0 8px 32px rgba(0, 0, 0, 0.12),
-                  0 2px 8px rgba(0, 0, 0, 0.08),
-                  inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                  0 0 0 1px rgba(255, 255, 255, 0.05)
-                `,
-                transition: 'all 0.5s cubic-bezier(0.23, 1, 0.32, 1)',
+                transition: 'all 0.25s ease',
                 position: 'relative',
-                transform: 'perspective(1000px) rotateX(0deg)',
-                willChange: 'transform',
                 cursor: 'pointer'
               }}
               onClick={() => handleMovieCardClick(movie)}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'perspective(1000px) rotateX(-2deg) translateY(-8px) scale(1.02)';
-                e.currentTarget.style.boxShadow = `
-                  0 20px 60px rgba(0, 0, 0, 0.2),
-                  0 8px 32px rgba(0, 255, 255, 0.15),
-                  inset 0 1px 0 rgba(255, 255, 255, 0.15),
-                  0 0 0 1px rgba(255, 255, 255, 0.1)
-                `;
-                e.currentTarget.style.background = 'linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06))';
-                e.currentTarget.style.borderColor = 'rgba(0, 255, 255, 0.3)';
+                e.currentTarget.style.borderColor = '#0b0e17';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'perspective(1000px) rotateX(0deg) translateY(0) scale(1)';
-                e.currentTarget.style.boxShadow = `
-                  0 8px 32px rgba(0, 0, 0, 0.12),
-                  0 2px 8px rgba(0, 0, 0, 0.08),
-                  inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                  0 0 0 1px rgba(255, 255, 255, 0.05)
-                `;
-                e.currentTarget.style.background = 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))';
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.18)';
+                e.currentTarget.style.borderColor = '#e5e7eb';
               }}
               >
                 {/* Movie Poster */}
                 <div style={{
                   position: 'relative',
-                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                  borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+                  backgroundColor: '#f6f6f7',
+                  borderBottom: '1px solid #eef0f2'
                 }}>
                   {movie.poster_url ? (
                     <img
@@ -490,8 +349,8 @@ const Home = () => {
                     position: 'absolute',
                     top: '12px',
                     left: '12px',
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    color: 'white',
+                    backgroundColor: '#0b0e17',
+                    color: '#ffffff',
                     padding: '4px 8px',
                     borderRadius: '6px',
                     fontSize: '0.75rem',
@@ -516,7 +375,7 @@ const Home = () => {
                     fontSize: '1.05rem',
                     fontWeight: '600',
                     marginBottom: '0.25rem',
-                    color: 'white',
+                    color: '#0b0e17',
                     lineHeight: '1.2',
                     display: '-webkit-box',
                     WebkitLineClamp: 1,
@@ -528,7 +387,7 @@ const Home = () => {
 
                   {/* Description */}
                   <p className="home-featured-desc" style={{
-                    color: 'var(--gray-600)',
+                    color: '#5c6270',
                     fontSize: '0.65rem',
                     marginBottom: '0.4rem',
                     lineHeight: '1.3',
@@ -554,7 +413,7 @@ const Home = () => {
                         marginLeft: '0px'
                       }}>
                         <i className="fas fa-map-marker-alt" style={{
-                          color: 'var(--gray-500)',
+                          color: '#8b909c',
                           fontSize: '0.7rem',
                           marginRight: '0.5rem',
                           minWidth: '14px'
@@ -564,7 +423,7 @@ const Home = () => {
                             className="home-featured-label"
                             style={{
                               fontSize: '0.6rem',
-                              color: 'white',
+                              color: '#8b909c',
                               fontWeight: '500',
                               textTransform: 'uppercase',
                               letterSpacing: '0.5px',
@@ -577,7 +436,7 @@ const Home = () => {
                             className="home-featured-value"
                             style={{
                               fontSize: '0.85rem',
-                              color: 'white',
+                              color: '#0b0e17',
                               fontWeight: '500'
                             }}
                           >
@@ -593,7 +452,7 @@ const Home = () => {
                         right: '0'
                       }}>
                         <i className="fas fa-clock" style={{
-                          color: 'var(--gray-500)',
+                          color: '#8b909c',
                           fontSize: '0.7rem',
                           marginRight: '0.5rem',
                           minWidth: '14px'
@@ -603,7 +462,7 @@ const Home = () => {
                             className="home-featured-label"
                             style={{
                               fontSize: '0.6rem',
-                              color: 'white',
+                              color: '#8b909c',
                               fontWeight: '500',
                               textTransform: 'uppercase',
                               letterSpacing: '0.5px',
@@ -616,7 +475,7 @@ const Home = () => {
                             className="home-featured-value"
                             style={{
                               fontSize: '0.85rem',
-                              color: 'white',
+                              color: '#0b0e17',
                               fontWeight: '500'
                             }}
                           >
@@ -646,29 +505,23 @@ const Home = () => {
               alignItems: 'center',
               gap: '0.5rem',
               padding: '0.6rem 1.1rem',
-              borderRadius: '10px',
-              background: 'rgba(255, 255, 255, 0.1)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              color: 'white',
+              background: '#0b0e17',
+              border: '1px solid #0b0e17',
+              color: '#ffffff',
               textDecoration: 'none',
-              fontSize: '0.85rem',
+              fontSize: '12px',
               fontWeight: '600',
-              boxShadow: '0 8px 32px rgba(255, 255, 255, 0.1)',
-              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-              textShadow: '0 1px 2px rgba(0,0,0,0.5)'
+              textTransform: 'uppercase',
+              letterSpacing: '0.09em',
+              transition: 'all 0.2s ease'
             }}
             onMouseEnter={(e) => {
-              e.target.style.transform = 'translateY(-4px) scale(1.05)';
-              e.target.style.background = 'rgba(255, 255, 255, 0.2)';
-              e.target.style.boxShadow = '0 16px 48px rgba(255, 255, 255, 0.15)';
-              e.target.style.borderColor = 'rgba(0, 255, 255, 0.4)';
+              e.target.style.background = '#ffffff';
+              e.target.style.color = '#0b0e17';
             }}
             onMouseLeave={(e) => {
-              e.target.style.transform = 'translateY(0) scale(1)';
-              e.target.style.background = 'rgba(255, 255, 255, 0.1)';
-              e.target.style.boxShadow = '0 8px 32px rgba(255, 255, 255, 0.1)';
-              e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+              e.target.style.background = '#0b0e17';
+              e.target.style.color = '#ffffff';
             }}
           >
             <i className="fas fa-film"></i>
@@ -680,17 +533,9 @@ const Home = () => {
         {/* About Us Section */}
         <div style={{marginTop: '2.5rem'}}>
           <div className="about-card" style={{
-            background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
-            backdropFilter: 'blur(25px) saturate(180%)',
-            border: '1px solid rgba(255, 255, 255, 0.18)',
-            borderRadius: '24px',
+            background: '#ffffff',
+            border: '1px solid #e5e7eb',
             overflow: 'hidden',
-            boxShadow: `
-              0 8px 32px rgba(0, 0, 0, 0.12),
-              0 2px 8px rgba(0, 0, 0, 0.08),
-              inset 0 1px 0 rgba(255, 255, 255, 0.1),
-              0 0 0 1px rgba(255, 255, 255, 0.05)
-            `,
             padding: '3rem'
           }}>
             <Row className="align-items-center about-row">
@@ -699,7 +544,7 @@ const Home = () => {
                 <h2 className="about-heading" style={{
                   fontSize: '2.5rem',
                   fontWeight: '700',
-                  color: 'white',
+                  color: '#0b0e17',
                   marginTop: '-0.3rem',
                   marginBottom: '1.5rem',
                   letterSpacing: '-0.025em'
@@ -708,7 +553,7 @@ const Home = () => {
                 </h2>
                 <div className="about-text" style={{
                   fontSize: '1.18rem',
-                  color: '#6c757d',
+                  color: '#5c6270',
                   lineHeight: '1.4',
                   marginBottom: '2rem'
                 }}>
@@ -717,18 +562,18 @@ const Home = () => {
                       key={index}
                       style={{
                         marginBottom: index === settings.about_text.split('\n\n').length - 1 ? '0' : '1.5rem',
-                        color: '#6c757d'
+                        color: '#5c6270'
                       }}
                     >
                       {paragraph}
                     </p>
                   )) : (
                     <>
-                      <p style={{marginBottom: '1.5rem', color: '#6c757d'}}>
+                      <p style={{marginBottom: '1.5rem', color: '#5c6270'}}>
                         <strong>Chalchitra Series</strong> is a pioneering student-led initiative at <strong>Indian Institute of Technology Jammu</strong>,
                         dedicated to bringing world-class cinematic experiences to our vibrant campus community.
                       </p>
-                      <p style={{marginBottom: '0', color: '#6c757d'}}>
+                      <p style={{marginBottom: '0', color: '#5c6270'}}>
                         Our mission goes beyond entertainment; we strive to foster a thriving cultural atmosphere that enriches
                         the lives of IIT Jammu students, providing affordable access to quality cinema while creating memorable
                         experiences that bring our community together.
@@ -739,52 +584,43 @@ const Home = () => {
 
                 <div className="about-badges" style={{display: 'flex', gap: '1rem', flexWrap: 'wrap'}}>
                   <div className="about-badge" style={{
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    borderRadius: '12px',
+                    background: '#f6f6f7',
+                    border: '1px solid #e5e7eb',
                     padding: '0.75rem 1.25rem',
                     fontSize: '0.9rem',
                     fontWeight: '600',
-                    color: 'white',
+                    color: '#0b0e17',
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '0.5rem',
-                    boxShadow: '0 2px 8px rgba(255, 255, 255, 0.1)'
+                    gap: '0.5rem'
                   }}>
                     <i className="fas fa-users"></i>
                     Student-Led Initiative
                   </div>
                   <div className="about-badge" style={{
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    borderRadius: '12px',
+                    background: '#f6f6f7',
+                    border: '1px solid #e5e7eb',
                     padding: '0.75rem 1.25rem',
                     fontSize: '0.9rem',
                     fontWeight: '600',
-                    color: 'white',
+                    color: '#0b0e17',
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '0.5rem',
-                    boxShadow: '0 2px 8px rgba(255, 255, 255, 0.1)'
+                    gap: '0.5rem'
                   }}>
                     <i className="fas fa-film"></i>
                     Premium Experience
                   </div>
                   <div className="about-badge" style={{
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    borderRadius: '12px',
+                    background: '#f6f6f7',
+                    border: '1px solid #e5e7eb',
                     padding: '0.75rem 1.25rem',
                     fontSize: '0.9rem',
                     fontWeight: '600',
-                    color: 'white',
+                    color: '#0b0e17',
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '0.5rem',
-                    boxShadow: '0 2px 8px rgba(255, 255, 255, 0.1)'
+                    gap: '0.5rem'
                   }}>
                     <i className="fas fa-heart"></i>
                     Community Focused
@@ -1074,7 +910,7 @@ const Home = () => {
               display: block !important;
               font-size: 1.18rem !important;
               line-height: 1.4 !important;
-              color: #6c757d !important;
+              color: #5c6270 !important;
               margin: 0 auto 0.6rem !important;
               text-align: center !important;
             }
@@ -1134,8 +970,7 @@ const Home = () => {
               padding: clamp(2px, 2vw, 5px) clamp(6px, 3.5vw, 10px) !important;
               font-size: clamp(0.65rem, 3vw, 0.85rem) !important;
               border-radius: 6px !important;
-              box-shadow: 0 2px 10px rgba(0,0,0,0.5) !important;
-              background-color: rgba(0, 0, 0, 0.8) !important;
+              background-color: #0b0e17 !important;
             }
 
             .home-featured-btn {
@@ -1349,7 +1184,7 @@ const Home = () => {
           /* Premium Focus States */
           button:focus,
           a:focus {
-            outline: 2px solid #00ffff !important;
+            outline: 2px solid #0b0e17 !important;
             outline-offset: 2px !important;
           }
 
@@ -1407,8 +1242,7 @@ const Home = () => {
               left: 0,
               right: 0,
               bottom: 0,
-              background: 'rgba(0, 0, 0, 0.8)',
-              backdropFilter: 'blur(20px)',
+              background: 'rgba(11, 14, 23, 0.4)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -1421,10 +1255,8 @@ const Home = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               style={{
-                background: 'rgba(255, 255, 255, 0.1)',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                borderRadius: '24px',
+                background: '#ffffff',
+                border: '1px solid #e5e7eb',
                 padding: '24px',
                 maxWidth: '360px',
                 textAlign: 'center',
@@ -1439,15 +1271,14 @@ const Home = () => {
                   position: 'absolute',
                   top: '14px',
                   right: '14px',
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  border: 'none',
-                  borderRadius: '50%',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
                   width: '32px',
                   height: '32px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: 'white',
+                  color: '#0b0e17',
                   cursor: 'pointer',
                   fontSize: '16px'
                 }}
@@ -1470,22 +1301,21 @@ const Home = () => {
 
               {/* Main message */}
               <h2 style={{
-                color: '#ffffff',
+                color: '#0b0e17',
                 fontSize: '22px',
                 fontWeight: 'bold',
-                marginBottom: '12px',
-                fontFamily: 'Arial, sans-serif'
+                marginBottom: '12px'
               }}>
                 Login Required
               </h2>
 
               <p style={{
-                color: 'rgba(255, 255, 255, 0.8)',
+                color: '#5c6270',
                 fontSize: '14px',
                 marginBottom: '20px',
                 lineHeight: '1.6'
               }}>
-                Please login with your <strong style={{color: '#FFD700'}}>IIT Jammu email</strong> to book movie tickets.
+                Please login with your <strong style={{color: '#0b0e17'}}>IIT Jammu email</strong> to book movie tickets.
               </p>
 
               {/* Login button */}
@@ -1495,31 +1325,24 @@ const Home = () => {
                   navigate('/login');
                 }}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                  borderRadius: '12px',
-                  color: 'white',
-                  fontSize: '14px',
+                  background: '#0b0e17',
+                  border: '1px solid #0b0e17',
+                  color: '#ffffff',
+                  fontSize: '12px',
                   fontWeight: 'bold',
+                  letterSpacing: '0.09em',
+                  textTransform: 'uppercase',
                   padding: '10px 24px',
                   cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  boxShadow: '0 6px 20px rgba(255, 255, 255, 0.18)',
-                  fontFamily: 'Arial, sans-serif',
-                  textShadow: '0 1px 2px rgba(0,0,0,0.5)'
+                  transition: 'all 0.3s ease'
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.transform = 'translateY(-2px)';
-                  e.target.style.background = 'rgba(255, 255, 255, 0.2)';
-                  e.target.style.boxShadow = '0 12px 40px rgba(255, 255, 255, 0.3)';
-                  e.target.style.borderColor = 'rgba(0, 255, 255, 0.4)';
+                  e.target.style.background = '#ffffff';
+                  e.target.style.color = '#0b0e17';
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.transform = 'translateY(0)';
-                  e.target.style.background = 'rgba(255, 255, 255, 0.1)';
-                  e.target.style.boxShadow = '0 8px 32px rgba(255, 255, 255, 0.2)';
-                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                  e.target.style.background = '#0b0e17';
+                  e.target.style.color = '#ffffff';
                 }}
               >
                 <i className="fas fa-sign-in-alt" style={{marginRight: '10px'}}></i>
@@ -1528,7 +1351,7 @@ const Home = () => {
 
               {/* Additional info */}
               <p style={{
-                color: 'rgba(255, 255, 255, 0.6)',
+                color: '#8b909c',
                 fontSize: '12px',
                 marginTop: '14px',
                 lineHeight: '1.5'
@@ -1554,8 +1377,7 @@ const Home = () => {
               left: 0,
               right: 0,
               bottom: 0,
-              background: 'rgba(0, 0, 0, 0.8)',
-              backdropFilter: 'blur(20px)',
+              background: 'rgba(11, 14, 23, 0.4)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -1568,10 +1390,8 @@ const Home = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               style={{
-                background: 'rgba(255, 255, 255, 0.1)',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                borderRadius: '24px',
+                background: '#ffffff',
+                border: '1px solid #e5e7eb',
                 padding: '24px',
                 maxWidth: '360px',
                 textAlign: 'center',
@@ -1585,15 +1405,14 @@ const Home = () => {
                   position: 'absolute',
                   top: '14px',
                   right: '14px',
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  border: 'none',
-                  borderRadius: '50%',
+                  background: '#f6f6f7',
+                  border: '1px solid #e5e7eb',
                   width: '32px',
                   height: '32px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: 'white',
+                  color: '#0b0e17',
                   cursor: 'pointer',
                   fontSize: '16px'
                 }}
@@ -1602,39 +1421,36 @@ const Home = () => {
               </button>
 
               <h2 style={{
-                color: '#ffffff',
+                color: '#0b0e17',
                 fontSize: '22px',
                 fontWeight: 'bold',
-                marginBottom: '12px',
-                fontFamily: 'Arial, sans-serif'
+                marginBottom: '12px'
               }}>
                 Booking Closed
               </h2>
 
               <p style={{
-                color: 'rgba(255, 255, 255, 0.8)',
+                color: '#5c6270',
                 fontSize: '14px',
                 marginBottom: '20px',
                 lineHeight: '1.6'
               }}>
-                Movie booking time is complete for <strong style={{ color: '#FFD700' }}>{bookingClosedMovieTitle}</strong>.
+                Movie booking time is complete for <strong style={{ color: '#0b0e17' }}>{bookingClosedMovieTitle}</strong>.
               </p>
 
               <button
                 onClick={() => setShowBookingClosedModal(false)}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                  borderRadius: '12px',
-                  color: 'white',
-                  fontSize: '14px',
-                  fontWeight: 'bold',
+                  background: '#0b0e17',
+                  border: '1px solid #0b0e17',
+                  color: '#ffffff',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  letterSpacing: '0.09em',
+                  textTransform: 'uppercase',
                   padding: '10px 24px',
                   cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  boxShadow: '0 6px 20px rgba(255, 255, 255, 0.18)',
-                  fontFamily: 'Arial, sans-serif'
+                  transition: 'all 0.3s ease'
                 }}
               >
                 OK

@@ -4,410 +4,58 @@ import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
-    <footer style={{
-      background: '#1a1a1a',
-      color: '#ffffff',
-      padding: '1rem 0 1rem',
-      position: 'relative',
-      zIndex: 100,
-      fontFamily: "'Inter', sans-serif"
-    }}>
-      <Container style={{
-        padding: '0 1.5rem',
-        maxWidth: '1200px'
-      }}>
-        {/* Main Footer Content */}
-        <Row className="mb-3" style={{gap: '0.5rem'}}>
-          {/* Brand Section - Modern & Professional */}
-          <Col lg={4} md={6} className="mb-4 mb-lg-0">
-            <div style={{textAlign: 'left'}}>
-              <h3 style={{
-                color: '#ffffff',
-                margin: '0 0 0.5rem 0',
-                fontSize: '2rem',
-                fontWeight: '700',
-                fontFamily: "'Montserrat', sans-serif",
-                letterSpacing: '-1px',
-                background: 'linear-gradient(45deg, #ffffff, #e0e0e0)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                display: 'inline-block'
-              }}>
-                Chalchitra Series
-              </h3>
-
-              {/* Modern Divider */}
-              <div style={{
-                width: '50px',
-                height: '3px',
-                background: 'linear-gradient(90deg, #e94560, #ff7f50)',
-                margin: '1rem 0',
-                borderRadius: '2px',
-                opacity: '0.9'
-              }}></div>
-
-              <p style={{
-                color: '#ffffff',
-                fontSize: '0.95rem',
-                lineHeight: '1.7',
-                maxWidth: '320px',
-                fontStyle: 'normal',
-                fontWeight: '300'
-              }}>
-                Elevating cinematic experiences for IIT Jammu community with premium screenings and exclusive events.
-              </p>
-
-              {/* Social Media Icons - Simple */}
-              <div style={{
-                display: 'flex',
-                gap: '12px',
-                marginTop: '1.5rem'
-              }}>
-                <a href="#" style={{
-                  color: '#ffffff',
-                  fontSize: '1.2rem',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.color = '#e94560';
-                  e.target.style.transform = 'translateY(-2px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.color = '#ffffff';
-                  e.target.style.transform = 'translateY(0)';
-                }}>
-                  <i className="fab fa-facebook-f"></i>
-                </a>
-                <a href="#" style={{
-                  color: '#ffffff',
-                  fontSize: '0.9rem',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.color = '#e94560';
-                  e.target.style.transform = 'translateY(-2px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.color = '#ffffff';
-                  e.target.style.transform = 'translateY(0)';
-                }}>
-                  <i className="fab fa-instagram"></i>
-                </a>
-                <a href="#" style={{
-                  color: '#ffffff',
-                  fontSize: '1.2rem',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.color = '#e94560';
-                  e.target.style.transform = 'translateY(-2px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.color = '#ffffff';
-                  e.target.style.transform = 'translateY(0)';
-                }}>
-                  <i className="fab fa-twitter"></i>
-                </a>
-              </div>
+    <footer className="qt-footer">
+      <Container style={{ maxWidth: '1120px', padding: '0 20px' }}>
+        <Row className="gy-4">
+          {/* Brand */}
+          <Col lg={4} md={6}>
+            <h3 className="qt-footer-brand">Chalchitra Series</h3>
+            <div className="qt-footer-rule" />
+            <p className="qt-footer-desc">
+              Elevating cinematic experiences for the IIT Jammu community with premium
+              screenings and exclusive events.
+            </p>
+            <div className="qt-footer-social">
+              <a href="https://www.instagram.com/chalchitra.iitjammu/" aria-label="Instagram" target="_blank" rel="noreferrer">
+                <i className="fab fa-instagram"></i>
+              </a>
+              <a href="mailto:chalchitra@iitjammu.ac.in" aria-label="Email">
+                <i className="fas fa-envelope"></i>
+              </a>
+              <a href="tel:+919569579671" aria-label="Phone">
+                <i className="fas fa-phone"></i>
+              </a>
+              <a href="https://www.google.com/maps/search/?api=1&query=IIT+Jammu,+Jagti" aria-label="Location" target="_blank" rel="noreferrer">
+                <i className="fas fa-map-marker-alt"></i>
+              </a>
             </div>
           </Col>
 
-          {/* Legal Links - Modern Style */}
-          <Col lg={3} md={6} className="mb-4 mb-lg-0 ms-lg-auto footer-legal" style={{
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            borderRadius: '8px',
-            padding: '1rem'
-          }}>
-            <h5 style={{
-              color: '#ffffff',
-              marginBottom: '1.5rem',
-              fontSize: '1.1rem',
-              fontWeight: '600',
-              textTransform: 'uppercase',
-              letterSpacing: '1px'
-            }}>
-              Legal
-            </h5>
-            <div style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
-              <Link to="/privacy-policy" style={{
-                color: '#ffffff',
-                textDecoration: 'none',
-                fontSize: '0.9rem',
-                fontWeight: '400',
-                transition: 'all 0.3s ease',
-                padding: '0.3rem 0',
-                position: 'relative',
-                display: 'inline-block',
-                textTransform: 'uppercase',
-                letterSpacing: '0.6px'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.color = '#ffffff';
-                e.target.style.transform = 'translateX(5px)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.color = '#ffffff';
-                e.target.style.transform = 'translateX(0)';
-              }}>
-                Privacy Policy
-              </Link>
-              <Link to="/terms-of-service" style={{
-                color: '#ffffff',
-                textDecoration: 'none',
-                fontSize: '0.9rem',
-                fontWeight: '400',
-                transition: 'all 0.3s ease',
-                padding: '0.3rem 0',
-                position: 'relative',
-                display: 'inline-block',
-                textTransform: 'uppercase',
-                letterSpacing: '0.6px'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.color = '#ffffff';
-                e.target.style.transform = 'translateX(5px)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.color = '#ffffff';
-                e.target.style.transform = 'translateX(0)';
-              }}>
-                Terms of Service
-              </Link>
-              <Link to="/refund-policy" style={{
-                color: '#ffffff',
-                textDecoration: 'none',
-                fontSize: '0.9rem',
-                fontWeight: '400',
-                transition: 'all 0.3s ease',
-                padding: '0.3rem 0',
-                position: 'relative',
-                display: 'inline-block',
-                textTransform: 'uppercase',
-                letterSpacing: '0.6px'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.color = '#ffffff';
-                e.target.style.transform = 'translateX(5px)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.color = '#ffffff';
-                e.target.style.transform = 'translateX(0)';
-              }}>
-                Refund Policy
-              </Link>
+          {/* Legal */}
+          <Col lg={3} md={6} className="ms-lg-auto">
+            <h5 className="qt-footer-head">Legal</h5>
+            <div className="qt-footer-links">
+              <Link to="/privacy-policy">Privacy Policy</Link>
+              <Link to="/terms-of-service">Terms of Service</Link>
             </div>
           </Col>
 
-          {/* Contact Information - Modern Style */}
-          <Col lg={3} md={6} className="footer-contact" style={{
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            borderRadius: '8px',
-            padding: '1rem'
-          }}>
-            <h5 style={{
-              color: '#ffffff',
-              marginBottom: '1.5rem',
-              fontSize: '1.1rem',
-              fontWeight: '600',
-              textTransform: 'uppercase',
-              letterSpacing: '1px'
-            }}>
-              Contact Us
-            </h5>
-            
-            {/* Contact Icons Row */}
-            <div style={{
-              display: 'flex',
-              gap: '15px',
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginBottom: '1.5rem'
-            }}>
-              <a href="mailto:chalchitra@iitjammu.ac.in" style={{
-                color: '#e94560',
-                fontSize: '1.5rem',
-                transition: 'all 0.3s ease',
-                padding: '0',
-                borderRadius: '50%',
-                background: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '44px',
-                height: '44px',
-                overflow: 'hidden'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}>
-                <img
-                  src="/logos/maillogo.png"
-                  alt="Email"
-                  style={{
-                    width: '30px',
-                    height: '30px',
-                    objectFit: 'contain'
-                  }}
-                />
-              </a>
-
-              <a href="https://www.instagram.com/chalchitra.iitjammu/" style={{
-                color: '#e94560',
-                fontSize: '1.5rem',
-                transition: 'all 0.3s ease',
-                padding: '0',
-                borderRadius: '50%',
-                background: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '44px',
-                height: '44px',
-                overflow: 'hidden'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}>
-                <img
-                  src="/logos/instalogo.png"
-                  alt="Instagram"
-                  style={{
-                    width: '42px',
-                    height: '42px',
-                    objectFit: 'contain'
-                  }}
-                />
-              </a>
-
-              <a href="tel:+919569579671" style={{
-                color: '#e94560',
-                fontSize: '1.5rem',
-                transition: 'all 0.3s ease',
-                padding: '0',
-                borderRadius: '50%',
-                background: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '44px',
-                height: '44px',
-                overflow: 'hidden'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}>
-                <img
-                  src="/misc/telephone.png"
-                  alt="Mobile"
-                  style={{
-                    width: '30px',
-                    height: '30px',
-                    objectFit: 'contain'
-                  }}
-                />
-              </a>
-
-              <a href="https://www.google.com/maps/search/?api=1&query=IIT+Jammu,+Jagti" style={{
-                color: '#e94560',
-                fontSize: '1.5rem',
-                transition: 'all 0.3s ease',
-                padding: '0',
-                borderRadius: '50%',
-                background: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '44px',
-                height: '44px',
-                overflow: 'hidden'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}>
-                <img
-                  src="/misc/adress.jpeg"
-                  alt="Address"
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover'
-                  }}
-                />
-              </a>
-            </div>
-
-            {/* Address Below Icons */}
-            <div style={{
-              textAlign: 'center',
-              color: '#b8c5d6',
-              fontSize: '0.85rem',
-              lineHeight: '1.4',
-              marginTop: '0.5rem'
-            }}>
-              <p style={{margin: '0 0 0.25rem 0'}}>
-                <strong style={{color: '#ffffff'}}>Chalchitra Series, IIT Jammu</strong>
-              </p>
-              <p style={{margin: '0 0 0.25rem 0', color: '#ffffff'}}>
-                Jagti, PO Nagrota, NH-44
-              </p>
-              <p style={{margin: '0', color: '#ffffff'}}>
-                Jammu - 181221, J&K, India
-              </p>
+          {/* Contact */}
+          <Col lg={3} md={6}>
+            <h5 className="qt-footer-head">Contact</h5>
+            <div className="qt-footer-contact">
+              <p><strong>Chalchitra Series, IIT Jammu</strong></p>
+              <p>Jagti, PO Nagrota, NH-44</p>
+              <p>Jammu — 181221, J&amp;K, India</p>
+              <p><a href="mailto:chalchitra@iitjammu.ac.in">chalchitra@iitjammu.ac.in</a></p>
             </div>
           </Col>
         </Row>
 
-        {/* Footer Bottom - Compact Style */}
-        <Row style={{
-          marginTop: '0.5rem',
-          paddingTop: '0.5rem',
-          borderTop: '1px solid rgba(255, 255, 255, 0.1)'
-        }}>
-          <Col md={6} sm={12} className="text-center text-sm-start mb-1 mb-sm-0">
-            <p style={{
-              color: '#ffffff',
-              margin: 0,
-              fontSize: '0.8rem',
-              fontWeight: '400'
-            }}>
-              © 2026 Chalchitra Series. All rights reserved.
-            </p>
-          </Col>
-          <Col md={6} sm={12} className="text-center text-sm-end">
-            <p style={{
-              color: '#ffffff',
-              margin: 0,
-              fontSize: '0.8rem',
-              fontWeight: '400'
-            }}>
-              Cinematic excellence for IIT Jammu
-            </p>
-          </Col>
-        </Row>
+        <div className="qt-footer-bottom">
+          <span>© 2026 Chalchitra Series. All rights reserved.</span>
+          <span>Cinematic excellence for IIT Jammu</span>
+        </div>
       </Container>
     </footer>
   );
