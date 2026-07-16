@@ -158,7 +158,7 @@ const NavigationBar = () => {
 
       <span className="mobile-menu-sep" />
 
-      {user ? (
+      {user && (
         <>
           <span className="mobile-menu-greeting">Hi, {user?.name?.split(' ')[0] || 'User'}</span>
           <Link to="/my-bookings" onClick={closeMenu} className="mobile-menu-link">My Bookings</Link>
@@ -170,12 +170,12 @@ const NavigationBar = () => {
           )}
           <button onClick={() => { logout(); closeMenu(); }} className="mobile-menu-logout">Logout</button>
         </>
-      ) : (
-        <Link to="/login" onClick={closeMenu} className="mobile-menu-link mobile-menu-login-link">
-          <img src="/logos/google-logo-icon-PNG-Transparent-Background.png" alt="" className="qt-google-icon" />
-          Login
-        </Link>
       )}
+
+      <Link to="/login" onClick={closeMenu} className="mobile-menu-link mobile-menu-login-link">
+        <img src="/logos/google-logo-icon-PNG-Transparent-Background.png" alt="" className="qt-google-icon" />
+        Login
+      </Link>
 
       <div className="mobile-menu-legal">
         <Link to="/privacy-policy" onClick={closeMenu}>Privacy Policy</Link>
