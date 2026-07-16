@@ -72,7 +72,6 @@ const Gallery = () => {
         {/* Professional Header */}
         <div className="gallery-header" style={{ textAlign: 'center', marginBottom: '1.5rem', marginTop: '-5rem', padding: '0 1rem' }}>
           <h1 className="gallery-title" style={{ fontSize: '2.5rem', fontWeight: '600', color: '#0b0e17', marginBottom: '1rem', letterSpacing: '-0.025em' }}>
-            <i className="fas fa-images me-3 gallery-title-icon" style={{ fontSize: '2rem', color: '#0b0e17', marginRight: '0.75rem' }}></i>
             EVENT GALLERY
           </h1>
           <p className="gallery-subtitle" style={{ fontSize: '1.1rem', color: '#5c6270', maxWidth: '600px', margin: '0 auto', lineHeight: '1.6', fontWeight: '400' }}>

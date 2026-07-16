@@ -377,7 +377,6 @@ const MyBookings = () => {
         <Container className="my-bookings-container">
           <div className="my-bookings-header">
             <h1 className="my-bookings-title">
-              <i className="fas fa-ticket-alt"></i>
               MY BOOKINGS
             </h1>
             <p className="my-bookings-subtitle">

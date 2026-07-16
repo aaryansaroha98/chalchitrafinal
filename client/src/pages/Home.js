@@ -229,11 +229,6 @@ const Home = () => {
             marginBottom: '0.3rem',
             letterSpacing: '0.02em'
           }}>
-            <i className="fas fa-home" style={{
-              color: '#0b0e17',
-              marginRight: '0.75rem',
-              fontSize: '2rem'
-            }}></i>
             WELCOME TO CHALCHITRA
           </h1>
           <p style={{

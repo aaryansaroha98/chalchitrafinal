@@ -269,11 +269,6 @@ const UpcomingMovies = () => {
             marginBottom: '1rem',
             letterSpacing: '-0.025em'
           }}>
-            <i className="fas fa-calendar-alt" style={{
-              color: '#0b0e17',
-              marginRight: '0.75rem',
-              fontSize: '2rem'
-            }}></i>
             UPCOMING MOVIES
           </h1>
           <p className="upcoming-subtitle" style={{

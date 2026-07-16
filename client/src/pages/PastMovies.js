@@ -59,11 +59,6 @@ const PastMovies = () => {
             marginBottom: '1rem',
             letterSpacing: '-0.025em'
           }}>
-            <i className="fas fa-history past-movies-title-icon" style={{
-              color: '#0b0e17',
-              marginRight: '0.75rem',
-              fontSize: '2rem'
-            }}></i>
             PAST MOVIES
           </h1>
           <p className="past-movies-subtitle" style={{
