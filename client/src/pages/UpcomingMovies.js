@@ -21,9 +21,8 @@ const UpcomingMovies = () => {
     fetchMovies();
   }, []);
 
-  const fetchMovies = async () => {
+  const fetchMovies = async (retries = 2) => {
     try {
-      // Fetch all movies and filter based on current date & time (client-side)
       const res = await api.get('/api/movies/all');
       const now = new Date();
       const upcoming = (res.data || [])
@@ -32,8 +31,12 @@ const UpcomingMovies = () => {
       setMovies(upcoming);
       setLoading(false);
     } catch (err) {
-      setError('Failed to load movies');
-      setLoading(false);
+      if (retries > 0) {
+        setTimeout(() => fetchMovies(retries - 1), 1500);
+      } else {
+        setError('Failed to load movies');
+        setLoading(false);
+      }
     }
   };
 
