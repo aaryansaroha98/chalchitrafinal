@@ -652,8 +652,7 @@ label {
   color: var(--qt-text) !important;
 }
 .loader-spinner {
-  border-color: var(--qt-line) !important;
-  border-top-color: var(--qt-ink) !important;
+  border: 2px solid var(--qt-line) !important;
 }
 
 /* ---------- Footer ---------- */
@@ -1151,3 +1150,14 @@ footer a:hover, .footer a:hover { color: var(--qt-text) !important; }
   padding: 2.5rem !important; text-align: center;
 }
 .error-card p { color: var(--qt-red) !important; font-size: 1rem !important; margin: 0; }
+
+/* ---------- Mobile shape override — force sharp everywhere ---------- */
+@media (max-width: 991px) {
+  .btn, .btn *, .nav-burger, .card, .card *, .form-control, .modal-content,
+  .modal-header, .modal-body, .modal-footer, .offcanvas, .offcanvas-header,
+  .badge, .list-group-item, .page-link, .alert, .input-group-text,
+  .dropdown-menu, .dropdown-item, .navbar-toggler, .navbar-toggler *,
+  [class*="rounded"] {
+    border-radius: 0 !important;
+  }
+}

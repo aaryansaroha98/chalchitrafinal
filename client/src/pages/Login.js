@@ -53,40 +53,7 @@ const Login = () => {
                   position: 'relative',
                   overflow: 'hidden'
                 }}>
-                  {/* Animated movie reel background */}
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    opacity: 0.8
-                  }}>
-                    <div style={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      transform: 'translate(-50%, -50%)',
-                      width: '300px',
-                      height: '300px',
-                      border: '2px solid #e5e7eb',
-                      borderRadius: '50%',
-                      animation: 'spin 20s linear infinite'
-                    }}></div>
-                    <div style={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      transform: 'translate(-50%, -50%)',
-                      width: '200px',
-                      height: '200px',
-                      border: '2px solid #e5e7eb',
-                      borderRadius: '50%',
-                      animation: 'spinReverse 15s linear infinite'
-                    }}></div>
-                  </div>
-
-                  {/* Main animated content */}
+                  {/* Main content */}
                   <div style={{textAlign: 'center', position: 'relative', zIndex: 2}}>
                     {/* Film strip animation */}
                     <div style={{marginBottom: '2rem'}}>
@@ -460,16 +427,6 @@ const Login = () => {
             50% {
               transform: translateY(-10px);
             }
-          }
-
-          @keyframes spin {
-            from { transform: translate(-50%, -50%) rotate(0deg); }
-            to { transform: translate(-50%, -50%) rotate(360deg); }
-          }
-
-          @keyframes spinReverse {
-            from { transform: translate(-50%, -50%) rotate(360deg); }
-            to { transform: translate(-50%, -50%) rotate(0deg); }
           }
 
           @keyframes filmStrip {
