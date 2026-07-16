@@ -3,7 +3,6 @@ import { Container, Row, Col, Card, Button, Alert, Badge, Modal } from 'react-bo
 import api from '../api/axios';
 import QRScanner from '../components/QRScanner';
 import Loader from '../components/Loader';
-import Icon from '../components/Icon';
 
 const TeamScanner = () => {
   const [showScanner, setShowScanner] = useState(false);
@@ -131,7 +130,7 @@ const TeamScanner = () => {
     return (
       <Container className="py-5">
         <Alert variant="danger" className="text-center">
-          <Icon name="exclamation-triangle" className="mb-3" />
+          <i className="fas fa-exclamation-triangle fa-2x mb-3"></i>
           <h4>Access Denied</h4>
           <p>{error || 'You are not authorized to use the QR scanner.'}</p>
           <p className="mb-0">Please contact an administrator to grant scanner access.</p>
@@ -144,12 +143,12 @@ const TeamScanner = () => {
     <Container className="py-5">
       <div className="text-center mb-4">
         <h1 className="mb-3">
-          <Icon name="qrcode" className="text-primary me-3" />
+          <i className="fas fa-qrcode text-primary me-3"></i>
           🎫 QR Code Scanner
         </h1>
         <p className="text-muted">Scan student tickets for movie entry validation</p>
         <Badge bg="success" className="fs-6 px-3 py-2">
-          <Icon name="user-check" className="me-1" />
+          <i className="fas fa-user-check me-1"></i>
           Authorized Scanner: {currentUser?.name}
         </Badge>
       </div>
@@ -160,7 +159,7 @@ const TeamScanner = () => {
           <Card className="text-center border-primary shadow-sm">
             <Card.Body className="py-4">
               <div className="mb-2">
-                <Icon name="qrcode" className="text-primary" />
+                <i className="fas fa-qrcode fa-2x text-primary"></i>
               </div>
               <h2 className="text-primary mb-1">{stats.totalScanned}</h2>
               <p className="mb-0 fw-bold">Total Scanned</p>
@@ -171,7 +170,7 @@ const TeamScanner = () => {
           <Card className="text-center border-success shadow-sm">
             <Card.Body className="py-4">
               <div className="mb-2">
-                <Icon name="check-circle" className="text-success" />
+                <i className="fas fa-check-circle fa-2x text-success"></i>
               </div>
               <h2 className="text-success mb-1">{stats.validTickets}</h2>
               <p className="mb-0 fw-bold">Valid Tickets</p>
@@ -182,7 +181,7 @@ const TeamScanner = () => {
           <Card className="text-center border-danger shadow-sm">
             <Card.Body className="py-4">
               <div className="mb-2">
-                <Icon name="times-circle" className="text-danger" />
+                <i className="fas fa-times-circle fa-2x text-danger"></i>
               </div>
               <h2 className="text-danger mb-1">{stats.invalidTickets}</h2>
               <p className="mb-0 fw-bold">Invalid Tickets</p>
@@ -204,11 +203,11 @@ const TeamScanner = () => {
             borderRadius: '50px'
           }}
         >
-          <Icon name="camera" className="me-2" />
+          <i className="fas fa-camera me-2"></i>
           Start Scanning Tickets
         </Button>
         <p className="text-muted mt-2 small">
-          <Icon name="info-circle" className="me-1" />
+          <i className="fas fa-info-circle me-1"></i>
           Use device camera to scan QR codes on student tickets
         </p>
       </div>
@@ -217,14 +216,14 @@ const TeamScanner = () => {
       <Card className="shadow-sm">
         <Card.Header className="bg-light">
           <h5 className="mb-0">
-            <Icon name="history" className="me-2" />
+            <i className="fas fa-history me-2"></i>
             Recent Scans
           </h5>
         </Card.Header>
         <Card.Body>
           {scanHistory.length === 0 ? (
             <div className="text-center text-muted py-4">
-              <Icon name="inbox" className="mb-3" />
+              <i className="fas fa-inbox fa-2x mb-3"></i>
               <p className="mb-0">No scans yet. Start scanning tickets!</p>
             </div>
           ) : (
@@ -234,7 +233,7 @@ const TeamScanner = () => {
                   <div>
                     <strong className="d-block">{scan.timestamp}</strong>
                     <small className={`text-${scan.success ? 'success' : 'danger'}`}>
-                      <Icon name={scan.success ? 'check' : 'times'} className="me-1" />
+                      <i className={`fas fa-${scan.success ? 'check' : 'times'} me-1`}></i>
                       {scan.success ? 'Entry Allowed' : 'Entry Denied'}
                     </small>
                   </div>

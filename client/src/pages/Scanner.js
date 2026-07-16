@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Icon from '../components/Icon';
 import { Container, Row, Col, Card, Button, Alert, Modal, Badge, Spinner } from 'react-bootstrap';
 import api from '../api/axios';
 import jsQR from 'jsqr';
@@ -863,7 +862,7 @@ const Scanner = () => {
     // Clear the container
     const container = document.getElementById('qr-reader');
     if (container) {
-      container.innerHTML = '<div class="text-center text-muted"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-3"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/></svg><p>Camera stopped</p></div>';
+      container.innerHTML = '<div class="text-center text-muted"><i class="fas fa-camera fa-3x mb-3"></i><p>Camera stopped</p></div>';
     }
   };
 
@@ -895,7 +894,7 @@ const Scanner = () => {
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zm0 0v6h6M4 16l3-3 2 2 3-3 4 4"/></svg>
+                <i class="fas fa-file-image me-2"></i>
                 Processing Image: ${file.name}
               </h5>
             </div>
@@ -923,12 +922,12 @@ const Scanner = () => {
               <div class="modal-content">
                 <div class="modal-header bg-success text-white">
                   <h5 class="modal-title">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><path d="M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0m-6-5l-7 7-3-3"/></svg>
+                    <i class="fas fa-check-circle me-2"></i>
                     QR Code Detected!
                   </h5>
                 </div>
                 <div class="modal-body text-center">
-                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-success mb-3"><path d="M3 3h6v6H3zm12 0h6v6h-6zM3 15h6v6H3zm15-3v6m-3 0h6"/></svg>
+                  <i class="fas fa-qrcode fa-3x text-success mb-3"></i>
                   <p class="mb-2">Successfully detected QR code in image</p>
                   <code class="d-block bg-light p-2 rounded small text-break">${qrCode}</code>
                   <p class="mt-3 mb-0">Processing ticket validation...</p>
@@ -950,7 +949,7 @@ const Scanner = () => {
               <div class="modal-content">
                 <div class="modal-header bg-warning">
                   <h5 class="modal-title">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><path d="M10.29 3.86l-8 14A1 1 0 0 0 3 20h18a1 1 0 0 0 .86-1.49l-8-14a1 1 0 0 0-1.72 0zM12 9v4m0 4h0"/></svg>
+                    <i class="fas fa-exclamation-triangle me-2"></i>
                     No QR Code Found
                   </h5>
                 </div>
@@ -962,7 +961,7 @@ const Scanner = () => {
                   </p>
                   <div class="input-group mb-3">
                     <span class="input-group-text">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h6v6H3zm12 0h6v6h-6zM3 15h6v6H3zm15-3v6m-3 0h6"/></svg>
+                      <i class="fas fa-qrcode"></i>
                     </span>
                     <input type="text" class="form-control" id="qrCodeInput" placeholder="Enter QR code data manually..." />
                   </div>
@@ -970,7 +969,7 @@ const Scanner = () => {
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
                   <button type="button" class="btn btn-primary" id="scanFromImageBtn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M15 15l4 4m-9-2a7 7 0 1 0 0-14 7 7 0 0 0 0 14z"/></svg>
+                    <i class="fas fa-search me-1"></i>
                     Scan Manually
                   </button>
                 </div>
@@ -1004,14 +1003,14 @@ const Scanner = () => {
           <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
               <div class="modal-header bg-danger text-white">
-                  <h5 class="modal-title">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20m0 6v4m0 4h0"/></svg>
-                    Processing Error
+                <h5 class="modal-title">
+                  <i class="fas fa-exclamation-circle me-2"></i>
+                  Processing Error
                 </h5>
                 <button type="button" class="btn-close btn-close-white" onclick="this.closest('.modal').remove()"></button>
               </div>
               <div class="modal-body text-center">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-danger mb-3"><path d="M10.29 3.86l-8 14A1 1 0 0 0 3 20h18a1 1 0 0 0 .86-1.49l-8-14a1 1 0 0 0-1.72 0zM12 9v4m0 4h0"/></svg>
+                <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
                 <p class="mb-0">Failed to process the image. Please try again.</p>
               </div>
               <div class="modal-footer">
@@ -1127,12 +1126,12 @@ const Scanner = () => {
       <Container style={{padding: '2rem 2rem 4rem'}}>
         <div className="text-center mb-4">
           <h1 className="mb-3" style={{color: '#0b0e17'}}>
-            <Icon name="qrcode" className="me-3" style={{color: '#0b0e17'}} />
+            <i className="fas fa-qrcode me-3" style={{color: '#0b0e17'}}></i>
             QR Code Scanner
           </h1>
           <p style={{color: '#5c6270'}}>Scan student tickets for entry validation</p>
           <Badge bg="info" className="fs-6 px-3 py-2">
-            <Icon name="shield-alt" className="me-1" />
+            <i className="fas fa-shield-alt me-1"></i>
             Secure Entry System
           </Badge>
         </div>
@@ -1191,7 +1190,7 @@ const Scanner = () => {
                 {!isScanning ? (
                   <div>
                     <div className="mb-4">
-                      <Icon name="mobile-alt" className="text-primary mb-3" />
+                      <i className="fas fa-mobile-alt fa-4x text-primary mb-3"></i>
                       <h5 style={{color: '#0b0e17'}}>Ready to Scan</h5>
                       <p style={{color: '#5c6270'}}>Click start to begin scanning tickets</p>
                     </div>
@@ -1202,7 +1201,7 @@ const Scanner = () => {
                         onClick={startScanner}
                         className="px-4"
                       >
-                        <Icon name="play" className="me-2" />
+                        <i className="fas fa-play me-2"></i>
                         Start Scanning
                       </Button>
                       <Button
@@ -1218,7 +1217,7 @@ const Scanner = () => {
                           </>
                         ) : (
                           <>
-                            <Icon name="server" className="me-2" />
+                            <i className="fas fa-server me-2"></i>
                             Test Server
                           </>
                         )}
@@ -1235,7 +1234,7 @@ const Scanner = () => {
                             setShowCameraSelector(true);
                           }}
                         >
-                          <Icon name="camera" className="me-2" />
+                          <i className="fas fa-camera me-2"></i>
                           Camera ({availableCameras.length})
                         </Button>
                         <Button
@@ -1245,7 +1244,7 @@ const Scanner = () => {
                             fileInputRef.current?.click();
                           }}
                         >
-                          <Icon name="file-image" className="me-2" />
+                          <i className="fas fa-file-image me-2"></i>
                           Upload Image
                         </Button>
                       </div>
@@ -1342,7 +1341,7 @@ const Scanner = () => {
                       onClick={stopScanner}
                       className="px-4"
                     >
-                      <Icon name="stop" className="me-2" />
+                      <i className="fas fa-stop me-2"></i>
                       Stop Scanning
                     </Button>
                   </div>
@@ -1374,17 +1373,17 @@ const Scanner = () => {
                       </>
                     ) : scanResult.status === 'valid' ? (
                       <>
-                        <Icon name="check-circle" className="me-2" />
+                        <i className="fas fa-check-circle me-2"></i>
                         ✓ VALID TICKET - Entry Allowed
                       </>
                     ) : scanResult.status === 'invalid' ? (
                       <>
-                        <Icon name="times-circle" className="me-2" />
+                        <i className="fas fa-times-circle me-2"></i>
                         ✗ INVALID TICKET - Entry Denied
                       </>
                     ) : (
                       <>
-                        <Icon name="exclamation-triangle" className="me-2" />
+                        <i className="fas fa-exclamation-triangle me-2"></i>
                         Error Processing Ticket
                       </>
                     )}
@@ -1459,7 +1458,7 @@ const Scanner = () => {
                         <Row className="mb-2">
                           <Col xs={12}>
                             <Badge bg="info" className="w-100 py-2">
-                              <Icon name="clock" className="me-2" />
+                              <i className="fas fa-clock me-2"></i>
                               Estimated preparation time: {scanResult.data.take_time} minutes
                             </Badge>
                           </Col>
@@ -1477,7 +1476,7 @@ const Scanner = () => {
                 {scanResult.status !== 'processing' && (
                   <Card.Footer className="text-center">
                     <Button variant="outline-primary" onClick={resetScan}>
-                      <Icon name="redo" className="me-2" />
+                      <i className="fas fa-redo me-2"></i>
                       Scan Another Ticket
                     </Button>
                   </Card.Footer>
@@ -1494,7 +1493,7 @@ const Scanner = () => {
               <Card className="shadow border-warning">
                 <Card.Header className="bg-warning text-dark text-center">
                   <h5 className="mb-0">
-                    <Icon name="utensils" className="me-2" />
+                    <i className="fas fa-utensils me-2"></i>
                     🍽️ Current Food Orders - {currentBookingFood.bookingId}
                   </h5>
                 </Card.Header>
@@ -1515,7 +1514,7 @@ const Scanner = () => {
                       marginBottom: '1rem',
                       textAlign: 'center'
                     }}>
-                      <Icon name="utensils" className="me-2" />
+                      <i className="fas fa-utensils me-2"></i>
                       🍽️ Food to Prepare ({currentBookingFood.items?.length || 0} items)
                     </div>
 
@@ -1560,7 +1559,7 @@ const Scanner = () => {
                               fontWeight: '600'
                             }}
                           >
-                            <Icon name="check" className="me-1" />
+                            <i className="fas fa-check me-1"></i>
                             Give ({food.remaining || food.remaining_quantity || food.quantity || 0})
                           </Button>
                         </div>
@@ -1579,7 +1578,7 @@ const Scanner = () => {
                         fontWeight: '600',
                         fontSize: '0.85rem'
                       }}>
-                        <Icon name="info-circle" className="me-1" />
+                        <i className="fas fa-info-circle me-1"></i>
                         Click "Give" when food is ready for the customer
                       </small>
                     </div>
@@ -1587,7 +1586,7 @@ const Scanner = () => {
                 </Card.Body>
                 <Card.Footer className="text-center">
                   <Button variant="outline-warning" onClick={() => setCurrentBookingFood(null)}>
-                    <Icon name="times" className="me-2" />
+                    <i className="fas fa-times me-2"></i>
                     Clear Food Orders
                   </Button>
                 </Card.Footer>
@@ -1607,12 +1606,12 @@ const Scanner = () => {
             color: '#0b0e17'
           }}>
             <h5 className="mb-0" style={{color: '#0b0e17'}}>
-              <Icon name="history" className="me-2" />
+              <i className="fas fa-history me-2"></i>
               Recent Scans ({scanHistory.length})
             </h5>
             {scanHistory.length > 0 && (
               <Button variant="outline-danger" size="sm" onClick={clearHistory}>
-                <Icon name="trash" className="me-1" />
+                <i className="fas fa-trash me-1"></i>
                 Clear History
               </Button>
             )}
@@ -1620,7 +1619,7 @@ const Scanner = () => {
           <Card.Body style={{color: '#0b0e17'}}>
             {scanHistory.length === 0 ? (
               <div className="text-center py-4" style={{color: '#5c6270'}}>
-                <Icon name="inbox" className="mb-3" />
+                <i className="fas fa-inbox fa-2x mb-3"></i>
                 <p className="mb-0">No scans yet. Start scanning tickets!</p>
               </div>
             ) : (
@@ -1672,7 +1671,7 @@ const Scanner = () => {
 
         {/* Instructions */}
         <Alert variant="info" className="mt-4">
-          <h6><Icon name="info-circle" className="me-2" />Scanning Instructions:</h6>
+          <h6><i className="fas fa-info-circle me-2"></i>Scanning Instructions:</h6>
           <ul className="mb-0 mt-2">
             <li>Ensure good lighting and hold the QR code steady</li>
             <li>Keep the QR code within the scanning area</li>
@@ -1687,14 +1686,14 @@ const Scanner = () => {
       <Modal show={showCameraSelector} onHide={() => setShowCameraSelector(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>
-            <Icon name="camera" className="me-2" />
+            <i className="fas fa-camera me-2"></i>
             Select Camera
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {availableCameras.length === 0 ? (
             <div className="text-center text-muted py-4">
-              <Icon name="camera-slash" className="mb-3" />
+              <i className="fas fa-camera-slash fa-3x mb-3"></i>
               <p>No cameras found</p>
               <small>Please check camera permissions</small>
             </div>
@@ -1711,7 +1710,7 @@ const Scanner = () => {
                   >
                     <div className="d-flex align-items-center">
                       <div className="me-3">
-                        <Icon name="video" />
+                        <i className="fas fa-video"></i>
                       </div>
                       <div>
                         <div className="fw-bold">
@@ -1729,7 +1728,7 @@ const Scanner = () => {
                       </div>
                       {selectedCamera === camera.deviceId && (
                         <div className="ms-auto">
-                          <Icon name="check-circle" className="text-success" />
+                          <i className="fas fa-check-circle text-success"></i>
                         </div>
                       )}
                     </div>
@@ -1750,7 +1749,7 @@ const Scanner = () => {
       <Modal show={showPartialAdmission} onHide={() => setShowPartialAdmission(false)} centered size="lg" scrollable>
         <Modal.Header closeButton>
           <Modal.Title>
-            <Icon name="users" className="me-2" />
+            <i className="fas fa-users me-2"></i>
             Ticket Validation - Select People
           </Modal.Title>
         </Modal.Header>
@@ -1758,7 +1757,7 @@ const Scanner = () => {
           {partialAdmissionData && (
             <div>
               <div className="text-center mb-4">
-                <Icon name="ticket-alt" className="text-primary mb-3" />
+                <i className="fas fa-ticket-alt fa-3x text-primary mb-3"></i>
                 <h5>🎫 Ticket Detected</h5>
                 <p className="text-muted">TICKET VALIDATED - Choose how many people you like to admit?</p>
               </div>
@@ -1785,7 +1784,7 @@ const Scanner = () => {
                       />
                     ) : (
                       <Alert variant="secondary" className="py-3 text-center">
-                        <Icon name="utensils" className="me-2" />
+                        <i className="fas fa-utensils me-2"></i>
                         No food order for this ticket
                       </Alert>
                     ))}
@@ -1839,7 +1838,7 @@ const Scanner = () => {
                 </div>
                 <div className="text-center mt-3">
                   <Badge bg="info" className="fs-6 px-3 py-2">
-                    <Icon name="users" className="me-1" />
+                    <i className="fas fa-users me-1"></i>
                     Admit {selectedPeopleCount} Person{selectedPeopleCount > 1 ? 's' : ''}
                   </Badge>
                 </div>
@@ -1868,7 +1867,7 @@ const Scanner = () => {
             className="px-4"
             style={{ minWidth: '175px', fontWeight: '700' }}
           >
-            <Icon name="check" className="me-2" />
+            <i className="fas fa-check me-2"></i>
             Admit {selectedPeopleCount} Person{selectedPeopleCount > 1 ? 's' : ''}
           </Button>
         </Modal.Footer>
@@ -1893,14 +1892,14 @@ const Scanner = () => {
           style={{ border: 'none' }}
         >
           <Modal.Title className="w-100 text-center">
-            <Icon name="check-circle" className="me-3" />
+            <i className="fas fa-check-circle fa-2x me-3"></i>
             ✅ VALID TICKET - Entry Allowed
           </Modal.Title>
         </Modal.Header>
         <Modal.Body className="text-center py-5">
           {lastScanResult && (
             <div>
-              <Icon name="check-circle" className="text-success mb-4" />
+              <i className="fas fa-check-circle fa-5x text-success mb-4"></i>
               <h4 className="text-success mb-4">Entry Granted Successfully!</h4>
 
               <Card className="border-success shadow-sm mb-4" style={{ maxWidth: '400px', margin: '0 auto' }}>
@@ -1921,7 +1920,7 @@ const Scanner = () => {
                           <Col xs={4} className="text-start fw-bold">Take Time:</Col>
                           <Col xs={8} className="text-start">
                             <Badge bg="info" className="px-3 py-2">
-                              <Icon name="clock" className="me-1" />
+                              <i className="fas fa-clock me-1"></i>
                               {lastScanResult.take_time} minutes
                             </Badge>
                           </Col>
@@ -1983,8 +1982,8 @@ const Scanner = () => {
                         <Row className="mb-2">
                           <Col xs={12} className="text-center">
                             <Badge bg="secondary" className="px-3 py-2">
-                        <Icon name="utensils" className="me-2" />
-                        No food order for this ticket
+                              <i className="fas fa-utensils me-2"></i>
+                              No food order for this ticket
                             </Badge>
                           </Col>
                         </Row>
@@ -1994,7 +1993,7 @@ const Scanner = () => {
                         <Col xs={4} className="text-start fw-bold">Status:</Col>
                         <Col xs={8} className="text-start">
                           <Badge bg="success" className="px-3 py-2">
-                            <Icon name="check" className="me-1" />
+                            <i className="fas fa-check me-1"></i>
                             {lastScanResult?.validity_status || 'VALID'}
                           </Badge>
                         </Col>
@@ -2019,7 +2018,7 @@ const Scanner = () => {
             }}
             className="px-4"
           >
-            <Icon name="play" className="me-2" />
+            <i className="fas fa-play me-2"></i>
             Continue Scanning
           </Button>
         </Modal.Footer>
@@ -2044,14 +2043,14 @@ const Scanner = () => {
           style={{ border: 'none' }}
         >
           <Modal.Title className="w-100 text-center">
-            <Icon name="times-circle" className="me-3" />
+            <i className="fas fa-times-circle fa-2x me-3"></i>
             ❌ INVALID TICKET - Entry Denied
           </Modal.Title>
         </Modal.Header>
         <Modal.Body className="text-center pt-3 pb-2">
           {lastScanResult && (
             <div>
-              <Icon name="times-circle" className="text-danger mb-3" />
+              <i className="fas fa-times-circle fa-5x text-danger mb-3"></i>
               <h4 className="text-danger mb-3">Entry Denied!</h4>
 
               <Card className="border-danger shadow-sm mb-4" style={{ maxWidth: '400px', margin: '0 auto' }}>
@@ -2059,10 +2058,10 @@ const Scanner = () => {
                   <Row className="mb-2">
                     <Col xs={4} className="text-start fw-bold">Status:</Col>
                     <Col xs={8} className="text-start">
-                          <Badge bg="danger" className="px-3 py-2">
-                            <Icon name="times" className="me-1" />
-                            {lastScanResult?.validity_status || 'INVALID'}
-                          </Badge>
+                      <Badge bg="danger" className="px-3 py-2">
+                        <i className="fas fa-times me-1"></i>
+                        {lastScanResult?.validity_status || 'INVALID'}
+                      </Badge>
                     </Col>
                   </Row>
                   {lastScanResult?.student_name && (
@@ -2132,7 +2131,7 @@ const Scanner = () => {
                 <Row className="mb-2">
                   <Col xs={12} className="text-center">
                     <Badge bg="secondary" className="px-3 py-2">
-                      <Icon name="utensils" className="me-2" />
+                      <i className="fas fa-utensils me-2"></i>
                       No food order for this ticket
                     </Badge>
                   </Col>
@@ -2155,7 +2154,7 @@ const Scanner = () => {
             className="px-5"
             style={{ minWidth: '190px', fontWeight: '600' }}
           >
-            <Icon name="redo" className="me-2" />
+            <i className="fas fa-redo me-2"></i>
             Scan Another
           </Button>
         </Modal.Footer>
@@ -2209,7 +2208,7 @@ const FoodMarkingComponent = ({ bookingId, foodStatus, onFoodMarked, markFoodAsG
         marginBottom: '1rem',
         textAlign: 'center'
       }}>
-        <Icon name="utensils" className="me-2" />
+        <i className="fas fa-utensils me-2"></i>
         🍽️ Food Status ({foodStatus.length} items)
       </div>
 
@@ -2244,7 +2243,7 @@ const FoodMarkingComponent = ({ bookingId, foodStatus, onFoodMarked, markFoodAsG
                   {food.food_name || food.name || `Food Item ${index + 1}`}
                   {isCompleted && (
                     <Badge bg="success" className="ms-2">
-                      <Icon name="check" className="me-1" />
+                      <i className="fas fa-check me-1"></i>
                       Served
                     </Badge>
                   )}
@@ -2272,7 +2271,7 @@ const FoodMarkingComponent = ({ bookingId, foodStatus, onFoodMarked, markFoodAsG
                     <Spinner animation="border" size="sm" />
                   ) : (
                     <>
-                      <Icon name="check" className="me-1" />
+                      <i className="fas fa-check me-1"></i>
                       Give All
                     </>
                   )}

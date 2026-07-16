@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, ListGroup } from 'react-bootstrap';
 import Loader from '../components/Loader';
-import Icon from '../components/Icon';
 
 const Contact = () => {
   const [loading, setLoading] = useState(true);
@@ -55,11 +54,11 @@ const Contact = () => {
             letterSpacing: '-0.025em',
             textShadow: '0 2px 4px rgba(0,0,0,0.5)'
           }}>
-            <Icon name="envelope" style={{
+            <i className="fas fa-envelope" style={{
               color: '#007bff',
               marginRight: '0.75rem',
               fontSize: '2rem'
-            }} />
+            }}></i>
             Contact Us
           </h1>
           <p className="contact-subtitle" style={{
@@ -131,11 +130,11 @@ const Contact = () => {
                   alignItems: 'center',
                   textShadow: '0 1px 2px rgba(0,0,0,0.5)'
                 }}>
-                  <Icon name="handshake" style={{
+                  <i className="fas fa-handshake" style={{
                     color: '#007bff',
                     marginRight: '0.75rem',
                     fontSize: '1.25rem'
-                  }} />
+                  }}></i>
                   Get in Touch
                 </h3>
               </div>
@@ -163,7 +162,7 @@ const Contact = () => {
                     fontWeight: '600',
                     textShadow: '0 1px 2px rgba(0,0,0,0.5)'
                   }}>
-                    <Icon name="lightbulb" style={{marginRight: '0.5rem'}} />
+                    <i className="fas fa-lightbulb" style={{marginRight: '0.5rem'}}></i>
                     Student-Led Initiative
                   </h5>
                   <p style={{
@@ -233,11 +232,11 @@ const Contact = () => {
                   alignItems: 'center',
                   textShadow: '0 1px 2px rgba(0,0,0,0.5)'
                 }}>
-                  <Icon name="paper-plane" style={{
+                  <i className="fas fa-paper-plane" style={{
                     color: '#28a745',
                     marginRight: '0.75rem',
                     fontSize: '1.1rem'
-                  }} />
+                  }}></i>
                   How to Reach Us
                 </h4>
               </div>
@@ -395,11 +394,11 @@ const Contact = () => {
                   alignItems: 'center',
                   textShadow: '0 1px 2px rgba(0,0,0,0.5)'
                 }}>
-                  <Icon name="crown" style={{
+                  <i className="fas fa-crown" style={{
                     color: '#ffc107',
                     marginRight: '0.75rem',
                     fontSize: '1rem'
-                  }} />
+                  }}></i>
                   Chalchitra Head
                 </h5>
               </div>
@@ -496,11 +495,11 @@ const Contact = () => {
                   alignItems: 'center',
                   textShadow: '0 1px 2px rgba(0,0,0,0.5)'
                 }}>
-                  <Icon name="map-marker-alt" style={{
+                  <i className="fas fa-map-marker-alt" style={{
                     color: '#6c757d',
                     marginRight: '0.75rem',
                     fontSize: '1rem'
-                  }} />
+                  }}></i>
                   Visit Us
                 </h5>
               </div>
@@ -528,7 +527,7 @@ const Contact = () => {
                     fontWeight: '500',
                     textAlign: 'center'
                   }}>
-                    <Icon name="bell" style={{marginRight: '0.5rem'}} />
+                    <i className="fas fa-bell" style={{marginRight: '0.5rem'}}></i>
                     Next event location and timing will be announced on our social media channels
                   </p>
                 </div>

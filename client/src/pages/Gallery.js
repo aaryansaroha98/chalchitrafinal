@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Alert, Modal } from 'react-bootstrap';
 import api from '../api/axios';
 import Loader from '../components/Loader';
-import Icon from '../components/Icon';
 
 const Gallery = () => {
   const [gallery, setGallery] = useState([]);
@@ -88,12 +87,12 @@ const Gallery = () => {
             textAlign: 'center',
             marginBottom: '3rem'
           }}>
-            <Icon name="exclamation-triangle" style={{
+            <i className="fas fa-exclamation-triangle" style={{
               fontSize: '2rem',
               color: '#d64545',
               marginBottom: '1rem',
               display: 'block'
-            }} />
+            }}></i>
             <h4 style={{ color: '#d64545', marginBottom: '0.5rem' }}>Unable to Load Gallery</h4>
             <p style={{ color: '#5c6270', margin: 0 }}>{error}</p>
           </div>
@@ -106,12 +105,12 @@ const Gallery = () => {
             padding: '4rem 2rem',
             textAlign: 'center'
           }}>
-            <Icon name="camera" style={{
+            <i className="fas fa-camera" style={{
               fontSize: '4rem',
               color: '#8b909c',
               marginBottom: '1.5rem',
               display: 'block'
-            }} />
+            }}></i>
             <h3 style={{ color: '#0b0e17', marginBottom: '1rem', fontWeight: '600' }}>
               Gallery Coming Soon
             </h3>
@@ -179,7 +178,7 @@ const Gallery = () => {
                       margin: 0,
                       fontWeight: '500'
                     }}>
-                      <Icon name="calendar" className="me-1" />
+                      <i className="fas fa-calendar me-1"></i>
                       {formatGalleryEventDate(image.event_date || image.eventDate || image.uploaded_at)}
                     </p>
                   </div>
@@ -229,7 +228,7 @@ const Gallery = () => {
                   margin: 0,
                   fontSize: '1.1rem'
                 }}>
-                  <Icon name="calendar" className="me-2" />
+                  <i className="fas fa-calendar me-2"></i>
                   {formatGalleryEventDate(selectedImage.event_date || selectedImage.eventDate || selectedImage.uploaded_at, true)}
                 </p>
               </div>

@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api/axios';
 import { useAuth } from '../contexts/AuthContext';
 import { isUpcomingMovie, compareMovieDatesAsc } from '../utils/movieStatus';
-import Icon from '../components/Icon';
 import Loader from '../components/Loader';
 
 const Home = () => {
@@ -279,7 +278,7 @@ const Home = () => {
             padding: '1rem 1.5rem',
             marginBottom: '2rem'
           }}>
-            <Icon name="exclamation-triangle" style={{marginRight: '0.5rem'}} />
+            <i className="fas fa-exclamation-triangle" style={{marginRight: '0.5rem'}}></i>
             {error}
           </Alert>
         )}
@@ -330,10 +329,10 @@ const Home = () => {
                       alignItems: 'center',
                       justifyContent: 'center'
                     }}>
-                      <Icon name="film" style={{
+                      <i className="fas fa-film" style={{
                         fontSize: '3rem',
                         color: '#adb5bd'
-                      }} />
+                      }}></i>
                     </div>
                   )}
 
@@ -349,7 +348,7 @@ const Home = () => {
                     fontSize: '0.75rem',
                     fontWeight: '600'
                   }}>
-                    <Icon name="calendar" style={{marginRight: '0.25rem'}} />
+                    <i className="fas fa-calendar" style={{marginRight: '0.25rem'}}></i>
                     {new Date(movie.date).toLocaleDateString('en-IN', {
                       month: 'short',
                       day: 'numeric'
@@ -405,12 +404,12 @@ const Home = () => {
                         alignItems: 'center',
                         marginLeft: '0px'
                       }}>
-                        <Icon name="map-marker-alt" style={{
+                        <i className="fas fa-map-marker-alt" style={{
                           color: '#8b909c',
                           fontSize: '0.7rem',
                           marginRight: '0.5rem',
                           minWidth: '14px'
-                        }} />
+                        }}></i>
                         <div>
                           <div
                             className="home-featured-label"
@@ -444,12 +443,12 @@ const Home = () => {
                         position: 'absolute',
                         right: '0'
                       }}>
-                        <Icon name="clock" style={{
+                        <i className="fas fa-clock" style={{
                           color: '#8b909c',
                           fontSize: '0.7rem',
                           marginRight: '0.5rem',
                           minWidth: '14px'
-                        }} />
+                        }}></i>
                         <div>
                           <div
                             className="home-featured-label"
@@ -517,9 +516,9 @@ const Home = () => {
               e.target.style.color = '#ffffff';
             }}
           >
-            <Icon name="film" />
+            <i className="fas fa-film"></i>
             <span>View All Upcoming Movies</span>
-            <Icon name="arrow-right" />
+            <i className="fas fa-arrow-right"></i>
           </Link>
         </div>
 
@@ -587,7 +586,7 @@ const Home = () => {
                     alignItems: 'center',
                     gap: '0.5rem'
                   }}>
-                    <Icon name="users" />
+                    <i className="fas fa-users"></i>
                     Student-Led Initiative
                   </div>
                   <div className="about-badge" style={{
@@ -601,7 +600,7 @@ const Home = () => {
                     alignItems: 'center',
                     gap: '0.5rem'
                   }}>
-                    <Icon name="film" />
+                    <i className="fas fa-film"></i>
                     Premium Experience
                   </div>
                   <div className="about-badge" style={{
@@ -615,7 +614,7 @@ const Home = () => {
                     alignItems: 'center',
                     gap: '0.5rem'
                   }}>
-                    <Icon name="heart" />
+                    <i className="fas fa-heart"></i>
                     Community Focused
                   </div>
                 </div>
@@ -1338,7 +1337,7 @@ const Home = () => {
                   e.target.style.color = '#ffffff';
                 }}
               >
-                <Icon name="sign-in-alt" style={{marginRight: '10px'}} />
+                <i className="fas fa-sign-in-alt" style={{marginRight: '10px'}}></i>
                 Login with IIT Jammu Mail
               </button>
 
