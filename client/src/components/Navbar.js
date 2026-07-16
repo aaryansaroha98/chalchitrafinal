@@ -57,7 +57,7 @@ const NavigationBar = () => {
       <Navbar className="qt-nav" style={shellStyle} sticky="top">
         <Container fluid className="qt-nav-inner">
           <Navbar.Brand as={Link} to="/" className="qt-brand">
-            <img src="/logos/logo-removebg-preview.png" alt="Chalchitra" className="qt-brand-logo" />
+            <img src="/logos/newlogo.png" alt="Chalchitra" className="qt-brand-logo" />
             <span className="qt-brand-name">CHALCHITRA</span>
           </Navbar.Brand>
         </Container>

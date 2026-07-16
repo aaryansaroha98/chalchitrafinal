@@ -397,6 +397,8 @@ if (usePostgres) {
       await pool.query('ALTER TABLE movies ADD COLUMN IF NOT EXISTS booking_stopped INTEGER DEFAULT 0');
       await pool.query('ALTER TABLE movies ADD COLUMN IF NOT EXISTS is_special INTEGER DEFAULT 0');
       await pool.query('ALTER TABLE movies ADD COLUMN IF NOT EXISTS special_message TEXT');
+      await pool.query('ALTER TABLE movies ADD COLUMN IF NOT EXISTS coin_price INTEGER DEFAULT 0');
+      await pool.query('ALTER TABLE movies ADD COLUMN IF NOT EXISTS booking_limit INTEGER DEFAULT 6');
       await pool.query('ALTER TABLE movie_foods ADD COLUMN IF NOT EXISTS is_free INTEGER DEFAULT 0');
       await pool.query('ALTER TABLE team ADD COLUMN IF NOT EXISTS section TEXT DEFAULT \'current_team\'');
       await pool.query('ALTER TABLE team ADD COLUMN IF NOT EXISTS display_order INTEGER DEFAULT 0');
