@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { Navbar, Nav, Container, Offcanvas } from 'react-bootstrap';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { Navbar, Nav, Container } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -9,6 +9,19 @@ const NavigationBar = () => {
   const [navHidden, setNavHidden] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const mountTimeRef = useRef(Date.now());
+
+  const closeMenu = useCallback(() => {
+    setMenuOpen(false);
+    document.body.classList.remove('menu-open');
+  }, []);
+
+  const toggleMenu = useCallback(() => {
+    setMenuOpen((prev) => {
+      const next = !prev;
+      document.body.classList.toggle('menu-open', next);
+      return next;
+    });
+  }, []);
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -44,7 +57,10 @@ const NavigationBar = () => {
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      document.body.classList.remove('menu-open');
+    };
   }, []);
 
   const shellStyle = {
@@ -119,57 +135,50 @@ const NavigationBar = () => {
           )}
         </div>
 
-        {/* Mobile: login + hamburger */}
+        {/* Mobile: hamburger */}
         <div className="d-lg-none qt-nav-mobile">
-          {!user && (
-            <button onClick={() => navigate('/login')} className="qt-icon-btn" aria-label="Login">
-              <img src="/logos/login_b_inverted.png" alt="Login" className="qt-mobile-login-icon" />
-            </button>
-          )}
-          <button onClick={() => setMenuOpen(!menuOpen)} className="qt-icon-btn qt-burger" aria-label="Open menu">
-            <span>☰</span>
-          </button>
+          <button
+            onClick={toggleMenu}
+            className={`nav-burger${menuOpen ? ' is-open' : ''}`}
+            type="button"
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={String(menuOpen)}
+            aria-controls="mobile-menu"
+          ><span></span></button>
         </div>
 
-        {/* Mobile offcanvas */}
-        <Offcanvas show={menuOpen} onHide={() => setMenuOpen(false)} placement="end" className="qt-offcanvas">
-          <Offcanvas.Header closeButton className="qt-offcanvas-head" />
-          <Offcanvas.Body className="qt-offcanvas-body">
-            <Nav className="flex-column qt-mobile-links">
-              {mainLinks.map((l) => (
-                <Nav.Link key={l.to} as={Link} to={l.to} onClick={() => setMenuOpen(false)} className="qt-mobile-link">{l.label}</Nav.Link>
-              ))}
-            </Nav>
+        {/* Mobile menu (full-screen overlay like Quantify) */}
+        <div className={`mobile-menu${menuOpen ? ' is-open' : ''}`} id="mobile-menu" aria-label="Mobile navigation">
+          {mainLinks.map((l) => (
+            <Link key={l.to} to={l.to} onClick={closeMenu} className="mobile-menu-link">{l.label}</Link>
+          ))}
 
-            <div style={{ flex: 1 }} />
+          <span className="mobile-menu-sep" />
 
-            {user ? (
-              <Nav className="flex-column qt-mobile-links qt-mobile-user">
-                <div className="qt-mobile-greeting">Hi, {user?.name?.split(' ')[0] || 'User'}</div>
-                {!!user.is_admin && (
-                  <Nav.Link as={Link} to="/admin" onClick={() => setMenuOpen(false)} className="qt-mobile-link qt-mobile-link-strong">
-                    <i className="fas fa-cog me-1" />{user.admin_tag || 'Admin'}
-                  </Nav.Link>
-                )}
-                <Nav.Link as={Link} to="/my-bookings" onClick={() => setMenuOpen(false)} className="qt-mobile-link">
-                  <i className="fas fa-ticket-alt me-1" />My Bookings
-                </Nav.Link>
-                {!!(user.code_scanner || user.team_scanner) && (
-                  <Nav.Link as={Link} to="/scanner" onClick={() => setMenuOpen(false)} className="qt-mobile-link">
-                    <i className="fas fa-qrcode me-1" />Scanner
-                  </Nav.Link>
-                )}
-                <button onClick={() => { logout(); setMenuOpen(false); }} className="qt-mobile-logout">Logout</button>
-              </Nav>
-            ) : (
-              <Nav className="flex-column qt-mobile-links qt-mobile-user">
-                <Nav.Link as={Link} to="/login" onClick={() => setMenuOpen(false)} className="qt-mobile-link qt-mobile-link-login">
-                  <img src="/logos/google-logo-icon-PNG-Transparent-Background.png" alt="" className="qt-google-icon" />Login
-                </Nav.Link>
-              </Nav>
-            )}
-          </Offcanvas.Body>
-        </Offcanvas>
+          {user ? (
+            <>
+              <span className="mobile-menu-greeting">Hi, {user?.name?.split(' ')[0] || 'User'}</span>
+              <Link to="/my-bookings" onClick={closeMenu} className="mobile-menu-link">My Bookings</Link>
+              {!!(user.code_scanner || user.team_scanner) && (
+                <Link to="/scanner" onClick={closeMenu} className="mobile-menu-link">Scanner</Link>
+              )}
+              {!!user.is_admin && (
+                <Link to="/admin" onClick={closeMenu} className="mobile-menu-link">Admin</Link>
+              )}
+              <button onClick={() => { logout(); closeMenu(); }} className="mobile-menu-logout">Logout</button>
+            </>
+          ) : (
+            <Link to="/login" onClick={closeMenu} className="mobile-menu-link mobile-menu-login-link">
+              <img src="/logos/google-logo-icon-PNG-Transparent-Background.png" alt="" className="qt-google-icon" />
+              Login
+            </Link>
+          )}
+
+          <div className="mobile-menu-legal">
+            <Link to="/privacy-policy" onClick={closeMenu}>Privacy Policy</Link>
+            <Link to="/terms-of-service" onClick={closeMenu}>Terms of Service</Link>
+          </div>
+        </div>
       </Container>
     </Navbar>
   );
