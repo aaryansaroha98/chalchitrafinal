@@ -172,10 +172,12 @@ const NavigationBar = () => {
         </>
       )}
 
-      <Link to="/login" onClick={closeMenu} className="mobile-menu-link mobile-menu-login-link">
-        <img src="/logos/google-logo-icon-PNG-Transparent-Background.png" alt="" className="qt-google-icon" />
-        Login
-      </Link>
+      {!user && (
+        <Link to="/login" onClick={closeMenu} className="mobile-menu-link mobile-menu-login-link">
+          <img src="/logos/google-logo-icon-PNG-Transparent-Background.png" alt="" className="qt-google-icon" />
+          Login
+        </Link>
+      )}
 
       <div className="mobile-menu-legal">
         <Link to="/privacy-policy" onClick={closeMenu}>Privacy Policy</Link>
