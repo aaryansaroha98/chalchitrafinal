@@ -126,19 +126,6 @@ const Payment = () => {
   if (error && !movie) {
     return (
       <div className="payment-page">
-        <div className="particles">
-          {Array.from({ length: 15 }, (_, i) => (
-            <div
-              key={i}
-              className="particle"
-              style={{
-                left: Math.random() * 100 + '%',
-                animationDelay: Math.random() * 10 + 's',
-                animationDuration: (10 + Math.random() * 20) + 's'
-              }}
-            />
-          ))}
-        </div>
         <div className="error-container">
           <div className="error-card">
             <p>{error}</p>
@@ -150,21 +137,6 @@ const Payment = () => {
 
   return (
     <div className="payment-page">
-      {/* Background Particles */}
-      <div className="particles">
-        {Array.from({ length: 15 }, (_, i) => (
-          <div
-            key={i}
-            className="particle"
-            style={{
-              left: Math.random() * 100 + '%',
-              animationDelay: Math.random() * 10 + 's',
-              animationDuration: (10 + Math.random() * 20) + 's'
-            }}
-          />
-        ))}
-      </div>
-
       <div className="payment-container">
         <div className="payment-card">
           {/* Header */}
@@ -344,9 +316,9 @@ const Payment = () => {
               alignItems: 'center',
               justifyContent: 'space-between',
               padding: '12px 16px',
-              background: 'rgba(255, 215, 0, 0.05)',
-              borderRadius: '12px',
-              border: coinBalance >= getTotalCoins() ? '2px solid #ffd700' : '1px solid rgba(255,255,255,0.1)',
+              background: '#f6f6f7',
+              borderRadius: '0',
+              border: coinBalance >= getTotalCoins() ? '1px solid #0b0e17' : '1px solid #e5e7eb',
               cursor: coinBalance >= getTotalCoins() ? 'pointer' : 'not-allowed',
               opacity: coinBalance >= getTotalCoins() ? 1 : 0.5
             }}
@@ -357,36 +329,37 @@ const Payment = () => {
             }}
             >
               <div>
-                <div style={{color: '#ffd700', fontWeight: '600', fontSize: '14px'}}>
+                <div style={{color: '#0b0e17', fontWeight: '600', fontSize: '14px'}}>
                   Your Balance: 🪙 {coinBalance}
                 </div>
-                <div style={{color: 'rgba(255,255,255,0.6)', fontSize: '12px', marginTop: '4px'}}>
-                  {coinBalance >= getTotalCoins() 
-                    ? `Enough coins to cover this booking` 
+                <div style={{color: '#5c6270', fontSize: '12px', marginTop: '4px'}}>
+                  {coinBalance >= getTotalCoins()
+                    ? `Enough coins to cover this booking`
                     : `Need ${getTotalCoins() - coinBalance} more coins`}
                 </div>
               </div>
               <div style={{
                 width: '24px',
                 height: '24px',
-                borderRadius: '4px',
-                border: '2px solid #ffd700',
-                background: useCoins ? '#ffd700' : 'transparent',
+                borderRadius: '0',
+                border: '1px solid #0b0e17',
+                background: useCoins ? '#0b0e17' : 'transparent',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>
-                {useCoins && <span style={{color: '#000', fontSize: '14px', fontWeight: 'bold'}}>✓</span>}
+                {useCoins && <span style={{color: '#fff', fontSize: '14px', fontWeight: 'bold'}}>✓</span>}
               </div>
             </div>
             {useCoins && (
               <div style={{
                 marginTop: '8px',
                 padding: '8px 12px',
-                background: 'rgba(255, 215, 0, 0.1)',
-                borderRadius: '8px',
+                background: '#f6f6f7',
+                border: '1px solid #e5e7eb',
+                borderRadius: '0',
                 fontSize: '12px',
-                color: '#ffd700',
+                color: '#5c6270',
                 textAlign: 'center'
               }}>
                 🪙 You will pay {getTotalCoins()} coins now. Coins will be refunded after you attend the movie!
@@ -531,16 +504,14 @@ const Payment = () => {
           }}>
             <div style={{
               padding: '12px 28px',
-              background: 'transparent',
-              border: '2px dotted #ffd700',
-              borderRadius: '12px',
-              color: '#ffd700',
+              background: '#f6f6f7',
+              border: '1px dashed #0b0e17',
+              borderRadius: '0',
+              color: '#0b0e17',
               fontSize: '14px',
               fontWeight: '600',
               letterSpacing: '1px',
-              textAlign: 'center',
-              fontFamily: 'Arial, sans-serif',
-              boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
+              textAlign: 'center'
             }}>
               {movie.special_message}
             </div>

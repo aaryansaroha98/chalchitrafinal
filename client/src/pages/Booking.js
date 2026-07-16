@@ -216,20 +216,7 @@ const Booking = () => {
           fontSize: `${fontSize}px`
         }}
       >
-        {isSelected && (
-          <div style={{
-            position: 'absolute',
-            top: '-2px',
-            left: '-2px',
-            right: '-2px',
-            bottom: '-2px',
-            background: 'rgba(255, 255, 255, 0.1)',
-            borderRadius: '10px',
-            backdropFilter: 'blur(8px)',
-            border: '1px solid rgba(255, 255, 255, 0.2)'
-          }} />
-        )}
-        <span className="relative z-10 drop-shadow-sm">
+        <span className="relative z-10">
           {seatNumber}
         </span>
       </motion.button>
@@ -246,125 +233,31 @@ const Booking = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-glass border-glass"
           style={{
-            backdropFilter: 'blur(20px)',
-            borderRadius: '24px',
+            background: '#ffffff',
+            border: '1px solid #e5e7eb',
             padding: '32px',
             textAlign: 'center'
           }}
         >
-          <h2 className="font-cinzel" style={{fontSize: '24px', color: 'white', marginBottom: '16px'}}>Movie Not Found</h2>
-          <p className="text-glass">The requested movie could not be loaded.</p>
+          <h2 className="font-cinzel" style={{fontSize: '24px', color: '#0b0e17', marginBottom: '16px'}}>Movie Not Found</h2>
+          <p style={{color: '#5c6270'}}>The requested movie could not be loaded.</p>
         </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="bg-void" style={{minHeight: '100vh', position: 'relative', overflow: 'hidden'}}>
-      {/* Classic Simple Animated Background */}
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        pointerEvents: 'none',
-        zIndex: 1,
-        overflow: 'hidden'
-      }}>
-        {/* Pure black background */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: '#000000'
-        }}></div>
-
-        {/* White animated particles */}
-        {Array.from({ length: 15 }, (_, i) => (
-          <div
-            key={i}
-            style={{
-              position: 'absolute',
-              width: Math.random() * 3 + 1 + 'px',
-              height: Math.random() * 3 + 1 + 'px',
-              backgroundColor: 'rgba(255, 255, 255, 0.6)',
-              borderRadius: '50%',
-              left: Math.random() * 100 + '%',
-              top: Math.random() * 100 + '%',
-              animation: `randomFloat${i % 4} ${10 + Math.random() * 20}s linear infinite`,
-              animationDelay: Math.random() * 10 + 's',
-              boxShadow: '0 0 6px rgba(255, 255, 255, 0.3)',
-              opacity: Math.random() * 0.4 + 0.2,
-              zIndex: 2
-            }}
-          />
-        ))}
-
-        {/* Gentle moving waves */}
-        <div style={{
-          position: 'absolute',
-          top: '30%',
-          left: 0,
-          right: 0,
-          height: '2px',
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%)',
-          animation: 'gentleWave 20s ease-in-out infinite',
-          opacity: 0.3
-        }}></div>
-
-        <div style={{
-          position: 'absolute',
-          top: '70%',
-          left: 0,
-          right: 0,
-          height: '2px',
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.08) 50%, transparent 100%)',
-          animation: 'gentleWave 25s ease-in-out infinite',
-          animationDelay: '5s',
-          opacity: 0.2
-        }}></div>
-
-        {/* Subtle geometric shapes */}
-        <div style={{
-          position: 'absolute',
-          top: '20%',
-          right: '10%',
-          width: '100px',
-          height: '100px',
-          border: '1px solid rgba(255, 255, 255, 0.05)',
-          borderRadius: '50%',
-          animation: 'slowRotate 60s linear infinite',
-          opacity: 0.2
-        }}></div>
-
-        <div style={{
-          position: 'absolute',
-          bottom: '15%',
-          left: '15%',
-          width: '80px',
-          height: '80px',
-          border: '1px solid rgba(255, 255, 255, 0.03)',
-          borderRadius: '50%',
-          animation: 'slowRotateReverse 45s linear infinite',
-          opacity: 0.15
-        }}></div>
-      </div>
-
-      <div className="booking-page" style={{ position: 'relative' }}>
+    <div className="bg-void" style={{ minHeight: '100vh' }}>
+      <div className="booking-page">
         {/* Page Title */}
         <div className="booking-title-wrap" style={{textAlign: 'center', marginBottom: '48px', marginTop: '-10px'}}>
           <h1 className="booking-title" style={{
             fontSize: '2.5rem',
             fontWeight: '600',
-            color: '#ffffff',
+            color: '#0b0e17',
             margin: '0',
             marginTop: '-6px',
-            textShadow: '0 4px 20px rgba(0, 255, 255, 0.3), 0 2px 4px rgba(0, 0, 0, 0.5)',
             letterSpacing: '-0.025em'
           }}>
             BOOK YOUR TICKET
@@ -505,9 +398,9 @@ const Booking = () => {
           transition={{ delay: 0.3 }}
           style={{marginBottom: '48px'}}
         >
-          <div className="bg-glass border-glass booking-seat-card" style={{
-            backdropFilter: 'blur(16px)',
-            borderRadius: '24px',
+          <div className="booking-seat-card" style={{
+            background: '#ffffff',
+            border: '1px solid #e5e7eb',
             padding: '32px'
           }}>
             <div style={{
@@ -518,9 +411,8 @@ const Booking = () => {
                 fontSize: '24px',
                 textAlign: 'center',
                 marginBottom: 0,
-                color: '#ffffff',
-                fontWeight: 'bold',
-                fontFamily: 'Arial, sans-serif'
+                color: '#0b0e17',
+                fontWeight: 'bold'
               }}>
                 Select Your Seats
               </h2>
@@ -539,18 +431,17 @@ const Booking = () => {
                 <svg width="400" height="80" viewBox="0 0 400 80" style={{margin: '0 auto 16px', display: 'block'}}>
                   <defs>
                     <linearGradient id="screenGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" style={{stopColor: 'rgba(255, 255, 255, 0.1)', stopOpacity: 1}} />
-                      <stop offset="50%" style={{stopColor: 'rgba(255, 255, 255, 0.15)', stopOpacity: 1}} />
-                      <stop offset="100%" style={{stopColor: 'rgba(255, 255, 255, 0.1)', stopOpacity: 1}} />
+                      <stop offset="0%" style={{stopColor: 'rgba(11, 14, 23, 0.06)', stopOpacity: 1}} />
+                      <stop offset="50%" style={{stopColor: 'rgba(11, 14, 23, 0.1)', stopOpacity: 1}} />
+                      <stop offset="100%" style={{stopColor: 'rgba(11, 14, 23, 0.06)', stopOpacity: 1}} />
                     </linearGradient>
                   </defs>
                   {/* Curved path for the screen */}
                   <path
                     d="M20,60 Q200,20 380,60 L380,70 Q200,30 20,70 Z"
                     fill="url(#screenGradient)"
-                    stroke="rgba(255, 255, 255, 0.2)"
+                    stroke="#e5e7eb"
                     strokeWidth="2"
-                    style={{filter: 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.1))'}}
                   />
                   {/* Animated glow effect */}
                   <motion.path
@@ -567,7 +458,7 @@ const Booking = () => {
                   className="font-cinzel"
                   style={{
                     fontSize: '24px',
-                    color: 'rgba(255, 255, 255, 0.8)',
+                    color: '#5c6270',
                     textTransform: 'uppercase',
                     letterSpacing: '0.2em',
                     marginTop: '-10px'
@@ -597,9 +488,8 @@ const Booking = () => {
                   <div style={{
                     fontSize: '18px',
                     fontWeight: 'bold',
-                    color: '#ffffff',
-                    marginBottom: '16px',
-                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
+                    color: '#0b0e17',
+                    marginBottom: '16px'
                   }}>
                     Block A
                   </div>
@@ -610,12 +500,9 @@ const Booking = () => {
                       flexDirection: 'column',
                       gap: '8px',
                       padding: '30px',
-                      background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01))',
-                      backdropFilter: 'blur(15px)',
-                      border: '1px solid rgba(255, 255, 255, 0.08)',
-                      borderRadius: '16px',
-                      position: 'relative',
-                      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)'
+                      background: '#f6f6f7',
+                      border: '1px solid #e5e7eb',
+                      position: 'relative'
                     }}
                     initial={{ opacity: 0, x: -30 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -676,9 +563,8 @@ const Booking = () => {
                   <div style={{
                     fontSize: '18px',
                     fontWeight: 'bold',
-                    color: '#ffffff',
-                    marginBottom: '16px',
-                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
+                    color: '#0b0e17',
+                    marginBottom: '16px'
                   }}>
                     Block B
                   </div>
@@ -689,12 +575,9 @@ const Booking = () => {
                       flexDirection: 'column',
                       gap: '8px',
                       padding: '30px',
-                      background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02))',
-                      backdropFilter: 'blur(18px)',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      borderRadius: '20px',
-                      position: 'relative',
-                      boxShadow: '0 6px 25px rgba(0, 0, 0, 0.2)'
+                      background: '#f6f6f7',
+                      border: '1px solid #e5e7eb',
+                      position: 'relative'
                     }}
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -757,9 +640,8 @@ const Booking = () => {
                   <div style={{
                     fontSize: '18px',
                     fontWeight: 'bold',
-                    color: '#ffffff',
-                    marginBottom: '16px',
-                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
+                    color: '#0b0e17',
+                    marginBottom: '16px'
                   }}>
                     Block C
                   </div>
@@ -770,12 +652,9 @@ const Booking = () => {
                       flexDirection: 'column',
                       gap: '8px',
                       padding: '30px',
-                      background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01))',
-                      backdropFilter: 'blur(15px)',
-                      border: '1px solid rgba(255, 255, 255, 0.08)',
-                      borderRadius: '16px',
-                      position: 'relative',
-                      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)'
+                      background: '#f6f6f7',
+                      border: '1px solid #e5e7eb',
+                      position: 'relative'
                     }}
                     initial={{ opacity: 0, x: 30 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -848,9 +727,8 @@ const Booking = () => {
                   <div style={{
                     fontSize: '18px',
                     fontWeight: 'bold',
-                    color: '#ffffff',
-                    marginBottom: '16px',
-                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
+                    color: '#0b0e17',
+                    marginBottom: '16px'
                   }}>
                     Block A
                   </div>
@@ -861,12 +739,9 @@ const Booking = () => {
                       flexDirection: 'column',
                       gap: '5px',
                       padding: '40px',
-                      background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01))',
-                      backdropFilter: 'blur(15px)',
-                      border: '1px solid rgba(255, 255, 255, 0.08)',
-                      borderRadius: '16px',
-                      position: 'relative',
-                      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)'
+                      background: '#f6f6f7',
+                      border: '1px solid #e5e7eb',
+                      position: 'relative'
                     }}
                     initial={{ opacity: 0, x: -30 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -886,7 +761,7 @@ const Booking = () => {
                             textAlign: 'center',
                             fontSize: '12px',
                             fontWeight: 'bold',
-                            color: '#ffffff',
+                            color: '#0b0e17',
                             marginRight: '8px'
                           }}>
                             {rowIndex + 1}
@@ -935,9 +810,8 @@ const Booking = () => {
                   <div style={{
                     fontSize: '18px',
                     fontWeight: 'bold',
-                    color: '#ffffff',
-                    marginBottom: '16px',
-                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
+                    color: '#0b0e17',
+                    marginBottom: '16px'
                   }}>
                     Block B
                   </div>
@@ -948,12 +822,9 @@ const Booking = () => {
                       flexDirection: 'column',
                       gap: '5px',
                       padding: '48px',
-                      background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02))',
-                      backdropFilter: 'blur(18px)',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      borderRadius: '20px',
-                      position: 'relative',
-                      boxShadow: '0 6px 25px rgba(0, 0, 0, 0.2)'
+                      background: '#f6f6f7',
+                      border: '1px solid #e5e7eb',
+                      position: 'relative'
                     }}
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -1012,9 +883,8 @@ const Booking = () => {
                   <div style={{
                     fontSize: '18px',
                     fontWeight: 'bold',
-                    color: '#ffffff',
-                    marginBottom: '16px',
-                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
+                    color: '#0b0e17',
+                    marginBottom: '16px'
                   }}>
                     Block C
                   </div>
@@ -1025,12 +895,9 @@ const Booking = () => {
                       flexDirection: 'column',
                       gap: '5px',
                       padding: '40px',
-                      background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01))',
-                      backdropFilter: 'blur(15px)',
-                      border: '1px solid rgba(255, 255, 255, 0.08)',
-                      borderRadius: '16px',
-                      position: 'relative',
-                      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)'
+                      background: '#f6f6f7',
+                      border: '1px solid #e5e7eb',
+                      position: 'relative'
                     }}
                     initial={{ opacity: 0, x: 30 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -1100,39 +967,36 @@ const Booking = () => {
                 <div style={{
                   width: '16px',
                   height: '16px',
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  borderRadius: '4px'
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb'
                 }}></div>
                 <span className="font-inter booking-seat-legend-text" style={{
                   fontSize: '14px',
-                  color: 'rgba(255, 255, 255, 0.8)'
+                  color: '#5c6270'
                 }}>Available</span>
               </div>
               <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
                 <div style={{
                   width: '16px',
                   height: '16px',
-                  background: 'rgba(255, 255, 255, 0.2)',
-                  border: '1px solid rgba(255, 255, 255, 0.4)',
-                  borderRadius: '4px'
+                  background: '#0b0e17',
+                  border: '1px solid #0b0e17'
                 }}></div>
                 <span className="font-inter booking-seat-legend-text" style={{
                   fontSize: '14px',
-                  color: 'rgba(255, 255, 255, 0.8)'
+                  color: '#5c6270'
                 }}>Selected</span>
               </div>
               <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
                 <div style={{
                   width: '16px',
                   height: '16px',
-                  background: 'rgba(5, 5, 5, 0.3)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '4px'
+                  background: '#f6f6f7',
+                  border: '1px solid #e5e7eb'
                 }}></div>
                 <span className="font-inter booking-seat-legend-text" style={{
                   fontSize: '14px',
-                  color: 'rgba(255, 255, 255, 0.8)'
+                  color: '#5c6270'
                 }}>Occupied</span>
               </div>
             </motion.div>
@@ -1143,19 +1007,16 @@ const Booking = () => {
         {availableFoods && availableFoods.length > 0 && (
           <div style={{marginBottom: '48px'}}>
             <div className="booking-food-panel" style={{
-              background: 'rgba(255, 255, 255, 0.08)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: '20px',
+              background: '#ffffff',
+              border: '1px solid #e5e7eb',
               padding: '32px'
             }}>
               <h2 className="booking-food-title" style={{
                 fontSize: '24px',
                 textAlign: 'center',
                 marginBottom: '32px',
-                color: '#ffffff',
-                fontWeight: 'bold',
-                fontFamily: 'Arial, sans-serif'
+                color: '#0b0e17',
+                fontWeight: 'bold'
               }}>
                 Available Food
               </h2>
@@ -1166,10 +1027,8 @@ const Booking = () => {
                     key={food.id}
                     className="booking-food-card"
                     style={{
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      borderRadius: '12px',
+                      background: '#f6f6f7',
+                      border: '1px solid #e5e7eb',
                       padding: '12px',
                       minHeight: '140px',
                       display: 'flex',
@@ -1186,31 +1045,29 @@ const Booking = () => {
                         style={{
                           width: '50px',
                           height: '50px',
-                          borderRadius: '8px',
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
+                          border: '1px solid #e5e7eb',
                           marginBottom: '8px',
                           objectFit: 'cover'
                         }}
                       />
                       <div>
                         <h4 className="booking-food-name" style={{
-                          color: '#ffffff',
+                          color: '#0b0e17',
                           fontSize: '16px',
                           fontWeight: 'bold',
-                          marginBottom: '4px',
-                          fontFamily: 'Arial, sans-serif'
+                          marginBottom: '4px'
                         }}>
                           {food.name}
                         </h4>
                         <p className="booking-food-desc" style={{
-                          color: 'rgba(255, 255, 255, 0.7)',
+                          color: '#5c6270',
                           fontSize: '14px',
                           marginBottom: '8px'
                         }}>
                           {food.description}
                         </p>
                         <p className="booking-food-price" style={{
-                          color: '#ffffff',
+                          color: '#0b0e17',
                           fontSize: '16px',
                           fontWeight: 'bold'
                         }}>
@@ -1235,25 +1092,23 @@ const Booking = () => {
                             handleFoodChange(food.id, isSelected ? 0 : 1);
                           }}
                           style={{
-                            background: selectedFoods[food.id] 
-                              ? 'rgba(0, 255, 255, 0.2)' 
-                              : 'rgba(255, 255, 255, 0.1)',
-                            backdropFilter: 'blur(10px)',
-                            border: '1px solid aria-label',
-                            borderColor: selectedFoods[food.id] 
-                              ? 'rgba(0, 255, 255, 0.5)' 
-                              : 'rgba(255, 255, 255, 0.2)',
-                            color: '#ffffff',
-                            borderRadius: '20px',
+                            background: selectedFoods[food.id]
+                              ? '#0b0e17'
+                              : '#ffffff',
+                            border: '1px solid',
+                            borderColor: selectedFoods[food.id]
+                              ? '#0b0e17'
+                              : '#e5e7eb',
+                            color: selectedFoods[food.id] ? '#ffffff' : '#0b0e17',
                             padding: '6px 16px',
                             fontSize: '12px',
                             fontWeight: '600',
-                            letterSpacing: '0.5px',
+                            letterSpacing: '0.09em',
+                            textTransform: 'uppercase',
                             cursor: 'pointer',
                             display: 'flex',
                             alignItems: 'center',
                             gap: '6px',
-                            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
                             transition: 'all 0.3s ease'
                           }}
                         >
@@ -1280,10 +1135,9 @@ const Booking = () => {
                             disabled={!selectedFoods[food.id] || selectedFoods[food.id] <= 0}
                             className="booking-food-btn"
                             style={{
-                              background: 'rgba(255, 255, 255, 0.1)',
-                              border: '1px solid rgba(255, 255, 255, 0.2)',
-                              color: '#ffffff',
-                              borderRadius: '6px',
+                              background: '#ffffff',
+                              border: '1px solid #e5e7eb',
+                              color: '#0b0e17',
                               width: '28px',
                               height: '28px',
                               display: 'flex',
@@ -1298,7 +1152,7 @@ const Booking = () => {
                           </button>
 
                           <span className="booking-food-qty" style={{
-                            color: '#ffffff',
+                            color: '#0b0e17',
                             fontSize: '16px',
                             fontWeight: 'bold',
                             minWidth: '30px',
@@ -1314,10 +1168,9 @@ const Booking = () => {
                             }}
                             className="booking-food-btn"
                             style={{
-                              background: 'rgba(255, 255, 255, 0.1)',
-                              border: '1px solid rgba(255, 255, 255, 0.2)',
-                              color: '#ffffff',
-                              borderRadius: '6px',
+                              background: '#ffffff',
+                              border: '1px solid #e5e7eb',
+                              color: '#0b0e17',
                               width: '28px',
                               height: '28px',
                               display: 'flex',
@@ -1349,10 +1202,8 @@ const Booking = () => {
             style={{marginBottom: '48px'}}
           >
             <div className="booking-selected-panel" style={{
-              background: 'rgba(255, 255, 255, 0.08)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: '20px',
+              background: '#ffffff',
+              border: '1px solid #e5e7eb',
               padding: '24px',
               maxWidth: '600px',
               margin: '0 auto'
@@ -1361,9 +1212,8 @@ const Booking = () => {
                 fontSize: '24px',
                 textAlign: 'center',
                 marginBottom: '32px',
-                color: '#ffffff',
-                fontWeight: 'bold',
-                fontFamily: 'Arial, sans-serif'
+                color: '#0b0e17',
+                fontWeight: 'bold'
               }}>
                 Selected Items
               </h2>
@@ -1372,19 +1222,16 @@ const Booking = () => {
                 {/* Selected Seats */}
                 <div style={{marginBottom: '24px'}}>
                   <h4 className="booking-selected-subtitle" style={{
-                    color: '#ffffff',
+                    color: '#0b0e17',
                     fontSize: '18px',
                     fontWeight: 'bold',
-                    marginBottom: '12px',
-                    fontFamily: 'Arial, sans-serif'
+                    marginBottom: '12px'
                   }}>
                     Selected Seats ({selectedSeats.length})
                   </h4>
                   <div className="booking-selected-card" style={{
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: '12px',
+                    background: '#f6f6f7',
+                    border: '1px solid #e5e7eb',
                     padding: '16px'
                   }}>
                     <div style={{
@@ -1397,16 +1244,13 @@ const Booking = () => {
                           key={seat}
                           className="booking-selected-tag"
                           style={{
-                            background: 'rgba(0, 255, 255, 0.1)',
-                            backdropFilter: 'blur(10px)',
-                            border: '1px solid rgba(0, 255, 255, 0.3)',
+                            background: '#0b0e17',
+                            border: '1px solid #0b0e17',
                             color: '#ffffff',
                             padding: '6px 10px',
-                            borderRadius: '6px',
                             fontSize: '12px',
                             fontWeight: 'bold',
-                            fontFamily: 'Arial, sans-serif',
-                            boxShadow: '0 2px 8px rgba(0, 255, 255, 0.2)'
+                            fontFamily: 'Arial, sans-serif'
                           }}
                         >
                           {seat}
@@ -1420,19 +1264,16 @@ const Booking = () => {
                 {Object.keys(selectedFoods).length > 0 && (
                   <div style={{marginBottom: '24px'}}>
                     <h4 className="booking-selected-subtitle" style={{
-                      color: '#ffffff',
+                      color: '#0b0e17',
                       fontSize: '18px',
                       fontWeight: 'bold',
-                      marginBottom: '12px',
-                      fontFamily: 'Arial, sans-serif'
+                      marginBottom: '12px'
                     }}>
                       Selected Food Items
                     </h4>
                     <div className="booking-selected-card" style={{
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      borderRadius: '12px',
+                      background: '#f6f6f7',
+                      border: '1px solid #e5e7eb',
                       padding: '16px'
                     }}>
                       {Object.entries(selectedFoods).map(([foodId, quantity]) => {
@@ -1448,13 +1289,12 @@ const Booking = () => {
                               alignItems: 'center',
                               marginBottom: '6px',
                               padding: '6px',
-                              background: 'rgba(255, 255, 255, 0.03)',
-                              borderRadius: '6px'
+                              background: '#f6f6f7'
                             }}
                           >
                             <div>
                               <span style={{
-                                color: '#ffffff',
+                                color: '#0b0e17',
                                 fontSize: '14px',
                                 fontWeight: 'bold',
                                 fontFamily: 'Arial, sans-serif'
@@ -1462,7 +1302,7 @@ const Booking = () => {
                                 {food.name}
                               </span>
                               <span style={{
-                                color: 'rgba(255, 255, 255, 0.6)',
+                                color: '#8b909c',
                                 marginLeft: '6px',
                                 fontSize: '12px'
                               }}>
@@ -1470,7 +1310,7 @@ const Booking = () => {
                               </span>
                             </div>
                             <span style={{
-                              color: '#ffffff',
+                              color: '#0b0e17',
                               fontSize: '14px',
                               fontWeight: 'bold',
                               fontFamily: 'Arial, sans-serif'
@@ -1493,7 +1333,7 @@ const Booking = () => {
                   marginBottom: '32px'
                 }}>
                   <div className="booking-total-box" style={{
-                    color: '#ffffff',
+                    color: '#0b0e17',
                     fontSize: '18px',
                     fontWeight: '700',
                     fontFamily: 'Arial, sans-serif',
@@ -1504,7 +1344,7 @@ const Booking = () => {
                       display: 'block',
                       fontSize: '12px',
                       fontWeight: '500',
-                      color: 'rgba(255, 255, 255, 0.8)',
+                      color: '#5c6270',
                       marginBottom: '4px',
                       textTransform: 'uppercase',
                       letterSpacing: '0.5px'
@@ -1518,33 +1358,27 @@ const Booking = () => {
                     onClick={handleBook}
                     className="booking-book-btn"
                     style={{
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      backdropFilter: 'blur(20px)',
-                      border: '1px solid rgba(255, 255, 255, 0.3)',
-                      borderRadius: '12px',
+                      background: '#0b0e17',
+                      border: '1px solid #0b0e17',
                       color: '#ffffff',
-                      fontSize: '16px',
+                      fontSize: '12px',
                       fontWeight: '600',
-                      fontFamily: 'Arial, sans-serif',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.09em',
                       padding: '16px 24px',
                       cursor: 'pointer',
-                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                      boxShadow: '0 4px 20px rgba(255, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+                      transition: 'all 0.2s ease',
                       minWidth: '220px',
                       position: 'relative',
                       overflow: 'hidden'
                     }}
                     onMouseEnter={(e) => {
-                      e.target.style.background = 'rgba(255, 255, 255, 0.2)';
-                      e.target.style.transform = 'translateY(-2px)';
-                      e.target.style.boxShadow = '0 8px 30px rgba(255, 255, 255, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.25)';
-                      e.target.style.border = '1px solid rgba(255, 255, 255, 0.45)';
+                      e.target.style.background = '#5c6270';
+                      e.target.style.border = '1px solid #5c6270';
                     }}
                     onMouseLeave={(e) => {
-                      e.target.style.background = 'rgba(255, 255, 255, 0.1)';
-                      e.target.style.transform = 'translateY(0)';
-                      e.target.style.boxShadow = '0 4px 20px rgba(255, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.15)';
-                      e.target.style.border = '1px solid rgba(255, 255, 255, 0.3)';
+                      e.target.style.background = '#0b0e17';
+                      e.target.style.border = '1px solid #0b0e17';
                     }}
                   >
                     <i className="fas fa-ticket-alt me-2" style={{fontSize: '14px'}}></i>
@@ -1563,15 +1397,12 @@ const Booking = () => {
                     <div style={{
                       padding: '12px 28px',
                       background: 'transparent',
-                      border: '2px dotted #ffd700',
-                      borderRadius: '12px',
-                      color: '#ffd700',
+                      border: '2px dotted #b7791f',
+                      color: '#b7791f',
                       fontSize: '14px',
                       fontWeight: '600',
                       letterSpacing: '1px',
-                      textAlign: 'center',
-                      fontFamily: 'Arial, sans-serif',
-                      boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
+                      textAlign: 'center'
                     }}>
                       {movie.special_message}
                     </div>
@@ -1596,12 +1427,10 @@ const Booking = () => {
                 bottom: '96px',
                 left: '50%',
                 transform: 'translateX(-50%)',
-                background: 'rgba(255, 255, 255, 0.1)',
-                backdropFilter: 'blur(16px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '16px',
+                background: '#0b0e17',
+                border: '1px solid #0b0e17',
                 padding: '16px',
-                color: 'white',
+                color: '#ffffff',
                 fontFamily: 'Inter, sans-serif'
               }}
             >
@@ -1623,8 +1452,7 @@ const Booking = () => {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                background: 'rgba(0, 0, 0, 0.85)',
-                backdropFilter: 'blur(20px)',
+                background: 'rgba(11, 14, 23, 0.4)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -1638,16 +1466,13 @@ const Booking = () => {
                 exit={{ scale: 0.8, opacity: 0 }}
                 transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                 style={{
-                  background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06))',
-                  backdropFilter: 'blur(30px) saturate(180%)',
-                  border: '1px solid rgba(255, 255, 255, 0.25)',
-                  borderRadius: '20px',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
                   padding: '20px',
                   maxWidth: '350px',
                   width: '90%',
                   textAlign: 'center',
-                  position: 'relative',
-                  boxShadow: '0 25px 80px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                  position: 'relative'
                 }}
               onClick={(e) => e.stopPropagation()}
             >
@@ -1658,26 +1483,26 @@ const Booking = () => {
                     position: 'absolute',
                     top: '16px',
                     right: '16px',
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    background: '#ffffff',
+                    border: '1px solid #e5e7eb',
                     borderRadius: '50%',
                     width: '36px',
                     height: '36px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: 'white',
+                    color: '#0b0e17',
                     cursor: 'pointer',
                     fontSize: '20px',
                     transition: 'all 0.3s ease'
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.background = 'rgba(255, 255, 255, 0.2)';
-                    e.target.style.transform = 'scale(1.1)';
+                    e.target.style.background = '#f6f6f7';
+                    e.target.style.borderColor = '#0b0e17';
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.background = 'rgba(255, 255, 255, 0.1)';
-                    e.target.style.transform = 'scale(1)';
+                    e.target.style.background = '#ffffff';
+                    e.target.style.borderColor = '#e5e7eb';
                   }}
                 >
                   ×
@@ -1685,7 +1510,7 @@ const Booking = () => {
 
                 {/* Main Message */}
                 <h2 style={{
-                  color: '#ffffff',
+                  color: '#0b0e17',
                   fontSize: '20px',
                   fontWeight: 'bold',
                   marginBottom: '12px',
@@ -1695,14 +1520,14 @@ const Booking = () => {
                 </h2>
 
                 <p style={{
-                  color: 'rgba(255, 255, 255, 0.85)',
+                  color: '#5c6270',
                   fontSize: '14px',
                   marginBottom: '24px',
                   lineHeight: '1.6',
                   fontFamily: 'Inter, sans-serif'
                 }}>
                   You have already booked tickets for this movie. <br/>
-                  <strong style={{color: 'white'}}>Check your email for the ticket or go to My Bookings page!</strong>
+                  <strong style={{color: '#0b0e17'}}>Check your email for the ticket or go to My Bookings page!</strong>
                 </p>
 
                 {/* View My Bookings Button */}
@@ -1716,27 +1541,23 @@ const Booking = () => {
                   style={{
                     width: '100%',
                     padding: '12px 20px',
-                    borderRadius: '12px',
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    color: 'white',
-                    fontSize: '14px',
+                    background: '#0b0e17',
+                    border: '1px solid #0b0e17',
+                    color: '#ffffff',
+                    fontSize: '12px',
                     fontWeight: 'bold',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.09em',
                     cursor: 'pointer',
                     transition: 'all 0.3s ease',
-                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
                     fontFamily: 'Arial, sans-serif',
                     marginBottom: '10px'
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.background = 'rgba(255, 255, 255, 0.15)';
-                    e.target.style.borderColor = 'rgba(255, 255, 255, 0.3)';
-                    e.target.style.transform = 'translateY(-1px)';
+                    e.target.style.background = '#232733';
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.background = 'rgba(255, 255, 255, 0.1)';
-                    e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.background = '#0b0e17';
                   }}
                 >
                   <i className="fas fa-list-alt" style={{marginRight: '8px'}}></i>
@@ -1751,26 +1572,26 @@ const Booking = () => {
                   style={{
                     width: '100%',
                     padding: '12px 24px',
-                    borderRadius: '14px',
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    color: 'rgba(255, 255, 255, 0.8)',
-                    fontSize: '14px',
+                    background: '#ffffff',
+                    border: '1px solid #e5e7eb',
+                    color: '#5c6270',
+                    fontSize: '12px',
                     fontWeight: '600',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.09em',
                     cursor: 'pointer',
                     transition: 'all 0.3s ease',
                     fontFamily: 'Arial, sans-serif'
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.background = 'rgba(255, 255, 255, 0.15)';
-                    e.target.style.borderColor = 'rgba(255, 255, 255, 0.3)';
-                    e.target.style.color = 'white';
+                    e.target.style.background = '#f6f6f7';
+                    e.target.style.borderColor = '#0b0e17';
+                    e.target.style.color = '#0b0e17';
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.background = 'rgba(255, 255, 255, 0.1)';
-                    e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-                    e.target.style.color = 'rgba(255, 255, 255, 0.8)';
+                    e.target.style.background = '#ffffff';
+                    e.target.style.borderColor = '#e5e7eb';
+                    e.target.style.color = '#5c6270';
                   }}
                 >
                   <i className="fas fa-times" style={{marginRight: '8px'}}></i>
@@ -1786,50 +1607,6 @@ const Booking = () => {
 
       <style>
         {`
-          @keyframes randomFloat0 {
-            0% { transform: translate(0px, 0px) rotate(0deg); opacity: 0.2; }
-            25% { transform: translate(15px, -20px) rotate(90deg); opacity: 0.6; }
-            50% { transform: translate(-10px, -40px) rotate(180deg); opacity: 0.3; }
-            75% { transform: translate(5px, -20px) rotate(270deg); opacity: 0.5; }
-            100% { transform: translate(0px, 0px) rotate(360deg); opacity: 0.2; }
-          }
-
-          @keyframes randomFloat1 {
-            0% { transform: translate(0px, 0px) scale(1); opacity: 0.3; }
-            33% { transform: translate(-15px, -25px) scale(1.2); opacity: 0.7; }
-            66% { transform: translate(20px, -15px) scale(0.8); opacity: 0.4; }
-            100% { transform: translate(0px, 0px) scale(1); opacity: 0.3; }
-          }
-
-          @keyframes randomFloat2 {
-            0% { transform: translate(0px, 0px) rotate(0deg); opacity: 0.25; }
-            50% { transform: translate(18px, -22px) rotate(180deg); opacity: 0.6; }
-            100% { transform: translate(0px, 0px) rotate(360deg); opacity: 0.25; }
-          }
-
-          @keyframes randomFloat3 {
-            0% { transform: translate(0px, 0px) scale(1); opacity: 0.2; }
-            25% { transform: translate(10px, -15px) scale(1.3); opacity: 0.5; }
-            50% { transform: translate(-8px, -30px) scale(0.9); opacity: 0.3; }
-            75% { transform: translate(12px, -15px) scale(1.1); opacity: 0.4; }
-            100% { transform: translate(0px, 0px) scale(1); opacity: 0.2; }
-          }
-
-          @keyframes gentleWave {
-            0%, 100% { opacity: 0.2; transform: translateX(-10px); }
-            50% { opacity: 0.4; transform: translateX(10px); }
-          }
-
-          @keyframes slowRotate {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
-          }
-
-          @keyframes slowRotateReverse {
-            0% { transform: translate(-50%, -50%) rotate(360deg); }
-            100% { transform: translate(-50%, -50%) rotate(0deg); }
-          }
-
           @media (max-width: 576px) {
             .booking-title-wrap {
               margin-top: -14px !important;

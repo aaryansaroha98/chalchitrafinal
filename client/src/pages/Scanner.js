@@ -888,7 +888,7 @@ const Scanner = () => {
       const modal = document.createElement('div');
       modal.className = 'modal fade show';
       modal.style.display = 'block';
-      modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+      modal.style.backgroundColor = 'rgba(11,14,23,0.4)';
       modal.innerHTML = `
         <div class="modal-dialog modal-lg modal-dialog-centered">
           <div class="modal-content">
@@ -1122,128 +1122,14 @@ const Scanner = () => {
 
 
   return (
-    <div className="bg-void" style={{minHeight: '100vh', position: 'relative', overflow: 'hidden'}}>
-      {/* Classic Simple Animated Background */}
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        pointerEvents: 'none',
-        zIndex: 1,
-        overflow: 'hidden'
-      }}>
-        {/* Pure black background */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: '#000000'
-        }}></div>
-
-        {/* White animated particles */}
-        {Array.from({ length: 15 }, (_, i) => (
-          <div
-            key={i}
-            style={{
-              position: 'absolute',
-              width: Math.random() * 3 + 1 + 'px',
-              height: Math.random() * 3 + 1 + 'px',
-              backgroundColor: 'rgba(255, 255, 255, 0.6)',
-              borderRadius: '50%',
-              left: Math.random() * 100 + '%',
-              top: Math.random() * 100 + '%',
-              animation: `randomFloat${i % 4} ${10 + Math.random() * 20}s linear infinite`,
-              animationDelay: Math.random() * 10 + 's',
-              boxShadow: '0 0 6px rgba(255, 255, 255, 0.3)',
-              opacity: Math.random() * 0.4 + 0.2,
-              zIndex: 2
-            }}
-          />
-        ))}
-
-        {/* Gentle moving waves */}
-        <div style={{
-          position: 'absolute',
-          top: '30%',
-          left: 0,
-          right: 0,
-          height: '2px',
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%)',
-          animation: 'gentleWave 20s ease-in-out infinite',
-          opacity: 0.3
-        }}></div>
-
-        <div style={{
-          position: 'absolute',
-          top: '70%',
-          left: 0,
-          right: 0,
-          height: '2px',
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.08) 50%, transparent 100%)',
-          animation: 'gentleWave 25s ease-in-out infinite',
-          animationDelay: '5s',
-          opacity: 0.2
-        }}></div>
-
-        {/* Subtle geometric shapes */}
-        <div style={{
-          position: 'absolute',
-          top: '20%',
-          right: '10%',
-          width: '100px',
-          height: '100px',
-          border: '1px solid rgba(255, 255, 255, 0.05)',
-          borderRadius: '50%',
-          animation: 'slowRotate 60s linear infinite',
-          opacity: 0.2
-        }}></div>
-
-        <div style={{
-          position: 'absolute',
-          bottom: '15%',
-          left: '15%',
-          width: '80px',
-          height: '80px',
-          border: '1px solid rgba(255, 255, 255, 0.03)',
-          borderRadius: '50%',
-          animation: 'slowRotateReverse 45s linear infinite',
-          opacity: 0.15
-        }}></div>
-      </div>
-
-      {/* Animated Background Grid */}
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundImage: `
-          radial-gradient(circle at 25% 25%, var(--primary-color) 1px, transparent 1px),
-          radial-gradient(circle at 75% 75%, var(--secondary-color) 1px, transparent 1px),
-          radial-gradient(circle at 50% 50%, var(--accent-color) 1px, transparent 1px)
-        `,
-        backgroundSize: '100px 100px, 150px 150px, 200px 200px',
-        backgroundPosition: '0 0, 50px 50px, 25px 25px',
-        opacity: 0.03,
-        animation: 'gridMove 20s linear infinite',
-        pointerEvents: 'none',
-        zIndex: 1
-      }}></div>
-
-
-
-      <Container style={{padding: '2rem 2rem 4rem', position: 'relative', zIndex: 2}}>
+    <div className="bg-void" style={{ minHeight: '100vh' }}>
+      <Container style={{padding: '2rem 2rem 4rem'}}>
         <div className="text-center mb-4">
-          <h1 className="mb-3" style={{color: 'white'}}>
-            <i className="fas fa-qrcode text-primary me-3"></i>
+          <h1 className="mb-3" style={{color: '#0b0e17'}}>
+            <i className="fas fa-qrcode me-3" style={{color: '#0b0e17'}}></i>
             QR Code Scanner
           </h1>
-          <p style={{color: 'white'}}>Scan student tickets for entry validation</p>
+          <p style={{color: '#5c6270'}}>Scan student tickets for entry validation</p>
           <Badge bg="info" className="fs-6 px-3 py-2">
             <i className="fas fa-shield-alt me-1"></i>
             Secure Entry System
@@ -1254,11 +1140,9 @@ const Scanner = () => {
         <Row className="mb-4 g-3 g-md-4 scanner-stats-row">
           <Col md={4} xs={4}>
             <Card className="text-center h-100 scanner-stat-card" style={{
-              background: 'linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04))',
-              border: '1px solid rgba(255,255,255,0.12)',
-              borderRadius: '14px',
-              boxShadow: '0 12px 32px rgba(0,0,0,0.35)',
-              backdropFilter: 'blur(10px)'
+              background: '#ffffff',
+              border: '1px solid #e5e7eb',
+              borderRadius: 0
             }}>
               <Card.Body className="py-3">
                 <h3 className="mb-1 scanner-stat-value">{formatStatValue(serverStats.totalScannedTickets)}</h3>
@@ -1269,11 +1153,9 @@ const Scanner = () => {
           </Col>
           <Col md={4} xs={4}>
             <Card className="text-center h-100 scanner-stat-card" style={{
-              background: 'linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04))',
-              border: '1px solid rgba(255,255,255,0.12)',
-              borderRadius: '14px',
-              boxShadow: '0 12px 32px rgba(0,0,0,0.35)',
-              backdropFilter: 'blur(10px)'
+              background: '#ffffff',
+              border: '1px solid #e5e7eb',
+              borderRadius: 0
             }}>
               <Card.Body className="py-3">
                 <h3 className="mb-1 scanner-stat-value">{formatStatValue(serverStats.totalRemainingTickets)}</h3>
@@ -1284,11 +1166,9 @@ const Scanner = () => {
           </Col>
           <Col md={4} xs={4}>
             <Card className="text-center h-100 scanner-stat-card" style={{
-              background: 'linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04))',
-              border: '1px solid rgba(255,255,255,0.12)',
-              borderRadius: '14px',
-              boxShadow: '0 12px 32px rgba(0,0,0,0.35)',
-              backdropFilter: 'blur(10px)'
+              background: '#ffffff',
+              border: '1px solid #e5e7eb',
+              borderRadius: 0
             }}>
               <Card.Body className="py-3">
                 <h3 className="mb-1 scanner-stat-value">{formatStatValue(serverStats.totalSeatsFilled)}</h3>
@@ -1301,20 +1181,18 @@ const Scanner = () => {
         {/* Scanner Controls */}
         <Row className="mb-4">
           <Col md={8} className="mx-auto">
-            <Card className="shadow" style={{
-              background: 'linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04))',
-              border: '1px solid rgba(255,255,255,0.12)',
-              borderRadius: '14px',
-              boxShadow: '0 12px 32px rgba(0,0,0,0.35)',
-              backdropFilter: 'blur(10px)'
+            <Card style={{
+              background: '#ffffff',
+              border: '1px solid #e5e7eb',
+              borderRadius: 0
             }}>
-              <Card.Body className="text-center" style={{color: '#ffffff'}}>
+              <Card.Body className="text-center" style={{color: '#0b0e17'}}>
                 {!isScanning ? (
                   <div>
                     <div className="mb-4">
                       <i className="fas fa-mobile-alt fa-4x text-primary mb-3"></i>
-                      <h5 style={{color: '#ffffff'}}>Ready to Scan</h5>
-                      <p style={{color: 'rgba(255,255,255,0.75)'}}>Click start to begin scanning tickets</p>
+                      <h5 style={{color: '#0b0e17'}}>Ready to Scan</h5>
+                      <p style={{color: '#5c6270'}}>Click start to begin scanning tickets</p>
                     </div>
                     <div className="d-flex gap-2 justify-content-center flex-wrap mb-3">
                       <Button
@@ -1396,10 +1274,8 @@ const Scanner = () => {
                             width: '320px',
                             height: '320px',
                             background: 'transparent',
-                            border: '4px solid #007bff',
-                            borderRadius: '16px',
+                            border: '2px solid #0b0e17',
                             position: 'relative',
-                            boxShadow: '0 0 20px rgba(0, 123, 255, 0.3)',
                             overflow: 'hidden'
                           }}
                         >
@@ -1410,9 +1286,8 @@ const Scanner = () => {
                             left: '10px',
                             width: '40px',
                             height: '40px',
-                            borderLeft: '4px solid #007bff',
-                            borderTop: '4px solid #007bff',
-                            borderRadius: '10px 0 0 0'
+                            borderLeft: '4px solid #0b0e17',
+                            borderTop: '4px solid #0b0e17'
                           }}></div>
                           <div style={{
                             position: 'absolute',
@@ -1420,9 +1295,8 @@ const Scanner = () => {
                             right: '10px',
                             width: '40px',
                             height: '40px',
-                            borderRight: '4px solid #007bff',
-                            borderTop: '4px solid #007bff',
-                            borderRadius: '0 10px 0 0'
+                            borderRight: '4px solid #0b0e17',
+                            borderTop: '4px solid #0b0e17'
                           }}></div>
                           <div style={{
                             position: 'absolute',
@@ -1430,9 +1304,8 @@ const Scanner = () => {
                             left: '10px',
                             width: '40px',
                             height: '40px',
-                            borderLeft: '4px solid #007bff',
-                            borderBottom: '4px solid #007bff',
-                            borderRadius: '0 0 0 10px'
+                            borderLeft: '4px solid #0b0e17',
+                            borderBottom: '4px solid #0b0e17'
                           }}></div>
                           <div style={{
                             position: 'absolute',
@@ -1440,9 +1313,8 @@ const Scanner = () => {
                             right: '10px',
                             width: '40px',
                             height: '40px',
-                            borderRight: '4px solid #007bff',
-                            borderBottom: '4px solid #007bff',
-                            borderRadius: '0 0 10px 0'
+                            borderRight: '4px solid #0b0e17',
+                            borderBottom: '4px solid #0b0e17'
                           }}></div>
 
                           {/* Camera Video Container */}
@@ -1451,10 +1323,9 @@ const Scanner = () => {
                             style={{
                               width: '100%',
                               height: '100%',
-                              background: '#000',
+                              background: '#0b0e17',
                               position: 'relative',
-                              overflow: 'hidden',
-                              borderRadius: '12px'
+                              overflow: 'hidden'
                             }}
                           >
                             {/* Camera will render here */}
@@ -1628,29 +1499,18 @@ const Scanner = () => {
                 </Card.Header>
                 <Card.Body>
                   <div style={{
-                    background: 'linear-gradient(135deg, rgba(255, 193, 7, 0.15), rgba(255, 152, 0, 0.08))',
-                    borderRadius: '12px',
+                    background: '#f6f6f7',
                     padding: '1rem',
-                    border: '2px solid rgba(255, 193, 7, 0.3)',
+                    border: '1px solid #e5e7eb',
                     position: 'relative',
                     overflow: 'hidden'
                   }}>
-                    <div style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      background: 'linear-gradient(45deg, rgba(255, 193, 7, 0.05), rgba(255, 152, 0, 0.03))',
-                      borderRadius: '12px'
-                    }}></div>
-
                     <div style={{
                       position: 'relative',
                       zIndex: 2,
                       fontSize: '1.1rem',
                       fontWeight: '700',
-                      color: '#f57c00',
+                      color: '#b7791f',
                       marginBottom: '1rem',
                       textAlign: 'center'
                     }}>
@@ -1665,11 +1525,9 @@ const Scanner = () => {
                     }}>
                       {currentBookingFood.items?.map((food, index) => (
                         <div key={index} style={{
-                          background: 'white',
-                          borderRadius: '10px',
+                          background: '#ffffff',
                           padding: '0.75rem',
-                          border: '2px solid rgba(255, 193, 7, 0.2)',
-                          boxShadow: '0 2px 8px rgba(255, 152, 0, 0.1)',
+                          border: '1px solid #e5e7eb',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'space-between'
@@ -1678,14 +1536,14 @@ const Scanner = () => {
                             <div style={{
                               fontSize: '1rem',
                               fontWeight: '600',
-                              color: '#333',
+                              color: '#0b0e17',
                               marginBottom: '0.25rem'
                             }}>
                               {food.name || `Food Item ${index + 1}`}
                             </div>
                             <div style={{
                               fontSize: '0.85rem',
-                              color: '#666'
+                              color: '#5c6270'
                             }}>
                               Ordered: {food.quantity || food.ordered_quantity || 0} |
                               Remaining: {food.remaining || food.remaining_quantity || 0}
@@ -1711,13 +1569,12 @@ const Scanner = () => {
                     <div style={{
                       marginTop: '1rem',
                       padding: '0.75rem',
-                      background: 'rgba(0, 0, 0, 0.1)',
-                      borderRadius: '8px',
-                      border: '1px solid rgba(255, 193, 7, 0.2)',
+                      background: '#ffffff',
+                      border: '1px solid #e5e7eb',
                       textAlign: 'center'
                     }}>
                       <small style={{
-                        color: '#f57c00',
+                        color: '#b7791f',
                         fontWeight: '600',
                         fontSize: '0.85rem'
                       }}>
@@ -1739,19 +1596,16 @@ const Scanner = () => {
         )}
 
         {/* Scan History */}
-        <Card className="shadow" style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04))',
-          border: '1px solid rgba(255,255,255,0.12)',
-          borderRadius: '14px',
-          boxShadow: '0 12px 32px rgba(0,0,0,0.35)',
-          backdropFilter: 'blur(10px)'
+        <Card style={{
+          background: '#ffffff',
+          border: '1px solid #e5e7eb'
         }}>
           <Card.Header className="d-flex justify-content-between align-items-center" style={{
             background: 'transparent',
-            borderBottom: '1px solid rgba(255,255,255,0.08)',
-            color: '#ffffff'
+            borderBottom: '1px solid #eef0f2',
+            color: '#0b0e17'
           }}>
-            <h5 className="mb-0" style={{color: '#ffffff'}}>
+            <h5 className="mb-0" style={{color: '#0b0e17'}}>
               <i className="fas fa-history me-2"></i>
               Recent Scans ({scanHistory.length})
             </h5>
@@ -1762,9 +1616,9 @@ const Scanner = () => {
               </Button>
             )}
           </Card.Header>
-          <Card.Body style={{color: '#ffffff'}}>
+          <Card.Body style={{color: '#0b0e17'}}>
             {scanHistory.length === 0 ? (
-              <div className="text-center py-4" style={{color: 'rgba(255,255,255,0.7)'}}>
+              <div className="text-center py-4" style={{color: '#5c6270'}}>
                 <i className="fas fa-inbox fa-2x mb-3"></i>
                 <p className="mb-0">No scans yet. Start scanning tickets!</p>
               </div>
@@ -1785,20 +1639,20 @@ const Scanner = () => {
 
                   return (
                     <div key={scan.id} className="list-group-item d-flex justify-content-between align-items-center" style={{
-                      background: 'rgba(255,255,255,0.02)',
-                      border: '1px solid rgba(255,255,255,0.05)',
-                      color: '#ffffff'
+                      background: '#ffffff',
+                      border: '1px solid #eef0f2',
+                      color: '#0b0e17'
                     }}>
                       <div className="flex-grow-1">
                         <div className="d-flex justify-content-between align-items-start mb-1">
-                          <strong className="text-truncate me-2" style={{maxWidth: '200px', color: '#ffffff'}}>
+                          <strong className="text-truncate me-2" style={{maxWidth: '200px', color: '#0b0e17'}}>
                             {displayName}
                           </strong>
                           <Badge bg={scan.valid ? 'success' : 'danger'} className="px-2 py-1">
                             {scan.valid ? 'VALID' : 'INVALID'}
                           </Badge>
                         </div>
-                        <small className="d-block" style={{color: 'rgba(255,255,255,0.7)'}}>
+                        <small className="d-block" style={{color: '#5c6270'}}>
                           {scan.timestamp} • {displayMovie}
                         </small>
                         {scan.data?.validity_status && (
@@ -2341,31 +2195,16 @@ const FoodMarkingComponent = ({ bookingId, foodStatus, onFoodMarked, markFoodAsG
 
   return (
     <div style={{
-      background: 'linear-gradient(135deg, rgba(255, 193, 7, 0.15), rgba(255, 152, 0, 0.08))',
-      borderRadius: '12px',
+      background: '#f6f6f7',
       padding: '1rem',
-      border: '2px solid rgba(255, 193, 7, 0.3)',
+      border: '1px solid #e5e7eb',
       position: 'relative',
       overflow: 'hidden'
     }}>
       <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'linear-gradient(45deg, rgba(255, 193, 7, 0.05), rgba(255, 152, 0, 0.03))',
-        borderRadius: '12px',
-        pointerEvents: 'none',
-        zIndex: 1
-      }}></div>
-
-      <div style={{
-        position: 'relative',
-        zIndex: 2,
         fontSize: '1.1rem',
         fontWeight: '700',
-        color: '#f57c00',
+        color: '#b7791f',
         marginBottom: '1rem',
         textAlign: 'center'
       }}>
@@ -2376,9 +2215,7 @@ const FoodMarkingComponent = ({ bookingId, foodStatus, onFoodMarked, markFoodAsG
       <div style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: '0.75rem',
-        position: 'relative',
-        zIndex: 2
+        gap: '0.75rem'
       }}>
         {foodStatus.map((food, index) => {
           const isCompleted = (food.quantity_given || 0) >= (food.ordered_quantity || 0);
@@ -2386,11 +2223,9 @@ const FoodMarkingComponent = ({ bookingId, foodStatus, onFoodMarked, markFoodAsG
 
           return (
             <div key={food.food_id || index} style={{
-              background: isCompleted ? 'rgba(232, 245, 233, 0.8)' : 'white',
-              borderRadius: '10px',
+              background: isCompleted ? '#f6f6f7' : '#ffffff',
               padding: '0.75rem',
-              border: isCompleted ? '2px solid #81c784' : '2px solid rgba(255, 193, 7, 0.2)',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+              border: isCompleted ? '1px solid #0f9d63' : '1px solid #e5e7eb',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
@@ -2400,7 +2235,7 @@ const FoodMarkingComponent = ({ bookingId, foodStatus, onFoodMarked, markFoodAsG
                 <div style={{
                   fontSize: '1rem',
                   fontWeight: '600',
-                  color: '#333',
+                  color: '#0b0e17',
                   marginBottom: '0.25rem',
                   display: 'flex',
                   alignItems: 'center'
@@ -2415,7 +2250,7 @@ const FoodMarkingComponent = ({ bookingId, foodStatus, onFoodMarked, markFoodAsG
                 </div>
                 <div style={{
                   fontSize: '0.85rem',
-                  color: '#666'
+                  color: '#5c6270'
                 }}>
                   Ordered: {food.ordered_quantity} | Served: {food.quantity_given}
                 </div>

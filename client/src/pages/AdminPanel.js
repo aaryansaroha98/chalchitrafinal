@@ -2033,35 +2033,33 @@ const AdminPanel = () => {
 
   return (
     <div style={{
-      background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2d2d2d 100%)',
+      background: '#ffffff',
       minHeight: '100vh',
       position: 'relative',
       padding: '2rem 0'
     }}>
       <Container className="py-5" style={{ position: 'relative', zIndex: 1 }}>
         <div style={{
-          background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
-          backdropFilter: 'blur(30px)',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
-          borderRadius: '30px',
+          background: '#ffffff',
+          border: '1px solid #e5e7eb',
+          borderRadius: '0',
           padding: '2rem',
           marginBottom: '2rem',
-          boxShadow: '0 25px 60px rgba(0,0,0,0.3), 0 10px 30px rgba(0,0,0,0.2)',
+          boxShadow: 'none',
           textAlign: 'center'
         }}>
           <div className="d-flex justify-content-center align-items-center flex-wrap gap-3 mb-2">
             <h1 style={{
-              color: 'white',
+              color: '#0b0e17',
               fontSize: '3rem',
               fontWeight: '700',
               marginBottom: '0',
-              textShadow: '0 2px 10px rgba(0,0,0,0.5)'
             }}>
               {currentUser?.admin_tag || 'Admin Panel'}
             </h1>
           </div>
           <p style={{
-            color: 'rgba(255, 255, 255, 0.8)',
+            color: '#5c6270',
             fontSize: '1.1rem',
             margin: 0,
             fontWeight: '300'
@@ -2072,13 +2070,12 @@ const AdminPanel = () => {
 
         {/* Navigation and content */}
         <div style={{
-          background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
-          backdropFilter: 'blur(25px)',
-          border: '1px solid rgba(255, 255, 255, 0.15)',
-          borderRadius: '20px',
+          background: '#ffffff',
+          border: '1px solid #e5e7eb',
+          borderRadius: '0',
           padding: '8px 12px',
           marginBottom: '2rem',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+          boxShadow: 'none',
           overflow: 'hidden'
         }}>
           <div style={{
@@ -2096,31 +2093,25 @@ const AdminPanel = () => {
                 onClick={() => setActiveTab(tab.id)}
                 style={{
                   background: activeTab === tab.id
-                    ? tab.id === 'config'
-                      ? 'linear-gradient(145deg, rgba(255, 215, 0, 0.3), rgba(255, 215, 0, 0.2))'
-                      : 'linear-gradient(145deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.15))'
+                    ? '#0b0e17'
                     : 'transparent',
-                  backdropFilter: activeTab === tab.id ? 'blur(15px)' : 'none',
                   border: activeTab === tab.id
-                    ? tab.id === 'config'
-                      ? '1px solid rgba(255, 215, 0, 0.6)'
-                      : '1px solid rgba(255, 255, 255, 0.4)'
-                    : 'none',
-                  borderRadius: '15px',
+                    ? '1px solid #0b0e17'
+                    : '1px solid #e5e7eb',
+                  borderRadius: '0',
                   padding: '8px 12px',
-                  color: tab.id === 'config' ? '#ffd700' : 'white',
+                  color: activeTab === tab.id ? '#ffffff' : '#0b0e17',
                   fontWeight: tab.id === 'config' ? '600' : '500',
                   fontSize: '0.8rem',
                   transition: 'all 0.25s ease',
-                  textShadow: '0 1px 2px rgba(0,0,0,0.3)',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
                   boxShadow: activeTab === tab.id
                     ? tab.id === 'config'
-                      ? '0 2px 8px rgba(255, 215, 0, 0.3)'
-                      : '0 2px 8px rgba(0,0,0,0.15)'
+                      ? 'none'
+                      : 'none'
                     : 'none',
                   minWidth: '65px',
                   justifyContent: 'center'
@@ -2167,12 +2158,11 @@ const AdminPanel = () => {
                   setShowMovieModal(true);
                 }}
                 style={{
-                  background: 'linear-gradient(145deg, rgba(40, 167, 69, 0.8), rgba(40, 167, 69, 0.6))',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  borderRadius: '25px',
-                  color: 'white',
-                  boxShadow: '0 8px 32px rgba(40, 167, 69, 0.3)',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
+                  color: '#0b0e17',
+                  boxShadow: 'none',
                   fontWeight: '600',
                   padding: '12px 24px'
                 }}
@@ -2186,11 +2176,10 @@ const AdminPanel = () => {
             <Row className="mb-4">
               <Col md={4}>
                 <Card className="text-dark h-100" style={{
-                  background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08))',
-                  backdropFilter: 'blur(30px)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                  borderRadius: '20px',
-                  boxShadow: '0 15px 50px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2)',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
+                  boxShadow: 'none',
                   position: 'relative',
                   overflow: 'hidden'
                 }}>
@@ -2200,19 +2189,17 @@ const AdminPanel = () => {
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.05) 100%)',
+                    background: '#ffffff',
                     pointerEvents: 'none'
                   }}></div>
                   <Card.Body className="text-center" style={{ position: 'relative', zIndex: 1 }}>
                     <Card.Title className="display-4 mb-3 fw-bold text-white" style={{
-                      textShadow: '0 2px 6px rgba(0,0,0,0.5)',
                       fontWeight: '700'
                     }}>
                       {movies.length}
                     </Card.Title>
                     <Card.Text className="h5 mb-0 text-white" style={{
                       fontWeight: '600',
-                      textShadow: '0 1px 3px rgba(0,0,0,0.3)'
                     }}>
                       Total Movies
                     </Card.Text>
@@ -2221,11 +2208,10 @@ const AdminPanel = () => {
               </Col>
               <Col md={4}>
                 <Card className="text-dark h-100" style={{
-                  background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08))',
-                  backdropFilter: 'blur(30px)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                  borderRadius: '20px',
-                  boxShadow: '0 15px 50px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2)',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
+                  boxShadow: 'none',
                   position: 'relative',
                   overflow: 'hidden'
                 }}>
@@ -2235,19 +2221,17 @@ const AdminPanel = () => {
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.05) 100%)',
+                    background: '#ffffff',
                     pointerEvents: 'none'
                   }}></div>
                   <Card.Body className="text-center" style={{ position: 'relative', zIndex: 1 }}>
                     <Card.Title className="display-4 mb-3 fw-bold text-white" style={{
-                      textShadow: '0 2px 6px rgba(0,0,0,0.5)',
                       fontWeight: '700'
                     }}>
                       {movies.filter(m => getMovieStatus(m.date) === 'Upcoming').length}
                     </Card.Title>
                     <Card.Text className="h5 mb-0 text-white" style={{
                       fontWeight: '600',
-                      textShadow: '0 1px 3px rgba(0,0,0,0.3)'
                     }}>
                       Upcoming Movies
                     </Card.Text>
@@ -2256,11 +2240,10 @@ const AdminPanel = () => {
               </Col>
               <Col md={4}>
                 <Card className="text-dark h-100" style={{
-                  background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08))',
-                  backdropFilter: 'blur(30px)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                  borderRadius: '20px',
-                  boxShadow: '0 15px 50px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2)',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
+                  boxShadow: 'none',
                   position: 'relative',
                   overflow: 'hidden'
                 }}>
@@ -2270,19 +2253,17 @@ const AdminPanel = () => {
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.05) 100%)',
+                    background: '#ffffff',
                     pointerEvents: 'none'
                   }}></div>
                   <Card.Body className="text-center" style={{ position: 'relative', zIndex: 1 }}>
                     <Card.Title className="display-4 mb-3 fw-bold text-white" style={{
-                      textShadow: '0 2px 6px rgba(0,0,0,0.5)',
                       fontWeight: '700'
                     }}>
                       {movies.filter(m => getMovieStatus(m.date) === 'Past').length}
                     </Card.Title>
                     <Card.Text className="h5 mb-0 text-white" style={{
                       fontWeight: '600',
-                      textShadow: '0 1px 3px rgba(0,0,0,0.3)'
                     }}>
                       Past Movies
                     </Card.Text>
@@ -2293,21 +2274,20 @@ const AdminPanel = () => {
 
             {/* Movies Table */}
             <Card style={{
-              background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
-              borderRadius: '15px',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+              background: '#ffffff',
+              border: '1px solid #e5e7eb',
+              borderRadius: '0',
+              boxShadow: 'none'
             }}>
               <Card.Body>
                 <Table responsive hover className="mb-0">
-                  <thead style={{ borderBottom: '2px solid rgba(0,0,0,0.1)' }}>
+                  <thead style={{ borderBottom: '1px solid #e5e7eb' }}>
                     <tr>
-                      <th style={{ color: 'black', border: '1px solid black', padding: '15px', fontWeight: '600' }}>Movie Details</th>
-                      <th style={{ color: 'black', border: '1px solid black', padding: '15px', fontWeight: '600' }}>Date & Venue</th>
-                      <th style={{ color: 'black', border: '1px solid black', padding: '15px', fontWeight: '600' }}>Food</th>
-                      <th style={{ color: 'black', border: '1px solid black', padding: '15px', fontWeight: '600' }}>Status</th>
-                      <th style={{ color: 'black', border: '1px solid black', padding: '15px', fontWeight: '600', textAlign: 'center' }}>Actions</th>
+                      <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '15px', fontWeight: '600' }}>Movie Details</th>
+                      <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '15px', fontWeight: '600' }}>Date & Venue</th>
+                      <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '15px', fontWeight: '600' }}>Food</th>
+                      <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '15px', fontWeight: '600' }}>Status</th>
+                      <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '15px', fontWeight: '600', textAlign: 'center' }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -2315,10 +2295,10 @@ const AdminPanel = () => {
                       const isBookingStopped = Number(movie.booking_stopped) === 1 || movie.booking_stopped === true;
                       return (
                       <tr key={movie.id} style={{
-                        borderBottom: '1px solid rgba(255,255,255,0.05)',
+                        borderBottom: '1px solid #e5e7eb',
                         transition: 'all 0.2s ease'
                       }}>
-                        <td style={{ padding: '15px', verticalAlign: 'middle', border: '1px solid black' }}>
+                        <td style={{ padding: '15px', verticalAlign: 'middle', border: '1px solid #e5e7eb' }}>
                           <div>
                             <h6 className="text-dark mb-1" style={{ fontWeight: '600' }}>
                               {movie.title}
@@ -2328,7 +2308,7 @@ const AdminPanel = () => {
                             </p>
                           </div>
                         </td>
-                        <td style={{ padding: '15px', verticalAlign: 'middle', border: '1px solid black' }}>
+                        <td style={{ padding: '15px', verticalAlign: 'middle', border: '1px solid #e5e7eb' }}>
                           <div className="text-dark">
                             <div style={{ fontWeight: '500' }}>
                               {new Date(movie.date).toLocaleDateString('en-IN', {
@@ -2350,7 +2330,7 @@ const AdminPanel = () => {
                             </div>
                           </div>
                         </td>
-                        <td style={{ padding: '15px', verticalAlign: 'middle', border: '1px solid black' }}>
+                        <td style={{ padding: '15px', verticalAlign: 'middle', border: '1px solid #e5e7eb' }}>
                           <div className="text-dark">
                             {movie.available_foods && movie.available_foods.trim() ? (
                               <div style={{ fontSize: '0.8rem' }}>
@@ -2367,11 +2347,11 @@ const AdminPanel = () => {
                                 })}
                               </div>
                             ) : (
-                              <span style={{ fontSize: '0.8rem', color: '#666' }}>No foods available</span>
+                              <span style={{ fontSize: '0.8rem', color: '#5c6270' }}>No foods available</span>
                             )}
                           </div>
                         </td>
-                        <td style={{ padding: '15px', verticalAlign: 'middle', border: '1px solid black' }}>
+                        <td style={{ padding: '15px', verticalAlign: 'middle', border: '1px solid #e5e7eb' }}>
                           <div className="d-flex flex-column align-items-start gap-1">
                             <Badge
                               bg={getMovieStatus(movie.date) === 'Upcoming' ? 'success' : 'warning'}
@@ -2389,7 +2369,7 @@ const AdminPanel = () => {
                             )}
                           </div>
                         </td>
-                        <td style={{ padding: '15px', verticalAlign: 'middle', border: '1px solid black', textAlign: 'center' }}>
+                        <td style={{ padding: '15px', verticalAlign: 'middle', border: '1px solid #e5e7eb', textAlign: 'center' }}>
                           <div className="d-flex flex-column gap-1 align-items-center">
                             <div className="d-flex gap-1 justify-content-center">
                               <Button
@@ -2428,8 +2408,8 @@ const AdminPanel = () => {
                                     });
                                 }}
                                 style={{
-                                  borderColor: '#000',
-                                  color: '#000',
+                                  borderColor: '#e5e7eb',
+                                  color: '#0b0e17',
                                   background: 'transparent',
                                   fontSize: '0.75rem'
                                 }}
@@ -2455,8 +2435,8 @@ const AdminPanel = () => {
                                   }
                                 }}
                                 style={{
-                                  borderColor: '#000',
-                                  color: '#000',
+                                  borderColor: '#e5e7eb',
+                                  color: '#0b0e17',
                                   background: 'transparent',
                                   fontSize: '0.75rem'
                                 }}
@@ -2499,8 +2479,8 @@ const AdminPanel = () => {
                                   }
                                 }}
                                 style={{
-                                  borderColor: isBookingStopped ? '#198754' : '#dc3545',
-                                  color: isBookingStopped ? '#198754' : '#dc3545',
+                                  borderColor: isBookingStopped ? '#0f9d63' : '#d64545',
+                                  color: isBookingStopped ? '#0f9d63' : '#d64545',
                                   background: 'transparent',
                                   fontSize: '0.75rem'
                                 }}
@@ -2526,8 +2506,8 @@ const AdminPanel = () => {
                                   }
                                 }}
                                 style={{
-                                  borderColor: '#000',
-                                  color: '#000',
+                                  borderColor: '#e5e7eb',
+                                  color: '#0b0e17',
                                   background: 'transparent',
                                   fontSize: '0.75rem'
                                 }}
@@ -2569,11 +2549,10 @@ const AdminPanel = () => {
             <Row className="mt-4">
               <Col md={3} className="mb-4">
                 <Card style={{
-                  background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06))',
-                  backdropFilter: 'blur(30px)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  borderRadius: '20px',
-                  boxShadow: '0 15px 50px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
+                  boxShadow: 'none',
                   position: 'relative',
                   overflow: 'hidden',
                   minHeight: '160px'
@@ -2582,18 +2561,16 @@ const AdminPanel = () => {
                     <Card.Title style={{
                       fontSize: '3rem',
                       fontWeight: '700',
-                      color: '#ffffff',
+                      color: '#0b0e17',
                       marginBottom: '0.5rem',
-                      textShadow: '0 2px 10px rgba(0, 0, 0, 0.5)'
                     }}>
                       {stats.total_movies || 0}
                     </Card.Title>
                     <Card.Text style={{
                       fontSize: '1.1rem',
-                      color: 'rgba(255, 255, 255, 0.9)',
+                      color: '#0b0e17',
                       fontWeight: '500',
                       margin: 0,
-                      textShadow: '0 1px 3px rgba(0,0,0,0.3)'
                     }}>
                       Total Movies
                     </Card.Text>
@@ -2603,11 +2580,10 @@ const AdminPanel = () => {
 
               <Col md={3} className="mb-4">
                 <Card style={{
-                  background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06))',
-                  backdropFilter: 'blur(30px)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  borderRadius: '20px',
-                  boxShadow: '0 15px 50px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
+                  boxShadow: 'none',
                   position: 'relative',
                   overflow: 'hidden',
                   minHeight: '160px'
@@ -2616,18 +2592,16 @@ const AdminPanel = () => {
                     <Card.Title style={{
                       fontSize: '3rem',
                       fontWeight: '700',
-                      color: '#ffffff',
+                      color: '#0b0e17',
                       marginBottom: '0.5rem',
-                      textShadow: '0 2px 10px rgba(0, 0, 0, 0.5)'
                     }}>
                       {stats.upcoming_bookings || 0}
                     </Card.Title>
                     <Card.Text style={{
                       fontSize: '1.1rem',
-                      color: 'rgba(255, 255, 255, 0.9)',
+                      color: '#0b0e17',
                       fontWeight: '500',
                       margin: 0,
-                      textShadow: '0 1px 3px rgba(0,0,0,0.3)'
                     }}>
                       Bookings For Upcoming Movies
                     </Card.Text>
@@ -2637,11 +2611,10 @@ const AdminPanel = () => {
 
               <Col md={3} className="mb-4">
                 <Card style={{
-                  background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06))',
-                  backdropFilter: 'blur(30px)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  borderRadius: '20px',
-                  boxShadow: '0 15px 50px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
+                  boxShadow: 'none',
                   position: 'relative',
                   overflow: 'hidden',
                   minHeight: '160px'
@@ -2650,18 +2623,16 @@ const AdminPanel = () => {
                     <Card.Title style={{
                       fontSize: '2.6rem',
                       fontWeight: '700',
-                      color: '#ffffff',
+                      color: '#0b0e17',
                       marginBottom: '0.5rem',
-                      textShadow: '0 2px 10px rgba(0, 0, 0, 0.5)'
                     }}>
                       {`${upcomingVenueBookedSeats} / ${upcomingVenueTotalSeats}`}
                     </Card.Title>
                     <Card.Text style={{
                       fontSize: '1.1rem',
-                      color: 'rgba(255, 255, 255, 0.9)',
+                      color: '#0b0e17',
                       fontWeight: '500',
                       margin: 0,
-                      textShadow: '0 1px 3px rgba(0,0,0,0.3)'
                     }}>
                       Seats Booked / Total Seats (Upcoming Venue)
                     </Card.Text>
@@ -2671,11 +2642,10 @@ const AdminPanel = () => {
 
               <Col md={3} className="mb-4">
                 <Card style={{
-                  background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06))',
-                  backdropFilter: 'blur(30px)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  borderRadius: '20px',
-                  boxShadow: '0 15px 50px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
+                  boxShadow: 'none',
                   position: 'relative',
                   overflow: 'hidden',
                   minHeight: '160px'
@@ -2684,18 +2654,16 @@ const AdminPanel = () => {
                     <Card.Title style={{
                       fontSize: '3rem',
                       fontWeight: '700',
-                      color: '#ffffff',
+                      color: '#0b0e17',
                       marginBottom: '0.5rem',
-                      textShadow: '0 2px 10px rgba(0, 0, 0, 0.5)'
                     }}>
                       {stats.total_bookings || 0}
                     </Card.Title>
                     <Card.Text style={{
                       fontSize: '1.1rem',
-                      color: 'rgba(255, 255, 255, 0.9)',
+                      color: '#0b0e17',
                       fontWeight: '500',
                       margin: 0,
-                      textShadow: '0 1px 3px rgba(0,0,0,0.3)'
                     }}>
                       Total Bookings
                     </Card.Text>
@@ -2705,11 +2673,10 @@ const AdminPanel = () => {
 
               <Col md={3} className="mb-4">
                 <Card style={{
-                  background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06))',
-                  backdropFilter: 'blur(30px)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  borderRadius: '20px',
-                  boxShadow: '0 15px 50px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
+                  boxShadow: 'none',
                   position: 'relative',
                   overflow: 'hidden',
                   minHeight: '160px'
@@ -2718,18 +2685,16 @@ const AdminPanel = () => {
                     <Card.Title style={{
                       fontSize: '2.5rem',
                       fontWeight: '700',
-                      color: '#28a745',
+                      color: '#0f9d63',
                       marginBottom: '0.5rem',
-                      textShadow: '0 2px 10px rgba(40, 167, 69, 0.4)'
                     }}>
                       {stats.total_users || 0}
                     </Card.Title>
                     <Card.Text style={{
                       fontSize: '1.1rem',
-                      color: 'rgba(255, 255, 255, 0.9)',
+                      color: '#0b0e17',
                       fontWeight: '500',
                       margin: 0,
-                      textShadow: '0 1px 3px rgba(0,0,0,0.3)'
                     }}>
                       Total Users
                     </Card.Text>
@@ -2746,12 +2711,11 @@ const AdminPanel = () => {
               className="mb-3"
               onClick={() => setShowFoodModal(true)}
               style={{
-                background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                borderRadius: '25px',
-                color: 'white',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+                background: '#ffffff',
+                border: '1px solid #e5e7eb',
+                borderRadius: '0',
+                color: '#0b0e17',
+                boxShadow: 'none',
                 fontWeight: '600',
                 padding: '12px 24px'
               }}
@@ -2891,11 +2855,10 @@ const AdminPanel = () => {
             <Row className="mb-5">
               <Col md={3} className="mb-4">
                 <Card className="text-white h-100" style={{
-                  background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  borderRadius: '15px',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
+                  boxShadow: 'none',
                   transition: 'all 0.3s ease'
                 }}>
                   <Card.Body className="text-center">
@@ -2911,11 +2874,10 @@ const AdminPanel = () => {
 
               <Col md={3} className="mb-4">
                 <Card className="text-white h-100" style={{
-                  background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  borderRadius: '15px',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
+                  boxShadow: 'none',
                   transition: 'all 0.3s ease'
                 }}>
                   <Card.Body className="text-center">
@@ -2931,11 +2893,10 @@ const AdminPanel = () => {
 
               <Col md={3} className="mb-4">
                 <Card className="text-white h-100" style={{
-                  background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  borderRadius: '15px',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
+                  boxShadow: 'none',
                   transition: 'all 0.3s ease'
                 }}>
                   <Card.Body className="text-center">
@@ -2951,11 +2912,10 @@ const AdminPanel = () => {
 
               <Col md={3} className="mb-4">
                 <Card className="text-white h-100" style={{
-                  background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  borderRadius: '15px',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
+                  boxShadow: 'none',
                   transition: 'all 0.3s ease'
                 }}>
                   <Card.Body className="text-center">
@@ -3016,9 +2976,9 @@ const AdminPanel = () => {
                   onClick={() => exportBookingsToPDF(filteredBookings)}
                   className="flex-grow-1"
                   style={{
-                    background: 'linear-gradient(145deg, rgba(40, 167, 69, 0.8), rgba(40, 167, 69, 0.6))',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    color: 'white'
+                    background: '#ffffff',
+                    border: '1px solid #e5e7eb',
+                    color: '#0b0e17'
                   }}
                 >
                   <i className="fas fa-file-pdf me-2"></i>
@@ -3028,9 +2988,9 @@ const AdminPanel = () => {
                   variant="danger"
                   onClick={handleResetBookings}
                   style={{
-                    background: 'linear-gradient(145deg, rgba(220, 53, 69, 0.8), rgba(220, 53, 69, 0.6))',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    color: 'white',
+                    background: '#ffffff',
+                    border: '1px solid #e5e7eb',
+                    color: '#0b0e17',
                     whiteSpace: 'nowrap'
                   }}
                 >
@@ -3136,11 +3096,10 @@ const AdminPanel = () => {
             <Row className="mb-4 justify-content-center">
               <Col md={4} className="mb-4">
                 <Card className="text-white h-100" style={{
-                  background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
-                  backdropFilter: 'blur(30px)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  borderRadius: '20px',
-                  boxShadow: '0 15px 50px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
+                  boxShadow: 'none',
                   position: 'relative',
                   overflow: 'hidden',
                   minHeight: '160px'
@@ -3149,18 +3108,16 @@ const AdminPanel = () => {
                     <Card.Title style={{
                       fontSize: '3rem',
                       fontWeight: '700',
-                      color: '#ffffff',
+                      color: '#0b0e17',
                       marginBottom: '0.5rem',
-                      textShadow: '0 2px 10px rgba(0, 0, 0, 0.5)'
                     }}>
                       {stats.total_users || 0}
                     </Card.Title>
                     <Card.Text style={{
                       fontSize: '1.1rem',
-                      color: 'rgba(255, 255, 255, 0.9)',
+                      color: '#0b0e17',
                       fontWeight: '500',
                       margin: 0,
-                      textShadow: '0 1px 3px rgba(0,0,0,0.3)'
                     }}>
                       Total Users
                     </Card.Text>
@@ -3227,12 +3184,11 @@ const AdminPanel = () => {
               className="mb-3"
               onClick={() => setShowTeamModal(true)}
               style={{
-                background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                borderRadius: '25px',
-                color: 'white',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+                background: '#ffffff',
+                border: '1px solid #e5e7eb',
+                borderRadius: '0',
+                color: '#0b0e17',
+                boxShadow: 'none',
                 fontWeight: '600',
                 padding: '12px 24px'
               }}
@@ -3259,9 +3215,9 @@ const AdminPanel = () => {
                       <div style={{
                         width: '40px',
                         height: '40px',
-                        borderRadius: '50%',
+                        borderRadius: '0',
                         overflow: 'hidden',
-                        border: '2px solid rgba(255, 255, 255, 0.3)',
+                        border: '1px solid #e5e7eb',
                         margin: '0 auto'
                       }}>
                         {member.photo_url ? (
@@ -3281,11 +3237,11 @@ const AdminPanel = () => {
                           <div style={{
                             width: '100%',
                             height: '100%',
-                            background: 'linear-gradient(135deg, rgba(0, 123, 255, 0.8), rgba(0, 123, 255, 0.6))',
+                            background: '#ffffff',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            color: 'white',
+                            color: '#0b0e17',
                             fontSize: '16px',
                             fontWeight: 'bold'
                           }}>
@@ -3372,12 +3328,11 @@ const AdminPanel = () => {
               <Button
                 onClick={() => setShowGalleryModal(true)}
                 style={{
-                  background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  borderRadius: '25px',
-                  color: 'white',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
+                  color: '#0b0e17',
+                  boxShadow: 'none',
                   fontWeight: '600',
                   padding: '12px 24px'
                 }}
@@ -3396,14 +3351,14 @@ const AdminPanel = () => {
                       style={{
                         height: '200px',
                         objectFit: 'contain',
-                        backgroundColor: 'rgba(0, 0, 0, 0.35)'
+                        backgroundColor: '#f6f6f7'
                       }}
                       onError={(e) => {
                         e.target.src = '/placeholder-movie.jpg';
                       }}
                     />
                     <Card.Body>
-                      <Card.Title className="text-truncate" style={{ color: 'black' }}>{image.event_name || 'Gallery Image'}</Card.Title>
+                      <Card.Title className="text-truncate" style={{ color: '#0b0e17' }}>{image.event_name || 'Gallery Image'}</Card.Title>
                       <div style={{ marginBottom: '1rem' }}>
                         <small style={{ color: 'var(--gray-600)', fontWeight: '500' }}>
                           <i className="fas fa-calendar me-1"></i>
@@ -3452,12 +3407,11 @@ const AdminPanel = () => {
                 <Button
                   onClick={() => setShowCouponModal(true)}
                   style={{
-                    background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
-                    backdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    borderRadius: '25px',
-                    color: 'white',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+                    background: '#ffffff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '0',
+                    color: '#0b0e17',
+                    boxShadow: 'none',
                     fontWeight: '600',
                     padding: '12px 24px'
                   }}
@@ -3484,8 +3438,8 @@ const AdminPanel = () => {
                       });
                   }}
                   style={{
-                    borderColor: '#17a2b8',
-                    color: '#17a2b8',
+                    borderColor: '#e5e7eb',
+                    color: '#2f6fd0',
                     background: 'transparent'
                   }}
                 >
@@ -3506,8 +3460,8 @@ const AdminPanel = () => {
                         }
                       }}
                       style={{
-                        borderColor: '#dc3545',
-                        color: '#dc3545',
+                        borderColor: '#e5e7eb',
+                        color: '#d64545',
                         background: 'transparent'
                       }}
                     >
@@ -3561,17 +3515,17 @@ const AdminPanel = () => {
                     <td>{coupon.discount_type === 'percentage' ? `${coupon.discount_value}%` : `🪙 ${coupon.discount_value} Coins`}</td>
                     <td>
                       <div className="d-flex flex-column gap-1">
-                        <div style={{ fontSize: '0.85rem', color: 'black' }}>
+                        <div style={{ fontSize: '0.85rem', color: '#0b0e17' }}>
                           {coupon.used_count || 0}/{coupon.usage_limit === -1 ? 'Unlimited' : coupon.usage_limit}
                         </div>
                         {coupon.usage_limit > 0 && (
-                          <div className="progress" style={{ height: '6px', borderRadius: '3px' }}>
+                          <div className="progress" style={{ height: '6px', borderRadius: '0' }}>
                             <div
                               className="progress-bar"
                               style={{
                                 width: `${coupon.usage_percentage || 0}%`,
-                                background: coupon.status === 'Expired' ? '#dc3545' :
-                                  coupon.status === 'Low Usage' ? '#ffc107' : '#28a745'
+                                background: coupon.status === 'Expired' ? '#d64545' :
+                                  coupon.status === 'Low Usage' ? '#b7791f' : '#0f9d63'
                               }}
                             ></div>
                           </div>
@@ -3653,12 +3607,11 @@ const AdminPanel = () => {
               className="mb-4"
               onClick={() => setShowWinnerModal(true)}
               style={{
-                background: 'linear-gradient(145deg, rgba(255, 193, 7, 0.8), rgba(255, 193, 7, 0.6))',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                borderRadius: '25px',
-                color: 'white',
-                boxShadow: '0 8px 32px rgba(255, 193, 7, 0.3)',
+                background: '#ffffff',
+                border: '1px solid #e5e7eb',
+                borderRadius: '0',
+                color: '#0b0e17',
+                boxShadow: 'none',
                 fontWeight: '600',
                 padding: '12px 24px'
               }}
@@ -3669,12 +3622,11 @@ const AdminPanel = () => {
 
             {/* Winners Table */}
             <div style={{
-              background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
-              borderRadius: '15px',
+              background: '#ffffff',
+              border: '1px solid #e5e7eb',
+              borderRadius: '0',
               padding: '1.5rem',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+              boxShadow: 'none',
               maxWidth: '1200px',
               margin: '0 auto'
             }}>
@@ -3745,8 +3697,8 @@ const AdminPanel = () => {
                           }
                         }}
                         style={{
-                          borderColor: '#dc3545',
-                          color: '#dc3545',
+                          borderColor: '#e5e7eb',
+                          color: '#d64545',
                           background: 'transparent'
                         }}
                       >
@@ -3767,43 +3719,43 @@ const AdminPanel = () => {
                     label={`Select All (${couponWinners.winners.length} winners)`}
                     checked={selectedWinners.length === couponWinners.winners.length && couponWinners.winners.length > 0}
                     onChange={(e) => handleSelectAllWinners(e.target.checked)}
-                    style={{ color: 'white' }}
+                    style={{ color: '#0b0e17' }}
                   />
                 </div>
               )}
 
               <Table striped bordered hover responsive style={{ marginBottom: 0 }}>
-                <thead style={{ borderBottom: '2px solid rgba(255,255,255,0.2)' }}>
+                <thead style={{ borderBottom: '1px solid #e5e7eb' }}>
                   <tr>
-                    <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'left' }}>User</th>
-                    <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'left' }}>Email</th>
-                    <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'left' }}>Coupon Code</th>
-                    <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'left' }}>Discount</th>
-                    <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'center' }}>Status</th>
-                    <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'left' }}>Won Date</th>
-                    <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'center' }}>Actions</th>
+                    <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>User</th>
+                    <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>Email</th>
+                    <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>Coupon Code</th>
+                    <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>Discount</th>
+                    <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>Status</th>
+                    <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>Won Date</th>
+                    <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {couponWinners && couponWinners.winners && couponWinners.winners.length > 0 ? couponWinners.winners.map(winner => (
                     <tr key={winner.id} style={{
-                      borderBottom: '1px solid rgba(255,255,255,0.05)',
-                      background: winner.is_used ? 'rgba(255,255,255,0.02)' : 'transparent'
+                      borderBottom: '1px solid #e5e7eb',
+                      background: winner.is_used ? '#f6f6f7' : 'transparent'
                     }}>
-                      <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'left' }}>
+                      <td style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>
                         <strong>{winner.user_name || 'N/A'}</strong>
                       </td>
-                      <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'left' }}>
-                        <code style={{ background: 'rgba(0,0,0,0.1)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.85rem' }}>
+                      <td style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>
+                        <code style={{ background: '#f6f6f7', padding: '2px 6px', borderRadius: '0', fontSize: '0.85rem' }}>
                           {winner.user_email}
                         </code>
                       </td>
-                      <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'left' }}>
+                      <td style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>
                         <Badge bg="warning" style={{ fontSize: '0.9rem', padding: '6px 10px' }}>
                           <strong>{winner.coupon_code}</strong>
                         </Badge>
                       </td>
-                      <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'left' }}>
+                      <td style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>
                         <div style={{ fontWeight: '600' }}>
                           {winner.discount_type === 'percentage'
                             ? `${winner.discount_amount}% off`
@@ -3816,7 +3768,7 @@ const AdminPanel = () => {
                           }
                         </div>
                       </td>
-                      <td style={{ border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'center' }}>
+                      <td style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>
                         <Badge bg={winner.is_used ? 'success' : 'warning'} style={{ fontSize: '0.8rem' }}>
                           {winner.is_used ? (
                             <>
@@ -3831,7 +3783,7 @@ const AdminPanel = () => {
                           )}
                         </Badge>
                       </td>
-                      <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'left' }}>
+                      <td style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>
                         <div>
                           <div style={{ fontWeight: '600' }}>
                             {new Date(winner.created_at).toLocaleDateString('en-IN', {
@@ -3851,7 +3803,7 @@ const AdminPanel = () => {
                           </div>
                         </div>
                       </td>
-                      <td style={{ border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'center' }}>
+                      <td style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>
                         <div className="d-flex gap-2 justify-content-center">
                           <Button
                             variant="outline-secondary"
@@ -3903,7 +3855,7 @@ const AdminPanel = () => {
                     </tr>
                   )) : (
                     <tr>
-                      <td colSpan="7" className="text-center py-5" style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
+                      <td colSpan="7" className="text-center py-5" style={{ border: '1px solid #e5e7eb' }}>
                         <div className="text-white-50">
                           <i className="fas fa-trophy fa-3x mb-3"></i>
                           <h5>No Winners Yet</h5>
@@ -3927,10 +3879,10 @@ const AdminPanel = () => {
                 variant="danger" 
                 onClick={handleResetFeedback}
                 style={{
-                  borderRadius: '12px',
+                  borderRadius: '0',
                   padding: '0.5rem 1.25rem',
                   fontWeight: '600',
-                  boxShadow: '0 4px 15px rgba(220, 53, 69, 0.3)',
+                  boxShadow: 'none',
                   border: 'none'
                 }}
               >
@@ -3942,71 +3894,67 @@ const AdminPanel = () => {
             <Row className="mb-4">
               <Col md={3}>
                 <Card style={{
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  borderRadius: '16px',
-                  color: 'white'
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
+                  color: '#0b0e17'
                 }}>
                   <Card.Body className="text-center">
-                    <i className="fas fa-star fa-2x mb-2" style={{ color: '#ffd700' }}></i>
-                    <h3 style={{ fontSize: '2rem', fontWeight: '700', color: '#ffffff' }}>
+                    <i className="fas fa-star fa-2x mb-2" style={{ color: '#0b0e17' }}></i>
+                    <h3 style={{ fontSize: '2rem', fontWeight: '700', color: '#0b0e17' }}>
                       {feedback && feedback.length > 0
                         ? (feedback.reduce((sum, f) => sum + (f.rating || 0), 0) / feedback.length).toFixed(1)
                         : '0.0'}
                     </h3>
-                    <p style={{ color: '#ffffff', marginBottom: 0 }}>Average Rating</p>
+                    <p style={{ color: '#0b0e17', marginBottom: 0 }}>Average Rating</p>
                   </Card.Body>
                 </Card>
               </Col>
               <Col md={3}>
                 <Card style={{
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  borderRadius: '16px',
-                  color: 'white'
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
+                  color: '#0b0e17'
                 }}>
                   <Card.Body className="text-center">
-                    <i className="fas fa-comments fa-2x mb-2" style={{ color: '#4CAF50' }}></i>
-                    <h3 style={{ fontSize: '2rem', fontWeight: '700', color: '#ffffff' }}>
+                    <i className="fas fa-comments fa-2x mb-2" style={{ color: '#0f9d63' }}></i>
+                    <h3 style={{ fontSize: '2rem', fontWeight: '700', color: '#0b0e17' }}>
                       {feedback ? feedback.length : 0}
                     </h3>
-                    <p style={{ color: '#ffffff', marginBottom: 0 }}>Total Responses</p>
+                    <p style={{ color: '#0b0e17', marginBottom: 0 }}>Total Responses</p>
                   </Card.Body>
                 </Card>
               </Col>
               <Col md={3}>
                 <Card style={{
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  borderRadius: '16px',
-                  color: 'white'
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
+                  color: '#0b0e17'
                 }}>
                   <Card.Body className="text-center">
-                    <i className="fas fa-thumbs-up fa-2x mb-2" style={{ color: '#2196F3' }}></i>
-                    <h3 style={{ fontSize: '2rem', fontWeight: '700', color: '#ffffff' }}>
+                    <i className="fas fa-thumbs-up fa-2x mb-2" style={{ color: '#2f6fd0' }}></i>
+                    <h3 style={{ fontSize: '2rem', fontWeight: '700', color: '#0b0e17' }}>
                       {feedback ? feedback.filter(f => f.rating >= 4).length : 0}
                     </h3>
-                    <p style={{ color: '#ffffff', marginBottom: 0 }}>Positive (4-5 ★)</p>
+                    <p style={{ color: '#0b0e17', marginBottom: 0 }}>Positive (4-5 ★)</p>
                   </Card.Body>
                 </Card>
               </Col>
               <Col md={3}>
                 <Card style={{
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  borderRadius: '16px',
-                  color: 'white'
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
+                  color: '#0b0e17'
                 }}>
                   <Card.Body className="text-center">
-                    <i className="fas fa-film fa-2x mb-2" style={{ color: '#9C27B0' }}></i>
-                    <h3 style={{ fontSize: '2rem', fontWeight: '700', color: '#ffffff' }}>
+                    <i className="fas fa-film fa-2x mb-2" style={{ color: '#0b0e17' }}></i>
+                    <h3 style={{ fontSize: '2rem', fontWeight: '700', color: '#0b0e17' }}>
                       {feedback ? [...new Set(feedback.map(f => f.movie_id))].length : 0}
                     </h3>
-                    <p style={{ color: '#ffffff', marginBottom: 0 }}>Movies Reviewed</p>
+                    <p style={{ color: '#0b0e17', marginBottom: 0 }}>Movies Reviewed</p>
                   </Card.Body>
                 </Card>
               </Col>
@@ -4014,16 +3962,15 @@ const AdminPanel = () => {
 
             {/* Per Movie Feedback Summary */}
             <Card style={{
-              background: 'rgba(255, 255, 255, 0.08)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
-              borderRadius: '16px',
+              background: '#ffffff',
+              border: '1px solid #e5e7eb',
+              borderRadius: '0',
               marginBottom: '1.5rem'
             }}>
               <Card.Header style={{
-                background: 'rgba(255, 255, 255, 0.05)',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-                color: 'white',
+                background: '#ffffff',
+                borderBottom: '1px solid #e5e7eb',
+                color: '#0b0e17',
                 fontWeight: '600',
                 fontSize: '1.1rem'
               }}>
@@ -4060,14 +4007,14 @@ const AdminPanel = () => {
                         return (
                           <Col md={6} lg={4} key={movieId} className="mb-3">
                             <div style={{
-                              background: 'rgba(255, 255, 255, 0.06)',
-                              border: '1px solid rgba(255, 255, 255, 0.1)',
-                              borderRadius: '12px',
+                              background: '#ffffff',
+                              border: '1px solid #e5e7eb',
+                              borderRadius: '0',
                               padding: '1rem',
                               height: '100%'
                             }}>
                               <h5 style={{
-                                color: 'white',
+                                color: '#0b0e17',
                                 marginBottom: '0.75rem',
                                 fontSize: '1rem',
                                 fontWeight: '600'
@@ -4085,7 +4032,7 @@ const AdminPanel = () => {
                                 <span style={{
                                   fontSize: '1.75rem',
                                   fontWeight: '700',
-                                  color: '#ffd700'
+                                  color: '#0b0e17'
                                 }}>
                                   {avgRating.toFixed(1)}
                                 </span>
@@ -4093,14 +4040,14 @@ const AdminPanel = () => {
                                   <div style={{ display: 'flex' }}>
                                     {[1, 2, 3, 4, 5].map(star => (
                                       <span key={star} style={{
-                                        color: star <= Math.round(avgRating) ? '#ffd700' : 'rgba(255, 255, 255, 0.3)',
+                                        color: star <= Math.round(avgRating) ? '#0b0e17' : '#e5e7eb',
                                         fontSize: '14px'
                                       }}>★</span>
                                     ))}
                                   </div>
                                   <span style={{
                                     fontSize: '0.75rem',
-                                    color: 'rgba(255, 255, 255, 0.6)'
+                                    color: '#5c6270'
                                   }}>
                                     {totalResponses} review{totalResponses !== 1 ? 's' : ''}
                                   </span>
@@ -4121,7 +4068,7 @@ const AdminPanel = () => {
                                     }}>
                                       <span style={{
                                         fontSize: '0.7rem',
-                                        color: 'rgba(255, 255, 255, 0.6)',
+                                        color: '#5c6270',
                                         width: '15px'
                                       }}>
                                         {star}★
@@ -4129,21 +4076,21 @@ const AdminPanel = () => {
                                       <div style={{
                                         flex: 1,
                                         height: '6px',
-                                        background: 'rgba(255, 255, 255, 0.1)',
-                                        borderRadius: '3px',
+                                        background: '#f6f6f7',
+                                        borderRadius: '0',
                                         overflow: 'hidden'
                                       }}>
                                         <div style={{
                                           width: `${percentage}%`,
                                           height: '100%',
-                                          background: star >= 4 ? '#4CAF50' : star >= 3 ? '#FFC107' : '#f44336',
-                                          borderRadius: '3px',
+                                          background: star >= 4 ? '#0f9d63' : star >= 3 ? '#b7791f' : '#d64545',
+                                          borderRadius: '0',
                                           transition: 'width 0.3s ease'
                                         }}></div>
                                       </div>
                                       <span style={{
                                         fontSize: '0.7rem',
-                                        color: 'rgba(255, 255, 255, 0.5)',
+                                        color: '#8b909c',
                                         width: '20px',
                                         textAlign: 'right'
                                       }}>
@@ -4160,7 +4107,7 @@ const AdminPanel = () => {
                     })()}
                   </Row>
                 ) : (
-                  <div className="text-center py-4" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+                  <div className="text-center py-4" style={{ color: '#5c6270' }}>
                     <i className="fas fa-chart-bar fa-2x mb-2"></i>
                     <p>No feedback data to analyze</p>
                   </div>
@@ -4170,15 +4117,14 @@ const AdminPanel = () => {
 
             {/* Detailed Feedback Table */}
             <Card style={{
-              background: 'rgba(255, 255, 255, 0.95)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(0, 0, 0, 0.1)',
-              borderRadius: '16px'
+              background: '#ffffff',
+              border: '1px solid #e5e7eb',
+              borderRadius: '0'
             }}>
               <Card.Header style={{
-                background: 'rgba(255, 255, 255, 0.9)',
-                borderBottom: '1px solid rgba(0, 0, 0, 0.1)',
-                color: '#000000',
+                background: '#ffffff',
+                borderBottom: '1px solid #e5e7eb',
+                color: '#0b0e17',
                 fontWeight: '600',
                 fontSize: '1.1rem'
               }}>
@@ -4188,28 +4134,28 @@ const AdminPanel = () => {
               <Card.Body style={{ padding: 0 }}>
                 <Table striped hover style={{ marginBottom: 0 }}>
                   <thead>
-                    <tr style={{ background: 'rgba(0, 0, 0, 0.03)' }}>
-                      <th style={{ color: '#000000', borderColor: 'rgba(0, 0, 0, 0.1)' }}>User</th>
-                      <th style={{ color: '#000000', borderColor: 'rgba(0, 0, 0, 0.1)' }}>Movie</th>
-                      <th style={{ color: '#000000', borderColor: 'rgba(0, 0, 0, 0.1)' }}>Rating</th>
-                      <th style={{ color: '#000000', borderColor: 'rgba(0, 0, 0, 0.1)' }}>Comment</th>
-                      <th style={{ color: '#000000', borderColor: 'rgba(0, 0, 0, 0.1)' }}>Date</th>
+                    <tr style={{ background: '#f6f6f7' }}>
+                      <th style={{ color: '#0b0e17', borderColor: '#e5e7eb' }}>User</th>
+                      <th style={{ color: '#0b0e17', borderColor: '#e5e7eb' }}>Movie</th>
+                      <th style={{ color: '#0b0e17', borderColor: '#e5e7eb' }}>Rating</th>
+                      <th style={{ color: '#0b0e17', borderColor: '#e5e7eb' }}>Comment</th>
+                      <th style={{ color: '#0b0e17', borderColor: '#e5e7eb' }}>Date</th>
                     </tr>
                   </thead>
                   <tbody>
                     {feedback && feedback.length > 0 ? feedback.map(item => (
                       <tr key={item.id} style={{ background: 'transparent' }}>
-                        <td style={{ color: '#333333', borderColor: 'rgba(0, 0, 0, 0.08)' }}>
+                        <td style={{ color: '#5c6270', borderColor: '#e5e7eb' }}>
                           {item.user_name || item.user_email || 'Anonymous'}
                         </td>
-                        <td style={{ color: '#333333', borderColor: 'rgba(0, 0, 0, 0.08)' }}>
+                        <td style={{ color: '#5c6270', borderColor: '#e5e7eb' }}>
                           {item.movie_title || 'N/A'}
                         </td>
-                        <td style={{ borderColor: 'rgba(0, 0, 0, 0.08)' }}>
+                        <td style={{ borderColor: '#e5e7eb' }}>
                           <div className="d-flex align-items-center">
                             {[...Array(5)].map((_, i) => (
                               <span key={i} style={{
-                                color: i < item.rating ? '#ffd700' : 'rgba(0, 0, 0, 0.2)',
+                                color: i < item.rating ? '#0b0e17' : '#e5e7eb',
                                 fontSize: '14px'
                               }}>
                                 ★
@@ -4217,7 +4163,7 @@ const AdminPanel = () => {
                             ))}
                             <span style={{
                               marginLeft: '8px',
-                              color: '#333333',
+                              color: '#5c6270',
                               fontSize: '0.85rem'
                             }}>
                               {item.rating}/5
@@ -4225,8 +4171,8 @@ const AdminPanel = () => {
                           </div>
                         </td>
                         <td style={{
-                          color: '#444444',
-                          borderColor: 'rgba(0, 0, 0, 0.08)',
+                          color: '#5c6270',
+                          borderColor: '#e5e7eb',
                           maxWidth: '250px',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
@@ -4234,7 +4180,7 @@ const AdminPanel = () => {
                         }}>
                           {item.comment || <span style={{ opacity: 0.5, fontStyle: 'italic' }}>No comment</span>}
                         </td>
-                        <td style={{ color: '#555555', borderColor: 'rgba(0, 0, 0, 0.08)' }}>
+                        <td style={{ color: '#5c6270', borderColor: '#e5e7eb' }}>
                           {new Date(item.created_at).toLocaleDateString('en-IN', {
                             day: 'numeric',
                             month: 'short',
@@ -4244,7 +4190,7 @@ const AdminPanel = () => {
                       </tr>
                     )) : (
                       <tr>
-                        <td colSpan="5" className="text-center py-4" style={{ color: '#666666' }}>
+                        <td colSpan="5" className="text-center py-4" style={{ color: '#5c6270' }}>
                           <i className="fas fa-comments fa-2x mb-2"></i>
                           <br />
                           No feedback received yet
@@ -4260,22 +4206,21 @@ const AdminPanel = () => {
 
         {activeTab === 'mail' && (
           <div className="text-center text-white py-5">
-            <h2 style={{ color: 'white' }}>Email Management</h2>
-            <p style={{ color: 'white' }}>Send emails to users and manage email templates.</p>
+            <h2 style={{ color: '#0b0e17' }}>Email Management</h2>
+            <p style={{ color: '#0b0e17' }}>Send emails to users and manage email templates.</p>
 
             <Row className="mb-4">
               <Col md={4}>
                 <Card style={{
-                  background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.6))',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(0, 0, 0, 0.2)',
-                  borderRadius: '20px',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
-                  color: 'black'
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
+                  boxShadow: 'none',
+                  color: '#0b0e17'
                 }}>
                   <Card.Body>
-                    <Card.Title style={{ color: 'black', fontWeight: '600' }}>Send Single Email</Card.Title>
-                    <Card.Text style={{ color: 'black', opacity: 0.8 }}>Send to a specific user or any email address</Card.Text>
+                    <Card.Title style={{ color: '#0b0e17', fontWeight: '600' }}>Send Single Email</Card.Title>
+                    <Card.Text style={{ color: '#0b0e17', opacity: 0.8 }}>Send to a specific user or any email address</Card.Text>
                     <Button
                       variant="primary"
                       onClick={() => {
@@ -4285,10 +4230,10 @@ const AdminPanel = () => {
                         setEmailForm({ user_id: '', recipient_name: '', email: '', subject: '', message: '', attachment_name: '', attachment_type: '', attachment_base64: '' });
                       }}
                       style={{
-                        background: 'linear-gradient(145deg, rgba(0, 123, 255, 0.9), rgba(0, 123, 255, 0.7))',
-                        border: '1px solid rgba(0, 0, 0, 0.2)',
-                        borderRadius: '25px',
-                        color: 'white',
+                        background: '#ffffff',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '0',
+                        color: '#0b0e17',
                         fontWeight: '600',
                         padding: '12px 24px'
                       }}
@@ -4302,16 +4247,15 @@ const AdminPanel = () => {
 
               <Col md={4}>
                 <Card style={{
-                  background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.6))',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(0, 0, 0, 0.2)',
-                  borderRadius: '20px',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
-                  color: 'black'
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
+                  boxShadow: 'none',
+                  color: '#0b0e17'
                 }}>
                   <Card.Body>
-                    <Card.Title style={{ color: 'black', fontWeight: '600' }}>Bulk Email</Card.Title>
-                    <Card.Text style={{ color: 'black', opacity: 0.8 }}>Send to multiple selected users</Card.Text>
+                    <Card.Title style={{ color: '#0b0e17', fontWeight: '600' }}>Bulk Email</Card.Title>
+                    <Card.Text style={{ color: '#0b0e17', opacity: 0.8 }}>Send to multiple selected users</Card.Text>
                     <Button
                       variant="warning"
                       onClick={() => {
@@ -4320,10 +4264,10 @@ const AdminPanel = () => {
                         setBulkEmailForm({ subject: '', message: '' });
                       }}
                       style={{
-                        background: 'linear-gradient(145deg, rgba(255, 193, 7, 0.9), rgba(255, 193, 7, 0.7))',
-                        border: '1px solid rgba(0, 0, 0, 0.2)',
-                        borderRadius: '25px',
-                        color: 'white',
+                        background: '#ffffff',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '0',
+                        color: '#0b0e17',
                         fontWeight: '600',
                         padding: '12px 24px'
                       }}
@@ -4337,18 +4281,17 @@ const AdminPanel = () => {
 
               <Col md={4}>
                 <Card style={{
-                  background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.6))',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(0, 0, 0, 0.2)',
-                  borderRadius: '20px',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
-                  color: 'black'
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
+                  boxShadow: 'none',
+                  color: '#0b0e17'
                 }}>
                   <Card.Body>
-                    <Card.Title style={{ color: 'black', fontWeight: '600' }}>Send Feedback Request</Card.Title>
-                    <Card.Text style={{ color: 'black', opacity: 0.8 }}>Send feedback email to users who scanned tickets</Card.Text>
+                    <Card.Title style={{ color: '#0b0e17', fontWeight: '600' }}>Send Feedback Request</Card.Title>
+                    <Card.Text style={{ color: '#0b0e17', opacity: 0.8 }}>Send feedback email to users who scanned tickets</Card.Text>
                     <Form.Group className="mb-3" style={{ textAlign: 'left' }}>
-                      <Form.Label style={{ fontWeight: '600', color: 'black' }}>Choose Movie</Form.Label>
+                      <Form.Label style={{ fontWeight: '600', color: '#0b0e17' }}>Choose Movie</Form.Label>
                       <Form.Select
                         size="sm"
                         value={feedbackMovieId}
@@ -4381,10 +4324,10 @@ const AdminPanel = () => {
                         }
                       }}
                       style={{
-                        background: 'linear-gradient(145deg, rgba(23, 162, 184, 0.9), rgba(23, 162, 184, 0.7))',
-                        border: '1px solid rgba(0, 0, 0, 0.2)',
-                        borderRadius: '25px',
-                        color: 'white',
+                        background: '#ffffff',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '0',
+                        color: '#0b0e17',
                         fontWeight: '600',
                         padding: '12px 24px'
                       }}
@@ -4397,22 +4340,22 @@ const AdminPanel = () => {
               </Col>
             </Row>
 
-            <Table striped bordered hover className="mt-4" style={{ color: 'black' }}>
-              <thead style={{ borderBottom: '2px solid rgba(0,0,0,0.1)' }}>
+            <Table striped bordered hover className="mt-4" style={{ color: '#0b0e17' }}>
+              <thead style={{ borderBottom: '1px solid #e5e7eb' }}>
                 <tr>
-                  <th style={{ color: 'black', border: '1px solid rgba(0,0,0,0.1)', padding: '12px', fontWeight: '600' }}>User</th>
-                  <th style={{ color: 'black', border: '1px solid rgba(0,0,0,0.1)', padding: '12px', fontWeight: '600' }}>Email</th>
-                  <th style={{ color: 'black', border: '1px solid rgba(0,0,0,0.1)', padding: '12px', fontWeight: '600' }}>Joined</th>
-                  <th style={{ color: 'black', border: '1px solid rgba(0,0,0,0.1)', padding: '12px', fontWeight: '600' }}>Actions</th>
+                  <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', fontWeight: '600' }}>User</th>
+                  <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', fontWeight: '600' }}>Email</th>
+                  <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', fontWeight: '600' }}>Joined</th>
+                  <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', fontWeight: '600' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {users && users.length > 0 ? users.slice(0, 10).map(user => (
-                  <tr key={user.id} style={{ borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
-                    <td style={{ color: 'black', border: '1px solid rgba(0,0,0,0.1)', padding: '12px' }}>{user.name}</td>
-                    <td style={{ color: 'black', border: '1px solid rgba(0,0,0,0.1)', padding: '12px' }}>{user.email}</td>
-                    <td style={{ color: 'black', border: '1px solid rgba(0,0,0,0.1)', padding: '12px' }}>{formatExactJoinDateTime(user.created_at)}</td>
-                    <td style={{ border: '1px solid rgba(0,0,0,0.1)', padding: '12px', textAlign: 'center' }}>
+                  <tr key={user.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
+                    <td style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px' }}>{user.name}</td>
+                    <td style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px' }}>{user.email}</td>
+                    <td style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px' }}>{formatExactJoinDateTime(user.created_at)}</td>
+                    <td style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>
                       <Button
                         variant="primary"
                         size="sm"
@@ -4429,10 +4372,10 @@ const AdminPanel = () => {
                           });
                         }}
                         style={{
-                          background: 'linear-gradient(145deg, rgba(0, 123, 255, 0.9), rgba(0, 123, 255, 0.7))',
-                          border: '1px solid rgba(0, 0, 0, 0.2)',
-                          borderRadius: '20px',
-                          color: 'white',
+                          background: '#ffffff',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: '0',
+                          color: '#0b0e17',
                           fontWeight: '600',
                           padding: '8px 16px'
                         }}
@@ -4444,8 +4387,8 @@ const AdminPanel = () => {
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan="4" className="text-center py-4" style={{ border: '1px solid rgba(0,0,0,0.1)' }}>
-                      <div style={{ color: 'black' }}>
+                    <td colSpan="4" className="text-center py-4" style={{ border: '1px solid #e5e7eb' }}>
+                      <div style={{ color: '#0b0e17' }}>
                         <i className="fas fa-users fa-2x mb-2"></i>
                         <br />
                         No users found
@@ -4599,14 +4542,13 @@ const AdminPanel = () => {
           <div className="text-center text-white py-5">
             {!hasConfigAccess ? (
               <div style={{
-                background: 'linear-gradient(145deg, rgba(220, 53, 69, 0.15), rgba(220, 53, 69, 0.1))',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(220, 53, 69, 0.4)',
-                borderRadius: '20px',
+                background: '#ffffff',
+                border: '1px solid #e5e7eb',
+                borderRadius: '0',
                 padding: '3rem',
                 maxWidth: '500px',
                 margin: '0 auto',
-                boxShadow: '0 15px 50px rgba(220, 53, 69, 0.3)'
+                boxShadow: 'none'
               }}>
                 <div style={{
                   fontSize: '4rem',
@@ -4615,14 +4557,14 @@ const AdminPanel = () => {
                   🚫
                 </div>
                 <h2 style={{
-                  color: '#ff6b6b',
+                  color: '#d64545',
                   fontWeight: '700',
                   marginBottom: '1rem'
                 }}>
                   Access Denied
                 </h2>
                 <p style={{
-                  color: 'rgba(255, 255, 255, 0.8)',
+                  color: '#5c6270',
                   fontSize: '1.1rem',
                   lineHeight: '1.6'
                 }}>
@@ -4631,9 +4573,9 @@ const AdminPanel = () => {
                   <strong>Note:</strong> Only the admin with email
                   <br />
                   <code style={{
-                    background: 'rgba(255, 255, 255, 0.1)',
+                    background: '#ffffff',
                     padding: '0.5rem 1rem',
-                    borderRadius: '8px',
+                    borderRadius: '0',
                     display: 'inline-block',
                     marginTop: '0.5rem',
                     fontSize: '1rem'
@@ -4650,9 +4592,9 @@ const AdminPanel = () => {
                   fontSize: '2rem',
                   fontWeight: '600',
                   marginBottom: '0.5rem',
-                  color: '#ffd700'
+                  color: '#0b0e17'
                 }}>
-                  <i className="fas fa-cogs me-2" style={{ color: '#ffd700' }}></i>
+                  <i className="fas fa-cogs me-2" style={{ color: '#0b0e17' }}></i>
                   Configuration Panel
                 </h2>
                 <p className="text-white-50 mb-5" style={{ fontSize: '1.1rem' }}>
@@ -4661,10 +4603,9 @@ const AdminPanel = () => {
 
                 {/* Config Access Granted Badge */}
                 <div style={{
-                  background: 'linear-gradient(145deg, rgba(40, 167, 69, 0.2), rgba(40, 167, 69, 0.1))',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(40, 167, 69, 0.4)',
-                  borderRadius: '15px',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
                   padding: '1rem 2rem',
                   marginBottom: '2rem',
                   display: 'inline-block'
@@ -4679,11 +4620,10 @@ const AdminPanel = () => {
                 <Row className="mt-4">
                   <Col md={4} className="mb-4">
                     <Card style={{
-                      background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
-                      backdropFilter: 'blur(30px)',
-                      border: '1px solid rgba(255, 255, 255, 0.15)',
-                      borderRadius: '20px',
-                      boxShadow: '0 15px 50px rgba(0,0,0,0.2)',
+                      background: '#ffffff',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '0',
+                      boxShadow: 'none',
                       minHeight: '200px'
                     }}>
                       <Card.Body className="text-center d-flex flex-column justify-content-center">
@@ -4693,10 +4633,10 @@ const AdminPanel = () => {
                         }}>
                           🔐
                         </div>
-                        <Card.Title style={{ color: 'white', fontWeight: '600' }}>
+                        <Card.Title style={{ color: '#0b0e17', fontWeight: '600' }}>
                           Security Settings
                         </Card.Title>
-                        <Card.Text style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                        <Card.Text style={{ color: '#5c6270' }}>
                           Configure mail server and payment gateway
                         </Card.Text>
                         <div className="d-flex flex-column gap-2 mt-3">
@@ -4708,7 +4648,7 @@ const AdminPanel = () => {
                               fetchMailSettings();
                             }}
                             style={{
-                              borderRadius: '20px',
+                              borderRadius: '0',
                               background: 'transparent'
                             }}
                           >
@@ -4723,7 +4663,7 @@ const AdminPanel = () => {
                               fetchRazorpaySettings();
                             }}
                             style={{
-                              borderRadius: '20px',
+                              borderRadius: '0',
                               background: 'transparent'
                             }}
                           >
@@ -4737,11 +4677,10 @@ const AdminPanel = () => {
 
                   <Col md={4} className="mb-4">
                     <Card style={{
-                      background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
-                      backdropFilter: 'blur(30px)',
-                      border: '1px solid rgba(255, 255, 255, 0.15)',
-                      borderRadius: '20px',
-                      boxShadow: '0 15px 50px rgba(0,0,0,0.2)',
+                      background: '#ffffff',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '0',
+                      boxShadow: 'none',
                       minHeight: '200px'
                     }}>
                       <Card.Body className="text-center d-flex flex-column justify-content-center">
@@ -4751,10 +4690,10 @@ const AdminPanel = () => {
                         }}>
                           📊
                         </div>
-                        <Card.Title style={{ color: 'white', fontWeight: '600' }}>
+                        <Card.Title style={{ color: '#0b0e17', fontWeight: '600' }}>
                           Database Management
                         </Card.Title>
-                        <Card.Text style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                        <Card.Text style={{ color: '#5c6270' }}>
                           View revenue, financial data, and sensitive info
                         </Card.Text>
                         <Button
@@ -4766,7 +4705,7 @@ const AdminPanel = () => {
                             fetchRevenueStats();
                           }}
                           style={{
-                            borderRadius: '20px',
+                            borderRadius: '0',
                             background: 'transparent'
                           }}
                         >
@@ -4779,11 +4718,10 @@ const AdminPanel = () => {
 
                   <Col md={4} className="mb-4">
                     <Card style={{
-                      background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
-                      backdropFilter: 'blur(30px)',
-                      border: '1px solid rgba(255, 255, 255, 0.15)',
-                      borderRadius: '20px',
-                      boxShadow: '0 15px 50px rgba(0,0,0,0.2)',
+                      background: '#ffffff',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '0',
+                      boxShadow: 'none',
                       minHeight: '200px'
                     }}>
                       <Card.Body className="text-center d-flex flex-column justify-content-center">
@@ -4793,10 +4731,10 @@ const AdminPanel = () => {
                         }}>
                           👥
                         </div>
-                        <Card.Title style={{ color: 'white', fontWeight: '600' }}>
+                        <Card.Title style={{ color: '#0b0e17', fontWeight: '600' }}>
                           Manage Admins
                         </Card.Title>
-                        <Card.Text style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                        <Card.Text style={{ color: '#5c6270' }}>
                           Grant or revoke admin tab permissions
                         </Card.Text>
                         <Button
@@ -4805,7 +4743,7 @@ const AdminPanel = () => {
                           className="mt-3"
                           onClick={() => setActiveTab('manage-admins')}
                           style={{
-                            borderRadius: '20px',
+                            borderRadius: '0',
                             background: 'transparent'
                           }}
                         >
@@ -4818,12 +4756,12 @@ const AdminPanel = () => {
 
                 {/* Warning about super admin access */}
                 <Alert variant="warning" className="mt-4" style={{
-                  background: 'rgba(255, 193, 7, 0.15)',
-                  border: '1px solid rgba(255, 193, 7, 0.4)',
-                  borderRadius: '15px',
-                  color: 'white'
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
+                  color: '#0b0e17'
                 }}>
-                  <Alert.Heading style={{ color: '#ffc107' }}>
+                  <Alert.Heading style={{ color: '#b7791f' }}>
                     <i className="fas fa-exclamation-triangle me-2"></i>
                     Super Admin Privileges
                   </Alert.Heading>
@@ -4842,8 +4780,8 @@ const AdminPanel = () => {
           <div className="text-center text-white py-5">
             <div className="d-flex justify-content-between align-items-center mb-4" style={{ maxWidth: '1400px', margin: '0 auto' }}>
               <div className="text-start">
-                <h2 style={{ fontSize: '2rem', fontWeight: '600', marginBottom: '0.5rem', color: '#28a745' }}>
-                  <i className="fas fa-database me-2" style={{ color: '#28a745' }}></i>
+                <h2 style={{ fontSize: '2rem', fontWeight: '600', marginBottom: '0.5rem', color: '#0f9d63' }}>
+                  <i className="fas fa-database me-2" style={{ color: '#0f9d63' }}></i>
                   Database Management
                 </h2>
                 <p className="text-white-50" style={{ fontSize: '1rem', margin: 0 }}>
@@ -4854,7 +4792,7 @@ const AdminPanel = () => {
                 variant="outline-light"
                 onClick={() => setShowDatabaseManagement(false)}
                 style={{
-                  borderRadius: '20px',
+                  borderRadius: '0',
                   background: 'transparent'
                 }}
               >
@@ -4877,11 +4815,10 @@ const AdminPanel = () => {
                   {/* Total Revenue Card */}
                   <Col md={3} className="mb-4">
                     <Card style={{
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      backdropFilter: 'blur(30px)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
-                      borderRadius: '20px',
-                      boxShadow: '0 15px 50px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)',
+                      background: '#ffffff',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '0',
+                      boxShadow: 'none',
                       minHeight: '180px'
                     }}>
                       <Card.Body className="text-center" style={{ position: 'relative', zIndex: 1, padding: '2rem 1.5rem' }}>
@@ -4889,18 +4826,16 @@ const AdminPanel = () => {
                         <Card.Title style={{
                           fontSize: '2rem',
                           fontWeight: '700',
-                          color: '#ffffff',
+                          color: '#0b0e17',
                           marginBottom: '0.5rem',
-                          textShadow: '0 2px 10px rgba(0, 0, 0, 0.5)'
                         }}>
                           🪙 {parseFloat(revenueStats.total_revenue || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                         </Card.Title>
                         <Card.Text style={{
                           fontSize: '1rem',
-                          color: 'rgba(255, 255, 255, 0.9)',
+                          color: '#0b0e17',
                           fontWeight: '500',
                           margin: 0,
-                          textShadow: '0 1px 3px rgba(0,0,0,0.3)'
                         }}>
                           Total Revenue (Bookings)
                         </Card.Text>
@@ -4911,11 +4846,10 @@ const AdminPanel = () => {
                   {/* Food Revenue Card */}
                   <Col md={3} className="mb-4">
                     <Card style={{
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      backdropFilter: 'blur(30px)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
-                      borderRadius: '20px',
-                      boxShadow: '0 15px 50px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)',
+                      background: '#ffffff',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '0',
+                      boxShadow: 'none',
                       minHeight: '180px'
                     }}>
                       <Card.Body className="text-center" style={{ position: 'relative', zIndex: 1, padding: '2rem 1.5rem' }}>
@@ -4923,18 +4857,16 @@ const AdminPanel = () => {
                         <Card.Title style={{
                           fontSize: '2rem',
                           fontWeight: '700',
-                          color: '#ffffff',
+                          color: '#0b0e17',
                           marginBottom: '0.5rem',
-                          textShadow: '0 2px 10px rgba(0, 0, 0, 0.5)'
                         }}>
                           🪙 {parseFloat(revenueStats.food_revenue || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                         </Card.Title>
                         <Card.Text style={{
                           fontSize: '1rem',
-                          color: 'rgba(255, 255, 255, 0.9)',
+                          color: '#0b0e17',
                           fontWeight: '500',
                           margin: 0,
-                          textShadow: '0 1px 3px rgba(0,0,0,0.3)'
                         }}>
                           Food Revenue
                         </Card.Text>
@@ -4945,11 +4877,10 @@ const AdminPanel = () => {
                   {/* Total Discounts Card */}
                   <Col md={3} className="mb-4">
                     <Card style={{
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      backdropFilter: 'blur(30px)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
-                      borderRadius: '20px',
-                      boxShadow: '0 15px 50px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)',
+                      background: '#ffffff',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '0',
+                      boxShadow: 'none',
                       minHeight: '180px'
                     }}>
                       <Card.Body className="text-center" style={{ position: 'relative', zIndex: 1, padding: '2rem 1.5rem' }}>
@@ -4957,18 +4888,16 @@ const AdminPanel = () => {
                         <Card.Title style={{
                           fontSize: '2rem',
                           fontWeight: '700',
-                          color: '#ffffff',
+                          color: '#0b0e17',
                           marginBottom: '0.5rem',
-                          textShadow: '0 2px 10px rgba(0, 0, 0, 0.5)'
                         }}>
                           🪙 {parseFloat(revenueStats.total_discounts || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                         </Card.Title>
                         <Card.Text style={{
                           fontSize: '1rem',
-                          color: 'rgba(255, 255, 255, 0.9)',
+                          color: '#0b0e17',
                           fontWeight: '500',
                           margin: 0,
-                          textShadow: '0 1px 3px rgba(0,0,0,0.3)'
                         }}>
                           Total Discounts Given
                         </Card.Text>
@@ -4979,11 +4908,10 @@ const AdminPanel = () => {
                   {/* Total Bookings Card */}
                   <Col md={3} className="mb-4">
                     <Card style={{
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      backdropFilter: 'blur(30px)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
-                      borderRadius: '20px',
-                      boxShadow: '0 15px 50px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)',
+                      background: '#ffffff',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '0',
+                      boxShadow: 'none',
                       minHeight: '180px'
                     }}>
                       <Card.Body className="text-center" style={{ position: 'relative', zIndex: 1, padding: '2rem 1.5rem' }}>
@@ -4991,18 +4919,16 @@ const AdminPanel = () => {
                         <Card.Title style={{
                           fontSize: '2rem',
                           fontWeight: '700',
-                          color: '#ffffff',
+                          color: '#0b0e17',
                           marginBottom: '0.5rem',
-                          textShadow: '0 2px 10px rgba(0, 0, 0, 0.5)'
                         }}>
                           {revenueStats.total_bookings || 0}
                         </Card.Title>
                         <Card.Text style={{
                           fontSize: '1rem',
-                          color: 'rgba(255, 255, 255, 0.9)',
+                          color: '#0b0e17',
                           fontWeight: '500',
                           margin: 0,
-                          textShadow: '0 1px 3px rgba(0,0,0,0.3)'
                         }}>
                           Total Bookings
                         </Card.Text>
@@ -5013,13 +4939,12 @@ const AdminPanel = () => {
 
                 {/* Revenue by Movie Table */}
                 <div style={{
-                  background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  borderRadius: '15px',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
                   padding: '1.5rem',
                   marginBottom: '2rem',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+                  boxShadow: 'none',
                   maxWidth: '1400px',
                   margin: '0 auto 2rem'
                 }}>
@@ -5054,25 +4979,25 @@ const AdminPanel = () => {
                     </Button>
                   </div>
                   <Table striped bordered hover responsive style={{ marginBottom: 0 }}>
-                    <thead style={{ borderBottom: '2px solid rgba(255,255,255,0.2)' }}>
+                    <thead style={{ borderBottom: '1px solid #e5e7eb' }}>
                       <tr>
-                        <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'left' }}>Movie</th>
-                        <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'left' }}>Date</th>
-                        <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'center' }}>Bookings</th>
-                        <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'right' }}>Revenue</th>
+                        <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>Movie</th>
+                        <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>Date</th>
+                        <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>Bookings</th>
+                        <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'right' }}>Revenue</th>
                       </tr>
                     </thead>
                     <tbody>
                       {revenueStats.revenue_by_movie && revenueStats.revenue_by_movie.length > 0 ? (
                         revenueStats.revenue_by_movie.map((movie, index) => (
                           <tr key={index} style={{
-                            borderBottom: '1px solid rgba(255,255,255,0.05)',
-                            background: index % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent'
+                            borderBottom: '1px solid #e5e7eb',
+                            background: index % 2 === 0 ? '#f6f6f7' : 'transparent'
                           }}>
-                            <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'left' }}>
+                            <td style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>
                               <strong>{movie.title}</strong>
                             </td>
-                            <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'left' }}>
+                            <td style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>
                               {new Date(movie.date).toLocaleDateString('en-IN', {
                                 weekday: 'short',
                                 year: 'numeric',
@@ -5080,11 +5005,11 @@ const AdminPanel = () => {
                                 day: 'numeric'
                               })}
                             </td>
-                            <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'center' }}>
+                            <td style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>
                               <Badge bg="primary">{movie.booking_count}</Badge>
                             </td>
-                            <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'right' }}>
-                              <strong style={{ color: '#28a745' }}>
+                            <td style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'right' }}>
+                              <strong style={{ color: '#0f9d63' }}>
                                 🪙 {parseFloat(movie.revenue || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                               </strong>
                             </td>
@@ -5092,7 +5017,7 @@ const AdminPanel = () => {
                         ))
                       ) : (
                         <tr>
-                          <td colSpan="4" className="text-center py-4" style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
+                          <td colSpan="4" className="text-center py-4" style={{ border: '1px solid #e5e7eb' }}>
                             <div className="text-white-50">
                               <i className="fas fa-film fa-2x mb-2"></i>
                               <p className="mb-0">No movie revenue data available</p>
@@ -5106,12 +5031,11 @@ const AdminPanel = () => {
 
                 {/* Recent Transactions Table */}
                 <div style={{
-                  background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  borderRadius: '15px',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
                   padding: '1.5rem',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+                  boxShadow: 'none',
                   maxWidth: '1400px',
                   margin: '0 auto'
                 }}>
@@ -5120,51 +5044,51 @@ const AdminPanel = () => {
                     Recent Transactions
                   </h4>
                   <Table striped bordered hover responsive style={{ marginBottom: 0 }}>
-                    <thead style={{ borderBottom: '2px solid rgba(255,255,255,0.2)' }}>
+                    <thead style={{ borderBottom: '1px solid #e5e7eb' }}>
                       <tr>
-                        <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'left' }}>ID</th>
-                        <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'left' }}>User</th>
-                        <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'left' }}>Movie</th>
-                        <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'center' }}>Seats</th>
-                        <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'right' }}>Amount</th>
-                        <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'center' }}>Status</th>
-                        <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'left' }}>Date</th>
+                        <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>ID</th>
+                        <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>User</th>
+                        <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>Movie</th>
+                        <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>Seats</th>
+                        <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'right' }}>Amount</th>
+                        <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>Status</th>
+                        <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>Date</th>
                       </tr>
                     </thead>
                     <tbody>
                       {revenueStats.recent_transactions && revenueStats.recent_transactions.length > 0 ? (
                         revenueStats.recent_transactions.map((tx, index) => (
                           <tr key={tx.id || index} style={{
-                            borderBottom: '1px solid rgba(255,255,255,0.05)',
-                            background: index % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent'
+                            borderBottom: '1px solid #e5e7eb',
+                            background: index % 2 === 0 ? '#f6f6f7' : 'transparent'
                           }}>
-                            <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'left' }}>
+                            <td style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>
                               <code>#{tx.booking_code || tx.id}</code>
                             </td>
-                            <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'left' }}>
+                            <td style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>
                               <div>
                                 <strong>{tx.user_name}</strong>
                                 <br />
-                                <small style={{ color: '#666' }}>{tx.user_email}</small>
+                                <small style={{ color: '#5c6270' }}>{tx.user_email}</small>
                               </div>
                             </td>
-                            <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'left' }}>
+                            <td style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>
                               {tx.movie_title}
                             </td>
-                            <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'center' }}>
+                            <td style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>
                               {tx.selected_seats ? JSON.parse(tx.selected_seats).join(', ') : tx.num_people}
                             </td>
-                            <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'right' }}>
-                              <strong style={{ color: '#28a745' }}>
+                            <td style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'right' }}>
+                              <strong style={{ color: '#0f9d63' }}>
                                 🪙 {parseFloat(tx.total_price || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                               </strong>
                             </td>
-                            <td style={{ border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'center' }}>
+                            <td style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>
                               <Badge bg={tx.is_used ? 'success' : 'warning'}>
                                 {tx.is_used ? 'Used' : 'Active'}
                               </Badge>
                             </td>
-                            <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'left' }}>
+                            <td style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>
                               {new Date(tx.created_at).toLocaleDateString('en-IN', {
                                 day: 'numeric',
                                 month: 'short',
@@ -5177,7 +5101,7 @@ const AdminPanel = () => {
                         ))
                       ) : (
                         <tr>
-                          <td colSpan="7" className="text-center py-4" style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
+                          <td colSpan="7" className="text-center py-4" style={{ border: '1px solid #e5e7eb' }}>
                             <div className="text-white-50">
                               <i className="fas fa-receipt fa-2x mb-2"></i>
                               <p className="mb-0">No recent transactions</p>
@@ -5192,13 +5116,12 @@ const AdminPanel = () => {
                 {/* Monthly Revenue Section */}
                 {revenueStats.monthly_revenue && revenueStats.monthly_revenue.length > 0 && (
                   <div style={{
-                    background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
-                    backdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(255, 255, 255, 0.15)',
-                    borderRadius: '15px',
+                    background: '#ffffff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '0',
                     padding: '1.5rem',
                     marginTop: '2rem',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+                    boxShadow: 'none',
                     maxWidth: '1400px',
                     margin: '2rem auto 0'
                   }}>
@@ -5210,15 +5133,15 @@ const AdminPanel = () => {
                       {revenueStats.monthly_revenue.map((month, index) => (
                         <Col md={4} key={index} className="mb-3">
                           <Card style={{
-                            background: 'rgba(255, 255, 255, 0.05)',
-                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                            borderRadius: '10px'
+                            background: '#ffffff',
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '0'
                           }}>
                             <Card.Body className="text-center">
-                              <Card.Title style={{ color: 'white', fontSize: '1.2rem' }}>
+                              <Card.Title style={{ color: '#0b0e17', fontSize: '1.2rem' }}>
                                 {month.month}
                               </Card.Title>
-                              <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#28a745' }}>
+                              <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#0f9d63' }}>
                                 🪙 {parseFloat(month.revenue || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                               </div>
                               <small className="text-white-50">
@@ -5235,13 +5158,12 @@ const AdminPanel = () => {
                 {/* Payment Methods Section */}
                 {revenueStats.payment_methods && revenueStats.payment_methods.length > 0 && (
                   <div style={{
-                    background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
-                    backdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(255, 255, 255, 0.15)',
-                    borderRadius: '15px',
+                    background: '#ffffff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '0',
                     padding: '1.5rem',
                     marginTop: '2rem',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+                    boxShadow: 'none',
                     maxWidth: '1400px',
                     margin: '2rem auto 0'
                   }}>
@@ -5253,18 +5175,18 @@ const AdminPanel = () => {
                       {revenueStats.payment_methods.map((pm, index) => (
                         <Col md={6} key={index} className="mb-3">
                           <Card style={{
-                            background: 'rgba(255, 255, 255, 0.05)',
-                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                            borderRadius: '10px'
+                            background: '#ffffff',
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '0'
                           }}>
                             <Card.Body className="text-center">
                               <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>
                                 {pm.payment_method === 'razorpay' ? '💳' : pm.payment_method === 'upi' ? '📱' : '🏦'}
                               </div>
-                              <Card.Title style={{ color: 'white', fontSize: '1.1rem' }}>
+                              <Card.Title style={{ color: '#0b0e17', fontSize: '1.1rem' }}>
                                 {pm.payment_method === 'razorpay' ? 'Razorpay' : pm.payment_method === 'upi' ? 'UPI' : pm.payment_method === 'offline' ? 'Offline' : pm.payment_method}
                               </Card.Title>
-                              <div style={{ fontSize: '1.3rem', fontWeight: '700', color: '#007bff' }}>
+                              <div style={{ fontSize: '1.3rem', fontWeight: '700', color: '#0b0e17' }}>
                                 🪙 {parseFloat(pm.total || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                               </div>
                               <small className="text-white-50">
@@ -5280,14 +5202,14 @@ const AdminPanel = () => {
 
                 {/* Warning about sensitive data */}
                 <Alert variant="danger" className="mt-4" style={{
-                  background: 'rgba(220, 53, 69, 0.15)',
-                  border: '1px solid rgba(220, 53, 69, 0.4)',
-                  borderRadius: '15px',
-                  color: 'white',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
+                  color: '#0b0e17',
                   maxWidth: '1400px',
                   margin: '0 auto'
                 }}>
-                  <Alert.Heading style={{ color: '#ff6b6b' }}>
+                  <Alert.Heading style={{ color: '#d64545' }}>
                     <i className="fas fa-exclamation-triangle me-2"></i>
                     Sensitive Data Warning
                   </Alert.Heading>
@@ -5306,8 +5228,8 @@ const AdminPanel = () => {
           <div className="text-center text-white py-5">
             <div className="d-flex justify-content-between align-items-center mb-4" style={{ maxWidth: '900px', margin: '0 auto' }}>
               <div className="text-start">
-                <h2 style={{ fontSize: '2rem', fontWeight: '600', marginBottom: '0.5rem', color: '#ffffff' }}>
-                  <i className="fas fa-envelope me-2" style={{ color: '#ffffff' }}></i>
+                <h2 style={{ fontSize: '2rem', fontWeight: '600', marginBottom: '0.5rem', color: '#0b0e17' }}>
+                  <i className="fas fa-envelope me-2" style={{ color: '#0b0e17' }}></i>
                   Mail Server Configuration
                 </h2>
                 <p className="text-white-50" style={{ fontSize: '1rem', margin: 0 }}>
@@ -5318,7 +5240,7 @@ const AdminPanel = () => {
                 variant="outline-light"
                 onClick={() => setShowMailSettings(false)}
                 style={{
-                  borderRadius: '20px',
+                  borderRadius: '0',
                   background: 'transparent'
                 }}
               >
@@ -5336,21 +5258,20 @@ const AdminPanel = () => {
               </div>
             ) : (
               <div style={{
-                background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                borderRadius: '20px',
+                background: '#ffffff',
+                border: '1px solid #e5e7eb',
+                borderRadius: '0',
                 padding: '2rem',
                 maxWidth: '900px',
                 margin: '0 auto',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+                boxShadow: 'none'
               }}>
                 {/* Success Message */}
                 {mailSettingsSuccess && (
                   <Alert variant="success" className="mb-4" style={{
-                    background: 'rgba(40, 167, 69, 0.2)',
-                    border: '1px solid rgba(40, 167, 69, 0.4)',
-                    borderRadius: '10px'
+                    background: '#ffffff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '0'
                   }}>
                     <i className="fas fa-check-circle me-2"></i>
                     {mailSettingsSuccess}
@@ -5360,9 +5281,9 @@ const AdminPanel = () => {
                 {/* Error Message */}
                 {mailSettingsError && (
                   <Alert variant="danger" className="mb-4" style={{
-                    background: 'rgba(220, 53, 69, 0.2)',
-                    border: '1px solid rgba(220, 53, 69, 0.4)',
-                    borderRadius: '10px'
+                    background: '#ffffff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '0'
                   }}>
                     <i className="fas fa-exclamation-circle me-2"></i>
                     {mailSettingsError}
@@ -5373,17 +5294,17 @@ const AdminPanel = () => {
                   <Row>
                     <Col md={6}>
                       <Form.Group className="mb-3">
-                        <Form.Label style={{ color: 'white', fontWeight: '500' }}>SMTP Host</Form.Label>
+                        <Form.Label style={{ color: '#0b0e17', fontWeight: '500' }}>SMTP Host</Form.Label>
                         <Form.Control
                           type="text"
                           value={mailSettings.email_host}
                           onChange={(e) => setMailSettings({ ...mailSettings, email_host: e.target.value })}
                           placeholder="e.g., smtp.gmail.com"
                           style={{
-                            background: 'rgba(255, 255, 255, 0.1)',
-                            border: '1px solid rgba(255, 255, 255, 0.2)',
-                            borderRadius: '10px',
-                            color: 'white',
+                            background: '#ffffff',
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '0',
+                            color: '#0b0e17',
                             padding: '12px'
                           }}
                         />
@@ -5394,17 +5315,17 @@ const AdminPanel = () => {
                     </Col>
                     <Col md={6}>
                       <Form.Group className="mb-3">
-                        <Form.Label style={{ color: 'white', fontWeight: '500' }}>SMTP Port</Form.Label>
+                        <Form.Label style={{ color: '#0b0e17', fontWeight: '500' }}>SMTP Port</Form.Label>
                         <Form.Control
                           type="number"
                           value={mailSettings.email_port}
                           onChange={(e) => setMailSettings({ ...mailSettings, email_port: parseInt(e.target.value) })}
                           placeholder="e.g., 587"
                           style={{
-                            background: 'rgba(255, 255, 255, 0.1)',
-                            border: '1px solid rgba(255, 255, 255, 0.2)',
-                            borderRadius: '10px',
-                            color: 'white',
+                            background: '#ffffff',
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '0',
+                            color: '#0b0e17',
                             padding: '12px'
                           }}
                         />
@@ -5418,17 +5339,17 @@ const AdminPanel = () => {
                   <Row>
                     <Col md={6}>
                       <Form.Group className="mb-3">
-                        <Form.Label style={{ color: 'white', fontWeight: '500' }}>Email Address</Form.Label>
+                        <Form.Label style={{ color: '#0b0e17', fontWeight: '500' }}>Email Address</Form.Label>
                         <Form.Control
                           type="email"
                           value={mailSettings.email_user}
                           onChange={(e) => setMailSettings({ ...mailSettings, email_user: e.target.value })}
                           placeholder="e.g., your-email@gmail.com"
                           style={{
-                            background: 'rgba(255, 255, 255, 0.1)',
-                            border: '1px solid rgba(255, 255, 255, 0.2)',
-                            borderRadius: '10px',
-                            color: 'white',
+                            background: '#ffffff',
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '0',
+                            color: '#0b0e17',
                             padding: '12px'
                           }}
                         />
@@ -5439,7 +5360,7 @@ const AdminPanel = () => {
                     </Col>
                     <Col md={6}>
                       <Form.Group className="mb-3">
-                        <Form.Label style={{ color: 'white', fontWeight: '500' }}>
+                        <Form.Label style={{ color: '#0b0e17', fontWeight: '500' }}>
                           App Password
                           {mailSettings.email_pass && mailSettings.email_pass !== '' && mailSettings.email_pass !== '••••••••' && (
                             <Badge bg="success" className="ms-2">Saved</Badge>
@@ -5451,10 +5372,10 @@ const AdminPanel = () => {
                           onChange={(e) => setMailSettings({ ...mailSettings, email_pass: e.target.value })}
                           placeholder="Enter app password"
                           style={{
-                            background: 'rgba(255, 255, 255, 0.1)',
-                            border: '1px solid rgba(255, 255, 255, 0.2)',
-                            borderRadius: '10px',
-                            color: 'white',
+                            background: '#ffffff',
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '0',
+                            color: '#0b0e17',
                             padding: '12px'
                           }}
                         />
@@ -5466,17 +5387,17 @@ const AdminPanel = () => {
                   </Row>
 
                   <Form.Group className="mb-4">
-                    <Form.Label style={{ color: 'white', fontWeight: '500' }}>Sender Name</Form.Label>
+                    <Form.Label style={{ color: '#0b0e17', fontWeight: '500' }}>Sender Name</Form.Label>
                     <Form.Control
                       type="text"
                       value={mailSettings.sender_name}
                       onChange={(e) => setMailSettings({ ...mailSettings, sender_name: e.target.value })}
                       placeholder="e.g., Chalchitra IIT Jammu"
                       style={{
-                        background: 'rgba(255, 255, 255, 0.1)',
-                        border: '1px solid rgba(255, 255, 255, 0.2)',
-                        borderRadius: '10px',
-                        color: 'white',
+                        background: '#ffffff',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '0',
+                        color: '#0b0e17',
                         padding: '12px'
                       }}
                     />
@@ -5493,7 +5414,7 @@ const AdminPanel = () => {
                       onClick={testMailSettings}
                       disabled={mailSettingsSaving}
                       style={{
-                        borderRadius: '20px',
+                        borderRadius: '0',
                         background: 'transparent',
                         padding: '12px 24px'
                       }}
@@ -5506,10 +5427,10 @@ const AdminPanel = () => {
                       type="submit"
                       disabled={mailSettingsSaving}
                       style={{
-                        background: 'linear-gradient(145deg, rgba(0, 123, 255, 0.8), rgba(0, 123, 255, 0.6))',
-                        border: '1px solid rgba(255, 255, 255, 0.2)',
-                        borderRadius: '25px',
-                        color: 'white',
+                        background: '#ffffff',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '0',
+                        color: '#0b0e17',
                         fontWeight: '600',
                         padding: '12px 24px'
                       }}
@@ -5522,16 +5443,16 @@ const AdminPanel = () => {
 
                 {/* Help Section */}
                 <div className="mt-5" style={{
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  borderRadius: '15px',
+                  background: '#ffffff',
+                  borderRadius: '0',
                   padding: '1.5rem',
                   textAlign: 'left'
                 }}>
-                  <h5 style={{ color: 'white', marginBottom: '1rem' }}>
+                  <h5 style={{ color: '#0b0e17', marginBottom: '1rem' }}>
                     <i className="fas fa-question-circle me-2"></i>
                     Setup Guide
                   </h5>
-                  <div style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.9rem', lineHeight: '1.8' }}>
+                  <div style={{ color: '#5c6270', fontSize: '0.9rem', lineHeight: '1.8' }}>
                     <p className="mb-3"><strong>For Gmail:</strong></p>
                     <ol style={{ paddingLeft: '1.5rem' }}>
                       <li>Go to your Google Account → Security</li>
@@ -5558,8 +5479,8 @@ const AdminPanel = () => {
           <div className="text-center text-white py-5">
             <div className="d-flex justify-content-between align-items-center mb-4" style={{ maxWidth: '900px', margin: '0 auto' }}>
               <div className="text-start">
-                <h2 style={{ fontSize: '2rem', fontWeight: '600', marginBottom: '0.5rem', color: '#ffffff' }}>
-                  <i className="fas fa-credit-card me-2" style={{ color: '#ffffff' }}></i>
+                <h2 style={{ fontSize: '2rem', fontWeight: '600', marginBottom: '0.5rem', color: '#0b0e17' }}>
+                  <i className="fas fa-credit-card me-2" style={{ color: '#0b0e17' }}></i>
                   Razorpay Configuration
                 </h2>
                 <p className="text-white-50" style={{ fontSize: '1rem', margin: 0 }}>
@@ -5570,7 +5491,7 @@ const AdminPanel = () => {
                 variant="outline-light"
                 onClick={() => setShowRazorpaySettings(false)}
                 style={{
-                  borderRadius: '20px',
+                  borderRadius: '0',
                   background: 'transparent'
                 }}
               >
@@ -5588,21 +5509,20 @@ const AdminPanel = () => {
               </div>
             ) : (
               <div style={{
-                background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                borderRadius: '20px',
+                background: '#ffffff',
+                border: '1px solid #e5e7eb',
+                borderRadius: '0',
                 padding: '2rem',
                 maxWidth: '900px',
                 margin: '0 auto',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+                boxShadow: 'none'
               }}>
                 {/* Success Message */}
                 {razorpaySettingsSuccess && (
                   <Alert variant="success" className="mb-4" style={{
-                    background: 'rgba(40, 167, 69, 0.2)',
-                    border: '1px solid rgba(40, 167, 69, 0.4)',
-                    borderRadius: '10px'
+                    background: '#ffffff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '0'
                   }}>
                     <i className="fas fa-check-circle me-2"></i>
                     {razorpaySettingsSuccess}
@@ -5612,9 +5532,9 @@ const AdminPanel = () => {
                 {/* Error Message */}
                 {razorpaySettingsError && (
                   <Alert variant="danger" className="mb-4" style={{
-                    background: 'rgba(220, 53, 69, 0.2)',
-                    border: '1px solid rgba(220, 53, 69, 0.4)',
-                    borderRadius: '10px'
+                    background: '#ffffff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '0'
                   }}>
                     <i className="fas fa-exclamation-circle me-2"></i>
                     {razorpaySettingsError}
@@ -5625,17 +5545,17 @@ const AdminPanel = () => {
                   <Row>
                     <Col md={12}>
                       <Form.Group className="mb-3">
-                        <Form.Label style={{ color: 'white', fontWeight: '500' }}>Razorpay Key ID</Form.Label>
+                        <Form.Label style={{ color: '#0b0e17', fontWeight: '500' }}>Razorpay Key ID</Form.Label>
                         <Form.Control
                           type="text"
                           value={razorpaySettings.key_id}
                           onChange={(e) => setRazorpaySettings({ ...razorpaySettings, key_id: e.target.value })}
                           placeholder="e.g., rzp_live_xxxxxxxxxx or rzp_test_xxxxxxxxxx"
                           style={{
-                            background: 'rgba(255, 255, 255, 0.1)',
-                            border: '1px solid rgba(255, 255, 255, 0.2)',
-                            borderRadius: '10px',
-                            color: 'white',
+                            background: '#ffffff',
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '0',
+                            color: '#0b0e17',
                             padding: '12px'
                           }}
                         />
@@ -5649,7 +5569,7 @@ const AdminPanel = () => {
                   <Row>
                     <Col md={12}>
                       <Form.Group className="mb-3">
-                        <Form.Label style={{ color: 'white', fontWeight: '500' }}>
+                        <Form.Label style={{ color: '#0b0e17', fontWeight: '500' }}>
                           Razorpay Key Secret
                           {razorpaySettings.has_secret && razorpaySettings.key_secret === '••••••••' && (
                             <Badge bg="success" className="ms-2">Saved</Badge>
@@ -5661,10 +5581,10 @@ const AdminPanel = () => {
                           onChange={(e) => setRazorpaySettings({ ...razorpaySettings, key_secret: e.target.value })}
                           placeholder="Enter Razorpay Key Secret"
                           style={{
-                            background: 'rgba(255, 255, 255, 0.1)',
-                            border: '1px solid rgba(255, 255, 255, 0.2)',
-                            borderRadius: '10px',
-                            color: 'white',
+                            background: '#ffffff',
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '0',
+                            color: '#0b0e17',
                             padding: '12px'
                           }}
                         />
@@ -5681,10 +5601,10 @@ const AdminPanel = () => {
                       type="submit"
                       disabled={razorpaySettingsSaving}
                       style={{
-                        background: 'linear-gradient(145deg, rgba(0, 123, 255, 0.8), rgba(0, 123, 255, 0.6))',
-                        border: '1px solid rgba(255, 255, 255, 0.2)',
-                        borderRadius: '25px',
-                        color: 'white',
+                        background: '#ffffff',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '0',
+                        color: '#0b0e17',
                         fontWeight: '600',
                         padding: '12px 24px'
                       }}
@@ -5697,27 +5617,27 @@ const AdminPanel = () => {
 
                 {/* Help Section */}
                 <div className="mt-5" style={{
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  borderRadius: '15px',
+                  background: '#ffffff',
+                  borderRadius: '0',
                   padding: '1.5rem',
                   textAlign: 'left'
                 }}>
-                  <h5 style={{ color: 'white', marginBottom: '1rem' }}>
+                  <h5 style={{ color: '#0b0e17', marginBottom: '1rem' }}>
                     <i className="fas fa-question-circle me-2"></i>
                     Setup Guide
                   </h5>
-                  <div style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.9rem', lineHeight: '1.8' }}>
+                  <div style={{ color: '#5c6270', fontSize: '0.9rem', lineHeight: '1.8' }}>
                     <p className="mb-3"><strong>To get your Razorpay API Keys:</strong></p>
                     <ol style={{ paddingLeft: '1.5rem' }}>
-                      <li>Login to your Razorpay Dashboard at <a href="https://dashboard.razorpay.com" target="_blank" rel="noopener noreferrer" style={{ color: '#00bfff' }}>dashboard.razorpay.com</a></li>
+                      <li>Login to your Razorpay Dashboard at <a href="https://dashboard.razorpay.com" target="_blank" rel="noopener noreferrer" style={{ color: '#0b0e17' }}>dashboard.razorpay.com</a></li>
                       <li>Go to Settings → API Keys</li>
                       <li>Generate or view your API keys</li>
                       <li>Copy the Key ID and Key Secret</li>
                     </ol>
                     <p className="mb-2 mt-3"><strong>Important Notes:</strong></p>
                     <ul style={{ paddingLeft: '1.5rem' }}>
-                      <li><strong>Test Keys:</strong> Use keys starting with <code style={{ color: '#00bfff' }}>rzp_test_</code> for testing</li>
-                      <li><strong>Live Keys:</strong> Use keys starting with <code style={{ color: '#00bfff' }}>rzp_live_</code> for production</li>
+                      <li><strong>Test Keys:</strong> Use keys starting with <code style={{ color: '#0b0e17' }}>rzp_test_</code> for testing</li>
+                      <li><strong>Live Keys:</strong> Use keys starting with <code style={{ color: '#0b0e17' }}>rzp_live_</code> for production</li>
                       <li>Never share your Key Secret publicly</li>
                       <li>The Key Secret is only shown once when generated - save it securely</li>
                     </ul>
@@ -5734,7 +5654,7 @@ const AdminPanel = () => {
             <div className="d-flex justify-content-between align-items-center mb-4" style={{ maxWidth: '1200px', margin: '0 auto' }}>
               <div className="text-start">
                 <h2 style={{ fontSize: '2rem', fontWeight: '600', marginBottom: '0.5rem' }}>
-                  <i className="fas fa-users-cog me-2" style={{ color: '#ffd700' }}></i>
+                  <i className="fas fa-users-cog me-2" style={{ color: '#0b0e17' }}></i>
                   Manage Admin Permissions
                 </h2>
                 <p className="text-white-50" style={{ fontSize: '1rem', margin: 0 }}>
@@ -5754,10 +5674,10 @@ const AdminPanel = () => {
                     }
                   }}
                   style={{
-                    borderRadius: '20px',
-                    background: 'rgba(0, 123, 255, 0.6)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    color: 'white'
+                    borderRadius: '0',
+                    background: '#ffffff',
+                    border: '1px solid #e5e7eb',
+                    color: '#0b0e17'
                   }}
                 >
                   <i className="fas fa-sync-alt me-2"></i>
@@ -5767,12 +5687,11 @@ const AdminPanel = () => {
                   variant="success"
                   onClick={openManageAccessModal}
                   style={{
-                    background: 'linear-gradient(145deg, rgba(40, 167, 69, 0.8), rgba(40, 167, 69, 0.6))',
-                    backdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    borderRadius: '25px',
-                    color: 'white',
-                    boxShadow: '0 8px 32px rgba(40, 167, 69, 0.3)',
+                    background: '#ffffff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '0',
+                    color: '#0b0e17',
+                    boxShadow: 'none',
                     fontWeight: '600',
                     padding: '10px 20px'
                   }}
@@ -5784,7 +5703,7 @@ const AdminPanel = () => {
                   variant="outline-light"
                   onClick={() => setActiveTab('config')}
                   style={{
-                    borderRadius: '20px',
+                    borderRadius: '0',
                     background: 'transparent'
                   }}
                 >
@@ -5795,15 +5714,15 @@ const AdminPanel = () => {
             </div>
 
             <Alert variant="info" style={{
-              background: 'rgba(0, 123, 255, 0.15)',
-              border: '1px solid rgba(0, 123, 255, 0.4)',
-              borderRadius: '15px',
-              color: 'black',
+              background: '#ffffff',
+              border: '1px solid #e5e7eb',
+              borderRadius: '0',
+              color: '#0b0e17',
               maxWidth: '1200px',
               margin: '0 auto 2rem',
               textAlign: 'left'
             }}>
-              <Alert.Heading style={{ color: '#0d6efd' }}>
+              <Alert.Heading style={{ color: '#0b0e17' }}>
                 <i className="fas fa-info-circle me-2"></i>
                 How Admin Permissions Work
               </Alert.Heading>
@@ -5817,17 +5736,16 @@ const AdminPanel = () => {
 
             {/* Admin Users Table */}
             <div style={{
-              background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
-              borderRadius: '15px',
+              background: '#ffffff',
+              border: '1px solid #e5e7eb',
+              borderRadius: '0',
               padding: '1.5rem',
               maxWidth: '1200px',
               margin: '0 auto',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+              boxShadow: 'none'
             }}>
               <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-                <div style={{ color: 'black', fontWeight: '600', fontSize: '0.9rem' }}>
+                <div style={{ color: '#0b0e17', fontWeight: '600', fontSize: '0.9rem' }}>
                   Selected admins: {selectedRemovableAdminIds.length}
                 </div>
                 <div className="d-flex gap-2 flex-wrap">
@@ -5862,9 +5780,9 @@ const AdminPanel = () => {
               </div>
 
               <Table striped bordered hover responsive style={{ marginBottom: 0 }}>
-                <thead style={{ borderBottom: '2px solid rgba(255,255,255,0.2)' }}>
+                <thead style={{ borderBottom: '1px solid #e5e7eb' }}>
                   <tr>
-                    <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'center', width: '70px' }}>
+                    <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center', width: '70px' }}>
                       <Form.Check
                         type="checkbox"
                         checked={allRemovableAdminsSelected}
@@ -5873,23 +5791,23 @@ const AdminPanel = () => {
                         aria-label="Select all removable admins"
                       />
                     </th>
-                    <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'center' }}>Admin Name</th>
-                    <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'center' }}>Tag Name</th>
-                    <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'center' }}>Email</th>
-                    <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'center' }}>Scanner</th>
-                    <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'center' }}>Tabs Access</th>
-                    <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'center' }}>Actions</th>
+                    <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>Admin Name</th>
+                    <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>Tag Name</th>
+                    <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>Email</th>
+                    <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>Scanner</th>
+                    <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>Tabs Access</th>
+                    <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {adminUsers && adminUsers.length > 0 ? adminUsers.map(admin => (
                     <tr key={admin.id} style={{
-                      borderBottom: '1px solid rgba(255,255,255,0.05)',
-                      background: admin.email === SUPER_ADMIN_EMAIL ? 'rgba(255, 215, 0, 0.05)' : 'transparent'
+                      borderBottom: '1px solid #e5e7eb',
+                      background: admin.email === SUPER_ADMIN_EMAIL ? '#f6f6f7' : 'transparent'
                     }}>
-                      <td style={{ border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'center' }}>
+                      <td style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>
                         {admin.email === SUPER_ADMIN_EMAIL ? (
-                          <i className="fas fa-lock" style={{ color: '#856404' }} title="Super admin cannot be selected"></i>
+                          <i className="fas fa-lock" style={{ color: '#b7791f' }} title="Super admin cannot be selected"></i>
                         ) : (
                           <Form.Check
                             type="checkbox"
@@ -5899,7 +5817,7 @@ const AdminPanel = () => {
                           />
                         )}
                       </td>
-                      <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'left' }}>
+                      <td style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>
                         <div className="d-flex align-items-center gap-2">
                           <strong>{admin.name}</strong>
                           {admin.email === SUPER_ADMIN_EMAIL && (
@@ -5907,17 +5825,17 @@ const AdminPanel = () => {
                           )}
                         </div>
                       </td>
-                      <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'left' }}>
+                      <td style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>
                         <Badge bg={admin.admin_tag ? 'info' : 'secondary'} style={{ fontSize: '0.8rem', padding: '4px 10px' }}>
                           {admin.admin_tag || 'No Tag'}
                         </Badge>
                       </td>
-                      <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'left' }}>
-                        <code style={{ background: 'rgba(0,0,0,0.2)', padding: '4px 8px', borderRadius: '4px' }}>
+                      <td style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>
+                        <code style={{ background: '#f6f6f7', padding: '4px 8px', borderRadius: '0' }}>
                           {admin.email}
                         </code>
                       </td>
-                      <td style={{ border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'center' }}>
+                      <td style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>
                         <Badge bg={admin.code_scanner ? 'success' : 'secondary'} style={{ fontSize: '0.75rem', padding: '4px 8px' }}>
                           {admin.code_scanner ? (
                             <>
@@ -5932,7 +5850,7 @@ const AdminPanel = () => {
                           )}
                         </Badge>
                       </td>
-                      <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'left' }}>
+                      <td style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>
                         <div className="d-flex flex-wrap gap-1">
                           {admin.allowed_tabs && admin.allowed_tabs.length > 0 ? (
                             admin.allowed_tabs.map(tabId => {
@@ -5955,7 +5873,7 @@ const AdminPanel = () => {
                           {admin.allowed_tabs?.length || 12} / 13 tabs
                         </small>
                       </td>
-                      <td style={{ border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'center' }}>
+                      <td style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>
                         <div className="d-flex gap-2 justify-content-center flex-wrap">
                           <>
                             <Button
@@ -5988,7 +5906,7 @@ const AdminPanel = () => {
                     </tr>
                   )) : (
                     <tr>
-                      <td colSpan="7" className="text-center py-5" style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
+                      <td colSpan="7" className="text-center py-5" style={{ border: '1px solid #e5e7eb' }}>
                         <div className="text-white-50">
                           <i className="fas fa-users fa-3x mb-3"></i>
                           <h5>No Admin Users Found</h5>
@@ -6002,17 +5920,16 @@ const AdminPanel = () => {
             </div>
 
             <div style={{
-              background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
-              borderRadius: '15px',
+              background: '#ffffff',
+              border: '1px solid #e5e7eb',
+              borderRadius: '0',
               padding: '1.5rem',
               maxWidth: '1200px',
               margin: '1.5rem auto 0',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+              boxShadow: 'none'
             }}>
               <div className="d-flex justify-content-between align-items-center mb-3">
-                <h5 style={{ color: 'black', margin: 0, fontWeight: '600' }}>
+                <h5 style={{ color: '#0b0e17', margin: 0, fontWeight: '600' }}>
                   <i className="fas fa-qrcode me-2"></i>
                   Scanner-Only Users
                 </h5>
@@ -6023,32 +5940,32 @@ const AdminPanel = () => {
 
               {scannerOnlyUsers.length > 0 ? (
                 <Table striped bordered hover responsive style={{ marginBottom: 0 }}>
-                  <thead style={{ borderBottom: '2px solid rgba(255,255,255,0.2)' }}>
+                  <thead style={{ borderBottom: '1px solid #e5e7eb' }}>
                     <tr>
-                      <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'center' }}>Name</th>
-                      <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'center' }}>Email</th>
-                      <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'center' }}>Access</th>
-                      <th style={{ color: 'black', border: '1px solid rgba(255,255,255,0.2)', padding: '12px', textAlign: 'center' }}>Actions</th>
+                      <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>Name</th>
+                      <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>Email</th>
+                      <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>Access</th>
+                      <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {scannerOnlyUsers.map(user => (
-                      <tr key={user.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                        <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'left' }}>
+                      <tr key={user.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
+                        <td style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>
                           <strong>{user.name}</strong>
                         </td>
-                        <td style={{ color: 'black', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'left' }}>
-                          <code style={{ background: 'rgba(0,0,0,0.2)', padding: '4px 8px', borderRadius: '4px' }}>
+                        <td style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>
+                          <code style={{ background: '#f6f6f7', padding: '4px 8px', borderRadius: '0' }}>
                             {user.email}
                           </code>
                         </td>
-                        <td style={{ border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'center' }}>
+                        <td style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>
                           <Badge bg="info" style={{ fontSize: '0.75rem' }}>
                             <i className="fas fa-check-circle me-1"></i>
                             Scanner Only
                           </Badge>
                         </td>
-                        <td style={{ border: '1px solid rgba(255,255,255,0.1)', padding: '12px', textAlign: 'center' }}>
+                        <td style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>
                           <div className="d-flex gap-2 justify-content-center flex-wrap">
                             <Button
                               variant="outline-secondary"
@@ -6078,8 +5995,8 @@ const AdminPanel = () => {
                 </Table>
               ) : (
                 <div className="text-center py-4" style={{
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  borderRadius: '10px'
+                  background: '#ffffff',
+                  borderRadius: '0'
                 }}>
                   <i className="fas fa-user-slash fa-2x mb-3 text-muted"></i>
                   <p className="text-muted mb-0">No scanner-only users right now.</p>
@@ -6117,10 +6034,10 @@ const AdminPanel = () => {
             ) : (
               <>
                 <Alert variant="info" style={{
-                  background: 'rgba(0, 123, 255, 0.15)',
-                  border: '1px solid rgba(0, 123, 255, 0.4)',
-                  borderRadius: '10px',
-                  color: 'black',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
+                  color: '#0b0e17',
                   marginBottom: '1.5rem'
                 }}>
                   <strong>Select which tabs this admin can access:</strong>
@@ -6134,13 +6051,12 @@ const AdminPanel = () => {
                 {/* Scanner Permission Toggle */}
                 <div style={{
                   background: selectedAdminScanner
-                    ? 'linear-gradient(145deg, rgba(40, 167, 69, 0.3), rgba(40, 167, 69, 0.2))'
-                    : 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
-                  backdropFilter: 'blur(10px)',
+                    ? '#f6f6f7'
+                    : '#ffffff',
                   border: selectedAdminScanner
-                    ? '2px solid rgba(40, 167, 69, 0.6)'
-                    : '1px solid rgba(255, 255, 255, 0.15)',
-                  borderRadius: '12px',
+                    ? '1px solid #0b0e17'
+                    : '1px solid #e5e7eb',
+                  borderRadius: '0',
                   padding: '16px',
                   marginBottom: '1.5rem',
                   display: 'flex',
@@ -6153,8 +6069,8 @@ const AdminPanel = () => {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{ fontSize: '1.8rem' }}>📱</div>
                     <div>
-                      <div style={{ color: '#222', fontWeight: '600', fontSize: '1rem' }}>Scanner Access</div>
-                      <div style={{ color: 'rgba(0,0,0,0.55)', fontSize: '0.85rem' }}>
+                      <div style={{ color: '#5c6270', fontWeight: '600', fontSize: '1rem' }}>Scanner Access</div>
+                      <div style={{ color: '#5c6270', fontSize: '0.85rem' }}>
                         Allow this admin to scan tickets
                       </div>
                     </div>
@@ -6162,8 +6078,8 @@ const AdminPanel = () => {
                   <div style={{
                     width: '50px',
                     height: '26px',
-                    borderRadius: '13px',
-                    background: selectedAdminScanner ? '#28a745' : 'rgba(255,255,255,0.2)',
+                    borderRadius: '0',
+                    background: selectedAdminScanner ? '#0b0e17' : '#e5e7eb',
                     position: 'relative',
                     transition: 'all 0.3s ease'
                   }}>
@@ -6173,8 +6089,8 @@ const AdminPanel = () => {
                       left: selectedAdminScanner ? '27px' : '3px',
                       width: '20px',
                       height: '20px',
-                      borderRadius: '50%',
-                      background: 'white',
+                      borderRadius: '0',
+                      background: '#ffffff',
                       transition: 'all 0.3s ease'
                     }}></div>
                   </div>
@@ -6191,13 +6107,12 @@ const AdminPanel = () => {
                       onClick={() => toggleAdminTab(tab.id)}
                       style={{
                         background: selectedAdminTabs.includes(tab.id)
-                          ? 'linear-gradient(145deg, rgba(40, 167, 69, 0.3), rgba(40, 167, 69, 0.2))'
-                          : 'linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
-                        backdropFilter: 'blur(10px)',
+                          ? '#f6f6f7'
+                          : '#ffffff',
                         border: selectedAdminTabs.includes(tab.id)
-                          ? '2px solid rgba(40, 167, 69, 0.6)'
-                          : '1px solid rgba(255, 255, 255, 0.15)',
-                        borderRadius: '12px',
+                          ? '1px solid #0b0e17'
+                          : '1px solid #e5e7eb',
+                        borderRadius: '0',
                         padding: '12px',
                         cursor: 'pointer',
                         transition: 'all 0.2s ease',
@@ -6205,15 +6120,16 @@ const AdminPanel = () => {
                       }}
                     >
                       <div style={{ fontSize: '1.5rem', marginBottom: '4px' }}>{tab.icon}</div>
-                      <div style={{ color: '#222', fontWeight: '500', fontSize: '0.9rem' }}>{tab.name}</div>
+                      <div style={{ color: '#5c6270', fontWeight: '500', fontSize: '0.9rem' }}>{tab.name}</div>
                       <div style={{
                         position: 'absolute',
                         top: '8px',
                         right: '8px',
                         width: '20px',
                         height: '20px',
-                        borderRadius: '50%',
-                        background: selectedAdminTabs.includes(tab.id) ? '#28a745' : 'rgba(255,255,255,0.2)',
+                        borderRadius: '0',
+                        background: selectedAdminTabs.includes(tab.id) ? '#0b0e17' : '#e5e7eb',
+                        color: selectedAdminTabs.includes(tab.id) ? '#ffffff' : '#5c6270',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -6464,12 +6380,12 @@ const AdminPanel = () => {
                 <div style={{
                   maxHeight: '200px',
                   overflowY: 'auto',
-                  border: '1px solid #dee2e6',
-                  borderRadius: '0.375rem',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
                   padding: '0.75rem'
                 }}>
                   {availableFoods && availableFoods.length > 0 ? availableFoods.map(food => (
-                    <div key={food.id} className="d-flex align-items-center justify-content-between mb-2 p-2 border rounded" style={{ background: selectedFoodsForMovie.includes(food.id) ? '#f8f9fa' : 'transparent' }}>
+                    <div key={food.id} className="d-flex align-items-center justify-content-between mb-2 p-2 border rounded" style={{ background: selectedFoodsForMovie.includes(food.id) ? '#f6f6f7' : 'transparent' }}>
                       <Form.Check
                         type="checkbox"
                         id={`food-${food.id}`}
@@ -7629,10 +7545,10 @@ const AdminPanel = () => {
           </Modal.Header>
           <Modal.Body>
             <Alert variant="info" style={{
-              background: 'rgba(0, 123, 255, 0.15)',
-              border: '1px solid rgba(0, 123, 255, 0.4)',
-              borderRadius: '10px',
-              color: 'black',
+              background: '#ffffff',
+              border: '1px solid #e5e7eb',
+              borderRadius: '0',
+              color: '#0b0e17',
               marginBottom: '1.5rem'
             }}>
               <strong>Search for a user to manage access:</strong>
@@ -7665,8 +7581,8 @@ const AdminPanel = () => {
               </div>
             ) : searchedUsers.length === 0 ? (
               <div className="text-center py-4" style={{
-                background: 'rgba(255, 255, 255, 0.05)',
-                borderRadius: '10px'
+                background: '#ffffff',
+                borderRadius: '0'
               }}>
                 <i className="fas fa-search fa-2x mb-3 text-muted"></i>
                 <p className="text-muted mb-0">
@@ -7679,8 +7595,8 @@ const AdminPanel = () => {
               <div style={{
                 maxHeight: '300px',
                 overflowY: 'auto',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                borderRadius: '10px'
+                border: '1px solid #e5e7eb',
+                borderRadius: '0'
               }}>
                 {searchedUsers.map(user => (
                   <div
@@ -7690,23 +7606,23 @@ const AdminPanel = () => {
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       padding: '12px 15px',
-                      borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                      borderBottom: '1px solid #e5e7eb',
                       transition: 'background 0.2s ease',
                       background: user.is_admin
-                        ? 'rgba(255, 193, 7, 0.05)'
-                        : (user.code_scanner ? 'rgba(23, 162, 184, 0.08)' : 'transparent')
+                        ? '#f6f6f7'
+                        : (user.code_scanner ? '#f6f6f7' : 'transparent')
                     }}
                   >
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: '600', color: 'black' }}>{user.name}</div>
-                      <div style={{ fontSize: '0.85rem', color: '#666' }}>
+                      <div style={{ fontWeight: '600', color: '#0b0e17' }}>{user.name}</div>
+                      <div style={{ fontSize: '0.85rem', color: '#5c6270' }}>
                         {user.email}
                       </div>
                     </div>
                     <div className="d-flex align-items-center gap-2">
                       {user.is_admin ? (
                         <>
-                          <Badge bg="warning" style={{ fontSize: '0.75rem', color: 'black' }}>
+                          <Badge bg="warning" style={{ fontSize: '0.75rem', color: '#0b0e17' }}>
                             <i className="fas fa-shield-alt me-1"></i>
                             Admin
                           </Badge>
@@ -7716,7 +7632,7 @@ const AdminPanel = () => {
                               size="sm"
                               onClick={() => removeUserAdmin(user.id, user.name)}
                               style={{
-                                borderRadius: '20px',
+                                borderRadius: '0',
                                 background: 'transparent'
                               }}
                             >
@@ -7738,7 +7654,7 @@ const AdminPanel = () => {
                               size="sm"
                               onClick={() => removeScannerOnlyAccess(user.id, user.name)}
                               style={{
-                                borderRadius: '20px',
+                                borderRadius: '0',
                                 background: 'transparent'
                               }}
                             >
@@ -7751,7 +7667,7 @@ const AdminPanel = () => {
                               size="sm"
                               onClick={() => grantScannerOnlyAccess(user.id, user.name)}
                               style={{
-                                borderRadius: '20px',
+                                borderRadius: '0',
                                 background: 'transparent'
                               }}
                             >
@@ -7769,9 +7685,9 @@ const AdminPanel = () => {
                               }
                             }}
                             style={{
-                              background: 'linear-gradient(145deg, rgba(40, 167, 69, 0.8), rgba(40, 167, 69, 0.6))',
-                              border: '1px solid rgba(255, 255, 255, 0.2)',
-                              borderRadius: '20px'
+                              background: '#ffffff',
+                              border: '1px solid #e5e7eb',
+                              borderRadius: '0'
                             }}
                           >
                             <i className="fas fa-check me-1"></i>

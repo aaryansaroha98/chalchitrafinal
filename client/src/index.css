@@ -602,7 +602,7 @@ a:hover {
   min-height: 100vh;
   padding: 3rem 0;
   position: relative;
-  background: #000000;
+  background: #ffffff;
 }
 
 /* Particles Background */
@@ -656,14 +656,14 @@ a:hover {
 
 .payment-success-page .error-card {
   padding: 2rem 3rem;
-  background: rgba(20, 20, 20, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0;
   text-align: center;
 }
 
 .payment-success-page .error-card p {
-  color: #f87171;
+  color: #d64545;
   font-size: 1rem;
 }
 
@@ -686,8 +686,8 @@ a:hover {
   width: 60px;
   height: 60px;
   margin: 0 auto 1rem;
-  background: rgba(74, 222, 128, 0.15);
-  border: 2px solid #4ade80;
+  background: rgba(15, 157, 99, 0.1);
+  border: 2px solid #0f9d63;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -699,38 +699,38 @@ a:hover {
   content: '';
   width: 20px;
   height: 10px;
-  border-left: 2px solid #4ade80;
-  border-bottom: 2px solid #4ade80;
+  border-left: 2px solid #0f9d63;
+  border-bottom: 2px solid #0f9d63;
   transform: rotate(-45deg) translateY(-2px);
 }
 
 .success-title {
   font-size: 2.2rem;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.95);
+  color: #0b0e17;
   margin: 0 0 0.5rem 0;
   letter-spacing: -0.5px;
 }
 
 .success-subtitle {
   font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: #5c6270;
   margin: 0;
 }
 
 /* Success Card */
 .success-card {
-  background: rgba(20, 20, 20, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0;
   margin-bottom: 1rem;
   overflow: hidden;
 }
 
 .success-card .card-header {
   padding: 1rem 1.5rem;
-  background: rgba(255, 255, 255, 0.03);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: #f6f6f7;
+  border-bottom: 1px solid #eef0f2;
   text-align: center;
 }
 
@@ -739,7 +739,7 @@ a:hover {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: rgba(255, 255, 255, 0.9);
+  color: #0b0e17;
 }
 
 .success-card .card-body {
@@ -750,7 +750,7 @@ a:hover {
 .movie-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.95);
+  color: #0b0e17;
   margin: 0 0 1rem 0;
   text-align: center;
 }
@@ -765,17 +765,17 @@ a:hover {
 
 .badge {
   padding: 0.5rem 1rem;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 20px;
+  background: #f6f6f7;
+  border: 1px solid #e5e7eb;
+  border-radius: 0;
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: #5c6270;
 }
 
 /* Divider */
 .divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.08);
+  background: #eef0f2;
   margin: 1.25rem 0;
 }
 
@@ -785,7 +785,7 @@ a:hover {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: rgba(255, 255, 255, 0.5);
+  color: #8b909c;
   margin: 0 0 1rem 0;
 }
 
@@ -802,12 +802,12 @@ a:hover {
 }
 
 .detail-label {
-  color: rgba(255, 255, 255, 0.5);
+  color: #5c6270;
   font-size: 0.9rem;
 }
 
 .detail-value {
-  color: rgba(255, 255, 255, 0.9);
+  color: #0b0e17;
   font-size: 0.95rem;
   font-weight: 500;
 }
@@ -815,7 +815,7 @@ a:hover {
 .transaction-id {
   font-family: monospace;
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: #5c6270;
 }
 
 /* Action Buttons */
@@ -827,7 +827,7 @@ a:hover {
 
 .action-hint {
   text-align: center;
-  color: rgba(255, 255, 255, 0.5);
+  color: #8b909c;
   font-size: 0.85rem;
   margin: 1rem 0 0 0;
 }
@@ -839,35 +839,35 @@ a:hover {
   justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  border-radius: 12px;
+  border-radius: 0;
   margin-bottom: 1.5rem;
   font-size: 0.9rem;
   font-weight: 500;
 }
 
 .email-status.sending {
-  background: rgba(255, 193, 7, 0.1);
-  border: 1px solid rgba(255, 193, 7, 0.3);
-  color: #ffc107;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  color: #b7791f;
 }
 
 .email-status.sent {
-  background: rgba(74, 222, 128, 0.1);
-  border: 1px solid rgba(74, 222, 128, 0.3);
-  color: #4ade80;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  color: #0f9d63;
 }
 
 .email-status.error {
-  background: rgba(248, 113, 113, 0.1);
-  border: 1px solid rgba(248, 113, 113, 0.3);
-  color: #f87171;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  color: #d64545;
 }
 
 .email-spinner {
   width: 16px;
   height: 16px;
-  border: 2px solid rgba(255, 193, 7, 0.3);
-  border-top-color: #ffc107;
+  border: 2px solid #e5e7eb;
+  border-top-color: #b7791f;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -881,25 +881,25 @@ a:hover {
   align-items: center;
   gap: 0.9rem;
   padding: 0.85rem 1rem;
-  border-radius: 14px;
+  border-radius: 0;
   margin-bottom: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid #e5e7eb;
+  background: #f6f6f7;
 }
 
 .email-status-banner.status-sending {
-  background: rgba(59, 130, 246, 0.12);
-  border-color: rgba(59, 130, 246, 0.35);
+  background: #ffffff;
+  border-color: #2f6fd0;
 }
 
 .email-status-banner.status-sent {
-  background: rgba(74, 222, 128, 0.12);
-  border-color: rgba(74, 222, 128, 0.35);
+  background: #ffffff;
+  border-color: #0f9d63;
 }
 
 .email-status-banner.status-failed {
-  background: rgba(248, 113, 113, 0.12);
-  border-color: rgba(248, 113, 113, 0.35);
+  background: #ffffff;
+  border-color: #d64545;
 }
 
 .email-status-visual {
@@ -920,8 +920,8 @@ a:hover {
   position: relative;
   width: 100%;
   height: 100%;
-  border: 2px solid rgba(255, 255, 255, 0.7);
-  border-radius: 7px;
+  border: 2px solid #0b0e17;
+  border-radius: 0;
   overflow: hidden;
 }
 
@@ -932,7 +932,7 @@ a:hover {
   left: -2px;
   right: -2px;
   height: 2px;
-  background: rgba(255, 255, 255, 0.5);
+  background: #8b909c;
 }
 
 .mail-envelope::before {
@@ -949,12 +949,12 @@ a:hover {
   position: absolute;
   width: 72%;
   height: 65%;
-  background: rgba(255, 255, 255, 0.9);
+  background: #f6f6f7;
+  border: 1px solid #e5e7eb;
   top: 6px;
   left: 50%;
   transform: translate(-50%, 14px);
-  border-radius: 4px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  border-radius: 0;
   animation: mailLetterLift 1.6s ease-in-out infinite;
 }
 
@@ -962,7 +962,7 @@ a:hover {
   position: absolute;
   width: 16px;
   height: 2px;
-  background: rgba(59, 130, 246, 0.9);
+  background: #2f6fd0;
   top: 15px;
   left: -18px;
   border-radius: 2px;
@@ -981,15 +981,15 @@ a:hover {
 }
 
 .mail-status-icon.success {
-  background: rgba(74, 222, 128, 0.2);
-  border: 1px solid rgba(74, 222, 128, 0.6);
-  color: #4ade80;
+  background: #ffffff;
+  border: 1px solid #0f9d63;
+  color: #0f9d63;
 }
 
 .mail-status-icon.error {
-  background: rgba(248, 113, 113, 0.2);
-  border: 1px solid rgba(248, 113, 113, 0.6);
-  color: #f87171;
+  background: #ffffff;
+  border: 1px solid #d64545;
+  color: #d64545;
 }
 
 .email-status-copy {
@@ -997,12 +997,12 @@ a:hover {
 }
 
 .email-status-title {
-  color: rgba(255, 255, 255, 0.95);
+  color: #0b0e17;
   font-weight: 600;
 }
 
 .email-status-sub {
-  color: rgba(255, 255, 255, 0.68);
+  color: #5c6270;
   font-size: 0.9rem;
   margin-top: 2px;
 }
@@ -1040,19 +1040,19 @@ a:hover {
 }
 
 .scanner-stat-card .scanner-stat-value {
-  color: #ffffff;
+  color: #0b0e17;
   font-weight: 700;
   font-size: 1.6rem;
   line-height: 1.2;
 }
 
 .scanner-stat-card .scanner-stat-label {
-  color: rgba(255, 255, 255, 0.95);
+  color: #5c6270;
   font-size: 0.95rem;
 }
 
 .scanner-stat-card .scanner-stat-sub {
-  color: rgba(255, 255, 255, 0.8);
+  color: #8b909c;
   font-size: 0.85rem;
 }
 
@@ -1085,42 +1085,44 @@ a:hover {
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  border-radius: 16px;
-  font-size: 1rem;
-  font-weight: 500;
+  border-radius: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
   cursor: pointer;
   transition: all 0.2s;
   width: 100%;
 }
 
 .action-btn.primary {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.95);
+  background: #0b0e17;
+  border: 1px solid #0b0e17;
+  color: #ffffff;
 }
 
 .action-btn.primary:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.3);
+  background: #000000;
+  border-color: #000000;
 }
 
 .action-btn.secondary {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.8);
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  color: #0b0e17;
 }
 
 .action-btn.secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.95);
+  background: #f6f6f7;
+  border-color: #0b0e17;
+  color: #0b0e17;
 }
 
 /* Notice Card */
 .notice-card {
-  background: rgba(20, 20, 20, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
 }
@@ -1130,7 +1132,7 @@ a:hover {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: rgba(255, 255, 255, 0.6);
+  color: #5c6270;
   margin: 0 0 1rem 0;
   text-align: center;
 }
@@ -1138,7 +1140,7 @@ a:hover {
 .notice-list {
   margin: 0;
   padding-left: 1.25rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: #5c6270;
   font-size: 0.85rem;
   line-height: 1.8;
 }
@@ -1149,7 +1151,7 @@ a:hover {
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: #8b909c;
   font-size: 0.9rem;
   text-align: center;
 }
@@ -1159,8 +1161,8 @@ a:hover {
   display: inline-block;
   width: 14px;
   height: 14px;
-  background: rgba(74, 222, 128, 0.2);
-  border: 1px solid #4ade80;
+  background: rgba(15, 157, 99, 0.15);
+  border: 1px solid #0f9d63;
   border-radius: 50%;
 }
 
@@ -1211,7 +1213,7 @@ a:hover {
   min-height: 100vh;
   padding: 3rem 0;
   position: relative;
-  background: #000000;
+  background: #ffffff;
 }
 
 /* Particles Background */
@@ -1267,15 +1269,15 @@ a:hover {
 .loading-spinner {
   width: 30px;
   height: 30px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-top-color: rgba(255, 255, 255, 0.6);
+  border: 2px solid #e5e7eb;
+  border-top-color: #0b0e17;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
 
 .loading-text {
   margin-top: 1rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: #5c6270;
   font-size: 0.9rem;
 }
 
@@ -1295,7 +1297,7 @@ a:hover {
 }
 
 .error-card p {
-  color: #f87171;
+  color: #d64545;
   font-size: 1rem;
 }
 
@@ -1310,9 +1312,9 @@ a:hover {
 
 /* Payment Card */
 .payment-card {
-  background: rgba(20, 20, 20, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0;
   margin-bottom: 1rem;
   overflow: hidden;
 }
@@ -1320,8 +1322,8 @@ a:hover {
 /* Header */
 .payment-header {
   padding: 1rem 1.5rem;
-  background: rgba(255, 255, 255, 0.03);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: #f6f6f7;
+  border-bottom: 1px solid #eef0f2;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1332,7 +1334,7 @@ a:hover {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: rgba(255, 255, 255, 0.9);
+  color: #0b0e17;
 }
 
 /* Body */
@@ -1365,7 +1367,7 @@ a:hover {
 .movie-title {
   font-size: 1.3rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.95);
+  color: #0b0e17;
   margin: 0 0 1rem 0;
   line-height: 1.3;
 }
@@ -1378,18 +1380,18 @@ a:hover {
 }
 
 .info-label {
-  color: rgba(255, 255, 255, 0.5);
+  color: #8b909c;
   min-width: 50px;
 }
 
 .info-value {
-  color: rgba(255, 255, 255, 0.8);
+  color: #0b0e17;
 }
 
 /* Divider */
 .divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.08);
+  background: #eef0f2;
   margin: 1.25rem 0;
 }
 
@@ -1399,7 +1401,7 @@ a:hover {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: rgba(255, 255, 255, 0.5);
+  color: #8b909c;
   margin: 0 0 1rem 0;
 }
 
@@ -1412,7 +1414,7 @@ a:hover {
 }
 
 .detail-label {
-  color: rgba(255, 255, 255, 0.7);
+  color: #5c6270;
   font-size: 0.9rem;
   display: flex;
   align-items: center;
@@ -1423,13 +1425,13 @@ a:hover {
   content: '';
   width: 4px;
   height: 4px;
-  background: rgba(255, 255, 255, 0.3);
+  background: #8b909c;
   border-radius: 50%;
 }
 
 .detail-value {
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
+  color: #0b0e17;
   font-size: 0.9rem;
 }
 
@@ -1446,43 +1448,43 @@ a:hover {
 }
 
 .total-label {
-  color: rgba(255, 255, 255, 0.5);
+  color: #5c6270;
   font-size: 0.9rem;
 }
 
 .total-value {
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
+  color: #0b0e17;
   font-size: 0.95rem;
 }
 
 .total-row.discount .total-value {
-  color: #4ade80;
+  color: #0f9d63;
 }
 
 .total-row.grand-total {
   padding-top: 0.75rem;
   margin-top: 0.25rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid #e5e7eb;
 }
 
 .total-row.grand-total .total-label {
   font-size: 1.1rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.95);
+  color: #0b0e17;
 }
 
 .total-row.grand-total .total-value {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #ffffff;
+  color: #0b0e17;
 }
 
 /* Coupon Card */
 .coupon-card {
-  background: rgba(20, 20, 20, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0;
   padding: 1.25rem 1.5rem;
   margin-bottom: 1rem;
 }
@@ -1490,7 +1492,7 @@ a:hover {
 .coupon-heading {
   font-size: 0.95rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.7);
+  color: #5c6270;
   margin: 0 0 1rem 0;
 }
 
@@ -1502,21 +1504,21 @@ a:hover {
 .coupon-input {
   flex: 1;
   padding: 0.75rem 1rem;
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
-  color: rgba(255, 255, 255, 0.9);
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0;
+  color: #0b0e17;
   font-size: 0.9rem;
   transition: border-color 0.2s;
 }
 
 .coupon-input:focus {
   outline: none;
-  border-color: rgba(255, 255, 255, 0.3);
+  border-color: #0b0e17;
 }
 
 .coupon-input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: #8b909c;
 }
 
 .coupon-input:disabled {
@@ -1526,10 +1528,10 @@ a:hover {
 
 .coupon-btn {
   padding: 0.75rem 1.25rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
-  color: rgba(255, 255, 255, 0.9);
+  background: #0b0e17;
+  border: 1px solid #0b0e17;
+  border-radius: 0;
+  color: #ffffff;
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
@@ -1538,7 +1540,7 @@ a:hover {
 }
 
 .coupon-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.15);
+  background: #23262f;
 }
 
 .coupon-btn:disabled {
@@ -1549,7 +1551,7 @@ a:hover {
 /* Messages */
 .error-msg {
   margin-top: 0.75rem;
-  color: #f87171;
+  color: #d64545;
   font-size: 0.85rem;
 }
 
@@ -1559,31 +1561,31 @@ a:hover {
   gap: 0.5rem;
   margin-top: 0.75rem;
   padding: 0.75rem 1rem;
-  background: rgba(74, 222, 128, 0.1);
-  border: 1px solid rgba(74, 222, 128, 0.2);
-  border-radius: 6px;
+  background: #ffffff;
+  border: 1px solid #0f9d63;
+  border-radius: 0;
 }
 
 .success-check {
-  color: #4ade80;
+  color: #0f9d63;
   font-size: 0.9rem;
 }
 
 .success-text {
   flex: 1;
-  color: #4ade80;
+  color: #0f9d63;
   font-size: 0.9rem;
 }
 
 .remove-link {
-  color: rgba(255, 255, 255, 0.5);
+  color: #5c6270;
   font-size: 0.8rem;
   cursor: pointer;
   transition: color 0.2s;
 }
 
 .remove-link:hover {
-  color: rgba(255, 255, 255, 0.8);
+  color: #0b0e17;
 }
 
 /* Pay Section */
@@ -1598,10 +1600,10 @@ a:hover {
   justify-content: center;
   gap: 0.5rem;
   padding: 1rem 2.5rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
-  color: rgba(255, 255, 255, 0.95);
+  background: #0b0e17;
+  border: 1px solid #0b0e17;
+  border-radius: 0;
+  color: #ffffff;
   font-size: 1.1rem;
   font-weight: 500;
   cursor: pointer;
@@ -1611,8 +1613,8 @@ a:hover {
 }
 
 .pay-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.3);
+  background: #21262f;
+  border-color: #21262f;
 }
 
 .pay-btn:disabled {
@@ -1633,8 +1635,8 @@ a:hover {
 .btn-spinner {
   width: 14px;
   height: 14px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-top-color: rgba(255, 255, 255, 0.8);
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -1645,12 +1647,12 @@ a:hover {
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: #8b909c;
   font-size: 0.85rem;
 }
 
 .footer-check {
-  color: #4ade80;
+  color: #0f9d63;
 }
 
 /* Animations */
@@ -1821,14 +1823,14 @@ a:hover {
 .booking-movie-title {
   font-size: clamp(1.9rem, 2.4vw, 2.7rem);
   font-weight: 600;
-  color: #ffffff;
+  color: #0b0e17;
   margin: 0;
   letter-spacing: 0.01em;
 }
 
 .booking-movie-description {
   font-size: 1.05rem;
-  color: rgba(255, 255, 255, 0.82);
+  color: #5c6270;
   line-height: 1.7;
   margin: 0;
 }
@@ -2197,9 +2199,8 @@ a:hover {
 .gallery-title {
   font-size: clamp(2.2rem, 6vw, 3.5rem);
   font-weight: 600;
-  color: white;
+  color: #0b0e17;
   margin-bottom: 1rem;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   letter-spacing: -0.02em;
 }
 
@@ -2304,7 +2305,7 @@ a:hover {
     font-size: 1.65rem !important;
     font-weight: 500 !important;
     letter-spacing: -0.01em !important;
-    color: #ffffff !important;
+    color: #0b0e17 !important;
     margin-bottom: 0.4rem !important;
   }
 
@@ -2389,12 +2390,12 @@ a:hover {
   }
 
   .offcanvas {
-    background: #1a1a1a !important;
+    background: #ffffff !important;
   }
 
   .offcanvas .offcanvas-body {
     padding: 0.75rem;
-    background: #1a1a1a !important;
+    background: #ffffff !important;
     display: flex;
     flex-direction: column;
   }
@@ -2404,7 +2405,7 @@ a:hover {
   }
 
   .offcanvas .offcanvas-header {
-    background: #1a1a1a !important;
+    background: #ffffff !important;
   }
 
   .offcanvas .offcanvas-title {

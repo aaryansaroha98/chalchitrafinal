@@ -250,21 +250,6 @@ const PaymentSuccess = () => {
 
   return (
     <div className="payment-success-page">
-      {/* Particles Background */}
-      <div className="particles">
-        {Array.from({ length: 15 }, (_, i) => (
-          <div
-            key={i}
-            className="particle"
-            style={{
-              left: Math.random() * 100 + '%',
-              animationDelay: Math.random() * 10 + 's',
-              animationDuration: (10 + Math.random() * 20) + 's'
-            }}
-          />
-        ))}
-      </div>
-
       <div className="success-container">
         {/* Success Header */}
         <div className="success-header">
@@ -308,7 +293,7 @@ const PaymentSuccess = () => {
                   {emailStatus === 'sent' && (
                     <>
                       <div className="email-status-title">Ticket email sent successfully!</div>
-                      <div className="email-status-sub">Check spam/junk if it's not in your inbox and mark it as <span style={{ color: '#ffd700', fontWeight: 'bold' }}>"Not Spam"</span>.</div>
+                      <div className="email-status-sub">Check spam/junk if it's not in your inbox and mark it as <span style={{ color: '#b7791f', fontWeight: 'bold' }}>"Not Spam"</span>.</div>
                     </>
                   )}
                   {emailStatus === 'failed' && (

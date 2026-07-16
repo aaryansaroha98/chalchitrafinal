@@ -307,99 +307,7 @@ const MyBookings = () => {
   }
 
   return (
-    <div className="bg-void" style={{minHeight: '100vh', position: 'relative', overflow: 'hidden'}}>
-      {/* Classic Simple Animated Background */}
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        pointerEvents: 'none',
-        zIndex: 1,
-        overflow: 'hidden'
-      }}>
-        {/* Pure black background */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: '#000000'
-        }}></div>
-
-        {/* White animated particles */}
-        {Array.from({ length: 15 }, (_, i) => (
-          <div
-            key={i}
-            style={{
-              position: 'absolute',
-              width: Math.random() * 3 + 1 + 'px',
-              height: Math.random() * 3 + 1 + 'px',
-              backgroundColor: 'rgba(255, 255, 255, 0.6)',
-              borderRadius: '50%',
-              left: Math.random() * 100 + '%',
-              top: Math.random() * 100 + '%',
-              animation: `randomFloat${i % 4} ${10 + Math.random() * 20}s linear infinite`,
-              animationDelay: Math.random() * 10 + 's',
-              boxShadow: '0 0 6px rgba(255, 255, 255, 0.3)',
-              opacity: Math.random() * 0.4 + 0.2,
-              zIndex: 2
-            }}
-          />
-        ))}
-
-        {/* Gentle moving waves */}
-        <div style={{
-          position: 'absolute',
-          top: '30%',
-          left: 0,
-          right: 0,
-          height: '2px',
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%)',
-          animation: 'gentleWave 20s ease-in-out infinite',
-          opacity: 0.3
-        }}></div>
-
-        <div style={{
-          position: 'absolute',
-          top: '70%',
-          left: 0,
-          right: 0,
-          height: '2px',
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.08) 50%, transparent 100%)',
-          animation: 'gentleWave 25s ease-in-out infinite',
-          animationDelay: '5s',
-          opacity: 0.2
-        }}></div>
-
-        {/* Subtle geometric shapes */}
-        <div style={{
-          position: 'absolute',
-          top: '20%',
-          right: '10%',
-          width: '100px',
-          height: '100px',
-          border: '1px solid rgba(255, 255, 255, 0.05)',
-          borderRadius: '50%',
-          animation: 'slowRotate 60s linear infinite',
-          opacity: 0.2
-        }}></div>
-
-        <div style={{
-          position: 'absolute',
-          bottom: '15%',
-          left: '15%',
-          width: '80px',
-          height: '80px',
-          border: '1px solid rgba(255, 255, 255, 0.03)',
-          borderRadius: '50%',
-          animation: 'slowRotateReverse 45s linear infinite',
-          opacity: 0.15
-        }}></div>
-      </div>
-
+    <div className="bg-void" style={{minHeight: '100vh'}}>
       <style>
         {`
           .my-bookings-container {
@@ -419,19 +327,19 @@ const MyBookings = () => {
             gap: 0.75rem;
             font-size: 2.5rem;
             font-weight: 600;
-            color: #ffffff;
+            color: #0b0e17;
             margin-bottom: 0.85rem;
             letter-spacing: -0.025em;
           }
 
           .my-bookings-title i {
-            color: #0d6efd;
+            color: #0b0e17;
             font-size: 2rem;
           }
 
           .my-bookings-subtitle {
             font-size: 1.05rem;
-            color: #6c757d;
+            color: #5c6270;
             max-width: 620px;
             margin: 0 auto;
             line-height: 1.6;
@@ -465,7 +373,7 @@ const MyBookings = () => {
         `}
       </style>
 
-      <div style={{position: 'relative', zIndex: 2}}>
+      <div>
         <Container className="my-bookings-container">
           <div className="my-bookings-header">
             <h1 className="my-bookings-title">
@@ -487,17 +395,14 @@ const MyBookings = () => {
           <Card style={{
             padding: '3rem',
             textAlign: 'center',
-            background: 'rgba(255, 255, 255, 0.08)',
-            backdropFilter: 'blur(25px) saturate(180%)',
-            border: '1px solid rgba(255, 255, 255, 0.18)',
-            borderRadius: '24px',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
-            color: '#ffffff'
+            background: '#ffffff',
+            border: '1px solid #e5e7eb',
+            color: '#0b0e17'
           }}>
             <Card.Body>
               <i className="fas fa-ticket-alt" style={{
                 fontSize: '4rem',
-                color: 'rgba(255, 255, 255, 0.6)',
+                color: '#8b909c',
                 marginBottom: '1.5rem',
                 display: 'block'
               }}></i>
@@ -507,23 +412,15 @@ const MyBookings = () => {
                 marginBottom: '1rem'
               }}>No Bookings Yet</h3>
               <p style={{
-                color: 'rgba(255, 255, 255, 0.7)',
+                color: '#5c6270',
                 fontSize: '1.1rem',
                 marginBottom: '2rem',
                 maxWidth: '500px',
                 margin: '0 auto 2rem'
               }}>You haven't booked any movie tickets yet. Discover amazing films and reserve your seats!</p>
-              <Button 
-                variant="primary" 
+              <Button
+                variant="primary"
                 onClick={() => window.location.href = '/upcoming-movies'}
-                style={{
-                  background: 'linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%)',
-                  padding: '0.75rem 2rem',
-                  borderRadius: '12px',
-                  fontWeight: '600',
-                  border: 'none',
-                  boxShadow: '0 4px 15px rgba(13, 110, 253, 0.3)'
-                }}
               >
                 Explore Movies
               </Button>
@@ -534,10 +431,8 @@ const MyBookings = () => {
             {/* Bulk Delete Controls */}
             {selectedBookings.size > 0 && (
               <div className="my-booking-bulk" style={{
-                background: 'rgba(255, 255, 255, 0.08)',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '16px',
+                background: '#ffffff',
+                border: '1px solid #e5e7eb',
                 padding: '1rem',
                 marginBottom: '2rem',
                 display: 'flex',
@@ -548,7 +443,7 @@ const MyBookings = () => {
               }}>
                 <div style={{display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap'}}>
                   <span className="my-booking-bulk-text" style={{
-                    color: '#ffffff',
+                    color: '#0b0e17',
                     fontSize: '1rem',
                     fontWeight: '600'
                   }}>
@@ -562,21 +457,20 @@ const MyBookings = () => {
                         setSelectedBookings(allIds);
                       }}
                       style={{
-                        border: '1px solid rgba(255, 255, 255, 0.3)',
-                        color: '#ffffff',
+                        border: '1px solid #e5e7eb',
+                        color: '#0b0e17',
                         padding: '0.4rem 0.8rem',
-                        borderRadius: '8px',
                         fontWeight: '600',
                         fontSize: '0.85rem',
-                        transition: 'all 0.3s ease'
+                        transition: 'all 0.2s ease'
                       }}
                       onMouseEnter={(e) => {
-                        e.target.style.background = 'rgba(255, 255, 255, 0.2)';
-                        e.target.style.transform = 'translateY(-1px)';
+                        e.target.style.background = '#f6f6f7';
+                        e.target.style.borderColor = '#0b0e17';
                       }}
                       onMouseLeave={(e) => {
                         e.target.style.background = 'transparent';
-                        e.target.style.transform = 'translateY(0)';
+                        e.target.style.borderColor = '#e5e7eb';
                       }}
                     >
                       <i className="fas fa-check-double me-1"></i>
@@ -586,21 +480,20 @@ const MyBookings = () => {
                       variant="outline-secondary"
                       onClick={() => setSelectedBookings(new Set())}
                       style={{
-                        border: '1px solid rgba(255, 255, 255, 0.2)',
-                        color: 'rgba(255, 255, 255, 0.8)',
+                        border: '1px solid #e5e7eb',
+                        color: '#5c6270',
                         padding: '0.4rem 0.8rem',
-                        borderRadius: '8px',
                         fontWeight: '600',
                         fontSize: '0.85rem',
-                        transition: 'all 0.3s ease'
+                        transition: 'all 0.2s ease'
                       }}
                       onMouseEnter={(e) => {
-                        e.target.style.background = 'rgba(255, 255, 255, 0.1)';
-                        e.target.style.transform = 'translateY(-1px)';
+                        e.target.style.background = '#f6f6f7';
+                        e.target.style.borderColor = '#0b0e17';
                       }}
                       onMouseLeave={(e) => {
                         e.target.style.background = 'transparent';
-                        e.target.style.transform = 'translateY(0)';
+                        e.target.style.borderColor = '#e5e7eb';
                       }}
                     >
                       <i className="fas fa-times me-1"></i>
@@ -619,23 +512,20 @@ const MyBookings = () => {
                     }
                   }}
                   style={{
-                    border: '1px solid #dc3545',
-                    color: '#dc3545',
+                    border: '1px solid #d64545',
+                    color: '#d64545',
                     padding: '0.5rem 1rem',
-                    borderRadius: '8px',
                     fontWeight: '600',
                     fontSize: '0.9rem',
-                    transition: 'all 0.3s ease'
+                    transition: 'all 0.2s ease'
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.background = '#dc3545';
-                    e.target.style.color = 'white';
-                    e.target.style.transform = 'translateY(-1px)';
+                    e.target.style.background = '#d64545';
+                    e.target.style.color = '#ffffff';
                   }}
                   onMouseLeave={(e) => {
                     e.target.style.background = 'transparent';
-                    e.target.style.color = '#dc3545';
-                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.color = '#d64545';
                   }}
                 >
                   <i className="fas fa-trash me-1"></i>
@@ -647,21 +537,14 @@ const MyBookings = () => {
               <Row className="my-bookings-row">
               {bookings.map((booking) => (
                 <Col lg={3} md={4} sm={6} xs={6} key={booking.id} className="mb-4">
-                  <Card className="h-100 border-0 shadow-lg my-booking-card" style={{
-                  background: selectedBookings.has(booking.id) 
-                    ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.06))'
-                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
-                  backdropFilter: 'blur(20px)',
-                  border: selectedBookings.has(booking.id) 
-                    ? '1px solid rgba(255, 255, 255, 0.35)'
-                    : '1px solid rgba(255, 215, 0, 0.2)',
-                  borderRadius: '20px',
+                  <Card className="h-100 border-0 my-booking-card" style={{
+                  background: '#ffffff',
+                  border: selectedBookings.has(booking.id)
+                    ? '1px solid #0b0e17'
+                    : '1px solid #e5e7eb',
                   overflow: 'hidden',
-                  boxShadow: selectedBookings.has(booking.id)
-                    ? '0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
-                    : '0 20px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                   position: 'relative',
-                  transition: 'all 0.3s ease'
+                  transition: 'all 0.2s ease'
                 }}>
                   {/* Selection Checkbox */}
                   <div className="my-booking-select" style={{
@@ -669,12 +552,12 @@ const MyBookings = () => {
                     top: '8px',
                     right: '8px',
                     zIndex: 10,
-                    background: selectedBookings.has(booking.id) 
-                      ? 'linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.12))'
-                      : 'rgba(0, 0, 0, 0.5)',
+                    background: selectedBookings.has(booking.id)
+                      ? '#0b0e17'
+                      : '#ffffff',
                     border: selectedBookings.has(booking.id)
-                      ? '1px solid rgba(255,255,255,0.35)'
-                      : '2px solid rgba(255, 255, 255, 0.8)',
+                      ? '1px solid #0b0e17'
+                      : '1px solid #e5e7eb',
                     borderRadius: '50%',
                     width: '22px',
                     height: '22px',
@@ -682,10 +565,7 @@ const MyBookings = () => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    boxShadow: selectedBookings.has(booking.id)
-                      ? '0 2px 8px rgba(0, 0, 0, 0.4)'
-                      : '0 2px 4px rgba(0, 0, 0, 0.3)'
+                    transition: 'all 0.2s ease'
                   }}
                     onClick={() => {
                       const newSelection = new Set(selectedBookings);
@@ -698,23 +578,21 @@ const MyBookings = () => {
                     }}
                     onMouseEnter={(e) => {
                       if (!selectedBookings.has(booking.id)) {
-                        e.target.style.background = 'rgba(40, 167, 69, 0.5)';
-                        e.target.style.borderColor = '#28a745';
-                        e.target.style.transform = 'scale(1.1)';
+                        e.target.style.background = '#f6f6f7';
+                        e.target.style.borderColor = '#0b0e17';
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (!selectedBookings.has(booking.id)) {
-                        e.target.style.background = 'rgba(0, 0, 0, 0.5)';
-                        e.target.style.borderColor = 'rgba(255, 255, 255, 0.8)';
-                        e.target.style.transform = 'scale(1)';
+                        e.target.style.background = '#ffffff';
+                        e.target.style.borderColor = '#e5e7eb';
                       }
                     }}
                   >
                     {selectedBookings.has(booking.id) ? (
                       <i className="fas fa-check" style={{color: '#ffffff', fontSize: '0.65rem', fontWeight: 'bold'}}></i>
                     ) : (
-                      <i className="far fa-check" style={{color: 'rgba(255, 255, 255, 0.9)', fontSize: '0.65rem'}}></i>
+                      <i className="far fa-check" style={{color: '#8b909c', fontSize: '0.65rem'}}></i>
                     )}
                   </div>
 
@@ -725,9 +603,8 @@ const MyBookings = () => {
                     right: 0,
                     bottom: 0,
                     border: selectedBookings.has(booking.id)
-                      ? '2px solid rgba(40, 167, 69, 0.4)'
-                      : '1px solid rgba(255, 215, 0, 0.1)',
-                    borderRadius: '20px',
+                      ? '1px solid #0b0e17'
+                      : '1px solid #eef0f2',
                     pointerEvents: 'none'
                   }}></div>
 
@@ -742,10 +619,9 @@ const MyBookings = () => {
                       <div className="my-booking-poster" style={{
                         width: '60px',
                         height: '60px',
-                        borderRadius: '8px',
                         overflow: 'hidden',
                         flexShrink: 0,
-                        border: '1px solid rgba(255, 255, 255, 0.2)'
+                        border: '1px solid #e5e7eb'
                       }}>
                         {booking.poster_url ? (
                           <img
@@ -761,14 +637,14 @@ const MyBookings = () => {
                           <div style={{
                             width: '100%',
                             height: '100%',
-                            background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(192, 192, 192, 0.05))',
+                            background: '#f6f6f7',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center'
                           }}>
                             <i className="fas fa-film" style={{
                               fontSize: '1.2rem',
-                              color: 'rgba(255, 215, 0, 0.7)'
+                              color: '#8b909c'
                             }}></i>
                           </div>
                         )}
@@ -779,9 +655,8 @@ const MyBookings = () => {
                         <h6 className="my-booking-title-text" style={{
                           fontSize: '0.95rem',
                           fontWeight: '700',
-                          color: '#ffffff',
+                          color: '#0b0e17',
                           marginBottom: '0.25rem',
-                          textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)',
                           lineHeight: '1.2'
                         }}>
                           {booking.title}
@@ -790,22 +665,15 @@ const MyBookings = () => {
                           display: 'inline-flex',
                           alignItems: 'center',
                           padding: '0.2rem 0.5rem',
-                          borderRadius: '12px',
                           fontSize: '0.65rem',
                           fontWeight: '700',
                           textTransform: 'uppercase',
                           letterSpacing: '0.5px',
-                          background: booking.is_used ?
-                            'linear-gradient(135deg, rgba(220, 53, 69, 0.2), rgba(176, 42, 55, 0.1))' :
-                            'linear-gradient(135deg, rgba(40, 167, 69, 0.2), rgba(34, 197, 94, 0.1))',
+                          background: '#ffffff',
                           border: booking.is_used ?
-                            '1px solid rgba(220, 53, 69, 0.3)' :
-                            '1px solid rgba(40, 167, 69, 0.3)',
-                          color: booking.is_used ? '#ff6b7a' : '#51cf66',
-                          backdropFilter: 'blur(5px)',
-                          boxShadow: booking.is_used ?
-                            '0 2px 8px rgba(220, 53, 69, 0.15)' :
-                            '0 2px 8px rgba(40, 167, 69, 0.15)'
+                            '1px solid #d64545' :
+                            '1px solid #0f9d63',
+                          color: booking.is_used ? '#d64545' : '#0f9d63'
                         }}>
                           <i className={`fas ${booking.is_used ? 'fa-times-circle' : 'fa-check-circle'} me-1`}
                              style={{fontSize: '0.6rem'}}></i>
@@ -820,25 +688,22 @@ const MyBookings = () => {
                         <div className="my-booking-info-box my-booking-info-date" style={{
                           flex: '1 1 auto',
                           minWidth: '100px',
-                          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
-                          backdropFilter: 'blur(10px)',
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
-                          borderRadius: '8px',
+                          background: '#f6f6f7',
+                          border: '1px solid #e5e7eb',
                           padding: '0.4rem 0.6rem',
                           textAlign: 'center',
                           display: 'flex',
                           flexDirection: 'column',
                           alignItems: 'center',
-                          justifyContent: 'center',
-                          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+                          justifyContent: 'center'
                         }}>
                           <i className="fas fa-calendar" style={{
-                            color: 'rgba(255, 255, 255, 0.7)',
+                            color: '#5c6270',
                             marginBottom: '0.2rem',
                             fontSize: '0.8rem',
                             display: 'block'
                           }}></i>
-                          <span style={{color: '#ffffff', fontSize: '0.8rem', fontWeight: '600'}}>
+                          <span style={{color: '#0b0e17', fontSize: '0.8rem', fontWeight: '600'}}>
                             {new Date(booking.date).toLocaleDateString('en-IN', {
                               month: 'short',
                               day: 'numeric'
@@ -850,25 +715,22 @@ const MyBookings = () => {
                         <div className="my-booking-info-box my-booking-info-time" style={{
                           flex: '1 1 auto',
                           minWidth: '100px',
-                          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
-                          backdropFilter: 'blur(10px)',
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
-                          borderRadius: '8px',
+                          background: '#f6f6f7',
+                          border: '1px solid #e5e7eb',
                           padding: '0.4rem 0.6rem',
                           textAlign: 'center',
                           display: 'flex',
                           flexDirection: 'column',
                           alignItems: 'center',
-                          justifyContent: 'center',
-                          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+                          justifyContent: 'center'
                         }}>
                           <i className="fas fa-clock" style={{
-                            color: 'rgba(255, 255, 255, 0.7)',
+                            color: '#5c6270',
                             marginBottom: '0.2rem',
                             fontSize: '0.8rem',
                             display: 'block'
                           }}></i>
-                          <span style={{color: '#ffffff', fontSize: '0.75rem', fontWeight: '600'}}>
+                          <span style={{color: '#0b0e17', fontSize: '0.75rem', fontWeight: '600'}}>
                             {new Date(booking.date).toLocaleTimeString('en-IN', {
                               hour: '2-digit',
                               minute: '2-digit'
@@ -880,26 +742,23 @@ const MyBookings = () => {
                         <div className="my-booking-info-box my-booking-info-venue" style={{
                           flex: '1 1 auto',
                           minWidth: '100px',
-                          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))',
-                          backdropFilter: 'blur(10px)',
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
-                          borderRadius: '8px',
+                          background: '#f6f6f7',
+                          border: '1px solid #e5e7eb',
                           padding: '0.4rem 0.6rem',
                           textAlign: 'center',
                           display: 'flex',
                           flexDirection: 'column',
                           alignItems: 'center',
-                          justifyContent: 'center',
-                          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+                          justifyContent: 'center'
                         }}>
                           <i className="fas fa-map-marker-alt" style={{
-                            color: 'rgba(255, 255, 255, 0.7)',
+                            color: '#5c6270',
                             marginBottom: '0.2rem',
                             fontSize: '0.8rem',
                             display: 'block'
                           }}></i>
                           <span style={{
-                            color: '#ffffff',
+                            color: '#0b0e17',
                             fontSize: '0.7rem',
                             fontWeight: '600',
                             display: 'block',
@@ -925,22 +784,13 @@ const MyBookings = () => {
                           <Button
                             size="sm"
                             style={{
-                              background: 'linear-gradient(135deg, #ffc107, #fd7e14)',
-                              border: 'none',
+                              background: '#0b0e17',
+                              border: '1px solid #0b0e17',
                               padding: '0.5rem 1rem',
-                              borderRadius: '8px',
                               fontWeight: '600',
                               fontSize: '0.8rem',
-                              boxShadow: '0 2px 8px rgba(255, 193, 7, 0.3)',
-                              transition: 'all 0.3s ease'
-                            }}
-                            onMouseEnter={(e) => {
-                              e.target.style.transform = 'translateY(-1px)';
-                              e.target.style.boxShadow = '0 4px 12px rgba(255, 193, 7, 0.4)';
-                            }}
-                            onMouseLeave={(e) => {
-                              e.target.style.transform = 'translateY(0)';
-                              e.target.style.boxShadow = '0 2px 8px rgba(255, 193, 7, 0.3)';
+                              color: '#ffffff',
+                              transition: 'all 0.2s ease'
                             }}
                             onClick={() => {
                               setSelectedBooking(booking);
@@ -957,23 +807,20 @@ const MyBookings = () => {
                             size="sm"
                             variant="outline-danger"
                             style={{
-                              border: '1px solid #dc3545',
-                              color: '#dc3545',
+                              border: '1px solid #d64545',
+                              color: '#d64545',
                               padding: '0.5rem 1rem',
-                              borderRadius: '8px',
                               fontWeight: '600',
                               fontSize: '0.8rem',
-                              transition: 'all 0.3s ease'
+                              transition: 'all 0.2s ease'
                             }}
                             onMouseEnter={(e) => {
-                              e.target.style.background = '#dc3545';
-                              e.target.style.color = 'white';
-                              e.target.style.transform = 'translateY(-1px)';
+                              e.target.style.background = '#d64545';
+                              e.target.style.color = '#ffffff';
                             }}
                             onMouseLeave={(e) => {
                               e.target.style.background = 'transparent';
-                              e.target.style.color = '#dc3545';
-                              e.target.style.transform = 'translateY(0)';
+                              e.target.style.color = '#d64545';
                             }}
                             onClick={() => handleDeleteBooking(booking.id)}
                           >
@@ -987,32 +834,15 @@ const MyBookings = () => {
                             size="sm"
                             disabled={downloadingTicket === booking.id}
                             style={{
-                              background: downloadingTicket === booking.id ?
-                                'linear-gradient(135deg, #6c757d, #495057)' :
-                                'linear-gradient(135deg, #28a745, #20c997)',
-                              border: 'none',
+                              background: '#0b0e17',
+                              border: '1px solid #0b0e17',
                               padding: '0.5rem 1rem',
-                              borderRadius: '8px',
                               fontWeight: '600',
                               fontSize: '0.8rem',
-                              boxShadow: downloadingTicket === booking.id ?
-                                '0 2px 8px rgba(108, 117, 125, 0.3)' :
-                                '0 2px 8px rgba(40, 167, 69, 0.3)',
-                              transition: 'all 0.3s ease',
-                              opacity: downloadingTicket === booking.id ? 0.7 : 1,
+                              color: '#ffffff',
+                              transition: 'all 0.2s ease',
+                              opacity: downloadingTicket === booking.id ? 0.6 : 1,
                               cursor: downloadingTicket === booking.id ? 'not-allowed' : 'pointer'
-                            }}
-                            onMouseEnter={(e) => {
-                              if (downloadingTicket !== booking.id) {
-                                e.target.style.transform = 'translateY(-1px)';
-                                e.target.style.boxShadow = '0 4px 12px rgba(40, 167, 69, 0.4)';
-                              }
-                            }}
-                            onMouseLeave={(e) => {
-                              if (downloadingTicket !== booking.id) {
-                                e.target.style.transform = 'translateY(0)';
-                                e.target.style.boxShadow = '0 2px 8px rgba(40, 167, 69, 0.3)';
-                              }
                             }}
                             onClick={() => handleDownloadTicket(booking)}
                           >
@@ -1042,23 +872,20 @@ const MyBookings = () => {
                             size="sm"
                             variant="outline-danger"
                             style={{
-                              border: '1px solid #dc3545',
-                              color: '#dc3545',
+                              border: '1px solid #d64545',
+                              color: '#d64545',
                               padding: '0.5rem 1rem',
-                              borderRadius: '8px',
                               fontWeight: '600',
                               fontSize: '0.8rem',
-                              transition: 'all 0.3s ease'
+                              transition: 'all 0.2s ease'
                             }}
                             onMouseEnter={(e) => {
-                              e.target.style.background = '#dc3545';
-                              e.target.style.color = 'white';
-                              e.target.style.transform = 'translateY(-1px)';
+                              e.target.style.background = '#d64545';
+                              e.target.style.color = '#ffffff';
                             }}
                             onMouseLeave={(e) => {
                               e.target.style.background = 'transparent';
-                              e.target.style.color = '#dc3545';
-                              e.target.style.transform = 'translateY(0)';
+                              e.target.style.color = '#d64545';
                             }}
                             onClick={() => handleDeleteBooking(booking.id)}
                           >
@@ -1083,28 +910,16 @@ const MyBookings = () => {
           centered
           size="md"
           style={{
-            backdropFilter: 'blur(20px)',
-            backgroundColor: 'rgba(0, 0, 0, 0.8)'
+            backgroundColor: 'rgba(11, 14, 23, 0.4)'
           }}
         >
           <div style={{
-            background: '#0b0c10',
-            backdropFilter: 'blur(14px)',
-            borderRadius: '6px',
-            border: '1px solid rgba(0, 0, 0, 0.4)',
-            boxShadow: '0 20px 50px rgba(0,0,0,0.6)',
-            color: '#e9edf5',
+            background: '#ffffff',
+            border: '1px solid #e5e7eb',
+            color: '#0b0e17',
             position: 'relative',
             overflow: 'hidden'
           }}>
-            {/* Glow accent */}
-            <div style={{
-              position: 'absolute',
-              inset: 0,
-              background: 'radial-gradient(circle at 50% -20%, rgba(255,255,255,0.015), transparent 32%)',
-              pointerEvents: 'none'
-            }} />
-
             {/* Modal Header */}
             <Modal.Header
               style={{
@@ -1116,15 +931,14 @@ const MyBookings = () => {
                 justifyContent: 'center'
               }}
             >
-              <h5 style={{ margin: 0, color: '#f7f8fc', fontWeight: 700, textAlign: 'center' }}>Delete booking{selectedBookings.size > 1 ? 's' : ''}</h5>
+              <h5 style={{ margin: 0, color: '#0b0e17', fontWeight: 700, textAlign: 'center' }}>Delete booking{selectedBookings.size > 1 ? 's' : ''}</h5>
             </Modal.Header>
 
             {/* Modal Body */}
             <Modal.Body style={{ padding: '0.6rem 1.4rem 1rem', zIndex: 1 }}>
               <div style={{
-                background: 'rgba(255, 255, 255, 0.03)',
-                borderRadius: '16px',
-                border: '1px solid rgba(255, 255, 255, 0.05)',
+                background: '#f6f6f7',
+                border: '1px solid #e5e7eb',
                 maxHeight: '260px',
                 overflow: 'auto',
                 padding: '0.75rem'
@@ -1139,27 +953,25 @@ const MyBookings = () => {
                         justifyContent: 'space-between',
                         alignItems: 'center',
                         padding: '0.65rem 0.75rem',
-                        borderRadius: '12px',
-                        background: 'rgba(255,255,255,0.025)',
-                        border: '1px solid rgba(255,255,255,0.04)',
+                        background: '#ffffff',
+                        border: '1px solid #e5e7eb',
                         marginBottom: '0.6rem'
                       }}
                     >
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                        <span style={{ color: '#fff', fontWeight: 600, fontSize: '1rem' }}>
+                        <span style={{ color: '#0b0e17', fontWeight: 600, fontSize: '1rem' }}>
                           {booking?.title || 'Booking'}
                         </span>
-                        <span style={{ color: '#98a0b3', fontSize: '0.85rem' }}>
+                        <span style={{ color: '#8b909c', fontSize: '0.85rem' }}>
                           #{booking?.booking_code || booking?.id}
                         </span>
                       </div>
                       <span style={{
-                        color: '#e9edf5',
+                        color: '#5c6270',
                         fontSize: '0.9rem',
-                        background: 'rgba(255,255,255,0.05)',
-                        borderRadius: '10px',
+                        background: '#f6f6f7',
                         padding: '0.3rem 0.7rem',
-                        border: '1px solid rgba(255,255,255,0.08)'
+                        border: '1px solid #e5e7eb'
                       }}>
                         {booking ? new Date(booking.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : ''}
                       </span>
@@ -1167,7 +979,7 @@ const MyBookings = () => {
                   );
                 })}
                 {selectedBookings.size === 0 && (
-                  <div style={{ color: '#98a0b3', textAlign: 'center', padding: '1rem' }}>
+                  <div style={{ color: '#8b909c', textAlign: 'center', padding: '1rem' }}>
                     No bookings selected.
                   </div>
                 )}
@@ -1186,12 +998,10 @@ const MyBookings = () => {
                 onClick={() => setShowBulkDelete(false)}
                 style={{
                   padding: '0.75rem 1.4rem',
-                  borderRadius: '12px',
                   fontWeight: 600,
-                  color: '#e9edf5',
-                  border: '1px solid rgba(255, 255, 255, 0.16)',
-                  background: 'rgba(255,255,255,0.06)',
-                  backdropFilter: 'blur(10px)'
+                  color: '#0b0e17',
+                  border: '1px solid #e5e7eb',
+                  background: '#ffffff'
                 }}
               >
                 Cancel
@@ -1201,13 +1011,10 @@ const MyBookings = () => {
                 onClick={handleBulkDelete}
                 style={{
                   padding: '0.75rem 1.6rem',
-                  borderRadius: '12px',
                   fontWeight: 700,
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08))',
-                  border: '1px solid rgba(255,255,255,0.2)',
-                  color: '#ffffff',
-                  boxShadow: '0 12px 30px rgba(0,0,0,0.35)',
-                  backdropFilter: 'blur(10px)'
+                  background: '#d64545',
+                  border: '1px solid #d64545',
+                  color: '#ffffff'
                 }}
               >
                 Delete {selectedBookings.size}
@@ -1223,27 +1030,23 @@ const MyBookings = () => {
           centered
           contentClassName="feedback-modal-content"
           style={{
-            backdropFilter: 'blur(10px)',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)'
+            backgroundColor: 'rgba(11, 14, 23, 0.4)'
           }}
         >
           <div style={{
-            background: 'rgba(15, 17, 21, 0.95)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            borderRadius: '16px',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.6)',
+            background: '#ffffff',
+            border: '1px solid #e5e7eb',
             position: 'relative',
             overflow: 'hidden',
             width: '95%',
             maxWidth: '400px',
-            margin: '0 auto',
-            backdropFilter: 'blur(20px)'
+            margin: '0 auto'
           }}>
             {/* Modal Header */}
             <Modal.Header closeButton style={{
               background: 'transparent',
-              borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-              color: '#ffffff',
+              borderBottom: '1px solid #eef0f2',
+              color: '#0b0e17',
               position: 'relative',
               zIndex: 2,
               padding: '1.25rem 1.5rem 1rem'
@@ -1254,8 +1057,7 @@ const MyBookings = () => {
                 textAlign: 'left',
                 width: '100%',
                 margin: 0,
-                color: '#ffffff',
-                fontFamily: 'Arial, sans-serif'
+                color: '#0b0e17'
               }}>
                 Share Your Experience
               </Modal.Title>
@@ -1276,31 +1078,29 @@ const MyBookings = () => {
                   marginBottom: '1rem'
                 }}>
                   <span style={{
-                    color: 'rgba(255, 255, 255, 0.8)',
+                    color: '#5c6270',
                     fontSize: '0.9rem',
                     fontWeight: '500'
                   }}>
                     Rating
                   </span>
                   <span style={{
-                    color: '#ffffff',
+                    color: '#0b0e17',
                     fontSize: '0.9rem',
                     fontWeight: '600',
-                    background: 'rgba(255, 255, 255, 0.1)',
+                    background: '#f6f6f7',
                     padding: '0.25rem 0.75rem',
-                    borderRadius: '20px',
-                    border: '1px solid rgba(255, 255, 255, 0.15)'
+                    border: '1px solid #e5e7eb'
                   }}>
                     {feedbackRating} / 5
                   </span>
                 </div>
-                
+
                 {/* Slider Container */}
                 <div style={{
                   padding: '0.5rem 0',
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  borderRadius: '12px',
-                  border: '1px solid rgba(255, 255, 255, 0.06)',
+                  background: '#f6f6f7',
+                  border: '1px solid #e5e7eb',
                   paddingLeft: '1rem',
                   paddingRight: '1rem'
                 }}>
@@ -1315,7 +1115,7 @@ const MyBookings = () => {
                       width: '100%',
                       height: '6px',
                       appearance: 'none',
-                      background: `linear-gradient(to right, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.6) ${(feedbackRating - 1) * 25}%, rgba(255, 255, 255, 0.15) ${(feedbackRating - 1) * 25}%, rgba(255, 255, 255, 0.15) 100%)`,
+                      background: `linear-gradient(to right, #0b0e17 0%, #0b0e17 ${(feedbackRating - 1) * 25}%, #e5e7eb ${(feedbackRating - 1) * 25}%, #e5e7eb 100%)`,
                       borderRadius: '5px',
                       outline: 'none',
                       cursor: 'pointer'
@@ -1331,7 +1131,7 @@ const MyBookings = () => {
                       <span
                         key={num}
                         style={{
-                          color: feedbackRating === num ? '#ffffff' : 'rgba(255, 255, 255, 0.4)',
+                          color: feedbackRating === num ? '#0b0e17' : '#8b909c',
                           fontSize: '0.75rem',
                           fontWeight: feedbackRating === num ? '600' : '400',
                           transition: 'all 0.2s ease'
@@ -1350,11 +1150,11 @@ const MyBookings = () => {
                   display: 'block',
                   marginBottom: '0.5rem',
                   fontWeight: '500',
-                  color: 'rgba(255, 255, 255, 0.8)',
+                  color: '#5c6270',
                   fontSize: '0.9rem'
                 }}>
                   Comment
-                  <span style={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: '400', marginLeft: '0.5rem' }}>(optional)</span>
+                  <span style={{ color: '#8b909c', fontWeight: '400', marginLeft: '0.5rem' }}>(optional)</span>
                 </label>
                 <textarea
                   value={feedbackComment}
@@ -1364,22 +1164,21 @@ const MyBookings = () => {
                   style={{
                     width: '100%',
                     padding: '0.85rem',
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: '10px',
+                    background: '#ffffff',
+                    border: '1px solid #e5e7eb',
                     fontSize: '0.9rem',
                     resize: 'vertical',
                     outline: 'none',
-                    color: '#f9fafb',
+                    color: '#0b0e17',
                     transition: 'all 0.3s ease',
                     fontFamily: 'inherit'
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = 'rgba(255, 255, 255, 0.25)';
-                    e.target.style.boxShadow = '0 0 0 3px rgba(255, 255, 255, 0.05)';
+                    e.target.style.borderColor = '#0b0e17';
+                    e.target.style.boxShadow = 'none';
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                    e.target.style.borderColor = '#e5e7eb';
                     e.target.style.boxShadow = 'none';
                   }}
                 />
@@ -1388,7 +1187,7 @@ const MyBookings = () => {
 
             {/* Modal Footer */}
             <Modal.Footer style={{
-              borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+              borderTop: '1px solid #eef0f2',
               padding: '1rem 1.5rem 1.25rem',
               background: 'transparent',
               position: 'relative',
@@ -1401,54 +1200,45 @@ const MyBookings = () => {
                 onClick={() => setShowFeedback(false)}
                 style={{
                   padding: '0.7rem 1.25rem',
-                  borderRadius: '10px',
                   fontWeight: '600',
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
-                  color: 'rgba(255, 255, 255, 0.8)',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  color: '#0b0e17',
                   fontSize: '0.9rem',
                   transition: 'all 0.3s ease',
                   flex: 1
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.background = 'rgba(255, 255, 255, 0.12)';
-                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-                  e.target.style.color = '#ffffff';
+                  e.target.style.background = '#f6f6f7';
+                  e.target.style.borderColor = '#0b0e17';
+                  e.target.style.color = '#0b0e17';
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.background = 'rgba(255, 255, 255, 0.08)';
-                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.12)';
-                  e.target.style.color = 'rgba(255, 255, 255, 0.8)';
+                  e.target.style.background = '#ffffff';
+                  e.target.style.borderColor = '#e5e7eb';
+                  e.target.style.color = '#0b0e17';
                 }}
               >
                 Cancel
               </Button>
               <Button
                 style={{
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  background: '#0b0e17',
+                  border: '1px solid #0b0e17',
                   padding: '0.7rem 1.25rem',
-                  borderRadius: '10px',
                   fontWeight: '600',
                   color: '#ffffff',
-                  boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
                   fontSize: '0.9rem',
                   transition: 'all 0.3s ease',
                   flex: 1.5
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.background = 'rgba(255, 255, 255, 0.15)';
-                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.3)';
-                  e.target.style.transform = 'translateY(-2px)';
-                  e.target.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.3)';
+                  e.target.style.background = '#000000';
+                  e.target.style.borderColor = '#000000';
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.background = 'rgba(255, 255, 255, 0.1)';
-                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-                  e.target.style.transform = 'translateY(0)';
-                  e.target.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.2)';
+                  e.target.style.background = '#0b0e17';
+                  e.target.style.borderColor = '#0b0e17';
                 }}
                 onClick={handleSubmitFeedback}
               >
@@ -1467,88 +1257,19 @@ const MyBookings = () => {
             appearance: none;
             width: 18px;
             height: 18px;
-            background: #ffffff;
+            background: #0b0e17;
             border-radius: 50%;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-            border: 2px solid rgba(255, 255, 255, 0.8);
+            border: 2px solid #ffffff;
           }
           input[type="range"]::-moz-range-thumb {
             width: 18px;
             height: 18px;
-            background: #ffffff;
+            background: #0b0e17;
             border-radius: 50%;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-            border: 2px solid rgba(255, 255, 255, 0.8);
+            border: 2px solid #ffffff;
           }
-          @keyframes liquidFlow {
-            0% {
-              transform: translateX(-20px) translateY(-20px) scale(1);
-              opacity: 0.6;
-            }
-            25% {
-              transform: translateX(20px) translateY(-10px) scale(1.05);
-              opacity: 0.8;
-            }
-            50% {
-              transform: translateX(-10px) translateY(20px) scale(0.95);
-              opacity: 0.5;
-            }
-            75% {
-              transform: translateX(10px) translateY(-20px) scale(1.02);
-              opacity: 0.7;
-            }
-            100% {
-              transform: translateX(-20px) translateY(-20px) scale(1);
-              opacity: 0.6;
-            }
-          }
-
-          @keyframes randomFloat0 {
-            0% { transform: translate(0px, 0px) rotate(0deg); opacity: 0.2; }
-            25% { transform: translate(15px, -20px) rotate(90deg); opacity: 0.6; }
-            50% { transform: translate(-10px, -40px) rotate(180deg); opacity: 0.3; }
-            75% { transform: translate(5px, -20px) rotate(270deg); opacity: 0.5; }
-            100% { transform: translate(0px, 0px) rotate(360deg); opacity: 0.2; }
-          }
-
-          @keyframes randomFloat1 {
-            0% { transform: translate(0px, 0px) scale(1); opacity: 0.3; }
-            33% { transform: translate(-15px, -25px) scale(1.2); opacity: 0.7; }
-            66% { transform: translate(20px, -15px) scale(0.8); opacity: 0.4; }
-            100% { transform: translate(0px, 0px) scale(1); opacity: 0.3; }
-          }
-
-          @keyframes randomFloat2 {
-            0% { transform: translate(0px, 0px) rotate(0deg); opacity: 0.25; }
-            50% { transform: translate(18px, -22px) rotate(180deg); opacity: 0.6; }
-            100% { transform: translate(0px, 0px) rotate(360deg); opacity: 0.25; }
-          }
-
-          @keyframes randomFloat3 {
-            0% { transform: translate(0px, 0px) scale(1); opacity: 0.2; }
-            25% { transform: translate(10px, -15px) scale(1.3); opacity: 0.5; }
-            50% { transform: translate(-8px, -30px) scale(0.9); opacity: 0.3; }
-            75% { transform: translate(12px, -15px) scale(1.1); opacity: 0.4; }
-            100% { transform: translate(0px, 0px) scale(1); opacity: 0.2; }
-          }
-
-          @keyframes gentleWave {
-            0%, 100% { opacity: 0.2; transform: translateX(-10px); }
-            50% { opacity: 0.4; transform: translateX(10px); }
-          }
-
-          @keyframes slowRotate {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
-          }
-
-          @keyframes slowRotateReverse {
-            0% { transform: translate(-50%, -50%) rotate(360deg); }
-            100% { transform: translate(-50%, -50%) rotate(0deg); }
-          }
-
           @media (max-width: 576px) {
             .my-bookings-title {
               font-size: 1.2rem !important;
