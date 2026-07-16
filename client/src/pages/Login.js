@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Row, Col, Button, Spinner } from 'react-bootstrap';
+import { Container, Row, Col, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../components/Loader';
 
@@ -9,11 +9,8 @@ const Login = () => {
 
   const handleGoogleLogin = () => {
     setIsLoading(true);
-    // Capture redirectTo from search params to pass to backend
     const searchParams = new URLSearchParams(window.location.search);
     const redirectTo = searchParams.get('redirectTo');
-    
-    // Use current browser origin for mobile compatibility
     const apiBaseUrl = window.location.origin;
     let authUrl = `${apiBaseUrl}/api/auth/google`;
     if (redirectTo) {
@@ -22,206 +19,55 @@ const Login = () => {
     window.location.href = authUrl;
   };
 
-  const handlePrivacyPolicyClick = () => {
-    navigate('/privacy-policy');
-  };
-
-  const handleTermsOfServiceClick = () => {
-    navigate('/terms-of-service');
-  };
-  
   if (isLoading) {
     return <Loader message="Authenticating" subtitle="Securely signing you in with Google..." />;
   }
 
   return (
-    <div className="bg-void" style={{minHeight: '100vh'}}>
-      {/* Main Container */}
-      <Container fluid style={{padding: '2rem'}}>
-        <Row className="justify-content-center align-items-center" style={{minHeight: '80vh'}}>
-          <Col xs={12} lg={9} xl={7}>
-            <div className="login-card-container" style={{
-              background: '#ffffff',
-              border: '1px solid #e5e7eb',
-              overflow: 'hidden',
-              minHeight: '400px'
-            }}>
-              <Row className="g-0 h-100">
-                {/* Left Side - Animated Image Section */}
-                <Col lg={6} className="d-none d-lg-flex align-items-center justify-content-center" style={{
-                  background: '#f6f6f7',
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}>
-                  {/* Main content */}
-                  <div style={{textAlign: 'center', position: 'relative', zIndex: 2}}>
-                    {/* Film strip animation */}
-                    <div style={{marginBottom: '2rem'}}>
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '8px',
-                        marginBottom: '1rem'
-                      }}>
-                        {[...Array(6)].map((_, i) => (
-                          <div
-                            key={i}
-                            style={{
-                              width: '4px',
-                              height: '40px',
-                              background: i % 2 === 0 ? '#0b0e17' : '#8b909c',
-                              borderRadius: '2px',
-                              animation: `filmStrip ${2 + i * 0.3}s ease-in-out infinite`,
-                              animationDelay: `${i * 0.2}s`
-                            }}
-                          ></div>
-                        ))}
-                      </div>
+    <div className="login-page">
+      <Container fluid className="login-container">
+        <Row className="login-row">
+          <Col xs={12} lg={9} xl={7} className="login-col">
+            <div className="login-card">
+              <Row className="g-0">
+                {/* Left Side - Brand Section */}
+                <Col lg={6} className="login-brand-col">
+                  <div className="login-brand-content">
+                    <div className="login-brand-icon">
+                      <img
+                        src="/logos/logo-removebg-preview.png"
+                        alt="Chalchitra Logo"
+                        className="login-brand-logo"
+                      />
                     </div>
-
-                    {/* Chalchitra Logo */}
-                    <div style={{marginBottom: '1.5rem'}}>
-                      <div style={{
-                        width: '120px',
-                        height: '120px',
-                        margin: '0 auto',
-                        background: '#ffffff',
-                        border: '1px solid #e5e7eb',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        animation: 'gentleFloat 4s ease-in-out infinite'
-                      }}>
-                        <img
-                          src="/logos/logo-removebg-preview.png"
-                          alt="Chalchitra Logo"
-                          style={{
-                            width: '90px',
-                            height: 'auto',
-                            objectFit: 'contain',
-                            filter: 'brightness(0)',
-                            opacity: 0.9
-                          }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Animated text */}
-                    <h3 style={{
-                      color: '#0b0e17',
-                      fontSize: '2rem',
-                      fontWeight: '300',
-                      marginBottom: '1rem',
-                      letterSpacing: '1px'
-                    }}>
-                      Welcome to Chalchitra
-                    </h3>
-                    <p style={{
-                      color: '#5c6270',
-                      fontSize: '1.1rem',
-                      margin: 0,
-                      fontWeight: '300',
-                      lineHeight: '1.6'
-                    }}>
+                    <h2 className="login-brand-title">Welcome to Chalchitra</h2>
+                    <p className="login-brand-subtitle">
                       Experience movies like never before
                     </p>
-
-
                   </div>
                 </Col>
 
                 {/* Right Side - Login Form */}
-                <Col lg={6} className="d-flex align-items-center justify-content-center" style={{padding: '1.6rem 0.8rem'}}>
-                  <div className="login-form-wrap" style={{width: '100%', maxWidth: '220px', padding: '0 4px'}}>
-                    {/* Login/Sign Up Container Title */}
-                    <div style={{
-                      textAlign: 'center',
-                      marginBottom: '1.5rem'
-                    }}>
-                    <h1 style={{
-                      color: '#0b0e17',
-                      fontSize: '2.6rem',
-                      fontWeight: '600',
-                      marginBottom: '0.35rem',
-                      letterSpacing: '0.6px'
-                    }}>
-                      LOGIN
-                    </h1>
-                      <div style={{
-                        width: '52px',
-                        height: '1.5px',
-                        background: '#0b0e17',
-                        margin: '0 auto'
-                      }}></div>
-                    </div>
+                <Col lg={6} className="login-form-col">
+                  <div className="login-form-wrap">
+
+                    <h1 className="login-heading">LOGIN</h1>
+                    <div className="login-divider"></div>
 
                     {/* Welcome Info (Desktop) */}
-                    <div className="login-iit-info" style={{
-                      width: '100%',
-                      background: '#f6f6f7',
-                      border: '1px solid #e5e7eb',
-                      padding: '0.75rem 0.75rem',
-                      marginBottom: '1rem',
-                      textAlign: 'center'
-                    }}>
-                      <div className="login-welcome-title" style={{
-                        fontSize: '1.35rem',
-                        fontWeight: '600',
-                        color: '#0b0e17',
-                        marginBottom: '0.2rem'
-                      }}>
-                        Welcome Back!
-                      </div>
-                      <div className="login-welcome-subtitle" style={{
-                        fontSize: '0.95rem',
-                        fontWeight: '400',
-                        color: '#5c6270',
-                        marginBottom: '0.6rem'
-                      }}>
-                        Please Login to continue
-                      </div>
-                      <p className="login-only-email" style={{
-                        color: '#5c6270',
-                        fontSize: '0.75rem',
-                        margin: 0,
-                        lineHeight: '1.5'
-                      }}>
+                    <div className="login-info-box d-none d-lg-block">
+                      <div className="login-info-title">Welcome Back!</div>
+                      <div className="login-info-subtitle">Please Login to continue</div>
+                      <p className="login-info-text">
                         Only @iitjammu.ac.in email addresses are authorized to access this platform.
                       </p>
                     </div>
 
                     {/* Welcome Info (Mobile) */}
-                    <div className="login-welcome-mobile" style={{
-                      width: '100%',
-                      background: '#f6f6f7',
-                      border: '1px solid #e5e7eb',
-                      padding: '0.75rem 0.75rem',
-                      marginBottom: '1rem',
-                      textAlign: 'center'
-                    }}>
-                      <div className="login-welcome-title" style={{
-                        fontSize: '1.2rem',
-                        fontWeight: '600',
-                        color: '#0b0e17',
-                        marginBottom: '0.2rem'
-                      }}>
-                        Welcome Back!
-                      </div>
-                      <div className="login-welcome-subtitle" style={{
-                        fontSize: '0.9rem',
-                        fontWeight: '400',
-                        color: '#5c6270',
-                        marginBottom: '0.6rem'
-                      }}>
-                        Please Login to continue
-                      </div>
-                      <p className="login-only-email" style={{
-                        color: '#5c6270',
-                        fontSize: '0.9rem',
-                        margin: 0,
-                        lineHeight: '1.5'
-                      }}>
+                    <div className="login-info-box login-info-mobile d-lg-none">
+                      <div className="login-info-title">Welcome Back!</div>
+                      <div className="login-info-subtitle">Please Login to continue</div>
+                      <p className="login-info-text">
                         Only @iitjammu.ac.in email addresses are authorized to access this platform.
                       </p>
                     </div>
@@ -230,118 +76,51 @@ const Login = () => {
                     <Button
                       onClick={handleGoogleLogin}
                       disabled={isLoading}
-                      style={{
-                        width: '100%',
-                        background: '#0b0e17',
-                        border: '1px solid #0b0e17',
-                        padding: 'clamp(0.38rem, 2vw, 0.55rem) 1.6rem',
-                        fontSize: '12px',
-                        fontWeight: '500',
-                        letterSpacing: '0.09em',
-                        textTransform: 'uppercase',
-                        color: '#ffffff',
-                        transition: 'all 0.2s ease',
-                        marginBottom: '1rem'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = '#ffffff';
-                        e.currentTarget.style.color = '#0b0e17';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = '#0b0e17';
-                        e.currentTarget.style.color = '#ffffff';
-                      }}
+                      className="login-google-btn"
                     >
-                      <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px'}}>
-                        {isLoading ? (
-                          <>
-                            <Spinner animation="border" size="sm" style={{color: '#ffffff'}} />
-                            <span>Connecting...</span>
-                          </>
-                        ) : (
-                          <>
-                            <img
-                              src="/logos/google-logo-icon-PNG-Transparent-Background.png"
-                              alt="Google"
-                              style={{width: '20px', height: '20px'}}
-                            />
-                            <span>Continue with Google</span>
-                          </>
-                        )}
+                      <div className="login-google-btn-inner">
+                        <img
+                          src="/logos/google-logo-icon-PNG-Transparent-Background.png"
+                          alt="Google"
+                          className="login-google-icon"
+                        />
+                        <span>Continue with Google</span>
                       </div>
                     </Button>
 
                     {/* Terms */}
-                    <div style={{textAlign: 'center'}}>
-                      <p className="login-terms" style={{
-                        fontSize: '0.82rem',
-                        color: '#5c6270',
-                        margin: 0,
-                        lineHeight: '1.5'
-                      }}>
+                    <div className="login-terms-wrap">
+                      <p className="login-terms-text">
                         By signing in, you agree to our{' '}
                         <span
-                          onClick={handleTermsOfServiceClick}
-                          style={{
-                            color: '#0b0e17',
-                            cursor: 'pointer',
-                            textDecoration: 'underline',
-                            fontWeight: '400'
-                          }}
-                          onMouseEnter={(e) => {
-                            e.target.style.color = '#5c6270';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.target.style.color = '#0b0e17';
-                          }}
+                          onClick={() => navigate('/terms-of-service')}
+                          className="login-link"
                         >
                           Terms of Service
                         </span>
                         {' '}and{' '}
                         <span
-                          onClick={handlePrivacyPolicyClick}
-                          style={{
-                            color: '#0b0e17',
-                            cursor: 'pointer',
-                            textDecoration: 'underline',
-                            fontWeight: '400'
-                          }}
-                          onMouseEnter={(e) => {
-                            e.target.style.color = '#5c6270';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.target.style.color = '#0b0e17';
-                          }}
+                          onClick={() => navigate('/privacy-policy')}
+                          className="login-link"
                         >
                           Privacy Policy
                         </span>
                       </p>
                     </div>
 
-                    {/* Additional info */}
-                    <div style={{
-                      marginTop: '1.25rem',
-                      padding: '0.75rem 0.85rem',
-                      width: '100%',
-                      background: '#f6f6f7',
-                      border: '1px solid #e5e7eb'
-                    }}>
-                      <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '0.5rem'}}>
-                        <i className="fas fa-shield-alt login-secure-icon" style={{color: '#5c6270', fontSize: '0.9rem'}}></i>
-                        <small className="login-secure-title" style={{color: '#5c6270', fontSize: '0.75rem', fontWeight: '600'}}>
-                          SECURE & PRIVATE
-                        </small>
+                    {/* Security notice */}
+                    <div className="login-security-box">
+                      <div className="login-security-header">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                        <small className="login-security-label">SECURE & PRIVATE</small>
                       </div>
-                      <p className="login-secure-text" style={{
-                        fontSize: '0.75rem',
-                        color: '#8b909c',
-                        margin: 0,
-                        textAlign: 'center',
-                        lineHeight: '1.4'
-                      }}>
+                      <p className="login-security-text">
                         Your data is protected with enterprise-grade security. Only IIT Jammu students can access this platform.
                       </p>
                     </div>
+
                   </div>
                 </Col>
               </Row>
@@ -350,195 +129,307 @@ const Login = () => {
         </Row>
       </Container>
 
-      {/* Custom CSS for animations */}
-      <style>
-        {`
-          .login-welcome-mobile {
-            display: none;
-          }
+      <style>{`
+        .login-page {
+          background: #f6f6f7;
+          min-height: 100vh;
+        }
 
+        .login-container {
+          padding: 2rem;
+        }
+
+        .login-row {
+          justify-content: center;
+          align-items: center;
+          min-height: 80vh;
+        }
+
+        .login-col {
+          padding: 0;
+        }
+
+        .login-card {
+          background: #ffffff;
+          border: 1px solid #e5e7eb;
+          min-height: 400px;
+        }
+
+        .login-brand-col {
+          display: none;
+          background: #f6f6f7;
+          position: relative;
+          overflow: hidden;
+        }
+
+        @media (min-width: 992px) {
+          .login-brand-col {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+        }
+
+        .login-brand-content {
+          text-align: center;
+          position: relative;
+          z-index: 2;
+          padding: 2rem;
+        }
+
+        .login-brand-icon {
+          margin-bottom: 1.5rem;
+          display: flex;
+          justify-content: center;
+        }
+
+        .login-brand-logo {
+          width: 90px;
+          height: auto;
+          object-fit: contain;
+          filter: brightness(0);
+          opacity: 0.9;
+        }
+
+        .login-brand-title {
+          color: #0b0e17;
+          font-size: 2rem;
+          font-weight: 300;
+          margin-bottom: 0.75rem;
+          letter-spacing: 1px;
+        }
+
+        .login-brand-subtitle {
+          color: #5c6270;
+          font-size: 1.1rem;
+          font-weight: 300;
+          margin: 0;
+          line-height: 1.6;
+        }
+
+        .login-form-col {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 1.6rem 0.8rem;
+        }
+
+        .login-form-wrap {
+          width: 100%;
+          max-width: 220px;
+          padding: 0 4px;
+        }
+
+        .login-heading {
+          color: #0b0e17;
+          font-size: 2.6rem;
+          font-weight: 600;
+          margin-bottom: 0.35rem;
+          letter-spacing: 0.6px;
+          text-align: center;
+        }
+
+        .login-divider {
+          width: 52px;
+          height: 1.5px;
+          background: #0b0e17;
+          margin: 0 auto 1.5rem;
+        }
+
+        .login-info-box {
+          width: 100%;
+          background: #f6f6f7;
+          border: 1px solid #e5e7eb;
+          padding: 0.75rem;
+          margin-bottom: 1rem;
+          text-align: center;
+        }
+
+        .login-info-title {
+          font-size: 1.35rem;
+          font-weight: 600;
+          color: #0b0e17;
+          margin-bottom: 0.2rem;
+        }
+
+        .login-info-subtitle {
+          font-size: 0.95rem;
+          font-weight: 400;
+          color: #5c6270;
+          margin-bottom: 0.6rem;
+        }
+
+        .login-info-text {
+          color: #5c6270;
+          font-size: 0.75rem;
+          margin: 0;
+          line-height: 1.5;
+        }
+
+        .login-info-mobile .login-info-title {
+          font-size: 1.2rem;
+        }
+
+        .login-info-mobile .login-info-subtitle {
+          font-size: 0.9rem;
+        }
+
+        .login-info-mobile .login-info-text {
+          font-size: 0.9rem;
+        }
+
+        .login-google-btn {
+          width: 100%;
+          background: #0b0e17;
+          border: 1px solid #0b0e17;
+          padding: clamp(0.38rem, 2vw, 0.55rem) 1.6rem;
+          font-size: 12px;
+          font-weight: 500;
+          letter-spacing: 0.09em;
+          text-transform: uppercase;
+          color: #ffffff;
+          transition: all 0.2s ease;
+          margin-bottom: 1rem;
+        }
+
+        .login-google-btn:hover {
+          background: #ffffff;
+          color: #0b0e17;
+        }
+
+        .login-google-btn-inner {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 12px;
+        }
+
+        .login-google-icon {
+          width: 20px;
+          height: 20px;
+        }
+
+        .login-terms-wrap {
+          text-align: center;
+        }
+
+        .login-terms-text {
+          font-size: 0.82rem;
+          color: #5c6270;
+          margin: 0;
+          line-height: 1.5;
+        }
+
+        .login-link {
+          color: #0b0e17;
+          cursor: pointer;
+          text-decoration: underline;
+          font-weight: 400;
+        }
+
+        .login-link:hover {
+          color: #5c6270;
+        }
+
+        .login-security-box {
+          margin-top: 1.25rem;
+          padding: 0.75rem 0.85rem;
+          width: 100%;
+          background: #f6f6f7;
+          border: 1px solid #e5e7eb;
+        }
+
+        .login-security-header {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          margin-bottom: 0.5rem;
+          color: #5c6270;
+        }
+
+        .login-security-label {
+          font-size: 0.75rem;
+          font-weight: 600;
+        }
+
+        .login-security-text {
+          font-size: 0.75rem;
+          color: #8b909c;
+          margin: 0;
+          text-align: center;
+          line-height: 1.4;
+        }
+
+        @media (max-width: 991px) {
+          .login-container {
+            padding: 1rem !important;
+          }
+          .login-heading {
+            font-size: 2.5rem !important;
+          }
+        }
+
+        @media (max-width: 576px) {
+          .login-container {
+            padding: 0 !important;
+          }
+          .login-card {
+            background: transparent !important;
+            border: none !important;
+          }
+          .login-heading {
+            font-size: 2rem !important;
+            margin-bottom: 1.25rem !important;
+            font-weight: 700 !important;
+          }
+          .login-google-btn {
+            padding: 1rem 1.5rem !important;
+            font-size: 1.15rem !important;
+          }
+          .login-info-box {
+            display: block !important;
+            background: #f6f6f7 !important;
+            border: 1px solid #e5e7eb !important;
+            padding: 1rem 0.75rem !important;
+            margin-bottom: 1.5rem !important;
+          }
+          .login-info-box.d-none.d-lg-block {
+            display: none !important;
+          }
+          .login-info-mobile {
+            display: block !important;
+          }
+          .login-info-title {
+            font-size: 1.5rem !important;
+            margin-bottom: 0.4rem !important;
+          }
+          .login-info-subtitle {
+            font-size: 1.05rem !important;
+            margin-bottom: 0.8rem !important;
+          }
+          .login-info-text {
+            font-size: 0.95rem !important;
+            line-height: 1.5 !important;
+          }
+          .login-terms-text {
+            font-size: 0.9rem !important;
+            margin-top: 0.75rem !important;
+          }
+          .login-security-label {
+            font-size: 0.85rem !important;
+          }
+          .login-security-text {
+            font-size: 0.8rem !important;
+          }
           .login-form-wrap {
-            max-width: 220px;
-            max-height: none;
-            overflow: visible;
-            padding-left: 4px;
-            padding-right: 4px;
+            max-width: 380px;
+            width: 96%;
+            margin: 0 auto;
+            padding: 0 4px;
           }
-
-          @keyframes randomFloat0 {
-            0% { transform: translate(0px, 0px) rotate(0deg); opacity: 0.2; }
-            25% { transform: translate(15px, -20px) rotate(90deg); opacity: 0.6; }
-            50% { transform: translate(-10px, -40px) rotate(180deg); opacity: 0.3; }
-            75% { transform: translate(5px, -20px) rotate(270deg); opacity: 0.5; }
-            100% { transform: translate(0px, 0px) rotate(360deg); opacity: 0.2; }
-          }
-
-          @keyframes randomFloat1 {
-            0% { transform: translate(0px, 0px) scale(1); opacity: 0.3; }
-            33% { transform: translate(-15px, -25px) scale(1.2); opacity: 0.7; }
-            66% { transform: translate(20px, -15px) scale(0.8); opacity: 0.4; }
-            100% { transform: translate(0px, 0px) scale(1); opacity: 0.3; }
-          }
-
-          @keyframes randomFloat2 {
-            0% { transform: translate(0px, 0px) rotate(0deg); opacity: 0.25; }
-            50% { transform: translate(18px, -22px) rotate(180deg); opacity: 0.6; }
-            100% { transform: translate(0px, 0px) rotate(360deg); opacity: 0.25; }
-          }
-
-          @keyframes randomFloat3 {
-            0% { transform: translate(0px, 0px) scale(1); opacity: 0.2; }
-            25% { transform: translate(10px, -15px) scale(1.3); opacity: 0.5; }
-            50% { transform: translate(-8px, -30px) scale(0.9); opacity: 0.3; }
-            75% { transform: translate(12px, -15px) scale(1.1); opacity: 0.4; }
-            100% { transform: translate(0px, 0px) scale(1); opacity: 0.2; }
-          }
-
-          @keyframes gentleWave {
-            0%, 100% { opacity: 0.2; transform: translateX(-10px); }
-            50% { opacity: 0.4; transform: translateX(10px); }
-          }
-
-          @keyframes slowRotate {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
-          }
-
-          @keyframes slowRotateReverse {
-            0% { transform: translate(-50%, -50%) rotate(360deg); }
-            100% { transform: translate(-50%, -50%) rotate(0deg); }
-          }
-
-          @keyframes floatLight {
-            0%, 100% {
-              transform: translateY(0px) scale(1);
-              opacity: 0.3;
-            }
-            50% {
-              transform: translateY(-20px) scale(1.1);
-              opacity: 0.6;
-            }
-          }
-
-          @keyframes gentleFloat {
-            0%, 100% {
-              transform: translateY(0px);
-            }
-            50% {
-              transform: translateY(-10px);
-            }
-          }
-
-          @keyframes filmStrip {
-            0%, 100% {
-              opacity: 0.3;
-              transform: scaleY(1);
-            }
-            50% {
-              opacity: 1;
-              transform: scaleY(1.2);
-            }
-          }
-
-          @keyframes particleFloat {
-            0%, 100% {
-              transform: translateY(0px) translateX(0px);
-              opacity: 0;
-            }
-            50% {
-              transform: translateY(-40px) translateX(10px);
-              opacity: 0.8;
-            }
-          }
-
-          /* Responsive adjustments */
-          @media (max-width: 991px) {
-            .container-fluid {
-              padding: 1rem !important;
-            }
-
-            h1 {
-              font-size: 2.5rem !important;
-            }
-          }
-
-          @media (max-width: 576px) {
-            .container-fluid {
-              padding: 0 !important;
-            }
-
-            .login-card-container {
-              background: transparent !important;
-              backdrop-filter: none !important;
-              border: none !important;
-              box-shadow: none !important;
-            }
-
-            h1 {
-              font-size: 2rem !important;
-              margin-bottom: 1.25rem !important;
-              font-weight: 700 !important;
-            }
-
-            .btn {
-              padding: 1rem 1.5rem !important;
-              font-size: 1.15rem !important;
-              border-radius: 20px !important;
-            }
-
-            .login-iit-info {
-              display: none !important;
-            }
-
-            .login-welcome-mobile {
-              display: block !important;
-              background: #f6f6f7 !important;
-              border: 1px solid #e5e7eb !important;
-              padding: 1rem 0.75rem !important;
-              margin-bottom: 1.5rem !important;
-            }
-
-            .login-welcome-title {
-              font-size: 1.5rem !important;
-              margin-bottom: 0.4rem !important;
-            }
-
-            .login-welcome-subtitle {
-              font-size: 1.05rem !important;
-              margin-bottom: 0.8rem !important;
-            }
-
-            .login-only-email {
-              font-size: 0.95rem !important;
-              line-height: 1.5 !important;
-            }
-
-            .login-terms {
-              font-size: 0.9rem !important;
-              margin-top: 0.75rem !important;
-            }
-
-            .login-secure-title {
-              font-size: 0.85rem !important;
-            }
-
-            .login-secure-text {
-              font-size: 0.8rem !important;
-            }
-
-            .login-secure-icon {
-              font-size: 1rem !important;
-            }
-
-            .login-form-wrap {
-              max-width: 380px;
-              width: 96%;
-              margin: 0 auto;
-              padding: 0 4px;
-            }
-          }
-        `}
-      </style>
+        }
+      `}</style>
     </div>
   );
 };
