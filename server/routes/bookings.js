@@ -467,7 +467,7 @@ router.post('/scan', (req, res) => {
 
     // Find the booking by booking_id (could be numeric database ID or custom alphanumeric code)
     // First try to find by custom booking_code, then fallback to numeric ID if bookingId is numeric
-    const query = 'SELECT b.*, u.name, u.email, m.title FROM bookings b LEFT JOIN users u ON b.user_id = u.id LEFT JOIN movies m ON b.movie_id = m.id WHERE b.booking_code = ?';
+    let query = 'SELECT b.*, u.name, u.email, m.title FROM bookings b LEFT JOIN users u ON b.user_id = u.id LEFT JOIN movies m ON b.movie_id = m.id WHERE b.booking_code = ?';
     const params = [bookingId];
 
     // If bookingId looks like a number, also try searching by numeric ID
@@ -583,7 +583,7 @@ router.post('/scan', (req, res) => {
 
     // Find booking by booking_id from QR data (could be numeric database ID or custom alphanumeric code)
     // First try to find by custom booking_code, then fallback to numeric ID if bookingId is numeric
-    const query = 'SELECT b.*, u.name, u.email, m.title FROM bookings b LEFT JOIN users u ON b.user_id = u.id LEFT JOIN movies m ON b.movie_id = m.id WHERE b.booking_code = ?';
+    let query = 'SELECT b.*, u.name, u.email, m.title FROM bookings b LEFT JOIN users u ON b.user_id = u.id LEFT JOIN movies m ON b.movie_id = m.id WHERE b.booking_code = ?';
     const params = [bookingId];
 
     // If bookingId looks like a number, also try searching by numeric ID

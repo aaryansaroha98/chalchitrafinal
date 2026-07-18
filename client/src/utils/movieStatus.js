@@ -4,7 +4,7 @@ const normalizeMovieDateInput = (movieDate) => {
   const raw = String(movieDate).trim();
   if (!raw) return null;
   if (raw.includes('T')) return raw;
-  return raw.replace(' ', 'T');
+  return raw + 'T00:00:00';
 };
 
 export const parseMovieDate = (movieDate) => {

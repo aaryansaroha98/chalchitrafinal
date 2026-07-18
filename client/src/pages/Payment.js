@@ -15,7 +15,7 @@ const Payment = () => {
   const { movieId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, fetchCoinBalance: refreshGlobalCoinBalance } = useAuth();
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
@@ -276,7 +276,8 @@ const Payment = () => {
                   setCouponData(res.data);
                   setCouponSuccess(res.data.message || `🪙 ${res.data.coins_granted} coins added!`);
                   setCouponError('');
-                  // Refresh coin balance
+                  // Refresh coin balance globally
+                  refreshGlobalCoinBalance();
                   await fetchCoinBalance();
                 } catch (err) {
                   setCouponError(err.response?.data?.error || 'Invalid coupon');
@@ -395,6 +396,8 @@ const Payment = () => {
                       coupon_code: couponCode
                     });
 
+                    refreshGlobalCoinBalance();
+
                     const successPayload = {
                       ticket: bookingRes.data,
                       movie: movie,
@@ -442,6 +445,8 @@ const Payment = () => {
                       use_coins: true,
                       customer_details: customerDetails
                     });
+
+                    refreshGlobalCoinBalance();
 
                     const successPayload = {
                       ticket: bookingRes.data,
