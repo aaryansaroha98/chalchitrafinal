@@ -18,6 +18,10 @@ const DatabaseSessionStore = require('./sessionStore');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Disable ETag for dynamic responses so the API never returns 304 Not Modified.
+// (Static assets served via express.static keep their own ETag/caching.)
+app.disable('etag');
 const SESSION_MAX_AGE_MS = Number(process.env.SESSION_MAX_AGE_MS) || (30 * 24 * 60 * 60 * 1000); // 30 days
 
 // Trust proxy - required when behind Vercel/Render proxies for secure cookies
@@ -38,6 +42,16 @@ const apiLimiter = rateLimit({
   legacyHeaders: false,
 });
 app.use('/api', apiLimiter);
+
+// Prevent browsers (especially Safari, which caches heuristically when no
+// Cache-Control is present) from serving stale API data. Movie lists are
+// time-sensitive (filtered by "date >= now"), so they must never be cached.
+app.use('/api', (req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  next();
+});
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
