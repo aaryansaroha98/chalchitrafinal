@@ -600,11 +600,15 @@ label {
   box-shadow: none;
 }
 .seat-button.occupied {
-  background: var(--qt-panel-soft);
-  border-color: var(--qt-line);
-  color: var(--qt-quiet);
+  background: #b8bcc4 !important;
+  border-color: #a1a6af !important;
+  color: #6b7078 !important;
   cursor: not-allowed;
   opacity: 1;
+}
+.seat-button.occupied:hover {
+  background: #b8bcc4 !important;
+  border-color: #a1a6af !important;
 }
 .seat-button.shake {
   animation: shake 0.5s ease-in-out;

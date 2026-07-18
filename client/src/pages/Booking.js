@@ -928,8 +928,8 @@ const Booking = () => {
                 <div style={{
                   width: '16px',
                   height: '16px',
-                  background: '#f6f6f7',
-                  border: '1px solid #e5e7eb'
+                  background: '#b8bcc4',
+                  border: '1px solid #a1a6af'
                 }}></div>
                 <span className="font-inter booking-seat-legend-text" style={{
                   fontSize: '14px',
