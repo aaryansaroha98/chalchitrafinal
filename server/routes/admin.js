@@ -884,9 +884,9 @@ router.get('/settings', (req, res) => {
       // Create default settings
       const defaultAboutText = 'Chalchitra Series is a pioneering student-led initiative at IIT Jammu dedicated to bringing world-class cinematic experiences to our vibrant campus community. Founded with the vision to create a cultural hub on campus, we organize premium movie screenings featuring a diverse collection of films - from timeless classics to contemporary blockbusters, independent gems to international masterpieces.\n\nOur mission goes beyond entertainment; we strive to foster a thriving cultural atmosphere that enriches the lives of IIT Jammu students, providing affordable access to quality cinema while creating memorable experiences that bring our community together. Through innovation, dedication, and a passion for storytelling, Chalchitra Series continues to be the heartbeat of cinematic culture at IIT Jammu, creating lasting memories one screening at a time.';
       db.run('INSERT INTO settings (id, tagline, hero_background, about_text, about_image) VALUES (1, ?, ?, ?, ?)',
-        ['Student-led movie screening initiative at IIT Jammu', '#007bff', defaultAboutText, '/about-image.jpg'], function (err) {
+        ['Student-led movie screening initiative at IIT Jammu', '#007bff', defaultAboutText, '/logos/newlogo.png'], function (err) {
           if (err) return res.status(500).json({ error: err.message });
-          res.json({ id: 1, tagline: 'Student-led movie screening initiative at IIT Jammu', hero_background: '#007bff', about_text: defaultAboutText, about_image: '/about-image.jpg' });
+          res.json({ id: 1, tagline: 'Student-led movie screening initiative at IIT Jammu', hero_background: '#007bff', about_text: defaultAboutText, about_image: '/logos/newlogo.png' });
         });
     } else {
       res.json(settings);
