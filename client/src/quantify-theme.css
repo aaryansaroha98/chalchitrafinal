@@ -1169,7 +1169,7 @@ footer a:hover, .footer a:hover { color: var(--qt-text) !important; }
 /* Pay button */
 .pay-section { margin-top: 1.5rem; }
 .pay-btn {
-  width: 100%; padding: 0.95rem !important;
+  width: 100%; max-width: none !important; padding: 0.95rem !important;
   background: var(--qt-ink) !important; color: #fff !important;
   border: 1px solid var(--qt-ink) !important;
   font-size: 12px !important; font-weight: 600 !important;

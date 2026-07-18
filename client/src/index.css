@@ -683,24 +683,26 @@ a:hover {
 }
 
 .check-icon {
-  width: 60px;
-  height: 60px;
-  margin: 0 auto 1rem;
-  background: rgba(15, 157, 99, 0.1);
-  border: 2px solid #0f9d63;
-  border-radius: 50%;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1.25rem;
+  background: #0f9d63;
+  border: none;
+  border-radius: 50% !important;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 4px 14px rgba(15, 157, 99, 0.3);
   animation: scaleIn 0.5s ease;
 }
 
 .check-icon::after {
   content: '';
   width: 20px;
-  height: 10px;
-  border-left: 2px solid #0f9d63;
-  border-bottom: 2px solid #0f9d63;
+  height: 11px;
+  border-left: 3px solid #ffffff;
+  border-bottom: 3px solid #ffffff;
+  border-radius: 0 !important;
   transform: rotate(-45deg) translateY(-2px);
 }
 
@@ -763,13 +765,16 @@ a:hover {
   margin-bottom: 1.5rem;
 }
 
-.badge {
+.badge-row .badge {
   padding: 0.5rem 1rem;
   background: #f6f6f7;
   border: 1px solid #e5e7eb;
   border-radius: 0;
   font-size: 0.85rem;
-  color: #5c6270;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: #0b0e17 !important;
 }
 
 /* Divider */
@@ -1188,7 +1193,8 @@ a:hover {
   }
 
   .check-icon {
-    font-size: 3.5rem;
+    width: 56px;
+    height: 56px;
   }
 
   .success-title {
@@ -1609,7 +1615,6 @@ a:hover {
   cursor: pointer;
   transition: all 0.2s;
   width: 100%;
-  max-width: 400px;
 }
 
 .pay-btn:hover:not(:disabled) {
