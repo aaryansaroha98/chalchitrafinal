@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Loader = ({ message = 'Loading...', subtitle = 'Please wait while we prepare things for you...' }) => {
+const Loader = () => {
   return (
     <div style={{
       background: '#ffffff',
@@ -15,29 +15,10 @@ const Loader = ({ message = 'Loading...', subtitle = 'Please wait while we prepa
       justifyContent: 'center',
       zIndex: 9999
     }}>
-      <div className="loader-glass-card" style={{
-        textAlign: 'center',
-        padding: '2.5rem 3rem',
-        maxWidth: '420px'
-      }}>
-        <div className="loader-spinner" role="status" aria-label="Loading">
-          {Array.from({ length: 12 }).map((_, i) => (
-            <div key={i} className="loader-spinner-bar" />
-          ))}
-        </div>
-        <h3 style={{
-          color: 'var(--qt-text)',
-          margin: '1.25rem 0 0.5rem',
-          fontWeight: 700,
-          fontSize: '1.35rem',
-          letterSpacing: '-0.02em'
-        }}>{message}</h3>
-        <p style={{
-          color: 'var(--qt-muted)',
-          margin: 0,
-          fontSize: '0.95rem',
-          lineHeight: '1.5'
-        }}>{subtitle}</p>
+      <div className="loader-spinner" role="status" aria-label="Loading">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <div key={i} className="loader-spinner-bar" />
+        ))}
       </div>
     </div>
   );

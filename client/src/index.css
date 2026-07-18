@@ -2795,21 +2795,21 @@ a:hover {
 /* Apple-style spinner: 12 rounded lines rotating in a circle */
 .loader-spinner {
   position: relative;
-  width: 56px;
-  height: 56px;
-  margin: 0 auto 2rem;
+  width: 40px;
+  height: 40px;
+  margin: 0 auto;
 }
 
 .loader-spinner-bar {
   position: absolute;
   top: 0;
   left: 50%;
-  width: 4px;
-  height: 14px;
-  margin-left: -2px;
+  width: 3px;
+  height: 10px;
+  margin-left: -1.5px;
   border-radius: 2px;
   background: var(--qt-text, #0b0e17);
-  transform-origin: 2px 28px; /* rotate around center (half of 56px) */
+  transform-origin: 1.5px 20px; /* rotate around center (half of 40px) */
   animation: loader-fade 1s linear infinite;
 }
 
@@ -2832,30 +2832,15 @@ a:hover {
 }
 
 @media (max-width: 576px) {
-  .loader-glass-card {
-    padding: 2rem !important;
-    max-width: 280px !important;
-  }
-  
   .loader-spinner {
-    width: 44px !important;
-    height: 44px !important;
-    margin-bottom: 1.25rem !important;
+    width: 34px !important;
+    height: 34px !important;
   }
 
   .loader-spinner-bar {
-    width: 3px;
-    height: 11px;
-    margin-left: -1.5px;
-    transform-origin: 1.5px 22px; /* half of 44px */
-  }
-  
-  .loader-glass-card h3 {
-    font-size: 1.15rem !important;
-    margin-bottom: 0.5rem !important;
-  }
-  
-  .loader-glass-card p {
-    font-size: 0.85rem !important;
+    width: 2.5px;
+    height: 9px;
+    margin-left: -1.25px;
+    transform-origin: 1.25px 17px; /* half of 34px */
   }
 }
