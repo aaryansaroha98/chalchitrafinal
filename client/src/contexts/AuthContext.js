@@ -157,7 +157,7 @@ export const AuthProvider = ({ children }) => {
               fontWeight: '600',
               marginBottom: '0.5rem'
             }}>
-              You got {bonusCoinAmount} coins!
+              Congratulations!
             </h3>
             <p style={{
               color: '#5c6270',
@@ -165,7 +165,7 @@ export const AuthProvider = ({ children }) => {
               marginBottom: '1.5rem',
               lineHeight: '1.5'
             }}>
-              Sign-up bonus credited to your account. Use coins to book movie tickets.
+              You got {bonusCoinAmount} Chalchitra coins. Use them to book movie tickets and more.
             </p>
             <button
               onClick={() => setShowCoinBonusPopup(false)}
