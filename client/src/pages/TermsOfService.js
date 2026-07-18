@@ -108,14 +108,14 @@ const TermsOfService = () => {
                 fontWeight: 'bold',
                 marginBottom: '1rem'
               }}>
-                Purchases and Payments
+                Chalchitra Coins and Bookings
               </h2>
               <p style={{
                 color: '#5c6270',
                 lineHeight: '1.6',
                 marginBottom: '2rem'
               }}>
-                Prices for our products and services are listed in INR (Indian Rupees). Payments can be made via credit card, debit card, or other accepted methods at checkout. We reserve the right to change prices or services at any time without notice.
+                All bookings on our platform are made using Chalchitra Coins, our in-platform credit system. Ticket and food prices are listed in Coins, and the required Coins are deducted from your account balance at the time of booking. Chalchitra Coins have no monetary value, cannot be exchanged for cash, and are usable only within the Chalchitra Series platform. We reserve the right to change Coin pricing or services at any time without notice.
               </p>
 
               <h2 style={{
@@ -172,14 +172,14 @@ const TermsOfService = () => {
                 fontWeight: 'bold',
                 marginBottom: '1rem'
               }}>
-                Refunds
+                Coin Refunds
               </h2>
               <p style={{
                 color: '#5c6270',
                 lineHeight: '1.6',
                 marginBottom: '2rem'
               }}>
-                Tickets purchased through our platform are non-refundable except in cases of event cancellation by Chalchitra. Refund requests will be reviewed on a case-by-case basis.
+                When you book a ticket, the Chalchitra Coins are deducted from your account. Once you attend the screening and your ticket is scanned for admission at the venue, the full Coin amount for that booking is credited back to your account. In other words, attending the screening returns your Coins. Coins are not returned for tickets that are never scanned or for no-shows, except where the event is cancelled by Chalchitra. As Chalchitra Coins carry no monetary value, no cash refunds are provided.
               </p>
 
               <h2 style={{

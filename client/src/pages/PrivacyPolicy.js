@@ -74,7 +74,7 @@ const PrivacyPolicy = () => {
                 lineHeight: '1.6',
                 marginBottom: '2rem'
               }}>
-                Chalchitra Series is an online platform designed for the IIT Jammu community to facilitate movie ticket bookings for screenings organized at the institute. Our services include ticket reservation, payment processing, and digital ticket issuance.
+                Chalchitra Series is an online platform designed for the IIT Jammu community to facilitate movie ticket bookings for screenings organized at the institute. Our services include ticket reservation, bookings through our Chalchitra Coin system, and digital ticket issuance.
               </p>
 
               <h2 style={{
@@ -90,7 +90,7 @@ const PrivacyPolicy = () => {
                 lineHeight: '1.6',
                 marginBottom: '2rem'
               }}>
-                We collect personal information such as your name, email address, and payment details when you register or make a purchase on our platform.
+                We collect personal information such as your name and email address when you register on our platform. When you make a booking, we also record your Chalchitra Coin balance and transaction history. We do not collect or store any credit card, debit card, or bank details, as all bookings are made using Chalchitra Coins.
               </p>
 
               <h2 style={{
@@ -106,7 +106,7 @@ const PrivacyPolicy = () => {
                 lineHeight: '1.6',
                 marginBottom: '2rem'
               }}>
-                Your information is used to process orders, provide customer support, and deliver our services. We may also use your contact information for important updates.
+                Your information is used to process bookings, manage your Chalchitra Coin balance, provide customer support, and deliver our services. We may also use your contact information for important updates.
               </p>
 
               <h2 style={{
