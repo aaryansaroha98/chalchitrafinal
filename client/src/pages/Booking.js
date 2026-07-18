@@ -56,6 +56,44 @@ const Booking = () => {
     fetchUserBookings();
   }, [movieId]);
 
+  // Real-time seat sync: poll occupied seats while the page is open so seats
+  // booked by other users show up as grayed-out without a manual refresh.
+  useEffect(() => {
+    if (!movieId) return;
+
+    const POLL_MS = 5000;
+    let intervalId = null;
+
+    const startPolling = () => {
+      if (intervalId) return;
+      intervalId = setInterval(() => fetchOccupiedSeats(true), POLL_MS);
+    };
+
+    const stopPolling = () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    };
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        fetchOccupiedSeats(true); // immediate refresh on refocus
+        startPolling();
+      } else {
+        stopPolling(); // don't poll a backgrounded tab
+      }
+    };
+
+    startPolling();
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      stopPolling();
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [movieId]);
+
   useEffect(() => {
     if (!seatScrollRef.current || !blockBRef.current) return;
     if (typeof window !== 'undefined' && window.innerWidth > 576) return;
@@ -72,12 +110,26 @@ const Booking = () => {
     });
   }, [movie?.venue, loading]);
 
-  const fetchOccupiedSeats = async () => {
+  const fetchOccupiedSeats = async (silent = false) => {
     try {
       const res = await api.get(`/api/bookings/occupied/${movieId}`);
-      setOccupiedSeats(res.data.occupied_seats || []);
+      const nextOccupied = res.data.occupied_seats || [];
+      setOccupiedSeats(nextOccupied);
+
+      // If a seat the user had selected was just booked by someone else,
+      // drop it from their selection and let them know.
+      setSelectedSeats(prev => {
+        const taken = prev.filter(seatId => nextOccupied.includes(seatId));
+        if (taken.length === 0) return prev;
+        setToastMessage(
+          `Seat${taken.length > 1 ? 's' : ''} ${taken.join(', ')} ${taken.length > 1 ? 'were' : 'was'} just booked by someone else`
+        );
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 2500);
+        return prev.filter(seatId => !nextOccupied.includes(seatId));
+      });
     } catch (err) {
-      console.error('Failed to fetch occupied seats:', err);
+      if (!silent) console.error('Failed to fetch occupied seats:', err);
     }
   };
 
