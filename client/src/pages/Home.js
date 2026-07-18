@@ -59,7 +59,7 @@ const Home = () => {
 
   const fetchUpcomingMovies = async (retries = 2) => {
     try {
-      const res = await api.get('/api/movies/all');
+      const res = await api.get('/api/movies/upcoming');
       const now = new Date();
       const upcoming = Array.isArray(res.data) ? res.data
         .filter((movie) => isUpcomingMovie(movie.date, now))

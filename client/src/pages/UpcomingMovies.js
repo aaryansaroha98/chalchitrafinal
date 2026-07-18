@@ -23,12 +23,8 @@ const UpcomingMovies = () => {
 
   const fetchMovies = async (retries = 2) => {
     try {
-      const res = await api.get('/api/movies/all');
-      const now = new Date();
-      const upcoming = (res.data || [])
-        .filter((movie) => isUpcomingMovie(movie.date, now))
-        .sort(compareMovieDatesAsc);
-      setMovies(upcoming);
+      const res = await api.get('/api/movies/upcoming');
+      setMovies(res.data || []);
       setLoading(false);
     } catch (err) {
       if (retries > 0) {

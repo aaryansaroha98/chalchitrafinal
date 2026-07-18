@@ -21,12 +21,8 @@ const PastMovies = () => {
 
   const fetchMovies = async (retries = 2) => {
     try {
-      const res = await api.get('/api/movies/all');
-      const now = new Date();
-      const past = (res.data || [])
-        .filter((movie) => isPastMovie(movie.date, now))
-        .sort(compareMovieDatesDesc);
-      setMovies(past);
+      const res = await api.get('/api/movies/past');
+      setMovies(res.data || []);
       setLoading(false);
     } catch (err) {
       if (retries > 0) {
