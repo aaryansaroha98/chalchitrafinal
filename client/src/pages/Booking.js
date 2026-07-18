@@ -188,27 +188,16 @@ const Booking = () => {
 
   const Seat = ({ seatId, seatNumber, isSelected, isOccupied, onClick, shake, size = 24, fontSize = 9 }) => {
     return (
-      <motion.button
-        key={seatId}
+      <button
         onClick={() => !isOccupied && onClick(seatId)}
         disabled={isOccupied}
-        animate={shake === seatId ? {
-          x: [-5, 5, -5, 5, 0],
-          transition: { duration: 0.5 }
-        } : {}}
-        whileHover={!isOccupied && !isSelected ? {
-          scale: 1.1,
-          y: -2,
-          transition: { duration: 0.2 }
-        } : {}}
-        whileTap={!isOccupied ? { scale: 0.95 } : {}}
         className={`
           seat-button relative ${isOccupied
             ? 'occupied'
             : isSelected
               ? 'selected'
               : 'available'
-          }
+          } ${shake === seatId ? 'shake' : ''}
         `}
         style={{
           width: `${size}px`,
@@ -219,7 +208,7 @@ const Booking = () => {
         <span className="relative z-10">
           {seatNumber}
         </span>
-      </motion.button>
+      </button>
     );
   };
 
@@ -392,12 +381,7 @@ const Booking = () => {
         </div>
 
         {/* Seat Selection */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          style={{marginBottom: '48px'}}
-        >
+          <div style={{marginBottom: '48px'}}>
           <div className="booking-seat-card" style={{
             background: '#ffffff',
             border: '1px solid #e5e7eb',
@@ -419,12 +403,9 @@ const Booking = () => {
             </div>
 
             {/* Curved Screen */}
-            <motion.div
+            <div
               className="booking-seat-screen"
               style={{textAlign: 'center', marginBottom: '32px', marginTop: '-40px'}}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.6 }}
             >
               <div style={{position: 'relative'}}>
                 {/* Curved screen effect using SVG */}
@@ -443,18 +424,8 @@ const Booking = () => {
                     stroke="#e5e7eb"
                     strokeWidth="2"
                   />
-                  {/* Animated glow effect */}
-                  <motion.path
-                    d="M20,60 Q200,20 380,60 L380,70 Q200,30 20,70 Z"
-                    fill="none"
-                    stroke="url(#screenGradient)"
-                    strokeWidth="1"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ duration: 2, ease: "easeInOut" }}
-                  />
                 </svg>
-                <motion.h3
+                <h3
                   className="font-cinzel"
                   style={{
                     fontSize: '24px',
@@ -463,13 +434,11 @@ const Booking = () => {
                     letterSpacing: '0.2em',
                     marginTop: '-10px'
                   }}
-                  animate={{ opacity: [0.7, 1, 0.7] }}
-                  transition={{ duration: 2, repeat: Infinity }}
                 >
                   Screen
-                </motion.h3>
+                </h3>
               </div>
-            </motion.div>
+            </div>
 
             {/* Pushkar Layout with Separate Block Containers */}
             {['Pushkar 11AC2022', 'Pushkar 11AC3027'].includes(movie.venue) ? (
@@ -493,7 +462,7 @@ const Booking = () => {
                   }}>
                     Block A
                   </div>
-                  <motion.div
+                  <div
                     className="seat-block"
                     style={{
                       display: 'flex',
@@ -504,9 +473,6 @@ const Booking = () => {
                       border: '1px solid #e5e7eb',
                       position: 'relative'
                     }}
-                    initial={{ opacity: 0, x: -30 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.8 }}
                   >
                     {Array.from({ length: 5 }, (_, rowIndex) => {
                       // Progressive seat sizing: smaller at front, larger at back
@@ -519,7 +485,7 @@ const Booking = () => {
                       const shiftAmount = rowIndex === 0 ? 20 : rowIndex === 4 ? -20 : 0; // Row 1: +20px, Row 5: -20px, others: 0
 
                       return (
-                        <motion.div
+                        <div
                           key={rowIndex}
                           style={{
                             display: 'flex',
@@ -528,9 +494,6 @@ const Booking = () => {
                             marginBottom: '2px',
                             transform: `translateX(${shiftAmount}px)`
                           }}
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: 0.05 * rowIndex }}
                         >
                           {Array.from({ length: 5 }, (_, col) => {
                             const seatNumber = col + 1;
@@ -552,10 +515,10 @@ const Booking = () => {
                               />
                             );
                           })}
-                        </motion.div>
+                        </div>
                       );
                     })}
-                  </motion.div>
+                  </div>
                 </div>
 
                 {/* Block B - 7 rows with varying seats */}
@@ -568,7 +531,7 @@ const Booking = () => {
                   }}>
                     Block B
                   </div>
-                  <motion.div
+                  <div
                     className="seat-block"
                     style={{
                       display: 'flex',
@@ -579,9 +542,6 @@ const Booking = () => {
                       border: '1px solid #e5e7eb',
                       position: 'relative'
                     }}
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.9 }}
                   >
                     {Array.from({ length: 7 }, (_, rowIndex) => {
                       // Define seats per row for Block B
@@ -594,7 +554,7 @@ const Booking = () => {
                       const seatGap = 3 + (rowIndex * 0.2); // 3, 3.2, 3.4, 3.6, 3.8, 4.0, 4.2
 
                       return (
-                        <motion.div
+                        <div
                           key={rowIndex}
                           style={{
                             display: 'flex',
@@ -602,9 +562,6 @@ const Booking = () => {
                             gap: `${seatGap}px`,
                             marginBottom: '2px'
                           }}
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: 0.05 * rowIndex }}
                         >
                           {Array.from({ length: seatsPerRow[rowIndex] }, (_, col) => {
                             const seatNumber = col + 1;
@@ -626,10 +583,10 @@ const Booking = () => {
                               />
                             );
                           })}
-                        </motion.div>
+                        </div>
                       );
                     })}
-                  </motion.div>
+                  </div>
                   <div className="booking-seat-venue-inline">
                     {movie?.venue}
                   </div>
@@ -645,7 +602,7 @@ const Booking = () => {
                   }}>
                     Block C
                   </div>
-                  <motion.div
+                  <div
                     className="seat-block"
                     style={{
                       display: 'flex',
@@ -656,9 +613,6 @@ const Booking = () => {
                       border: '1px solid #e5e7eb',
                       position: 'relative'
                     }}
-                    initial={{ opacity: 0, x: 30 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 1.0 }}
                   >
                     {Array.from({ length: 5 }, (_, rowIndex) => {
                       // Progressive seat sizing: smaller at front, larger at back
@@ -671,7 +625,7 @@ const Booking = () => {
                       const shiftAmount = rowIndex === 0 ? -20 : rowIndex === 4 ? 20 : 0; // Row 1: -20px, Row 5: +20px, others: 0
 
                       return (
-                        <motion.div
+                        <div
                           key={rowIndex}
                           style={{
                             display: 'flex',
@@ -680,9 +634,6 @@ const Booking = () => {
                             marginBottom: '2px',
                             transform: `translateX(${shiftAmount}px)`
                           }}
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: 0.05 * rowIndex }}
                         >
                           {Array.from({ length: 5 }, (_, col) => {
                             const seatNumber = col + 1;
@@ -704,10 +655,10 @@ const Booking = () => {
                               />
                             );
                           })}
-                        </motion.div>
+                        </div>
                       );
                     })}
-                  </motion.div>
+                  </div>
                 </div>
               </div>
             ) : (
@@ -732,7 +683,7 @@ const Booking = () => {
                   }}>
                     Block A
                   </div>
-                  <motion.div
+                  <div
                     className="seat-block"
                     style={{
                       display: 'flex',
@@ -743,9 +694,6 @@ const Booking = () => {
                       border: '1px solid #e5e7eb',
                       position: 'relative'
                     }}
-                    initial={{ opacity: 0, x: -30 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.8 }}
                   >
                     {/* Block A: 15 rows × 7 seats */}
                     {Array.from({ length: 15 }, (_, rowIndex) => {
@@ -767,16 +715,13 @@ const Booking = () => {
                             {rowIndex + 1}
                           </div>
                           {/* Seats */}
-                          <motion.div
+                          <div
                             style={{
                               display: 'flex',
                               justifyContent: 'center',
                               gap: `${seatGap}px`,
                               marginBottom: '1px'
                             }}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: 0.03 * rowIndex }}
                           >
                             {Array.from({ length: 7 }, (_, col) => {
                               const seatNumber = col + 1;
@@ -798,11 +743,11 @@ const Booking = () => {
                                 />
                               );
                             })}
-                          </motion.div>
+                          </div>
                         </div>
                       );
                     })}
-                  </motion.div>
+                  </div>
                 </div>
 
                 {/* Center Block - Block B */}
@@ -815,7 +760,7 @@ const Booking = () => {
                   }}>
                     Block B
                   </div>
-                  <motion.div
+                  <div
                     className="seat-block"
                     style={{
                       display: 'flex',
@@ -826,9 +771,6 @@ const Booking = () => {
                       border: '1px solid #e5e7eb',
                       position: 'relative'
                     }}
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.9 }}
                   >
                     {/* Block B: 14 rows × 11 seats */}
                     {Array.from({ length: 14 }, (_, rowIndex) => {
@@ -837,7 +779,7 @@ const Booking = () => {
                       const seatGap = 4;
 
                       return (
-                        <motion.div
+                        <div
                           key={rowIndex}
                           style={{
                             display: 'flex',
@@ -845,9 +787,6 @@ const Booking = () => {
                             gap: `${seatGap}px`,
                             marginBottom: '1px'
                           }}
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: 0.03 * rowIndex }}
                         >
                           {Array.from({ length: 11 }, (_, col) => {
                             const seatNumber = col + 1;
@@ -869,10 +808,10 @@ const Booking = () => {
                               />
                             );
                           })}
-                        </motion.div>
+                        </div>
                       );
                     })}
-                  </motion.div>
+                  </div>
                   <div className="booking-seat-venue-inline">
                     {movie?.venue}
                   </div>
@@ -888,7 +827,7 @@ const Booking = () => {
                   }}>
                     Block C
                   </div>
-                  <motion.div
+                  <div
                     className="seat-block"
                     style={{
                       display: 'flex',
@@ -899,9 +838,6 @@ const Booking = () => {
                       border: '1px solid #e5e7eb',
                       position: 'relative'
                     }}
-                    initial={{ opacity: 0, x: 30 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 1.0 }}
                   >
                     {/* Block C: 15 rows × 7 seats */}
                     {Array.from({ length: 15 }, (_, rowIndex) => {
@@ -910,7 +846,7 @@ const Booking = () => {
                       const seatGap = 4;
 
                       return (
-                        <motion.div
+                        <div
                           key={rowIndex}
                           style={{
                             display: 'flex',
@@ -918,9 +854,6 @@ const Booking = () => {
                             gap: `${seatGap}px`,
                             marginBottom: '1px'
                           }}
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: 0.03 * rowIndex }}
                         >
                           {Array.from({ length: 7 }, (_, col) => {
                             const seatNumber = col + 1;
@@ -942,16 +875,16 @@ const Booking = () => {
                               />
                             );
                           })}
-                        </motion.div>
+                        </div>
                       );
                     })}
-                  </motion.div>
+                  </div>
                 </div>
               </div>
             )}
 
             {/* Legend */}
-            <motion.div
+            <div
               className="booking-seat-legend"
               style={{
                 display: 'flex',
@@ -959,9 +892,6 @@ const Booking = () => {
                 gap: '32px',
                 marginTop: '32px'
               }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1 }}
             >
               <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
                 <div style={{
@@ -999,9 +929,9 @@ const Booking = () => {
                   color: '#5c6270'
                 }}>Occupied</span>
               </div>
-            </motion.div>
+            </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Food Selection */}
         {availableFoods && availableFoods.length > 0 && (
@@ -1084,9 +1014,7 @@ const Booking = () => {
                       marginTop: '-10px'
                     }}>
                       {food.is_free ? (
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
+                        <button
                           onClick={() => {
                             const isSelected = !!selectedFoods[food.id];
                             handleFoodChange(food.id, isSelected ? 0 : 1);
@@ -1120,7 +1048,7 @@ const Booking = () => {
                           ) : (
                             'INCLUDE'
                           )}
-                        </motion.button>
+                        </button>
                       ) : (
                         <div style={{
                           display: 'flex',
@@ -1195,12 +1123,7 @@ const Booking = () => {
 
         {/* Selected Items Summary */}
         {selectedSeats.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            style={{marginBottom: '48px'}}
-          >
+          <div style={{marginBottom: '48px'}}>
             <div className="booking-selected-panel" style={{
               background: '#ffffff',
               border: '1px solid #e5e7eb',
@@ -1410,7 +1333,7 @@ const Booking = () => {
                 )}
               </div>
             </div>
-          </motion.div>
+          </div>
         )}
 
 

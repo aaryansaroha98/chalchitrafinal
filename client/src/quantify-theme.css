@@ -606,6 +606,45 @@ label {
   cursor: not-allowed;
   opacity: 1;
 }
+.seat-button.shake {
+  animation: shake 0.5s ease-in-out;
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+}
+
+/* ---------- Booking info text (light-theme overrides) ---------- */
+.booking-header-card {
+  background: #fff !important;
+  backdrop-filter: none !important;
+  border-color: var(--qt-line) !important;
+  box-shadow: none !important;
+}
+.booking-poster {
+  border-color: var(--qt-line) !important;
+  box-shadow: none !important;
+}
+.booking-info-label {
+  color: var(--qt-muted) !important;
+}
+.booking-info-value {
+  color: var(--qt-text) !important;
+}
+.booking-food-pill {
+  background: var(--qt-panel-soft) !important;
+  border-color: var(--qt-line) !important;
+  color: var(--qt-text) !important;
+}
+.booking-info-empty {
+  color: var(--qt-quiet) !important;
+}
+.booking-seat-venue-inline {
+  color: var(--qt-muted) !important;
+}
 
 /* ---------- Payment / Payment success (class-driven CSS) ---------- */
 .payment-page,
