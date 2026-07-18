@@ -1548,6 +1548,34 @@ const Booking = () => {
               font-weight: 500 !important;
               margin-top: -10px !important;
             }
+
+            .seat-button {
+              width: 30px !important;
+              height: 30px !important;
+              font-size: 10px !important;
+              min-width: 30px;
+              min-height: 30px;
+            }
+
+            .seat-block {
+              padding: 12px !important;
+              overflow-x: auto;
+            }
+
+            .seat-block-wrap {
+              max-width: 100%;
+              overflow-x: auto;
+            }
+          }
+
+          @media (max-width: 400px) {
+            .seat-button {
+              width: 26px !important;
+              height: 26px !important;
+              font-size: 8px !important;
+              min-width: 26px;
+              min-height: 26px;
+            }
           }
         `}
       </style>

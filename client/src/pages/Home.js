@@ -48,8 +48,10 @@ const Home = () => {
 
   const fetchSettings = async () => {
     try {
-      const res = await api.get('/api/admin/settings');
-      setSettings(res.data);
+      const res = await fetch('/api/admin/settings', { credentials: 'omit' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (data && typeof data === 'object') setSettings(data);
     } catch (err) {
       console.error('Error fetching settings:', err);
     }
