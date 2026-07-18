@@ -696,10 +696,6 @@ label {
   -webkit-backdrop-filter: none !important;
   color: var(--qt-text) !important;
 }
-.loader-spinner {
-  border: 2px solid var(--qt-line) !important;
-}
-
 /* ---------- Footer ---------- */
 footer, .footer {
   background: var(--qt-bg) !important;
