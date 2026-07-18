@@ -175,6 +175,7 @@ if (usePostgres) {
         booking_code TEXT UNIQUE,
         is_used INTEGER DEFAULT 0,
         coin_amount INTEGER DEFAULT 0,
+        coins_refunded INTEGER DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`,
       `CREATE TABLE IF NOT EXISTS feedback (
@@ -384,6 +385,14 @@ if (usePostgres) {
       console.log('bookings.coin_amount ensure warning:', err.message);
     }
 
+    // Ensure bookings.coins_refunded column exists (guards against double coin refunds on scan)
+    try {
+      await pool.query('ALTER TABLE bookings ADD COLUMN IF NOT EXISTS coins_refunded INTEGER DEFAULT 0');
+      console.log('✅ bookings.coins_refunded column ensured');
+    } catch (err) {
+      console.log('bookings.coins_refunded ensure warning:', err.message);
+    }
+
     // Ensure email_history.booking_id column exists for older databases
     try {
       await pool.query('ALTER TABLE email_history ADD COLUMN IF NOT EXISTS booking_id TEXT');
@@ -542,6 +551,7 @@ if (usePostgres) {
         booking_code TEXT UNIQUE,
         is_used INTEGER DEFAULT 0,
         coin_amount INTEGER DEFAULT 0,
+        coins_refunded INTEGER DEFAULT 0,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )`,
       `CREATE TABLE IF NOT EXISTS feedback (
@@ -705,6 +715,7 @@ if (usePostgres) {
           ensureMovieFoodIsFreeColumn();
           ensureUserCoinsColumn();
           ensureBookingCoinAmountColumn();
+          ensureBookingCoinsRefundedColumn();
           createDefaultData();
         }
       });
@@ -811,6 +822,26 @@ if (usePostgres) {
             return;
           }
           console.log('✅ bookings.coin_amount column added');
+        });
+      }
+    });
+  }
+
+  function ensureBookingCoinsRefundedColumn() {
+    db.all('PRAGMA table_info(bookings)', [], (err, columns) => {
+      if (err) {
+        console.log('⚠️  Could not inspect bookings table columns:', err.message);
+        return;
+      }
+
+      const hasCoinsRefunded = Array.isArray(columns) && columns.some((col) => col.name === 'coins_refunded');
+      if (!hasCoinsRefunded) {
+        db.run('ALTER TABLE bookings ADD COLUMN coins_refunded INTEGER DEFAULT 0', (alterErr) => {
+          if (alterErr) {
+            console.log('⚠️  Could not add bookings.coins_refunded:', alterErr.message);
+            return;
+          }
+          console.log('✅ bookings.coins_refunded column added');
         });
       }
     });

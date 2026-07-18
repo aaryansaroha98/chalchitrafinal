@@ -86,6 +86,63 @@ function generateBookingId() {
   return result;
 }
 
+// Refund the full coin cost of a booking exactly once, immediately on admission.
+//
+// Rule (per product decision): the moment a ticket is scanned/admitted — whether
+// a single person, a partial group, or the final person — the booking's entire
+// coin amount is credited back to the buyer's account, one time only.
+//
+// Idempotency: a group ticket can be scanned in several batches, and every
+// admission path calls this helper. To guarantee we never refund twice, we flip
+// bookings.coins_refunded from 0 -> 1 in a single atomic UPDATE guarded by
+// "AND coins_refunded = 0". Only the call whose UPDATE actually changes a row
+// (this.changes === 1) goes on to credit coins and log the transaction. All
+// later scans of the same booking see 0 changed rows and no-op.
+function refundBookingCoinsOnce(booking) {
+  if (!booking || !booking.user_id) return;
+
+  const refundAmount = booking.coin_amount || booking.total_price || booking.payment_amount || 0;
+  if (!refundAmount || refundAmount <= 0) return;
+
+  db.run(
+    'UPDATE bookings SET coins_refunded = 1 WHERE id = ? AND COALESCE(coins_refunded, 0) = 0',
+    [booking.id],
+    function (guardErr) {
+      if (guardErr) {
+        console.error('⚠️ Coin refund guard error:', guardErr.message);
+        return;
+      }
+      // Another scan already claimed the refund — do nothing.
+      if (this.changes === 0) {
+        console.log(`↩️  Coins already refunded for booking ${booking.booking_code}, skipping`);
+        return;
+      }
+
+      db.run(
+        'INSERT INTO coin_transactions (user_id, amount, type, reason, booking_id) VALUES (?, ?, ?, ?, ?)',
+        [booking.user_id, refundAmount, 'credit', 'attendance_refund', booking.booking_code],
+        function (txnErr) {
+          if (txnErr) console.error('⚠️ Coin refund transaction log error:', txnErr.message);
+        }
+      );
+
+      db.run(
+        'UPDATE users SET coins = COALESCE(coins, 0) + ? WHERE id = ?',
+        [refundAmount, booking.user_id],
+        function (creditErr) {
+          if (creditErr) {
+            console.error('⚠️ Coin refund credit error:', creditErr.message);
+            // Roll back the guard so a later scan can retry the refund.
+            db.run('UPDATE bookings SET coins_refunded = 0 WHERE id = ?', [booking.id]);
+          } else {
+            console.log(`✅ ${refundAmount} coins refunded to user ${booking.user_id} for booking ${booking.booking_code}`);
+          }
+        }
+      );
+    }
+  );
+}
+
 // Ensure booking ID is unique
 async function generateUniqueBookingId() {
   let bookingId;
@@ -537,6 +594,9 @@ router.post('/scan', (req, res) => {
               return res.status(500).json({ error: 'Failed to update booking status' });
             }
 
+            // Refund full booking coins immediately on admission (once, guarded).
+            refundBookingCoinsOnce(booking);
+
             console.log('Partial admission successful');
             res.json({
               message: `${peopleToAdmit} PEOPLE ADMITTED - ENTRY ALLOWED`,
@@ -804,25 +864,8 @@ router.post('/scan', (req, res) => {
               return res.status(500).json({ error: 'Failed to update booking status' });
             }
 
-            // REFUND COINS IMMEDIATELY on ANY ticket scan/admission (not just on full admission)
-            const refundAmount = booking.coin_amount || booking.total_price || booking.payment_amount || 0;
-            if (refundAmount > 0) {
-              db.run(
-                'INSERT INTO coin_transactions (user_id, amount, type, reason, booking_id) VALUES (?, ?, ?, ?, ?)',
-                [booking.user_id, refundAmount, 'credit', 'attendance_refund', booking.booking_code],
-                function(refundErr) {
-                  if (refundErr) console.error('⚠️ Coin refund error:', refundErr.message);
-                }
-              );
-              db.run(
-                'UPDATE users SET coins = COALESCE(coins, 0) + ? WHERE id = ?',
-                [refundAmount, booking.user_id],
-                function(refundUpdateErr) {
-                  if (refundUpdateErr) console.error('⚠️ Coin refund update error:', refundUpdateErr.message);
-                  else console.log(`✅ ${refundAmount} coins refunded to user ${booking.user_id} for booking ${booking.booking_code}`);
-                }
-              );
-            }
+            // Refund full booking coins immediately on admission (once, guarded).
+            refundBookingCoinsOnce(booking);
 
             console.log('📤 Sending scan response with food_orders:', Object.keys(foodOrders).length > 0 ? foodOrders : null);
 
@@ -873,6 +916,10 @@ router.post('/scan', (req, res) => {
         db.run('UPDATE bookings SET is_used = 1, admitted_people = ?, remaining_people = 0 WHERE id = ?',
           [booking.num_people, booking.id], function(err) {
             if (err) return res.status(500).json({ error: err.message });
+
+            // Refund full booking coins immediately on admission (once, guarded).
+            refundBookingCoinsOnce(booking);
+
             res.json({
               message: 'VALID TICKET - ENTRY ALLOWED',
               used: false,
