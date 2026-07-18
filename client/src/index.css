@@ -2792,11 +2792,43 @@ a:hover {
   transition: all 0.3s ease;
 }
 
+/* Apple-style spinner: 12 rounded lines rotating in a circle */
 .loader-spinner {
-  width: 64px;
-  height: 64px;
-  border: 2px solid var(--qt-line);
+  position: relative;
+  width: 56px;
+  height: 56px;
   margin: 0 auto 2rem;
+}
+
+.loader-spinner-bar {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 4px;
+  height: 14px;
+  margin-left: -2px;
+  border-radius: 2px;
+  background: var(--qt-text, #0b0e17);
+  transform-origin: 2px 28px; /* rotate around center (half of 56px) */
+  animation: loader-fade 1s linear infinite;
+}
+
+.loader-spinner-bar:nth-child(1)  { transform: rotate(0deg);   animation-delay: -0.916s; }
+.loader-spinner-bar:nth-child(2)  { transform: rotate(30deg);  animation-delay: -0.833s; }
+.loader-spinner-bar:nth-child(3)  { transform: rotate(60deg);  animation-delay: -0.75s; }
+.loader-spinner-bar:nth-child(4)  { transform: rotate(90deg);  animation-delay: -0.666s; }
+.loader-spinner-bar:nth-child(5)  { transform: rotate(120deg); animation-delay: -0.583s; }
+.loader-spinner-bar:nth-child(6)  { transform: rotate(150deg); animation-delay: -0.5s; }
+.loader-spinner-bar:nth-child(7)  { transform: rotate(180deg); animation-delay: -0.416s; }
+.loader-spinner-bar:nth-child(8)  { transform: rotate(210deg); animation-delay: -0.333s; }
+.loader-spinner-bar:nth-child(9)  { transform: rotate(240deg); animation-delay: -0.25s; }
+.loader-spinner-bar:nth-child(10) { transform: rotate(270deg); animation-delay: -0.166s; }
+.loader-spinner-bar:nth-child(11) { transform: rotate(300deg); animation-delay: -0.083s; }
+.loader-spinner-bar:nth-child(12) { transform: rotate(330deg); animation-delay: 0s; }
+
+@keyframes loader-fade {
+  0%   { opacity: 1; }
+  100% { opacity: 0.15; }
 }
 
 @media (max-width: 576px) {
@@ -2806,10 +2838,16 @@ a:hover {
   }
   
   .loader-spinner {
-    width: 40px !important;
-    height: 40px !important;
-    border-width: 3px !important;
+    width: 44px !important;
+    height: 44px !important;
     margin-bottom: 1.25rem !important;
+  }
+
+  .loader-spinner-bar {
+    width: 3px;
+    height: 11px;
+    margin-left: -1.5px;
+    transform-origin: 1.5px 22px; /* half of 44px */
   }
   
   .loader-glass-card h3 {

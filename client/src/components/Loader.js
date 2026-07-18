@@ -20,7 +20,11 @@ const Loader = ({ message = 'Loading...', subtitle = 'Please wait while we prepa
         padding: '2.5rem 3rem',
         maxWidth: '420px'
       }}>
-        <div className="loader-spinner"></div>
+        <div className="loader-spinner" role="status" aria-label="Loading">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div key={i} className="loader-spinner-bar" />
+          ))}
+        </div>
         <h3 style={{
           color: 'var(--qt-text)',
           margin: '1.25rem 0 0.5rem',
