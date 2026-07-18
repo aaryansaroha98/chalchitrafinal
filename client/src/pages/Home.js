@@ -21,7 +21,8 @@ const Home = () => {
     tagline: 'Student-led movie screening initiative at IIT Jammu',
     hero_background: '#ffffff',
     about_text: 'Chalchitra Series is a student-led initiative at IIT Jammu dedicated to bringing quality movie screenings to our campus community. We organize regular movie screenings featuring a diverse range of films, from classics to contemporary hits.\n\nOur mission is to create a vibrant cultural atmosphere on campus while providing students with affordable entertainment options.',
-    about_image: '/logos/newlogo.png'
+    about_image: '/logos/newlogo.png',
+    hero_background_video: '/hero/hero-video-1770835410993.mp4'
   });
 
   useEffect(() => {
@@ -116,6 +117,8 @@ const Home = () => {
             muted
             loop
             playsInline
+            preload="auto"
+            poster="/hero/hero-bg-1767879490201.jpg"
             style={{
               position: 'absolute',
               top: 0,
