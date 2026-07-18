@@ -59,7 +59,9 @@ const Payment = () => {
     fetchMovie();
     fetchFoodData();
     fetchCoinBalance();
-  }, [movieId, bookingDetails, navigate]);
+  }, [movieId,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    JSON.stringify(bookingDetails), navigate]);
 
   const fetchCoinBalance = async () => {
     try {
@@ -389,7 +391,8 @@ const Payment = () => {
                       quantity: quantity,
                       payment_id: 'FREE_BOOKING',
                       customer_details: customerDetails,
-                      food_orders: selectedFoods
+                      food_orders: selectedFoods,
+                      coupon_code: couponCode
                     });
 
                     const successPayload = {

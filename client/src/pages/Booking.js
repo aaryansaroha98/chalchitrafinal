@@ -111,10 +111,11 @@ const Booking = () => {
         // Deselect
         return prev.filter(id => id !== seatId);
       } else {
-        // Check 6-ticket limit
-        if (prev.length >= 6) {
+        // Check movie's booking limit
+        const limit = movie?.booking_limit || 6;
+        if (prev.length >= limit) {
           setShakeSeat(seatId);
-          setToastMessage('Maximum 6 tickets allowed per booking');
+          setToastMessage(`Maximum ${limit} ticket${limit > 1 ? 's' : ''} allowed per booking`);
           setShowToast(true);
           setTimeout(() => {
             setShakeSeat(null);
@@ -130,7 +131,6 @@ const Booking = () => {
 
   const handleQuantityChange = (newQuantity) => {
     setQuantity(newQuantity);
-    // Reset selected seats if current selection exceeds new quantity
     if (selectedSeats.length > newQuantity) {
       setSelectedSeats(selectedSeats.slice(0, newQuantity));
     }
@@ -168,7 +168,14 @@ const Booking = () => {
       return;
     }
 
-    // Get customer details - always pass data even if session expired
+    const limit = movie?.booking_limit || 6;
+    if (selectedSeats.length > limit) {
+      setToastMessage(`Maximum ${limit} ticket${limit > 1 ? 's' : ''} allowed per booking`);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 2000);
+      return;
+    }
+
     const customerData = {
       name: user?.name || user?.email?.split('@')[0] || 'Guest',
       email: user?.email || 'guest@iitjammu.ac.in',

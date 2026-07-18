@@ -151,7 +151,7 @@ const MyBookings = () => {
           <div style="position: absolute; left: 227px; top: 189px; width: 260px; color: #000000; fontFamily: 'Tahoma, Arial, sans-serif';">
             <div style="font-size: 12px; font-weight: 400; letter-spacing: 0.2px;">
               ${booking.selected_seats
-                ? JSON.parse(booking.selected_seats).map(seat => String(seat)).join(', ')
+                ? (() => { try { const seats = typeof booking.selected_seats === 'string' ? JSON.parse(booking.selected_seats) : booking.selected_seats; return Array.isArray(seats) ? seats.map(seat => String(seat)).join(', ') : 'N/A'; } catch(e) { return 'N/A'; } })()
                 : 'N/A'}
             </div>
           </div>

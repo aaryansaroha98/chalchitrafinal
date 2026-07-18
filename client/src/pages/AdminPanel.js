@@ -2383,13 +2383,15 @@ const AdminPanel = () => {
                                     date: new Date(movie.date).toISOString().slice(0, 16),
                                     venue: movie.venue,
                                     price: movie.price || '',
+                                    coin_price: movie.coin_price ?? 20,
                                     category: movie.category || '',
                                     duration: movie.duration || '',
                                     imdb_rating: movie.imdb_rating || '',
                                     language: movie.language || '',
                                     poster: null,
                                     is_special: movie.is_special || 0,
-                                    special_message: movie.special_message || ''
+                                    special_message: movie.special_message || '',
+                                    booking_limit: movie.booking_limit ?? 6
                                   });
                                   // Load existing food links
                                   api.get(`/api/foods/movie/${movie.id}`)
@@ -4963,7 +4965,7 @@ const AdminPanel = () => {
                           m.title,
                           new Date(m.date).toLocaleDateString('en-IN'),
                           m.booking_count,
-                          `🪙{parseFloat(m.revenue).toLocaleString('en-IN', { maximumFractionDigits: 2 })}`
+                          `🪙${parseFloat(m.revenue).toLocaleString('en-IN', { maximumFractionDigits: 2 })}`
                         ]);
                         const csvContent = [headers, ...rows].map(row => row.join(',')).join('\n');
                         const blob = new Blob([csvContent], { type: 'text/csv' });

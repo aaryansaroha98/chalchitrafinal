@@ -149,26 +149,33 @@ router.post('/', async (req, res) => {
   
   // Check movie-specific booking limit later after fetching movie data
 
-  // Check if any selected seats are already booked
-  db.all('SELECT selected_seats FROM bookings WHERE movie_id = ? AND selected_seats IS NOT NULL', [movie_id], (err, bookings) => {
-    if (err) return res.status(500).json({ error: err.message });
-
-    const occupiedSeats = [];
-    bookings.forEach(booking => {
-      try {
-        const seats = JSON.parse(booking.selected_seats);
-        occupiedSeats.push(...seats);
-      } catch (e) {
-        // Ignore invalid JSON
-      }
-    });
-
-    const conflictingSeats = selectedSeats.filter(seat => occupiedSeats.includes(seat));
-    if (conflictingSeats.length > 0) {
-      return res.status(400).json({ error: `Seats ${conflictingSeats.join(', ')} are already booked` });
+  // Check if user already has a booking for this movie (1-booking-per-user limit)
+  db.get('SELECT id FROM bookings WHERE user_id = ? AND movie_id = ? LIMIT 1', [req.user.id, movie_id], (dupErr, existingBooking) => {
+    if (dupErr) return res.status(500).json({ error: dupErr.message });
+    if (existingBooking) {
+      return res.status(400).json({ error: 'You already have a booking for this movie. Only one booking per user is allowed.' });
     }
 
-    // Get movie details
+    // Check if any selected seats are already booked
+    db.all('SELECT selected_seats FROM bookings WHERE movie_id = ? AND selected_seats IS NOT NULL', [movie_id], (err, bookings) => {
+      if (err) return res.status(500).json({ error: err.message });
+
+      const occupiedSeats = [];
+      bookings.forEach(booking => {
+        try {
+          const seats = JSON.parse(booking.selected_seats);
+          occupiedSeats.push(...seats);
+        } catch (e) {
+          // Ignore invalid JSON
+        }
+      });
+
+      const conflictingSeats = selectedSeats.filter(seat => occupiedSeats.includes(seat));
+      if (conflictingSeats.length > 0) {
+        return res.status(400).json({ error: `Seats ${conflictingSeats.join(', ')} are already booked` });
+      }
+
+      // Get movie details
     db.get('SELECT * FROM movies WHERE id = ? AND is_upcoming = 1', [movie_id], (err, movie) => {
       if (err) return res.status(500).json({ error: err.message });
       if (!movie) return res.status(404).json({ error: 'Movie not found or not upcoming' });
@@ -370,6 +377,7 @@ router.post('/', async (req, res) => {
       }
     });
   });
+  }); // End duplicate booking check
 });
 
 // Get user bookings
@@ -980,6 +988,7 @@ router.post('/generate-pdf', (req, res) => {
 
   try {
     const { booking_id, movie_title, movie_date, venue, selected_seats, qr_code_url } = req.body;
+    let movieName = '';
 
     // Verify the booking belongs to the authenticated user
     const numericPdfId = parseInt(booking_id);
@@ -988,19 +997,15 @@ router.post('/generate-pdf', (req, res) => {
       [String(booking_id), safeId], (err, bookingRow) => {
         if (err) {
           console.error('Error fetching movie name:', err);
-          console.log('Error details:', err.message);
         } else if (bookingRow && bookingRow.user_id) {
           if (bookingRow.user_id !== req.user.id) {
             return res.status(403).json({ error: 'You can only download your own tickets' });
           }
-          movieName = bookingRow.title;
-          console.log('Successfully fetched movie name:', movieName);
+          movieName = bookingRow.title || movie_title || 'Movie Ticket';
         } else if (bookingRow && bookingRow.title) {
           movieName = bookingRow.title;
-          console.log('Successfully fetched movie name:', movieName);
         } else {
-          console.log('No movie name found for booking:', booking_id);
-          console.log('Movie row result:', bookingRow);
+          movieName = movie_title || 'Movie Ticket';
         }
 
         // Clean movie name for filename (remove special characters)

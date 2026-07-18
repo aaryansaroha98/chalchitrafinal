@@ -357,7 +357,7 @@ const PaymentSuccess = () => {
 
               <div className="detail-row">
                 <span className="detail-label">Amount Paid</span>
-                <span className="detail-value">🪙 {payment?.amount || (selectedSeats?.length * 20) || 0} Coins</span>
+                <span className="detail-value">🪙 {payment?.amount ?? (selectedSeats?.length * 20) ?? 0} Coins</span>
               </div>
 
               {payment?.transaction_id && (
