@@ -1537,44 +1537,56 @@ const Booking = () => {
 
       <style>
         {`
-          @media (max-width: 576px) {
-            .booking-title-wrap {
-              margin-top: -14px !important;
-              margin-bottom: 16px !important;
-            }
-
-            .booking-title {
-              font-size: 1.65rem !important;
-              font-weight: 500 !important;
-              margin-top: -10px !important;
-            }
-
-            .seat-button {
-              width: 30px !important;
-              height: 30px !important;
-              font-size: 10px !important;
-              min-width: 30px;
-              min-height: 30px;
+          @media (max-width: 768px) {
+            .seat-block-wrap {
+              width: 100%;
+              max-width: 100%;
+              overflow-x: auto;
+              -webkit-overflow-scrolling: touch;
             }
 
             .seat-block {
-              padding: 12px !important;
-              overflow-x: auto;
+              padding: 8px !important;
+              overflow: visible;
+              min-width: fit-content;
+              width: auto;
             }
 
-            .seat-block-wrap {
-              max-width: 100%;
-              overflow-x: auto;
+            .seat-block > div {
+              justify-content: flex-start !important;
+              gap: 4px !important;
+            }
+
+            .seat-button {
+              width: 28px !important;
+              height: 28px !important;
+              font-size: 9px !important;
+              min-width: 28px;
+              min-height: 28px;
+              flex-shrink: 0;
+            }
+
+            .booking-page {
+              padding-left: 8px !important;
+              padding-right: 8px !important;
             }
           }
 
           @media (max-width: 400px) {
             .seat-button {
-              width: 26px !important;
-              height: 26px !important;
-              font-size: 8px !important;
-              min-width: 26px;
-              min-height: 26px;
+              width: 24px !important;
+              height: 24px !important;
+              font-size: 7px !important;
+              min-width: 24px;
+              min-height: 24px;
+            }
+
+            .seat-block {
+              padding: 4px !important;
+            }
+
+            .seat-block > div {
+              gap: 2px !important;
             }
           }
         `}
