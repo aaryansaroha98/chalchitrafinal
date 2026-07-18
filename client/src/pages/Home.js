@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Alert } from 'react-bootstrap';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -17,6 +17,16 @@ const Home = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showBookingClosedModal, setShowBookingClosedModal] = useState(false);
   const [bookingClosedMovieTitle, setBookingClosedMovieTitle] = useState('');
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    if (videoRef.current && settings.hero_background_video) {
+      const tryPlay = () => videoRef.current.play().catch(() => {});
+      tryPlay();
+      videoRef.current.addEventListener('canplay', tryPlay, { once: true });
+    }
+  }, [settings.hero_background_video]);
+
   const [settings, setSettings] = useState({
     tagline: 'Student-led movie screening initiative at IIT Jammu',
     hero_background: '#ffffff',
@@ -113,12 +123,13 @@ const Home = () => {
         {/* Background Video with Normal Opacity */}
         {settings.hero_background_video && (
           <video
+            ref={videoRef}
             autoPlay
             muted
             loop
             playsInline
+            webkit-playsinline
             preload="auto"
-            poster="/hero/hero-bg-1767879490201.jpg"
             style={{
               position: 'absolute',
               top: 0,
