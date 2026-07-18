@@ -1540,45 +1540,38 @@ const Booking = () => {
           @media (max-width: 768px) {
             .seat-block-wrap {
               width: 100%;
-              max-width: 100%;
-              overflow-x: auto;
-              -webkit-overflow-scrolling: touch;
             }
 
             .seat-block {
               padding: 8px !important;
-              overflow: visible;
-              min-width: fit-content;
-              width: auto;
             }
 
             .seat-block > div {
-              justify-content: flex-start !important;
-              gap: 4px !important;
+              justify-content: center !important;
+              gap: 3px !important;
             }
 
             .seat-button {
-              width: 28px !important;
-              height: 28px !important;
-              font-size: 9px !important;
-              min-width: 28px;
-              min-height: 28px;
-              flex-shrink: 0;
+              width: 22px !important;
+              height: 22px !important;
+              font-size: 7px !important;
+              min-width: 22px;
+              min-height: 22px;
             }
 
             .booking-page {
-              padding-left: 8px !important;
-              padding-right: 8px !important;
+              padding-left: 4px !important;
+              padding-right: 4px !important;
             }
           }
 
           @media (max-width: 400px) {
             .seat-button {
-              width: 24px !important;
-              height: 24px !important;
-              font-size: 7px !important;
-              min-width: 24px;
-              min-height: 24px;
+              width: 18px !important;
+              height: 18px !important;
+              font-size: 6px !important;
+              min-width: 18px;
+              min-height: 18px;
             }
 
             .seat-block {
