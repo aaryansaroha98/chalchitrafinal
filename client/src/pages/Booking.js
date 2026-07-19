@@ -381,6 +381,13 @@ const Booking = () => {
                       {movie.venue}
                     </span>
                   </div>
+
+                  <div className="booking-info-row">
+                    <span className="booking-info-label">Ticket Price:</span>
+                    <span className="booking-info-value">
+                      {TICKET_PRICE > 0 ? `🪙 ${TICKET_PRICE} Coins / seat` : 'FREE'}
+                    </span>
+                  </div>
                   <div className="booking-info-row booking-info-food">
                     <span className="booking-info-label">Available Food:</span>
                     <div className="booking-food-grid">

@@ -161,6 +161,7 @@ const NavigationBar = () => {
       {user && (
         <>
           <span className="mobile-menu-greeting">Hi, {user?.name?.split(' ')[0] || 'User'}</span>
+          <span className="mobile-menu-coins">🪙 {coinBalanceLoading ? '...' : coinBalance} Coins</span>
           <Link to="/my-bookings" onClick={closeMenu} className="mobile-menu-link">My Bookings</Link>
           {!!(user.code_scanner || user.team_scanner) && (
             <Link to="/scanner" onClick={closeMenu} className="mobile-menu-link">Scanner</Link>

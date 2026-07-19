@@ -931,6 +931,21 @@ body.menu-open { overflow: hidden; }
   padding: 8px 18px;
 }
 
+.mobile-menu-coins {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  align-self: flex-start;
+  margin: 2px 18px 6px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--qt-text);
+  border: 1px solid var(--qt-line);
+  padding: 0.35rem 0.7rem;
+  white-space: nowrap;
+}
+
 .mobile-menu-logout {
   background: transparent;
   border: none;
