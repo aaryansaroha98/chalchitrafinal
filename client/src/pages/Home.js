@@ -22,7 +22,7 @@ const Home = () => {
     hero_background: '#ffffff',
     about_text: 'Chalchitra Series is a student-led initiative at IIT Jammu dedicated to bringing quality movie screenings to our campus community. We organize regular movie screenings featuring a diverse range of films, from classics to contemporary hits.\n\nOur mission is to create a vibrant cultural atmosphere on campus while providing students with affordable entertainment options.',
     about_image: '/logos/newlogo.png',
-    hero_background_video: '/hero/hero-video-1770835410993.mp4'
+    hero_background_video: null
   });
   const [founder, setFounder] = useState(null);
 
@@ -63,7 +63,11 @@ const Home = () => {
       const res = await fetch('/api/admin/settings', { credentials: 'omit', cache: 'no-store' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      if (data && typeof data === 'object') setSettings(data);
+      if (data && typeof data === 'object') {
+        // Merge over defaults so a missing field never wipes an existing value,
+        // and always trust the server's hero_background_video (even if null).
+        setSettings(prev => ({ ...prev, ...data }));
+      }
     } catch (err) {
       console.error('Error fetching settings:', err);
     }
@@ -135,6 +139,7 @@ const Home = () => {
         {/* Background Video with Normal Opacity */}
         {settings.hero_background_video && (
           <video
+            key={settings.hero_background_video}
             ref={videoRef}
             autoPlay
             muted
