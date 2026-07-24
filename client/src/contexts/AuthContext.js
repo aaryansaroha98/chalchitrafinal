@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import api from '../api/axios';
+import CoinIcon from '../components/CoinIcon';
 
 const AuthContext = createContext();
 
@@ -144,12 +145,7 @@ export const AuthProvider = ({ children }) => {
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0b0e17" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="9"/>
-                <path d="M12 6v12"/>
-                <path d="M8 10c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2"/>
-                <path d="M8 14c0 1.1.9 2 2 2h4c1.1 0 2-.9 2-2"/>
-              </svg>
+              <CoinIcon size={40} />
             </div>
             <h3 style={{
               color: '#0b0e17',
@@ -157,15 +153,16 @@ export const AuthProvider = ({ children }) => {
               fontWeight: '600',
               marginBottom: '0.5rem'
             }}>
-              Congratulations!
+              Congratulations! 🎉
             </h3>
             <p style={{
               color: '#5c6270',
-              fontSize: '0.9rem',
+              fontSize: '0.95rem',
               marginBottom: '1.5rem',
-              lineHeight: '1.5'
+              lineHeight: '1.6'
             }}>
-              You got {bonusCoinAmount} Chalchitra coins. Use them to book movie tickets and more.
+              You got <strong style={{ color: '#0b0e17' }}>{bonusCoinAmount} bonus coins</strong> as a welcome gift!
+              Use them to book movie tickets and other stuff.
             </p>
             <button
               onClick={() => setShowCoinBonusPopup(false)}

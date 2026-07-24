@@ -2,6 +2,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
+import CoinIcon from '../components/CoinIcon';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { useAuth } from '../contexts/AuthContext';
@@ -385,7 +386,7 @@ const Booking = () => {
                   <div className="booking-info-row">
                     <span className="booking-info-label">Ticket Price:</span>
                     <span className="booking-info-value">
-                      {TICKET_PRICE > 0 ? `🪙 ${TICKET_PRICE} Coins / seat` : 'FREE'}
+                      {TICKET_PRICE > 0 ? <><CoinIcon size={14} /> {TICKET_PRICE} Coins / seat</> : 'FREE'}
                     </span>
                   </div>
                   <div className="booking-info-row booking-info-food">
@@ -1340,7 +1341,7 @@ const Booking = () => {
                     }}>
                       Total Amount
                     </span>
-                    🪙 {getTotalPrice()}
+                    <CoinIcon size={18} /> {getTotalPrice()}
                   </div>
 
                   <button

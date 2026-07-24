@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Navbar, Nav, Container } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import CoinIcon from './CoinIcon';
 
 const NavigationBar = () => {
   const navigate = useNavigate();
@@ -131,7 +132,7 @@ const NavigationBar = () => {
           {user && (
             <div className="qt-user-cluster">
               <span className="qt-user-name">Hi, {user?.name?.split(' ')[0] || 'User'}</span>
-              <span className="qt-coin-badge">🪙 {coinBalanceLoading ? '...' : coinBalance}</span>
+              <span className="qt-coin-badge"><CoinIcon size={14} /> {coinBalanceLoading ? '...' : coinBalance}</span>
             </div>
           )}
         </div>
@@ -161,7 +162,7 @@ const NavigationBar = () => {
       {user && (
         <>
           <span className="mobile-menu-greeting">Hi, {user?.name?.split(' ')[0] || 'User'}</span>
-          <span className="mobile-menu-coins">🪙 {coinBalanceLoading ? '...' : coinBalance} Coins</span>
+          <span className="mobile-menu-coins"><CoinIcon size={14} /> {coinBalanceLoading ? '...' : coinBalance} Coins</span>
           <Link to="/my-bookings" onClick={closeMenu} className="mobile-menu-link">My Bookings</Link>
           {!!(user.code_scanner || user.team_scanner) && (
             <Link to="/scanner" onClick={closeMenu} className="mobile-menu-link">Scanner</Link>
