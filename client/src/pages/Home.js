@@ -24,6 +24,7 @@ const Home = () => {
     about_image: '/logos/newlogo.png',
     hero_background_video: '/hero/hero-video-1770835410993.mp4'
   });
+  const [founder, setFounder] = useState(null);
 
   const videoRef = useRef(null);
   useEffect(() => {
@@ -37,6 +38,7 @@ const Home = () => {
   useEffect(() => {
     fetchUpcomingMovies();
     fetchSettings();
+    fetchFounder();
   }, []);
 
   // Gentle auto-scroll on desktop to reveal content below hero video
@@ -64,6 +66,17 @@ const Home = () => {
       if (data && typeof data === 'object') setSettings(data);
     } catch (err) {
       console.error('Error fetching settings:', err);
+    }
+  };
+
+  const fetchFounder = async () => {
+    try {
+      const res = await api.get('/api/team');
+      const team = Array.isArray(res.data) ? res.data : [];
+      const founderMember = team.find(m => m.section === 'foundation_team');
+      if (founderMember) setFounder(founderMember);
+    } catch (err) {
+      console.error('Error fetching founder:', err);
     }
   };
 
@@ -652,6 +665,104 @@ const Home = () => {
             </Row>
           </div>
         </div>
+
+        {/* Founder's Note Section */}
+        <div className="founder-note-section" style={{marginTop: '2.5rem'}}>
+          <div className="founder-note-card" style={{
+            background: '#ffffff',
+            border: '1px solid #e5e7eb',
+            overflow: 'hidden',
+            padding: '3rem'
+          }}>
+            <div className="row align-items-center founder-note-row">
+              <Col lg={4} md={5} className="text-center founder-note-img-wrap">
+                {founder && founder.photo_url ? (
+                  <img
+                    src={founder.photo_url.startsWith('http') ? founder.photo_url : `${window.location.origin}${founder.photo_url}`}
+                    alt={founder.name || 'Founder'}
+                    className="founder-note-photo"
+                    onError={(e) => { e.target.onerror = null; e.target.style.display = 'none'; }}
+                    style={{
+                      width: '220px',
+                      height: '220px',
+                      objectFit: 'cover',
+                      borderRadius: '50%',
+                      border: '3px solid #e5e7eb'
+                    }}
+                  />
+                ) : (
+                  <div style={{
+                    width: '220px',
+                    height: '220px',
+                    borderRadius: '50%',
+                    backgroundColor: '#f6f6f7',
+                    border: '3px solid #e5e7eb',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto',
+                    fontSize: '4rem',
+                    color: '#8b909c',
+                    fontWeight: '300'
+                  }}>
+                    <i className="fas fa-user"></i>
+                  </div>
+                )}
+              </Col>
+              <Col lg={8} md={7} className="founder-note-text-wrap">
+                <h3 className="founder-note-heading" style={{
+                  fontSize: '1.8rem',
+                  fontWeight: '700',
+                  color: '#0b0e17',
+                  marginBottom: '1.5rem',
+                  letterSpacing: '-0.025em'
+                }}>
+                  <i className="fas fa-feather-alt" style={{marginRight: '0.75rem', color: '#5c6270'}}></i>
+                  Founder's Note
+                </h3>
+                <div className="founder-note-text" style={{
+                  fontSize: '1.05rem',
+                  color: '#5c6270',
+                  lineHeight: '1.5',
+                  fontStyle: 'italic',
+                  marginBottom: '1rem'
+                }}>
+                  <p style={{marginBottom: '0', color: '#5c6270'}}>
+                    Some of the best memories on campus are made when people come together, and I've always believed that cinema is one of the simplest ways to make that happen. Watching people laugh, cheer, clap, react to every twist, and leave with a smile has been the most rewarding part of this journey. It has been my privilege to be part of founding Chalchitra alongside everyone who believed in this vision. No matter how your day has been, I hope Chalchitra will always be a place where you can pause, share a few laughs, and leave feeling a little lighter. More than just another campus event, I hope it becomes a tradition that brings people together, where everyone feels welcome and every movie creates a memory.
+                  </p>
+                </div>
+                {founder && founder.name && (
+                  <div className="founder-note-sign" style={{
+                    marginTop: '1.5rem',
+                    borderTop: '1px solid #e5e7eb',
+                    paddingTop: '1rem'
+                  }}>
+                    <p style={{
+                      fontSize: '1rem',
+                      fontWeight: '600',
+                      color: '#0b0e17',
+                      margin: 0,
+                      fontStyle: 'normal'
+                    }}>
+                      — {founder.name}
+                    </p>
+                    {founder.role && (
+                      <p style={{
+                        fontSize: '0.85rem',
+                        color: '#8b909c',
+                        margin: '0.15rem 0 0 0',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px'
+                      }}>
+                        {founder.role}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </Col>
+            </div>
+          </div>
+        </div>
       </Container>
 
       {/* Custom CSS for animations */}
@@ -894,6 +1005,61 @@ const Home = () => {
 
             .about-logo {
               max-width: 180px !important;
+            }
+
+            .founder-note-card {
+              padding: 1.1rem 2.6rem !important;
+              width: 100% !important;
+              max-width: 100% !important;
+            }
+
+            .founder-note-card .row {
+              margin-left: 0 !important;
+              margin-right: 0 !important;
+            }
+
+            .founder-note-card .row > [class*="col-"] {
+              padding-left: 0 !important;
+              padding-right: 0 !important;
+            }
+
+            .founder-note-row {
+              display: flex !important;
+              flex-direction: column-reverse !important;
+              flex-wrap: nowrap !important;
+              align-items: center !important;
+              gap: 1.5rem !important;
+            }
+
+            .founder-note-row > [class*="col-"] {
+              flex: 1 1 auto !important;
+              width: 100% !important;
+              max-width: 100% !important;
+            }
+
+            .founder-note-img-wrap {
+              display: flex !important;
+              justify-content: center !important;
+              align-items: center !important;
+            }
+
+            .founder-note-heading {
+              font-size: 1.35rem !important;
+              text-align: center !important;
+            }
+
+            .founder-note-text {
+              font-size: 1.05rem !important;
+              text-align: center !important;
+            }
+
+            .founder-note-sign {
+              text-align: center !important;
+            }
+
+            .founder-note-photo {
+              width: 160px !important;
+              height: 160px !important;
             }
 
             .home-cta-button {
@@ -1157,6 +1323,23 @@ const Home = () => {
 
             section:nth-of-type(3) h2 {
               font-size: 2.8rem !important;
+            }
+
+            .founder-note-row {
+              flex-direction: column-reverse !important;
+              gap: 2rem !important;
+            }
+
+            .founder-note-heading {
+              text-align: center !important;
+            }
+
+            .founder-note-text {
+              text-align: center !important;
+            }
+
+            .founder-note-sign {
+              text-align: center !important;
             }
           }
 
