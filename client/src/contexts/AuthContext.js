@@ -35,6 +35,26 @@ export const AuthProvider = ({ children }) => {
     }
   }, [user]);
 
+  // Refresh coin balance when the user returns to the tab (e.g. after an admin sends coins)
+  useEffect(() => {
+    if (!user || !user.id) return;
+
+    const refreshOnActive = () => {
+      if (document.visibilityState === 'visible') {
+        fetchCoinBalance();
+      }
+    };
+
+    document.addEventListener('visibilitychange', refreshOnActive);
+    window.addEventListener('focus', refreshOnActive);
+    return () => {
+      document.removeEventListener('visibilitychange', refreshOnActive);
+      window.removeEventListener('focus', refreshOnActive);
+    };
+    // fetchCoinBalance is a stable useCallback([]) declared below; omitted from deps to avoid TDZ
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
   const checkAuthStatus = async () => {
     try {
       const response = await api.get('/api/auth/current_user', {

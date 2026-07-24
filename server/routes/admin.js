@@ -88,6 +88,19 @@ const requireAdmin = (req, res, next) => {
   return res.status(403).json({ error: 'Admin access required' });
 };
 
+// Middleware to restrict an action to the super admin only
+const SUPER_ADMIN_EMAIL = '2025uee0154@iitjammu.ac.in';
+const requireSuperAdmin = (req, res, next) => {
+  const email =
+    (req.user && req.user.email) ||
+    (req.session && req.session.adminUser && req.session.adminUser.email) ||
+    null;
+  if (email && email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) {
+    return next();
+  }
+  return res.status(403).json({ error: 'Super admin access required' });
+};
+
 // Middleware to check user authentication
 const requireAuth = (req, res, next) => {
   // Check for OAuth user first
@@ -446,6 +459,47 @@ router.get('/users', requireAdmin, (req, res) => {
     res.json(users);
     }
   );
+});
+
+// Grant coins directly to a user (super admin only)
+router.post('/users/:id/grant-coins', requireSuperAdmin, (req, res) => {
+  const userId = parseInt(req.params.id, 10);
+  const rawAmount = req.body && req.body.amount;
+  const note = (req.body && typeof req.body.reason === 'string') ? req.body.reason.trim() : '';
+
+  const amount = Number(rawAmount);
+  if (!Number.isInteger(amount) || amount <= 0 || amount > 100000) {
+    return res.status(400).json({ error: 'Amount must be a whole number between 1 and 100000' });
+  }
+  if (!Number.isInteger(userId)) {
+    return res.status(400).json({ error: 'Invalid user id' });
+  }
+
+  db.get('SELECT id, COALESCE(coins, 0) as coins FROM users WHERE id = ?', [userId], (err, user) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    const reason = note ? `admin_grant: ${note}`.slice(0, 255) : 'admin_grant';
+
+    db.run(
+      'INSERT INTO coin_transactions (user_id, amount, type, reason) VALUES (?, ?, ?, ?)',
+      [userId, amount, 'credit', reason],
+      function (insertErr) {
+        if (insertErr) return res.status(500).json({ error: insertErr.message });
+
+        db.run(
+          'UPDATE users SET coins = COALESCE(coins, 0) + ? WHERE id = ?',
+          [amount, userId],
+          function (updateErr) {
+            if (updateErr) return res.status(500).json({ error: updateErr.message });
+            const newBalance = user.coins + amount;
+            console.log(`✅ Admin granted ${amount} coins to user ${userId} (new balance: ${newBalance})`);
+            res.json({ success: true, coins: newBalance });
+          }
+        );
+      }
+    );
+  });
 });
 
 // Get bookings for admin

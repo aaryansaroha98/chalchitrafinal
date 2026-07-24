@@ -255,6 +255,13 @@ const AdminPanel = () => {
   const [bookingSearchTerm, setBookingSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('dashboard');
   const [userSearchTerm, setUserSearchTerm] = useState('');
+  // Send Coins (super admin) state
+  const [coinSearchTerm, setCoinSearchTerm] = useState('');
+  const [selectedCoinUser, setSelectedCoinUser] = useState(null);
+  const [coinAmount, setCoinAmount] = useState('');
+  const [coinNote, setCoinNote] = useState('');
+  const [coinSending, setCoinSending] = useState(false);
+  const [coinFeedback, setCoinFeedback] = useState(null); // { type: 'success' | 'error', text }
   const [movieForm, setMovieForm] = useState({
     title: '',
     description: '',
@@ -1034,6 +1041,52 @@ const AdminPanel = () => {
     user.name.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
     user.email.toLowerCase().includes(userSearchTerm.toLowerCase())
   );
+
+  // Users matching the Send Coins search box (only when a term is typed and no user is locked in)
+  const coinSearchResults = coinSearchTerm.trim()
+    ? users.filter(user =>
+        (user.name || '').toLowerCase().includes(coinSearchTerm.toLowerCase()) ||
+        (user.email || '').toLowerCase().includes(coinSearchTerm.toLowerCase())
+      ).slice(0, 8)
+    : [];
+
+  // Send coins directly to a selected user (super admin only)
+  const handleSendCoins = async () => {
+    if (!selectedCoinUser) {
+      setCoinFeedback({ type: 'error', text: 'Please select a user first.' });
+      return;
+    }
+    const amount = Number(coinAmount);
+    if (!Number.isInteger(amount) || amount <= 0 || amount > 100000) {
+      setCoinFeedback({ type: 'error', text: 'Enter a whole number between 1 and 100000.' });
+      return;
+    }
+    setCoinSending(true);
+    setCoinFeedback(null);
+    try {
+      const res = await api.post(`/api/admin/users/${selectedCoinUser.id}/grant-coins`, {
+        amount,
+        reason: coinNote.trim()
+      });
+      setCoinFeedback({
+        type: 'success',
+        text: `Sent ${amount} coins to ${selectedCoinUser.name || selectedCoinUser.email}. New balance: ${res.data.coins}.`
+      });
+      setCoinAmount('');
+      setCoinNote('');
+      setSelectedCoinUser(null);
+      setCoinSearchTerm('');
+      await fetchAllData();
+    } catch (err) {
+      setCoinFeedback({
+        type: 'error',
+        text: 'Error sending coins: ' + (err.response?.data?.error || err.message)
+      });
+    } finally {
+      setCoinSending(false);
+    }
+  };
+
 
   // Filter bookings based on selected movie + booking search
   const normalizedBookingSearch = bookingSearchTerm.trim().toLowerCase();
@@ -3127,6 +3180,133 @@ const AdminPanel = () => {
                 </Card>
               </Col>
             </Row>
+
+            {/* Send Coins Section (super admin only) */}
+            {hasConfigAccess && (
+              <>
+                <h4 className="text-white mt-5 mb-4 text-start">
+                  <i className="fas fa-coins me-2"></i>
+                  Send Coins to a User
+                </h4>
+                <Card className="text-start mb-4" style={{
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0',
+                  boxShadow: 'none',
+                  color: '#0b0e17'
+                }}>
+                  <Card.Body style={{ padding: '1.5rem' }}>
+                    {coinFeedback && (
+                      <div
+                        className="mb-3"
+                        style={{
+                          padding: '0.75rem 1rem',
+                          borderRadius: '0',
+                          border: '1px solid ' + (coinFeedback.type === 'success' ? '#16a34a' : '#dc2626'),
+                          background: coinFeedback.type === 'success' ? '#f0fdf4' : '#fef2f2',
+                          color: coinFeedback.type === 'success' ? '#166534' : '#991b1b',
+                          fontWeight: 500
+                        }}
+                      >
+                        {coinFeedback.text}
+                      </div>
+                    )}
+
+                    {/* Step 1: pick a user */}
+                    {selectedCoinUser ? (
+                      <div className="mb-3 d-flex align-items-center justify-content-between" style={{
+                        padding: '0.75rem 1rem',
+                        border: '1px solid #e5e7eb',
+                        background: '#f9fafb'
+                      }}>
+                        <span>
+                          <strong>{selectedCoinUser.name || 'Unnamed'}</strong>
+                          <span style={{ color: '#6b7280' }}> — {selectedCoinUser.email}</span>
+                        </span>
+                        <Button
+                          size="sm"
+                          variant="outline-secondary"
+                          onClick={() => { setSelectedCoinUser(null); setCoinFeedback(null); }}
+                        >
+                          Change
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="mb-3" style={{ position: 'relative' }}>
+                        <label className="mb-1" style={{ fontWeight: 600 }}>Search user</label>
+                        <input
+                          type="text"
+                          placeholder="Search by name or email..."
+                          value={coinSearchTerm}
+                          onChange={(e) => setCoinSearchTerm(e.target.value)}
+                          className="form-control"
+                          style={{ maxWidth: '400px' }}
+                        />
+                        {coinSearchResults.length > 0 && (
+                          <div style={{
+                            maxWidth: '400px',
+                            border: '1px solid #e5e7eb',
+                            borderTop: 'none',
+                            background: '#ffffff',
+                            maxHeight: '240px',
+                            overflowY: 'auto'
+                          }}>
+                            {coinSearchResults.map(u => (
+                              <div
+                                key={u.id}
+                                onClick={() => { setSelectedCoinUser(u); setCoinSearchTerm(''); setCoinFeedback(null); }}
+                                style={{ padding: '0.5rem 0.75rem', cursor: 'pointer', borderBottom: '1px solid #f3f4f6' }}
+                                onMouseEnter={(e) => (e.currentTarget.style.background = '#f3f4f6')}
+                                onMouseLeave={(e) => (e.currentTarget.style.background = '#ffffff')}
+                              >
+                                <strong>{u.name || 'Unnamed'}</strong>
+                                <span style={{ color: '#6b7280' }}> — {u.email}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Step 2: amount + optional note */}
+                    <div className="mb-3">
+                      <label className="mb-1" style={{ fontWeight: 600 }}>Coins to send</label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="100000"
+                        placeholder="e.g. 100"
+                        value={coinAmount}
+                        onChange={(e) => setCoinAmount(e.target.value)}
+                        className="form-control"
+                        style={{ maxWidth: '200px' }}
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label className="mb-1" style={{ fontWeight: 600 }}>Note (optional)</label>
+                      <input
+                        type="text"
+                        placeholder="Reason shown in transaction history"
+                        value={coinNote}
+                        onChange={(e) => setCoinNote(e.target.value)}
+                        className="form-control"
+                        style={{ maxWidth: '400px' }}
+                        maxLength={200}
+                      />
+                    </div>
+
+                    <Button
+                      variant="dark"
+                      onClick={handleSendCoins}
+                      disabled={coinSending || !selectedCoinUser || !coinAmount}
+                      style={{ borderRadius: '0' }}
+                    >
+                      {coinSending ? 'Sending…' : 'Send Coins'}
+                    </Button>
+                  </Card.Body>
+                </Card>
+              </>
+            )}
 
             {/* Search Users Section */}
             <h4 className="text-white mt-5 mb-4 text-start">
