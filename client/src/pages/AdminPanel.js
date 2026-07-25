@@ -1252,6 +1252,19 @@ const AdminPanel = () => {
     }
   };
 
+  // Delete individual booking (admin)
+  const handleDeleteBooking = async (bookingId) => {
+    if (!window.confirm('Are you sure you want to delete this booking? This action cannot be undone.')) return;
+    try {
+      await api.delete(`/api/admin/bookings/${bookingId}`);
+      alert('Booking deleted successfully!');
+      fetchAllData();
+    } catch (err) {
+      console.error('Error deleting booking:', err);
+      alert('Error deleting booking: ' + (err.response?.data?.error || err.message));
+    }
+  };
+
   // Export bookings to PDF
   const exportBookingsToPDF = (bookingsToExport) => {
     try {
@@ -3125,6 +3138,13 @@ const AdminPanel = () => {
                         onClick={() => handleDownloadTicketForBooking(booking)}
                       >
                         Download Ticket
+                      </Button>
+                      <Button
+                        variant="outline-danger"
+                        size="sm"
+                        onClick={() => handleDeleteBooking(booking.id)}
+                      >
+                        <i className="fas fa-trash me-1"></i>Delete
                       </Button>
                     </td>
                   </tr>

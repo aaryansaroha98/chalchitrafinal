@@ -21,8 +21,6 @@ const MyBookings = () => {
   const [feedbackRating, setFeedbackRating] = useState(5);
   const [feedbackComment, setFeedbackComment] = useState('');
   const [downloadingTicket, setDownloadingTicket] = useState(null);
-  const [selectedBookings, setSelectedBookings] = useState(new Set());
-  const [showBulkDelete, setShowBulkDelete] = useState(false);
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
@@ -52,18 +50,6 @@ const MyBookings = () => {
     }
   };
 
-  const handleDeleteBooking = async (bookingId) => {
-    if (window.confirm('Are you sure you want to delete this booking?')) {
-      try {
-        await api.delete(`/api/bookings/${bookingId}`);
-        setBookings(bookings.filter(booking => booking.id !== bookingId));
-        alert('Booking deleted successfully!');
-      } catch (err) {
-        alert('Failed to delete booking');
-      }
-    }
-  };
-
   const handleSubmitFeedback = async () => {
     try {
       await api.post('/api/feedback', {
@@ -77,30 +63,6 @@ const MyBookings = () => {
       setFeedbackComment('');
     } catch (error) {
       alert('Failed to submit feedback');
-    }
-  };
-
-  const handleBulkDelete = async () => {
-    try {
-      // Convert Set to array for API call
-      const bookingIds = Array.from(selectedBookings);
-      
-      // Delete all selected bookings
-      await Promise.all(bookingIds.map(id => api.delete(`/api/bookings/${id}`)));
-      
-      // Update state to remove deleted bookings
-      setBookings(bookings.filter(booking => !selectedBookings.has(booking.id)));
-      
-      // Clear selection
-      setSelectedBookings(new Set());
-      
-      // Close modal
-      setShowBulkDelete(false);
-      
-      alert(`Successfully deleted ${selectedBookings.size} booking${selectedBookings.size > 1 ? 's' : ''}!`);
-    } catch (err) {
-      console.error('Failed to delete bookings:', err);
-      alert('Failed to delete some bookings. Please try again.');
     }
   };
 
@@ -427,185 +389,16 @@ const MyBookings = () => {
           </Card>
         ) : (
           <>
-            {/* Bulk Delete Controls */}
-            {selectedBookings.size > 0 && (
-              <div className="my-booking-bulk" style={{
-                background: '#ffffff',
-                border: '1px solid #e5e7eb',
-                padding: '1rem',
-                marginBottom: '2rem',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                flexWrap: 'wrap',
-                gap: '1rem'
-              }}>
-                <div style={{display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap'}}>
-                  <span className="my-booking-bulk-text" style={{
-                    color: '#0b0e17',
-                    fontSize: '1rem',
-                    fontWeight: '600'
-                  }}>
-                    Selected: {selectedBookings.size} booking{selectedBookings.size > 1 ? 's' : ''}
-                  </span>
-                  <div className="my-booking-bulk-actions" style={{display: 'flex', gap: '0.5rem'}}>
-                    <Button
-                      variant="outline-light"
-                      onClick={() => {
-                        const allIds = new Set(bookings.map(b => b.id));
-                        setSelectedBookings(allIds);
-                      }}
-                      style={{
-                        border: '1px solid #e5e7eb',
-                        color: '#0b0e17',
-                        padding: '0.4rem 0.8rem',
-                        fontWeight: '600',
-                        fontSize: '0.85rem',
-                        transition: 'all 0.2s ease'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.target.style.background = '#f6f6f7';
-                        e.target.style.borderColor = '#0b0e17';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.background = 'transparent';
-                        e.target.style.borderColor = '#e5e7eb';
-                      }}
-                    >
-                      <i className="fas fa-check-double me-1"></i>
-                      Select All
-                    </Button>
-                    <Button
-                      variant="outline-secondary"
-                      onClick={() => setSelectedBookings(new Set())}
-                      style={{
-                        border: '1px solid #e5e7eb',
-                        color: '#5c6270',
-                        padding: '0.4rem 0.8rem',
-                        fontWeight: '600',
-                        fontSize: '0.85rem',
-                        transition: 'all 0.2s ease'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.target.style.background = '#f6f6f7';
-                        e.target.style.borderColor = '#0b0e17';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.background = 'transparent';
-                        e.target.style.borderColor = '#e5e7eb';
-                      }}
-                    >
-                      <i className="fas fa-times me-1"></i>
-                      Deselect All
-                    </Button>
-                  </div>
-                </div>
-                  <Button
-                    className="my-booking-bulk-delete"
-                    variant="outline-danger"
-                  onClick={() => {
-                    if (selectedBookings.size === 0) return;
-                    const confirmed = window.confirm(`Delete ${selectedBookings.size} booking${selectedBookings.size > 1 ? 's' : ''}? This action cannot be undone.`);
-                    if (confirmed) {
-                      handleBulkDelete();
-                    }
-                  }}
-                  style={{
-                    border: '1px solid #d64545',
-                    color: '#d64545',
-                    padding: '0.5rem 1rem',
-                    fontWeight: '600',
-                    fontSize: '0.9rem',
-                    transition: 'all 0.2s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.background = '#d64545';
-                    e.target.style.color = '#ffffff';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.background = 'transparent';
-                    e.target.style.color = '#d64545';
-                  }}
-                >
-                  <i className="fas fa-trash me-1"></i>
-                  Delete Selected ({selectedBookings.size})
-                </Button>
-              </div>
-            )}
-
               <Row className="my-bookings-row">
               {bookings.map((booking) => (
                 <Col lg={3} md={4} sm={6} xs={6} key={booking.id} className="mb-4">
                   <Card className="h-100 border-0 my-booking-card" style={{
                   background: '#ffffff',
-                  border: selectedBookings.has(booking.id)
-                    ? '1px solid #0b0e17'
-                    : '1px solid #e5e7eb',
+                  border: '1px solid #e5e7eb',
                   overflow: 'hidden',
                   position: 'relative',
                   transition: 'all 0.2s ease'
                 }}>
-                  {/* Selection Checkbox */}
-                  <div className="my-booking-select" style={{
-                    position: 'absolute',
-                    top: '8px',
-                    right: '8px',
-                    zIndex: 10,
-                    background: selectedBookings.has(booking.id)
-                      ? '#0b0e17'
-                      : '#ffffff',
-                    border: selectedBookings.has(booking.id)
-                      ? '1px solid #0b0e17'
-                      : '1px solid #e5e7eb',
-                    borderRadius: '50%',
-                    width: '22px',
-                    height: '22px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease'
-                  }}
-                    onClick={() => {
-                      const newSelection = new Set(selectedBookings);
-                      if (newSelection.has(booking.id)) {
-                        newSelection.delete(booking.id);
-                      } else {
-                        newSelection.add(booking.id);
-                      }
-                      setSelectedBookings(newSelection);
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!selectedBookings.has(booking.id)) {
-                        e.target.style.background = '#f6f6f7';
-                        e.target.style.borderColor = '#0b0e17';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!selectedBookings.has(booking.id)) {
-                        e.target.style.background = '#ffffff';
-                        e.target.style.borderColor = '#e5e7eb';
-                      }
-                    }}
-                  >
-                    {selectedBookings.has(booking.id) ? (
-                      <i className="fas fa-check" style={{color: '#ffffff', fontSize: '0.65rem', fontWeight: 'bold'}}></i>
-                    ) : (
-                      <i className="far fa-check" style={{color: '#8b909c', fontSize: '0.65rem'}}></i>
-                    )}
-                  </div>
-
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    border: selectedBookings.has(booking.id)
-                      ? '1px solid #0b0e17'
-                      : '1px solid #eef0f2',
-                    pointerEvents: 'none'
-                  }}></div>
 
                   <Card.Body className="my-booking-card-body" style={{padding: '0.75rem'}}>
                     <div style={{
@@ -801,31 +594,6 @@ const MyBookings = () => {
                             <i className="fas fa-star me-1"></i>
                             Feedback
                           </Button>
-
-                          <Button
-                            size="sm"
-                            variant="outline-danger"
-                            style={{
-                              border: '1px solid #d64545',
-                              color: '#d64545',
-                              padding: '0.5rem 1rem',
-                              fontWeight: '600',
-                              fontSize: '0.8rem',
-                              transition: 'all 0.2s ease'
-                            }}
-                            onMouseEnter={(e) => {
-                              e.target.style.background = '#d64545';
-                              e.target.style.color = '#ffffff';
-                            }}
-                            onMouseLeave={(e) => {
-                              e.target.style.background = 'transparent';
-                              e.target.style.color = '#d64545';
-                            }}
-                            onClick={() => handleDeleteBooking(booking.id)}
-                          >
-                            <i className="fas fa-trash me-1"></i>
-                            Delete
-                          </Button>
                         </>
                       ) : (
                         <>
@@ -866,31 +634,6 @@ const MyBookings = () => {
                               </>
                             )}
                           </Button>
-
-                          <Button
-                            size="sm"
-                            variant="outline-danger"
-                            style={{
-                              border: '1px solid #d64545',
-                              color: '#d64545',
-                              padding: '0.5rem 1rem',
-                              fontWeight: '600',
-                              fontSize: '0.8rem',
-                              transition: 'all 0.2s ease'
-                            }}
-                            onMouseEnter={(e) => {
-                              e.target.style.background = '#d64545';
-                              e.target.style.color = '#ffffff';
-                            }}
-                            onMouseLeave={(e) => {
-                              e.target.style.background = 'transparent';
-                              e.target.style.color = '#d64545';
-                            }}
-                            onClick={() => handleDeleteBooking(booking.id)}
-                          >
-                            <i className="fas fa-trash me-1"></i>
-                            Delete
-                          </Button>
                         </>
                       )}
                     </div>
@@ -901,126 +644,6 @@ const MyBookings = () => {
           </Row>
         </>
         )}
-
-        {/* Bulk Delete Modal */}
-        <Modal
-          show={showBulkDelete}
-          onHide={() => setShowBulkDelete(false)}
-          centered
-          size="md"
-          style={{
-            backgroundColor: 'rgba(11, 14, 23, 0.4)'
-          }}
-        >
-          <div style={{
-            background: '#ffffff',
-            border: '1px solid #e5e7eb',
-            color: '#0b0e17',
-            position: 'relative',
-            overflow: 'hidden'
-          }}>
-            {/* Modal Header */}
-            <Modal.Header
-              style={{
-                borderBottom: 'none',
-                background: 'transparent',
-                padding: '1rem 1.2rem 0.2rem',
-                zIndex: 1,
-                display: 'flex',
-                justifyContent: 'center'
-              }}
-            >
-              <h5 style={{ margin: 0, color: '#0b0e17', fontWeight: 700, textAlign: 'center' }}>Delete booking{selectedBookings.size > 1 ? 's' : ''}</h5>
-            </Modal.Header>
-
-            {/* Modal Body */}
-            <Modal.Body style={{ padding: '0.6rem 1.4rem 1rem', zIndex: 1 }}>
-              <div style={{
-                background: '#f6f6f7',
-                border: '1px solid #e5e7eb',
-                maxHeight: '260px',
-                overflow: 'auto',
-                padding: '0.75rem'
-              }}>
-                {Array.from(selectedBookings).map((bookingId) => {
-                  const booking = bookings.find(b => b.id === bookingId);
-                  return (
-                    <div
-                      key={bookingId}
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        padding: '0.65rem 0.75rem',
-                        background: '#ffffff',
-                        border: '1px solid #e5e7eb',
-                        marginBottom: '0.6rem'
-                      }}
-                    >
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                        <span style={{ color: '#0b0e17', fontWeight: 600, fontSize: '1rem' }}>
-                          {booking?.title || 'Booking'}
-                        </span>
-                        <span style={{ color: '#8b909c', fontSize: '0.85rem' }}>
-                          #{booking?.booking_code || booking?.id}
-                        </span>
-                      </div>
-                      <span style={{
-                        color: '#5c6270',
-                        fontSize: '0.9rem',
-                        background: '#f6f6f7',
-                        padding: '0.3rem 0.7rem',
-                        border: '1px solid #e5e7eb'
-                      }}>
-                        {booking ? new Date(booking.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : ''}
-                      </span>
-                    </div>
-                  );
-                })}
-                {selectedBookings.size === 0 && (
-                  <div style={{ color: '#8b909c', textAlign: 'center', padding: '1rem' }}>
-                    No bookings selected.
-                  </div>
-                )}
-              </div>
-            </Modal.Body>
-
-            {/* Modal Footer */}
-            <Modal.Footer style={{
-              borderTop: 'none',
-              padding: '1rem 1.4rem 1.3rem',
-              background: 'transparent',
-              zIndex: 1
-            }}>
-              <Button
-                variant="outline-light"
-                onClick={() => setShowBulkDelete(false)}
-                style={{
-                  padding: '0.75rem 1.4rem',
-                  fontWeight: 600,
-                  color: '#0b0e17',
-                  border: '1px solid #e5e7eb',
-                  background: '#ffffff'
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="dark"
-                onClick={handleBulkDelete}
-                style={{
-                  padding: '0.75rem 1.6rem',
-                  fontWeight: 700,
-                  background: '#d64545',
-                  border: '1px solid #d64545',
-                  color: '#ffffff'
-                }}
-              >
-                Delete {selectedBookings.size}
-              </Button>
-            </Modal.Footer>
-          </div>
-        </Modal>
 
         {/* Feedback Modal - Glass Effect Design */}
         <Modal
@@ -1366,22 +989,7 @@ const MyBookings = () => {
               border-radius: 5px !important;
             }
 
-            .my-booking-bulk {
-              padding: 0.7rem !important;
-              gap: 0.6rem !important;
-              margin-bottom: 1rem !important;
-            }
 
-            .my-booking-bulk-text {
-              font-size: 0.7rem !important;
-            }
-
-            .my-booking-bulk-actions button,
-            .my-booking-bulk-delete {
-              padding: 0.3rem 0.6rem !important;
-              font-size: 0.65rem !important;
-              border-radius: 6px !important;
-            }
           }
         `}
       </style>
