@@ -21,7 +21,7 @@ const Home = () => {
     tagline: 'Student-led movie screening initiative at IIT Jammu',
     hero_background: '#ffffff',
     about_text: 'Chalchitra Series is a student-led initiative at IIT Jammu dedicated to bringing quality movie screenings to our campus community. We organize regular movie screenings featuring a diverse range of films, from classics to contemporary hits.\n\nOur mission is to create a vibrant cultural atmosphere on campus while providing students with affordable entertainment options.',
-    about_image: '/logos/newlogo.png',
+    about_image: '/favicons/PHOTO-2026-01-03-23-03-23%202.jpg',
     hero_background_video: null
   });
   const [founder, setFounder] = useState(null);
@@ -657,9 +657,9 @@ const Home = () => {
               <Col lg={4} md={5} className="text-center about-logo-wrap">
                 <img
                   className="about-logo"
-                  src={settings.about_image ? (settings.about_image.startsWith('http') ? settings.about_image : `${window.location.origin}${settings.about_image}`) : '/logos/newlogo.png'}
+                  src={settings.about_image ? (settings.about_image.startsWith('http') ? settings.about_image : `${window.location.origin}${settings.about_image}`) : '/favicons/PHOTO-2026-01-03-23-03-23%202.jpg'}
                   alt="Chalchitra Logo"
-                  onError={(e) => { e.target.onerror = null; e.target.src = '/logos/newlogo.png'; }}
+                  onError={(e) => { e.target.onerror = null; e.target.src = '/favicons/PHOTO-2026-01-03-23-03-23%202.jpg'; }}
                   style={{
                     maxWidth: '300px',
                     width: '100%',
