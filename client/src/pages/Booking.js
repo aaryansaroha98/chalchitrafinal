@@ -395,7 +395,7 @@ const Booking = () => {
                       {availableFoods && availableFoods.length > 0 ? (
                         availableFoods.map(food => (
                           <span key={food.id} className="booking-food-pill">
-                            {food.name} - {food.is_free ? 'FREE' : `🪙 ${Math.ceil(food.price / 10)} Coins`}
+                            {food.name} - {food.is_free ? 'FREE' : <><CoinIcon size={14} /> {Math.ceil(food.price / 10)} Coins</>}
                           </span>
                         ))
                       ) : (
@@ -1068,7 +1068,7 @@ const Booking = () => {
                           fontSize: '16px',
                           fontWeight: 'bold'
                         }}>
-                          {food.is_free ? 'FREE' : `🪙 ${Math.ceil(food.price / 10)} Coins`}
+                          {food.is_free ? 'FREE' : <><CoinIcon size={14} /> {Math.ceil(food.price / 10)} Coins</>}
                         </p>
                       </div>
                     </div>
@@ -1305,7 +1305,7 @@ const Booking = () => {
                               fontWeight: 'bold',
                               fontFamily: 'Arial, sans-serif'
                             }}>
-                              {food.is_free ? 'FREE' : `🪙 ${Math.ceil(food.price / 10) * quantity}`}
+                              {food.is_free ? 'FREE' : <><CoinIcon size={14} /> {Math.ceil(food.price / 10) * quantity}</>}
                             </span>
                           </div>
                         );
@@ -1341,7 +1341,7 @@ const Booking = () => {
                     }}>
                       Total Amount
                     </span>
-                    <CoinIcon size={18} /> {getTotalPrice()}
+                    <CoinIcon size={18} /> {getTotalPrice()} Coins
                   </div>
 
                   <button
