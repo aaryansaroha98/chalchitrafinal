@@ -813,6 +813,15 @@ footer, .footer {
   white-space: nowrap;
 }
 
+.qt-coin-badge-mobile {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--qt-text);
+  white-space: nowrap;
+}
 .qt-nav-mobile {
   margin-left: auto;
   display: flex;
@@ -931,20 +940,6 @@ body.menu-open { overflow: hidden; }
   padding: 8px 18px;
 }
 
-.mobile-menu-coins {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  align-self: center;
-  margin: 2px auto 6px;
-  font-size: 0.9rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: var(--qt-text);
-  border: 1px solid var(--qt-line);
-  padding: 0.35rem 0.7rem;
-  white-space: nowrap;
-}
 
 .mobile-menu-logout {
   background: transparent;

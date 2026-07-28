@@ -137,8 +137,11 @@ const NavigationBar = () => {
           )}
         </div>
 
-        {/* Mobile: hamburger */}
+        {/* Mobile: coin badge + hamburger */}
         <div className="d-lg-none qt-nav-mobile">
+          {user && (
+            <span className="qt-coin-badge-mobile"><CoinIcon size={14} /> {coinBalanceLoading ? '...' : coinBalance}</span>
+          )}
           <button
             onClick={toggleMenu}
             className={`nav-burger${menuOpen ? ' is-open' : ''}`}
@@ -162,7 +165,6 @@ const NavigationBar = () => {
       {user && (
         <>
           <span className="mobile-menu-greeting">Hi, {user?.name?.split(' ')[0] || 'User'}</span>
-          <span className="mobile-menu-coins"><CoinIcon size={14} /> {coinBalanceLoading ? '...' : coinBalance} Coins</span>
           <Link to="/my-bookings" onClick={closeMenu} className="mobile-menu-link">My Bookings</Link>
           {!!(user.code_scanner || user.team_scanner) && (
             <Link to="/scanner" onClick={closeMenu} className="mobile-menu-link">Scanner</Link>

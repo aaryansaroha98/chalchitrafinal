@@ -4,6 +4,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import api from '../api/axios';
 import { useAuth } from '../contexts/AuthContext';
 import Loader from '../components/Loader';
+import CoinIcon from '../components/CoinIcon';
 
 // Derive API base URL to build absolute URLs for poster/image assets
 const apiBaseUrl = process.env.REACT_APP_API_URL ||
@@ -193,7 +194,7 @@ const Payment = () => {
 
                 <div className="info-item">
                   <span className="info-label">Tickets:</span>
-                  <span className="info-value">{quantity} x 🪙 {TICKET_COIN_PRICE}</span>
+                  <span className="info-value">{quantity} x <CoinIcon size={14} /> {TICKET_COIN_PRICE}</span>
                 </div>
               </div>
             </div>
@@ -207,7 +208,7 @@ const Payment = () => {
 
               <div className="detail-item">
                 <span className="detail-label">Tickets x {quantity}</span>
-                <span className="detail-value">🪙 {(quantity * TICKET_COIN_PRICE).toFixed(2)}</span>
+                <span className="detail-value"><CoinIcon size={14} /> {(quantity * TICKET_COIN_PRICE).toFixed(2)}</span>
               </div>
 
               {Object.entries(selectedFoods).map(([foodId, qty]) => {
@@ -219,7 +220,7 @@ const Payment = () => {
                 return (
                   <div key={foodId} className="detail-item">
                     <span className="detail-label">{foodItem ? foodItem.name : `Food ${foodId}`} x {qty}</span>
-                    <span className="detail-value">{isFree ? 'FREE' : `🪙 ${itemTotal} Coins`}</span>
+                    <span className="detail-value">{isFree ? 'FREE' : <><CoinIcon size={14} /> {itemTotal} Coins</>}</span>
                   </div>
                 );
               })}
@@ -232,7 +233,7 @@ const Payment = () => {
             <div className="totals-section">
               <div className="total-row grand-total">
                 <span className="total-label">Total</span>
-                <span className="total-value">🪙 {getTotalCoins()} Coins</span>
+                <span className="total-value"><CoinIcon size={16} /> {getTotalCoins()} Coins</span>
               </div>
             </div>
           </div>
@@ -313,7 +314,7 @@ const Payment = () => {
         {/* Coin Balance Display */}
         {user && (
           <div className="coupon-card" style={{marginTop: '16px'}}>
-            <h3 className="coupon-heading">🪙 Your Coin Balance</h3>
+            <h3 className="coupon-heading"><CoinIcon size={18} style={{verticalAlign: 'middle', marginRight: '4px'}} /> Your Coin Balance</h3>
             <div style={{
               display: 'flex',
               alignItems: 'center',
@@ -333,7 +334,7 @@ const Payment = () => {
             >
               <div>
                 <div style={{color: '#0b0e17', fontWeight: '600', fontSize: '14px'}}>
-                  Your Balance: 🪙 {coinBalance}
+                  <CoinIcon size={14} /> Your Balance: {coinBalance}
                 </div>
                 <div style={{color: '#5c6270', fontSize: '12px', marginTop: '4px'}}>
                   {coinBalance >= getTotalCoins()
@@ -365,7 +366,7 @@ const Payment = () => {
                 color: '#5c6270',
                 textAlign: 'center'
               }}>
-                🪙 You will pay {getTotalCoins()} coins now. Coins will be refunded after you attend the movie!
+                <CoinIcon size={14} /> You will pay {getTotalCoins()} coins now. Coins will be refunded after you attend the movie!
               </div>
             )}
           </div>
@@ -496,7 +497,7 @@ const Payment = () => {
               </span>
             ) : (
               <span className="btn-content">
-                {getTotalCoins() === 0 ? 'CONFIRM TICKET' : `Pay 🪙${getTotalCoins()}`}
+                {getTotalCoins() === 0 ? 'CONFIRM TICKET' : <><CoinIcon size={14} style={{verticalAlign: 'middle', marginRight: '4px'}} /> Pay {getTotalCoins()}</>}
               </span>
             )}
           </button>
