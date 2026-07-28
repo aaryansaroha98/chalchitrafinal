@@ -1955,6 +1955,28 @@ const AdminPanel = () => {
     }
   };
 
+  const deleteUser = async (userId, userEmail, userName) => {
+    if (userEmail === SUPER_ADMIN_EMAIL) {
+      alert('Cannot delete the super admin account.');
+      return;
+    }
+    if (!window.confirm(`Are you sure you want to permanently delete "${userName}" and ALL their data (bookings, coins, etc.)? This cannot be undone.`)) {
+      return;
+    }
+    if (!window.confirm(`FINAL WARNING: This will permanently remove ${userName} from the system. Continue?`)) {
+      return;
+    }
+
+    try {
+      await api.delete(`/api/admin/users/${userId}`);
+      alert(`User "${userName}" and all associated data have been deleted.`);
+      await refreshUserAndAdminLists();
+    } catch (err) {
+      console.error('Error deleting user:', err);
+      alert('Error deleting user: ' + (err.response?.data?.error || err.message));
+    }
+  };
+
   const openManageAccessModal = async () => {
     setUserSearchTerm('');
     setSearchedUsers(users);
@@ -3350,6 +3372,7 @@ const AdminPanel = () => {
                   <th>Email</th>
                   <th>Role</th>
                   <th>Joined</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -3363,10 +3386,21 @@ const AdminPanel = () => {
                       </Badge>
                     </td>
                     <td>{formatExactJoinDateTime(user.created_at)}</td>
+                    <td>
+                      <Button
+                        variant="outline-danger"
+                        size="sm"
+                        onClick={() => deleteUser(user.id, user.email, user.name)}
+                        title="Delete user and all their data"
+                      >
+                        <i className="fas fa-trash me-1"></i>
+                        Delete
+                      </Button>
+                    </td>
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan="4" className="text-center text-muted py-4">
+                    <td colSpan="5" className="text-center text-muted py-4">
                       <i className="fas fa-users fa-2x mb-2"></i>
                       <br />
                       No users found
@@ -7842,6 +7876,21 @@ const AdminPanel = () => {
                               Remove Admin
                             </Button>
                           )}
+                          <Button
+                            variant="outline-danger"
+                            size="sm"
+                            onClick={() => deleteUser(user.id, user.email, user.name)}
+                            style={{
+                              borderRadius: '0',
+                              background: 'transparent',
+                              borderColor: '#dc3545',
+                              color: '#dc3545'
+                            }}
+                            title="Delete user and all their data"
+                          >
+                            <i className="fas fa-trash me-1"></i>
+                            Delete
+                          </Button>
                         </>
                       ) : (
                         <>
@@ -7894,6 +7943,22 @@ const AdminPanel = () => {
                           >
                             <i className="fas fa-check me-1"></i>
                             Make Admin
+                          </Button>
+
+                          <Button
+                            variant="outline-danger"
+                            size="sm"
+                            onClick={() => deleteUser(user.id, user.email, user.name)}
+                            style={{
+                              borderRadius: '0',
+                              background: 'transparent',
+                              borderColor: '#dc3545',
+                              color: '#dc3545'
+                            }}
+                            title="Delete user and all their data"
+                          >
+                            <i className="fas fa-trash me-1"></i>
+                            Delete
                           </Button>
                         </>
                       )}

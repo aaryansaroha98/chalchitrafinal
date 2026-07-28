@@ -461,6 +461,71 @@ router.get('/users', requireAdmin, (req, res) => {
   );
 });
 
+// Delete a user and all their associated data
+router.delete('/users/:id', requireAdmin, (req, res) => {
+  const userId = parseInt(req.params.id, 10);
+  if (!Number.isInteger(userId)) {
+    return res.status(400).json({ error: 'Invalid user id' });
+  }
+
+  db.get('SELECT id, name, email FROM users WHERE id = ?', [userId], (err, user) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    const SUPER_ADMIN_EMAIL = process.env.SUPER_ADMIN_EMAIL || '2025uee0154@iitjammu.ac.in';
+    if (user.email === SUPER_ADMIN_EMAIL) {
+      return res.status(403).json({ error: 'Cannot delete the super admin account' });
+    }
+
+    // Gather all booking IDs for this user
+    db.all('SELECT id FROM bookings WHERE user_id = ?', [userId], (err, bookings) => {
+      if (err) return res.status(500).json({ error: err.message });
+
+      const bookingIds = bookings.map(b => b.id);
+
+      const runInSequence = (steps, idx = 0) => {
+        if (idx >= steps.length) {
+          console.log(`✅ User ${user.name} (${user.email}, id=${userId}) fully deleted`);
+          return res.json({ message: `User "${user.name}" and all their data have been deleted` });
+        }
+        steps[idx](function (nextErr) {
+          if (nextErr) {
+            console.error(`⚠️ Step ${idx} error:`, nextErr.message);
+          }
+          runInSequence(steps, idx + 1);
+        });
+      };
+
+      runInSequence([
+        // 1. Delete booking_food_status for user's bookings
+        (cb) => {
+          if (bookingIds.length === 0) return cb(null);
+          const placeholders = bookingIds.map(() => '?').join(',');
+          db.run(`DELETE FROM booking_food_status WHERE booking_id IN (${placeholders})`, bookingIds, cb);
+        },
+        // 2. Delete booking_foods for user's bookings
+        (cb) => {
+          if (bookingIds.length === 0) return cb(null);
+          const placeholders = bookingIds.map(() => '?').join(',');
+          db.run(`DELETE FROM booking_foods WHERE booking_id IN (${placeholders})`, bookingIds, cb);
+        },
+        // 3. Delete feedback for user
+        (cb) => db.run('DELETE FROM feedback WHERE user_id = ?', [userId], cb),
+        // 4. Delete coin_transactions for user
+        (cb) => db.run('DELETE FROM coin_transactions WHERE user_id = ?', [userId], cb),
+        // 5. Delete coupon_winners for user
+        (cb) => db.run('DELETE FROM coupon_winners WHERE user_id = ?', [userId], cb),
+        // 6. Delete admin_permissions for user
+        (cb) => db.run('DELETE FROM admin_permissions WHERE admin_user_id = ?', [userId], cb),
+        // 7. Delete bookings for user
+        (cb) => db.run('DELETE FROM bookings WHERE user_id = ?', [userId], cb),
+        // 8. Finally delete the user
+        (cb) => db.run('DELETE FROM users WHERE id = ?', [userId], cb),
+      ]);
+    });
+  });
+});
+
 // Grant coins directly to a user (super admin only)
 router.post('/users/:id/grant-coins', requireSuperAdmin, (req, res) => {
   const userId = parseInt(req.params.id, 10);
