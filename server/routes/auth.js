@@ -124,7 +124,9 @@ function initializeGoogleStrategy() {
 
   passport.deserializeUser((id, done) => {
     db.get('SELECT * FROM users WHERE id = ?', [id], (err, user) => {
-      done(err, user);
+      if (err) return done(err);
+      if (!user) return done(null, false); // user was deleted — invalidate session silently
+      done(null, user);
     });
   });
 }
