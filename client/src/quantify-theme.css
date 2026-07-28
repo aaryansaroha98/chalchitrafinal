@@ -816,9 +816,9 @@ footer, .footer {
 .qt-coin-badge-mobile {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
-  font-size: 12px;
-  font-weight: 600;
+  gap: 0.3rem;
+  font-size: 14px;
+  font-weight: 700;
   color: var(--qt-text);
   white-space: nowrap;
 }
