@@ -140,7 +140,7 @@ const NavigationBar = () => {
         {/* Mobile: coin badge + hamburger */}
         <div className="d-lg-none qt-nav-mobile">
           {user && (
-            <span className="qt-coin-badge-mobile"><CoinIcon size={14} /> {coinBalanceLoading ? '...' : coinBalance}</span>
+            <span className="qt-coin-badge-mobile"><CoinIcon size={16} /> {coinBalanceLoading ? '...' : coinBalance}</span>
           )}
           <button
             onClick={toggleMenu}
