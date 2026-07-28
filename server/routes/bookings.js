@@ -101,8 +101,8 @@ function generateBookingId() {
 function refundBookingCoinsOnce(booking) {
   if (!booking || !booking.user_id) return;
 
-  const refundAmount = booking.coin_amount || booking.total_price || booking.payment_amount || 0;
-  if (!refundAmount || refundAmount <= 0) return;
+  const refundAmount = (booking.coin_amount || booking.total_price || booking.payment_amount || 0) + 3;
+  if (refundAmount <= 3) return;
 
   db.run(
     'UPDATE bookings SET coins_refunded = 1 WHERE id = ? AND COALESCE(coins_refunded, 0) = 0',
