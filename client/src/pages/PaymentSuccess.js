@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../api/axios';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import CoinIcon from '../components/CoinIcon';
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
@@ -357,7 +358,7 @@ const PaymentSuccess = () => {
 
               <div className="detail-row">
                 <span className="detail-label">Amount Paid</span>
-                <span className="detail-value">🪙 {payment?.amount ?? (selectedSeats?.length * 20) ?? 0} Coins</span>
+                <span className="detail-value"><CoinIcon size={14} /> {payment?.amount ?? (selectedSeats?.length * 20) ?? 0} Coins</span>
               </div>
 
               {payment?.transaction_id && (
