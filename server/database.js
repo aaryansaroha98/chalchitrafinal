@@ -371,7 +371,7 @@ if (usePostgres) {
 
     // Ensure users.coins column exists for older databases
     try {
-      await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS coins INTEGER DEFAULT 20');
+      await pool.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS coins INTEGER DEFAULT 0");
       console.log('✅ users.coins column ensured');
     } catch (err) {
       console.log('users.coins ensure warning:', err.message);
@@ -793,16 +793,16 @@ if (usePostgres) {
 
       const hasCoins = Array.isArray(columns) && columns.some((col) => col.name === 'coins');
       if (!hasCoins) {
-        db.run('ALTER TABLE users ADD COLUMN coins INTEGER DEFAULT 20', (alterErr) => {
+        db.run('ALTER TABLE users ADD COLUMN coins INTEGER DEFAULT 0', (alterErr) => {
           if (alterErr) {
             console.log('⚠️  Could not add users.coins:', alterErr.message);
             return;
           }
-          db.run('UPDATE users SET coins = 20 WHERE coins IS NULL');
-          console.log('✅ users.coins column added with default 20');
+          db.run('UPDATE users SET coins = 0 WHERE coins IS NULL');
+          console.log('✅ users.coins column added');
         });
       } else {
-        db.run('UPDATE users SET coins = 20 WHERE coins IS NULL');
+        db.run('UPDATE users SET coins = 0 WHERE coins IS NULL');
       }
     });
   }
