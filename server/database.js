@@ -716,6 +716,7 @@ if (usePostgres) {
           ensureUserCoinsColumn();
           ensureBookingCoinAmountColumn();
           ensureBookingCoinsRefundedColumn();
+          fixAboutText();
           createDefaultData();
         }
       });
@@ -997,6 +998,19 @@ if (usePostgres) {
         });
       }
     });
+  }
+
+  function fixAboutText() {
+    db.run(
+      `UPDATE settings SET about_text = REPLACE(about_text, 'affordable access', 'inclusive access') WHERE about_text LIKE '%affordable access%'`,
+      function (err) {
+        if (err) {
+          console.log('⚠️  Could not fix about_text:', err.message);
+        } else if (this.changes > 0) {
+          console.log(`✅ Updated about_text: 'affordable' → 'inclusive' in ${this.changes} row(s)`);
+        }
+      }
+    );
   }
 
   function createDefaultData() {
