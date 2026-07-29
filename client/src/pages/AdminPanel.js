@@ -6476,7 +6476,7 @@ const AdminPanel = () => {
                     <Form.Label>🪙 Ticket Price (Coins) *</Form.Label>
                     <Form.Control
                       type="number"
-                      value={movieForm.coin_price || 20}
+                      value={movieForm.coin_price}
                       onChange={(e) => setMovieForm({ ...movieForm, coin_price: e.target.value })}
                       placeholder="Enter ticket price in coins"
                       min="1"
@@ -6495,7 +6495,7 @@ const AdminPanel = () => {
                     <Form.Label>👥 Booking Limit Per User *</Form.Label>
                     <Form.Control
                       type="number"
-                      value={movieForm.booking_limit || 6}
+                      value={movieForm.booking_limit}
                       onChange={(e) => setMovieForm({ ...movieForm, booking_limit: e.target.value })}
                       placeholder="Maximum seats per booking"
                       min="1"
