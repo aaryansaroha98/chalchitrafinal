@@ -2944,7 +2944,7 @@ const AdminPanel = () => {
             {/* Simple Glass Design Stats Cards */}
             <Row className="mb-5">
               <Col md={3} className="mb-4">
-                <Card className="text-white h-100" style={{
+                <Card className="h-100" style={{
                   background: '#ffffff',
                   border: '1px solid #e5e7eb',
                   borderRadius: '0',
@@ -2952,10 +2952,10 @@ const AdminPanel = () => {
                   transition: 'all 0.3s ease'
                 }}>
                   <Card.Body className="text-center">
-                    <Card.Title className="display-4 mb-3 fw-bold text-white">
+                    <Card.Title className="display-4 mb-3 fw-bold" style={{ color: '#0b0e17' }}>
                       {stats.upcoming_movies || 0}
                     </Card.Title>
-                    <Card.Text className="h5 mb-0 text-white-50">
+                    <Card.Text className="h5 mb-0" style={{ color: '#5c6270' }}>
                       Upcoming Movies
                     </Card.Text>
                   </Card.Body>
@@ -2963,7 +2963,7 @@ const AdminPanel = () => {
               </Col>
 
               <Col md={3} className="mb-4">
-                <Card className="text-white h-100" style={{
+                <Card className="h-100" style={{
                   background: '#ffffff',
                   border: '1px solid #e5e7eb',
                   borderRadius: '0',
@@ -2971,10 +2971,10 @@ const AdminPanel = () => {
                   transition: 'all 0.3s ease'
                 }}>
                   <Card.Body className="text-center">
-                    <Card.Title className="display-4 mb-3 fw-bold text-white">
+                    <Card.Title className="display-4 mb-3 fw-bold" style={{ color: '#0b0e17' }}>
                       {stats.total_bookings || 0}
                     </Card.Title>
-                    <Card.Text className="h5 mb-0 text-white-50">
+                    <Card.Text className="h5 mb-0" style={{ color: '#5c6270' }}>
                       Total Bookings
                     </Card.Text>
                   </Card.Body>
@@ -2982,7 +2982,7 @@ const AdminPanel = () => {
               </Col>
 
               <Col md={3} className="mb-4">
-                <Card className="text-white h-100" style={{
+                <Card className="h-100" style={{
                   background: '#ffffff',
                   border: '1px solid #e5e7eb',
                   borderRadius: '0',
@@ -2990,10 +2990,10 @@ const AdminPanel = () => {
                   transition: 'all 0.3s ease'
                 }}>
                   <Card.Body className="text-center">
-                    <Card.Title className="display-4 mb-3 fw-bold text-white">
+                    <Card.Title className="display-4 mb-3 fw-bold" style={{ color: '#0b0e17' }}>
                       {stats.recent_bookings || 0}
                     </Card.Title>
-                    <Card.Text className="h5 mb-0 text-white-50">
+                    <Card.Text className="h5 mb-0" style={{ color: '#5c6270' }}>
                       Recent Bookings (7 days)
                     </Card.Text>
                   </Card.Body>
@@ -3001,7 +3001,7 @@ const AdminPanel = () => {
               </Col>
 
               <Col md={3} className="mb-4">
-                <Card className="text-white h-100" style={{
+                <Card className="h-100" style={{
                   background: '#ffffff',
                   border: '1px solid #e5e7eb',
                   borderRadius: '0',
@@ -3009,10 +3009,10 @@ const AdminPanel = () => {
                   transition: 'all 0.3s ease'
                 }}>
                   <Card.Body className="text-center">
-                    <Card.Title className="mb-3 fw-bold text-white" style={{ fontSize: '2.1rem' }}>
+                    <Card.Title className="mb-3 fw-bold" style={{ color: '#0b0e17', fontSize: '2.1rem' }}>
                       {`${upcomingVenueBookedSeats} / ${upcomingVenueTotalSeats}`}
                     </Card.Title>
-                    <Card.Text className="h5 mb-0 text-white-50">
+                    <Card.Text className="h5 mb-0" style={{ color: '#5c6270' }}>
                       Seats Booked / Total Seats
                     </Card.Text>
                   </Card.Body>
