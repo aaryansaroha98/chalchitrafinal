@@ -6473,7 +6473,7 @@ const AdminPanel = () => {
               <Row>
                 <Col md={6}>
                   <Form.Group className="mb-3">
-                    <Form.Label>🪙 Coin Price (Required) *</Form.Label>
+                    <Form.Label>🪙 Ticket Price (Coins) *</Form.Label>
                     <Form.Control
                       type="number"
                       value={movieForm.coin_price || 20}
@@ -6484,7 +6484,7 @@ const AdminPanel = () => {
                       required
                     />
                     <Form.Text className="text-muted">
-                      How many coins each ticket costs. Default: 20 coins.
+                      Each ticket costs this many coins.
                     </Form.Text>
                   </Form.Group>
                 </Col>
