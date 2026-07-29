@@ -204,8 +204,8 @@ router.post('/', (req, res) => {
   }
 
   // Use coin_price if provided, otherwise convert price to coins (or default to 20)
-  const finalCoinPrice = coin_price !== undefined ? parseInt(coin_price) : 20;
-  const finalBookingLimit = booking_limit !== undefined ? parseInt(booking_limit) : 6;
+  const finalCoinPrice = coin_price !== undefined && coin_price !== '' ? parseInt(coin_price) : 20;
+  const finalBookingLimit = booking_limit !== undefined && booking_limit !== '' ? parseInt(booking_limit) : 6;
 
   const sql = `INSERT INTO movies (title, description, poster_url, date, venue, price, is_upcoming, available_foods, category, duration, imdb_rating, language, is_special, special_message, coin_price, booking_limit) 
                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
@@ -339,7 +339,7 @@ router.put('/:id', (req, res) => {
     coin_price !== undefined && coin_price !== '' ? parseInt(coin_price) : 20,
     finalIsUpcoming, availableFoodsString, category || '', duration || '', 
     imdb_rating || '', language || '', is_special ? parseInt(is_special) : 0, 
-    special_message || '', booking_limit !== undefined ? parseInt(booking_limit) : 6, movieId
+    special_message || '', booking_limit !== undefined && booking_limit !== '' ? parseInt(booking_limit) : 6, movieId
   ];
 
   console.log('💾 Executing UPDATE query for movie ID:', movieId);
