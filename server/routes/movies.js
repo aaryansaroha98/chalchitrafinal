@@ -33,10 +33,10 @@ const validateMovieData = (data) => {
     errors.push('Venue is required');
   }
   
-  if (data.price === undefined || data.price === '' || data.price === null) {
-    errors.push('Price is required');
-  } else if (isNaN(parseFloat(data.price)) || parseFloat(data.price) < 0) {
-    errors.push('Price must be a valid number');
+  if (data.price !== undefined && data.price !== '' && data.price !== null) {
+    if (isNaN(parseFloat(data.price)) || parseFloat(data.price) < 0) {
+      errors.push('Price must be a valid number');
+    }
   }
   
   return errors;
