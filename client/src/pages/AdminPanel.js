@@ -864,7 +864,7 @@ const AdminPanel = () => {
         // Close modal and reset form
         setShowMovieModal(false);
         setEditingMovie(null);
-        setMovieForm({ title: '', description: '', date: '', venue: '', price: '', category: '', duration: '', imdb_rating: '', language: '', poster: null, availableFoods: [], is_special: 0, special_message: '' });
+        setMovieForm({ title: '', description: '', date: '', venue: '', price: 0, category: '', duration: '', imdb_rating: '', language: '', poster: null, availableFoods: [], is_special: 0, special_message: '' });
         setSelectedFoodsForMovie([]);
         setFreeFoodIds([]);
 
@@ -2233,7 +2233,7 @@ const AdminPanel = () => {
                     description: '',
                     date: '',
                     venue: '',
-                    price: '',
+    price: 0,
                     category: '',
                     duration: '',
                     imdb_rating: '',
@@ -2470,7 +2470,7 @@ const AdminPanel = () => {
                                     description: movie.description || '',
                                     date: new Date(movie.date).toISOString().slice(0, 16),
                                     venue: movie.venue,
-                                    price: movie.price || '',
+                                    price: movie.price ?? 0,
                                     coin_price: movie.coin_price ?? 20,
                                     category: movie.category || '',
                                     duration: movie.duration || '',
@@ -6667,7 +6667,7 @@ const AdminPanel = () => {
               <Button variant="secondary" onClick={() => {
                 setShowMovieModal(false);
                 setEditingMovie(null);
-                setMovieForm({ title: '', description: '', date: '', venue: '', price: '', category: '', duration: '', imdb_rating: '', language: '', poster: null });
+                setMovieForm({ title: '', description: '', date: '', venue: '', price: 0, category: '', duration: '', imdb_rating: '', language: '', poster: null });
                 setSelectedFoodsForMovie([]);
                 setFreeFoodIds([]);
               }}>
