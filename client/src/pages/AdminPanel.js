@@ -864,7 +864,7 @@ const AdminPanel = () => {
         // Close modal and reset form
         setShowMovieModal(false);
         setEditingMovie(null);
-        setMovieForm({ title: '', description: '', date: '', venue: '', price: '', category: '', duration: '', imdb_rating: '', language: '', poster: null, availableFoods: [], is_special: 0, special_message: '' });
+        setMovieForm({ title: '', description: '', date: '', venue: '', price: 0, category: '', duration: '', imdb_rating: '', language: '', poster: null, availableFoods: [], is_special: 0, special_message: '' });
         setSelectedFoodsForMovie([]);
         setFreeFoodIds([]);
 
@@ -2233,7 +2233,7 @@ const AdminPanel = () => {
                     description: '',
                     date: '',
                     venue: '',
-                    price: '',
+    price: 0,
                     category: '',
                     duration: '',
                     imdb_rating: '',
@@ -2470,7 +2470,7 @@ const AdminPanel = () => {
                                     description: movie.description || '',
                                     date: new Date(movie.date).toISOString().slice(0, 16),
                                     venue: movie.venue,
-                                    price: movie.price || '',
+                                    price: movie.price ?? 0,
                                     coin_price: movie.coin_price ?? 20,
                                     category: movie.category || '',
                                     duration: movie.duration || '',
@@ -6473,23 +6473,7 @@ const AdminPanel = () => {
               <Row>
                 <Col md={6}>
                   <Form.Group className="mb-3">
-                    <Form.Label>Ticket Price (🪙 Coins)</Form.Label>
-                    <Form.Control
-                      type="number"
-                      value={movieForm.price}
-                      onChange={(e) => setMovieForm({ ...movieForm, price: e.target.value })}
-                      placeholder="Enter ticket price (for reference)"
-                      min="0"
-                      step="1"
-                    />
-                    <Form.Text className="text-muted">
-                      Note: Actual booking uses coin price below.
-                    </Form.Text>
-                  </Form.Group>
-                </Col>
-                <Col md={6}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>🪙 Coin Price (Required) *</Form.Label>
+                    <Form.Label>🪙 Ticket Price (Coins) *</Form.Label>
                     <Form.Control
                       type="number"
                       value={movieForm.coin_price || 20}
@@ -6500,7 +6484,7 @@ const AdminPanel = () => {
                       required
                     />
                     <Form.Text className="text-muted">
-                      How many coins each ticket costs. Default: 20 coins.
+                      Each ticket costs this many coins.
                     </Form.Text>
                   </Form.Group>
                 </Col>
@@ -6667,7 +6651,7 @@ const AdminPanel = () => {
               <Button variant="secondary" onClick={() => {
                 setShowMovieModal(false);
                 setEditingMovie(null);
-                setMovieForm({ title: '', description: '', date: '', venue: '', price: '', category: '', duration: '', imdb_rating: '', language: '', poster: null });
+                setMovieForm({ title: '', description: '', date: '', venue: '', price: 0, category: '', duration: '', imdb_rating: '', language: '', poster: null });
                 setSelectedFoodsForMovie([]);
                 setFreeFoodIds([]);
               }}>
