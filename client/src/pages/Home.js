@@ -725,7 +725,17 @@ const Home = () => {
                   <i className="fas fa-feather-alt" style={{marginRight: '0.75rem', color: '#5c6270'}}></i>
                   Founder's Note
                 </h3>
-
+                <div className="founder-note-text" style={{
+                  fontSize: '1.05rem',
+                  color: '#5c6270',
+                  lineHeight: '1.5',
+                  fontStyle: 'italic',
+                  marginBottom: '1rem'
+                }}>
+                  <p style={{marginBottom: '0', color: '#5c6270'}}>
+                    Some of the best memories on campus are made when people come together, and I've always believed that cinema is one of the simplest ways to make that happen. Watching people laugh, cheer, clap, react to every twist, and leave with a smile has been the most rewarding part of this journey. It has been my privilege to be part of founding Chalchitra alongside everyone who believed in this vision. No matter how your day has been, I hope Chalchitra will always be a place where you can pause, share a few laughs, and leave feeling a little lighter. More than just another campus event, I hope it becomes a tradition that brings people together, where everyone feels welcome and every movie creates a memory.
+                  </p>
+                </div>
                 {founder && founder.name && (
                   <div className="founder-note-sign" style={{
                     marginTop: '1.5rem',
@@ -741,17 +751,6 @@ const Home = () => {
                     }}>
                       — {founder.name}
                     </p>
-                    {founder.role && (
-                      <p style={{
-                        fontSize: '0.85rem',
-                        color: '#8b909c',
-                        margin: '0.15rem 0 0 0',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.5px'
-                      }}>
-                        {founder.role}
-                      </p>
-                    )}
                   </div>
                 )}
               </Col>
