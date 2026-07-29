@@ -6473,22 +6473,6 @@ const AdminPanel = () => {
               <Row>
                 <Col md={6}>
                   <Form.Group className="mb-3">
-                    <Form.Label>Ticket Price (🪙 Coins)</Form.Label>
-                    <Form.Control
-                      type="number"
-                      value={movieForm.price}
-                      onChange={(e) => setMovieForm({ ...movieForm, price: e.target.value })}
-                      placeholder="Enter ticket price (for reference)"
-                      min="0"
-                      step="1"
-                    />
-                    <Form.Text className="text-muted">
-                      Note: Actual booking uses coin price below.
-                    </Form.Text>
-                  </Form.Group>
-                </Col>
-                <Col md={6}>
-                  <Form.Group className="mb-3">
                     <Form.Label>🪙 Coin Price (Required) *</Form.Label>
                     <Form.Control
                       type="number"
