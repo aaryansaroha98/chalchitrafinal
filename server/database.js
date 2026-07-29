@@ -1002,7 +1002,7 @@ if (usePostgres) {
 
   function fixAboutText() {
     db.run(
-      `UPDATE settings SET about_text = REPLACE(about_text, 'affordable access', 'inclusive access') WHERE about_text LIKE '%affordable access%'`,
+      `UPDATE settings SET about_text = REPLACE(about_text, 'affordable', 'inclusive') WHERE about_text LIKE '%affordable%'`,
       function (err) {
         if (err) {
           console.log('⚠️  Could not fix about_text:', err.message);
