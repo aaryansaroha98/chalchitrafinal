@@ -20,7 +20,7 @@ const Home = () => {
   const [settings, setSettings] = useState({
     tagline: 'Student-led movie screening initiative at IIT Jammu',
     hero_background: '#ffffff',
-    about_text: 'Chalchitra Series is a student-led initiative at IIT Jammu dedicated to bringing quality movie screenings to our campus community. We organize regular movie screenings featuring a diverse range of films, from classics to contemporary hits.\n\nOur mission is to create a vibrant cultural atmosphere on campus while providing students with affordable entertainment options.',
+    about_text: 'Chalchitra Series is a student-led initiative at IIT Jammu dedicated to bringing quality movie screenings to our campus community. We organize regular movie screenings featuring a diverse range of films, from classics to contemporary hits.\n\nOur mission is to create a vibrant cultural atmosphere on campus while providing students with inclusive entertainment options.',
     about_image: '/favicons/PHOTO-2026-01-03-23-03-23%202.jpg',
     hero_background_video: null
   });
@@ -600,7 +600,7 @@ const Home = () => {
                       </p>
                       <p style={{marginBottom: '0', color: '#5c6270'}}>
                         Our mission goes beyond entertainment; we strive to foster a thriving cultural atmosphere that enriches
-                        the lives of IIT Jammu students, providing affordable access to quality cinema while creating memorable
+                        the lives of IIT Jammu students, providing inclusive access to quality cinema while creating memorable
                         experiences that bring our community together.
                       </p>
                     </>
@@ -725,17 +725,7 @@ const Home = () => {
                   <i className="fas fa-feather-alt" style={{marginRight: '0.75rem', color: '#5c6270'}}></i>
                   Founder's Note
                 </h3>
-                <div className="founder-note-text" style={{
-                  fontSize: '1.05rem',
-                  color: '#5c6270',
-                  lineHeight: '1.5',
-                  fontStyle: 'italic',
-                  marginBottom: '1rem'
-                }}>
-                  <p style={{marginBottom: '0', color: '#5c6270'}}>
-                    Some of the best memories on campus are made when people come together, and I've always believed that cinema is one of the simplest ways to make that happen. Watching people laugh, cheer, clap, react to every twist, and leave with a smile has been the most rewarding part of this journey. It has been my privilege to be part of founding Chalchitra alongside everyone who believed in this vision. No matter how your day has been, I hope Chalchitra will always be a place where you can pause, share a few laughs, and leave feeling a little lighter. More than just another campus event, I hope it becomes a tradition that brings people together, where everyone feels welcome and every movie creates a memory.
-                  </p>
-                </div>
+
                 {founder && founder.name && (
                   <div className="founder-note-sign" style={{
                     marginTop: '1.5rem',
