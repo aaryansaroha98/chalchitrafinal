@@ -62,7 +62,7 @@ const Booking = () => {
   useEffect(() => {
     if (!movieId) return;
 
-    const POLL_MS = 5000;
+    const POLL_MS = 12000;
     let intervalId = null;
 
     const startPolling = () => {
