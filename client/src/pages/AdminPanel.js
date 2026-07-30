@@ -1108,11 +1108,20 @@ const AdminPanel = () => {
     const userEmail = String(booking.email || booking.user_email || '').toLowerCase();
     const bookingId = String(booking.id || '');
     const bookingCode = String(booking.booking_code || '').toLowerCase();
+    const seatNumbers = (() => {
+      try {
+        const seats = typeof booking.selected_seats === 'string'
+          ? JSON.parse(booking.selected_seats)
+          : (booking.selected_seats || []);
+        return Array.isArray(seats) ? seats.join(' ') : '';
+      } catch { return ''; }
+    })();
 
     return userName.includes(normalizedBookingSearch)
       || userEmail.includes(normalizedBookingSearch)
       || bookingId.includes(normalizedBookingSearch)
-      || bookingCode.includes(normalizedBookingSearch);
+      || bookingCode.includes(normalizedBookingSearch)
+      || seatNumbers.includes(normalizedBookingSearch);
   });
 
   // Filter users for winner selection based on search term
