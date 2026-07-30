@@ -28,6 +28,9 @@ lerna-debug.log*
 # Uploads (user-uploaded files - backup separately)
 uploads/
 
+# Local data backups (contain user PII - never commit)
+scripts/backups/
+
 # IDEs
 .vscode/
 .idea/

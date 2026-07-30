@@ -1108,20 +1108,30 @@ const AdminPanel = () => {
     const userEmail = String(booking.email || booking.user_email || '').toLowerCase();
     const bookingId = String(booking.id || '');
     const bookingCode = String(booking.booking_code || '').toLowerCase();
-    const seatNumbers = (() => {
+    const seatArray = (() => {
       try {
         const seats = typeof booking.selected_seats === 'string'
           ? JSON.parse(booking.selected_seats)
           : (booking.selected_seats || []);
-        return Array.isArray(seats) ? seats.join(' ') : '';
-      } catch { return ''; }
+        return Array.isArray(seats) ? seats.map((s) => String(s).toLowerCase()) : [];
+      } catch { return []; }
     })();
+    const seatNumbers = seatArray.join(' ');
+
+    // Support pasting the raw seat value like ["B-R5-S2"] or "B-R5-S2,B-R5-S3"
+    // by stripping brackets/quotes and splitting into individual seat tokens.
+    const seatTokens = normalizedBookingSearch
+      .replace(/[[\]{}"']/g, ' ')
+      .split(/[\s,]+/)
+      .filter(Boolean);
+    const matchesSeat = seatNumbers.includes(normalizedBookingSearch)
+      || seatTokens.some((token) => seatArray.some((seat) => seat.includes(token)));
 
     return userName.includes(normalizedBookingSearch)
       || userEmail.includes(normalizedBookingSearch)
       || bookingId.includes(normalizedBookingSearch)
       || bookingCode.includes(normalizedBookingSearch)
-      || seatNumbers.includes(normalizedBookingSearch);
+      || matchesSeat;
   });
 
   // Filter users for winner selection based on search term
