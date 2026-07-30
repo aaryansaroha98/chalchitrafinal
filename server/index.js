@@ -154,20 +154,29 @@ const realClientIp = (req) => {
 };
 
 // Stable per-request identity: prefer the authenticated user, fall back to the
-// temporary-login session user, else the shared IP.
+// temporary-login session user, else the shared IP. Admins are flagged so they
+// get a much higher ceiling — they legitimately fire bursts (bulk coin grants,
+// ticket scanning) that would otherwise look like abuse.
 const identityOf = (req) => {
-  const uid = (req.user && req.user.id) ||
-              (req.session && req.session.adminUser && req.session.adminUser.id);
-  return uid ? { key: `user:${uid}`, authed: true }
-             : { key: `ip:${realClientIp(req)}`, authed: false };
+  const user = req.user || (req.session && req.session.adminUser) || null;
+  const uid = user && user.id;
+  const isAdmin = !!(user && user.is_admin);
+  return uid ? { key: `user:${uid}`, authed: true, admin: isAdmin }
+             : { key: `ip:${realClientIp(req)}`, authed: false, admin: false };
 };
 
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  // Per logged-in student: a generous personal budget. Anonymous/shared-IP:
-  // a very high ceiling that a whole campus browsing won't realistically hit,
-  // so it only ever stops a genuine flood/DoS — never normal viewing.
-  max: (req) => (identityOf(req).authed ? 1500 : 20000),
+  // Admins: a very high ceiling so bulk actions (coin grants, ticket scanning)
+  // never trip the limiter — they're trusted operators, not a flood risk.
+  // Per logged-in student: a generous personal budget. Anonymous/shared-IP: a
+  // very high ceiling that a whole campus browsing won't realistically hit, so
+  // it only ever stops a genuine flood/DoS — never normal viewing.
+  max: (req) => {
+    const id = identityOf(req);
+    if (id.admin) return 100000;
+    return id.authed ? 1500 : 20000;
+  },
   message: { error: 'Too many requests, please try again later.' },
   standardHeaders: true,
   legacyHeaders: false,
