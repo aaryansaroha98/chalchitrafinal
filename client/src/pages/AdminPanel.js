@@ -1072,11 +1072,20 @@ const AdminPanel = () => {
         type: 'success',
         text: `Sent ${amount} coins to ${selectedCoinUser.name || selectedCoinUser.email}. New balance: ${res.data.coins}.`
       });
+      // Update ONLY this user's balance locally instead of re-fetching ALL admin
+      // data. fetchAllData() fires 12 parallel requests, so sending coins to
+      // several users in a row was bursting ~13 requests per click and draining
+      // the rate-limit budget — that's what caused "too many requests" followed
+      // by "unable to load". A single targeted state update is instant and cheap.
+      const targetUserId = selectedCoinUser.id;
+      const newBalance = res.data.coins;
+      setUsers((prev) => prev.map((u) =>
+        u.id === targetUserId ? { ...u, coins: newBalance } : u
+      ));
       setCoinAmount('');
       setCoinNote('');
       setSelectedCoinUser(null);
       setCoinSearchTerm('');
-      await fetchAllData();
     } catch (err) {
       setCoinFeedback({
         type: 'error',
@@ -2281,13 +2290,13 @@ const AdminPanel = () => {
                     pointerEvents: 'none'
                   }}></div>
                   <Card.Body className="text-center" style={{ position: 'relative', zIndex: 1 }}>
-                    <Card.Title className="display-4 mb-3 fw-bold text-white" style={{
-                      fontWeight: '700'
+                    <Card.Title className="display-4 mb-3 fw-bold" style={{
+                      fontWeight: '700', color: '#0b0e17'
                     }}>
                       {movies.length}
                     </Card.Title>
-                    <Card.Text className="h5 mb-0 text-white" style={{
-                      fontWeight: '600',
+                    <Card.Text className="h5 mb-0" style={{
+                      fontWeight: '600', color: '#5c6270'
                     }}>
                       Total Movies
                     </Card.Text>
@@ -2313,13 +2322,13 @@ const AdminPanel = () => {
                     pointerEvents: 'none'
                   }}></div>
                   <Card.Body className="text-center" style={{ position: 'relative', zIndex: 1 }}>
-                    <Card.Title className="display-4 mb-3 fw-bold text-white" style={{
-                      fontWeight: '700'
+                    <Card.Title className="display-4 mb-3 fw-bold" style={{
+                      fontWeight: '700', color: '#0b0e17'
                     }}>
                       {movies.filter(m => getMovieStatus(m.date) === 'Upcoming').length}
                     </Card.Title>
-                    <Card.Text className="h5 mb-0 text-white" style={{
-                      fontWeight: '600',
+                    <Card.Text className="h5 mb-0" style={{
+                      fontWeight: '600', color: '#5c6270'
                     }}>
                       Upcoming Movies
                     </Card.Text>
@@ -2345,13 +2354,13 @@ const AdminPanel = () => {
                     pointerEvents: 'none'
                   }}></div>
                   <Card.Body className="text-center" style={{ position: 'relative', zIndex: 1 }}>
-                    <Card.Title className="display-4 mb-3 fw-bold text-white" style={{
-                      fontWeight: '700'
+                    <Card.Title className="display-4 mb-3 fw-bold" style={{
+                      fontWeight: '700', color: '#0b0e17'
                     }}>
                       {movies.filter(m => getMovieStatus(m.date) === 'Past').length}
                     </Card.Title>
-                    <Card.Text className="h5 mb-0 text-white" style={{
-                      fontWeight: '600',
+                    <Card.Text className="h5 mb-0" style={{
+                      fontWeight: '600', color: '#5c6270'
                     }}>
                       Past Movies
                     </Card.Text>
