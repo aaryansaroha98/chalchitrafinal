@@ -33,34 +33,18 @@ app.use(helmet({
   contentSecurityPolicy: false,
 }));
 
-// Rate limiting
-const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 300,
-  message: { error: 'Too many requests, please try again later.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-app.use('/api', apiLimiter);
-
 // Prevent browsers (especially Safari, which caches heuristically when no
 // Cache-Control is present) from serving stale API data. Movie lists are
 // time-sensitive (filtered by "date >= now"), so they must never be cached.
+// NOTE: rate limiting is defined further down, AFTER the session/passport
+// middleware, so it can key on the logged-in student's identity instead of a
+// shared campus IP. See the "Rate limiting" block below.
 app.use('/api', (req, res, next) => {
   res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
   res.set('Pragma', 'no-cache');
   res.set('Expires', '0');
   next();
 });
-
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: { error: 'Too many login attempts, please try again later.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-app.use('/api/auth', authLimiter);
 
 // Database setup - SQLite only for localhost
 const dbPath = path.join(__dirname, '..', 'database.db');
@@ -136,6 +120,79 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+
+// ---------------------------------------------------------------------------
+// Rate limiting (identity-aware) — MUST come after session + passport so we
+// can see WHO is making the request.
+//
+// The problem this solves:
+//   * Production path is Browser → Vercel → Render (two proxies).
+//   * The whole college shares ONE public IP via NAT (campus WiFi + mobile
+//     hotspots), so hundreds of students look like a single client.
+//   * The old limiter keyed on IP → the entire campus drew from ONE bucket and
+//     everyone got "Too many requests" / "failed to load movie".
+//
+// The fix:
+//   * Logged-in students are keyed by their USER ID → every student gets their
+//     own private budget no matter whose WiFi they're on. This is the case
+//     that matters for the actual movie-booking traffic.
+//   * Anonymous visitors (before login) can only be keyed by IP, so the whole
+//     campus may share that bucket — we therefore give the anonymous/IP bucket
+//     a very high ceiling so it acts purely as flood protection, never as a
+//     per-person limit. Public pages (home / movie lists) load fine for all.
+const { ipKeyGenerator } = rateLimit;
+
+// Real client IP: leftmost X-Forwarded-For entry (edge proxies prepend it),
+// normalized for IPv6 via ipKeyGenerator (required by express-rate-limit v7+).
+const realClientIp = (req) => {
+  const xff = req.headers['x-forwarded-for'];
+  if (typeof xff === 'string' && xff.length) {
+    const first = xff.split(',')[0].trim();
+    if (first) return ipKeyGenerator(first);
+  }
+  return ipKeyGenerator(req.ip || (req.socket && req.socket.remoteAddress) || 'unknown');
+};
+
+// Stable per-request identity: prefer the authenticated user, fall back to the
+// temporary-login session user, else the shared IP.
+const identityOf = (req) => {
+  const uid = (req.user && req.user.id) ||
+              (req.session && req.session.adminUser && req.session.adminUser.id);
+  return uid ? { key: `user:${uid}`, authed: true }
+             : { key: `ip:${realClientIp(req)}`, authed: false };
+};
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  // Per logged-in student: a generous personal budget. Anonymous/shared-IP:
+  // a very high ceiling that a whole campus browsing won't realistically hit,
+  // so it only ever stops a genuine flood/DoS — never normal viewing.
+  max: (req) => (identityOf(req).authed ? 1500 : 20000),
+  message: { error: 'Too many requests, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => identityOf(req).key,
+  skip: (req) => req.method === 'OPTIONS', // never count CORS preflight
+});
+app.use('/api', apiLimiter);
+
+// Stricter limiter for AUTHENTICATION ATTEMPTS only (Google OAuth start /
+// temporary email login). Keyed by IP because the user isn't logged in yet —
+// but the ceiling is high enough that an entire campus starting Google login
+// from one shared IP won't trip it. This was the exact endpoint throwing 429
+// in the wild (/api/auth/google). It must NOT cover /api/auth/current_user,
+// which every page load calls — that stays on the generous apiLimiter above.
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 2000, // login STARTS per 15 min from a shared campus IP — flood guard only
+  message: { error: 'Too many login attempts, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => `ip:${realClientIp(req)}`,
+  skip: (req) => req.method === 'OPTIONS',
+});
+app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/google', authLimiter);
 
 // Serve static files
 app.use(express.static(path.join(__dirname, '..', 'public')));
