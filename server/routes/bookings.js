@@ -8,6 +8,71 @@ const jsPDF = require('jspdf');
 
 const router = express.Router();
 
+// ---------------------------------------------------------------------------
+// Resolve a booking's food cost in COINS straight from the database, so the
+// server charges EXACTLY what the client displayed to the user.
+//
+// The client (Booking.js / Payment.js) shows, per unit:
+//     is_free ? 0 : Math.ceil(price / 10)
+// where `price` is the rupee price in the `foods` table and `is_free` is the
+// per-movie flag in `movie_foods`. We reproduce that formula here.
+//
+// Safety: foods that aren't linked/available for this movie simply don't come
+// back from the query and are charged 0 — we never REJECT the whole booking
+// over a food-pricing mismatch, so a data glitch can't break checkout. A read
+// error is likewise treated as "food free" rather than a failed booking.
+function calculateFoodCoinsForMovie(movieId, foodOrders) {
+  return new Promise((resolve) => {
+    if (!foodOrders || typeof foodOrders !== 'object' || Array.isArray(foodOrders) ||
+        Object.keys(foodOrders).length === 0) {
+      return resolve(0);
+    }
+
+    // Normalize + validate the requested quantities (positive ints, capped).
+    const orders = {};
+    for (const [rawId, rawQty] of Object.entries(foodOrders)) {
+      const id = parseInt(rawId, 10);
+      const qty = Math.floor(Number(rawQty));
+      if (!Number.isInteger(id) || id <= 0) continue;
+      if (!Number.isFinite(qty) || qty <= 0) continue;
+      orders[id] = (orders[id] || 0) + Math.min(qty, 20); // cap per item
+    }
+
+    const ids = Object.keys(orders).map((id) => parseInt(id, 10));
+    if (ids.length === 0) return resolve(0);
+
+    const placeholders = ids.map(() => '?').join(',');
+    const query = `
+      SELECT f.id, f.price, mf.is_free
+      FROM foods f
+      JOIN movie_foods mf ON mf.food_id = f.id
+      WHERE mf.movie_id = ?
+        AND f.is_available = 1
+        AND f.id IN (${placeholders})
+    `;
+
+    db.all(query, [movieId, ...ids], (err, rows) => {
+      if (err) {
+        // Never fail a booking over a pricing read — log and treat food as free
+        // so the ticket can still be issued.
+        console.error('⚠️ Food price lookup failed, treating food as free:', err.message);
+        return resolve(0);
+      }
+
+      let coins = 0;
+      (rows || []).forEach((row) => {
+        const qty = orders[Number(row.id)] || 0;
+        if (qty <= 0) return;
+        // Free-for-this-movie → 0 coins; otherwise rupee→coin conversion that
+        // matches the client exactly (Math.ceil(price / 10) per unit).
+        const perUnit = row.is_free ? 0 : Math.max(0, Math.ceil(Number(row.price) / 10));
+        coins += perUnit * qty;
+      });
+      resolve(coins);
+    });
+  });
+}
+
 // ===== BREVO (Sendinblue) EMAIL via HTTP API =====
 // No SMTP needed — works on Render free tier (which blocks SMTP ports)
 const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
@@ -256,46 +321,39 @@ router.post('/', async (req, res) => {
       const coinPrice = movie.coin_price || 20;
       const ticketCoinCost = num_people * coinPrice;
 
-      // Calculate food cost in coins (assuming food prices are also in coins now)
-      let food_cost = 0;
-      if (req.body.food_orders && Object.keys(req.body.food_orders).length > 0) {
-        const foodOrders = req.body.food_orders;
-        // Calculate food cost based on food prices (treating them as coins)
-        const foodPrices = {
-          1: 5, // Popcorn - 5 coins
-          2: 3, // Soda - 3 coins
-          3: 8, // Combo Meal - 8 coins
-          4: 6, // Nachos - 6 coins
-          5: 2, // Candy - 2 coins
-        };
-
-        for (const [foodId, quantity] of Object.entries(foodOrders)) {
-          const price = foodPrices[foodId] || 3; // default price in coins
-          food_cost += price * quantity;
-        }
-      }
-
-      const total_coins = ticketCoinCost + food_cost;
-
+      // Resolve food cost in COINS from the DB so the charge always equals what
+      // the client displayed: Math.ceil(price/10) coins per unit, and 0 when the
+      // item is free for this movie. Free food therefore costs exactly 0 — no
+      // more phantom "+3" default that made a free item still cost coins.
+      let total_coins = ticketCoinCost;
       const userId = req.user.id;
       let studentName = '';
       let studentEmail = '';
 
-      db.get('SELECT name, email FROM users WHERE id = ?', [req.user.id], (err, user) => {
-        if (err) return res.status(500).json({ error: err.message });
+      calculateFoodCoinsForMovie(movie_id, req.body.food_orders)
+        .then((food_cost) => {
+          total_coins = ticketCoinCost + food_cost;
 
-        if (user) {
-          studentName = user.name;
-          if (!studentName || studentName.trim() === '') {
-            const emailParts = user.email.split('@');
-            studentName = emailParts[0] || 'Student';
-            studentName = studentName.charAt(0).toUpperCase() + studentName.slice(1);
-          }
-          studentEmail = user.email;
-        }
+          db.get('SELECT name, email FROM users WHERE id = ?', [req.user.id], (err, user) => {
+            if (err) return res.status(500).json({ error: err.message });
 
-        createBooking();
-      });
+            if (user) {
+              studentName = user.name;
+              if (!studentName || studentName.trim() === '') {
+                const emailParts = user.email.split('@');
+                studentName = emailParts[0] || 'Student';
+                studentName = studentName.charAt(0).toUpperCase() + studentName.slice(1);
+              }
+              studentEmail = user.email;
+            }
+
+            createBooking();
+          });
+        })
+        .catch((e) => {
+          console.error('❌ Food cost calculation failed:', e && e.message ? e.message : e);
+          return res.status(500).json({ error: 'Failed to calculate food cost' });
+        });
 
       async function createBooking() {
         try {
