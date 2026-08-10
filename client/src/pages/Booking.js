@@ -614,7 +614,7 @@ const Booking = () => {
                     Block A
                   </div>
                   <div
-                    className="seat-block pushkar-side-seat-block"
+                    className="seat-block"
                     style={{
                       display: 'flex',
                       flexDirection: 'column',
@@ -626,14 +626,9 @@ const Booking = () => {
                     }}
                   >
                     {Array.from({ length: 5 }, (_, rowIndex) => {
-                      // Progressive seat sizing: smaller at front, larger at back
-                      const baseSize = 24;
-                      const sizeIncrement = 2.5;
-                      const seatSize = baseSize + (rowIndex * sizeIncrement); // 24, 26.5, 29, 31.5, 34
-                      const fontSize = 9 + (rowIndex * 0.4); // 9, 9.4, 9.8, 10.2, 10.6
-                      const seatGap = 4 + (rowIndex * 0.4); // 4, 4.4, 4.8, 5.2, 5.6
-                      // First row right, last row left for Block A
-                      const shiftAmount = rowIndex === 0 ? 20 : rowIndex === 4 ? -20 : 0; // Row 1: +20px, Row 5: -20px, others: 0
+                      const seatSize = 28;
+                      const fontSize = 10;
+                      const seatGap = 4;
 
                       return (
                         <div
@@ -642,8 +637,7 @@ const Booking = () => {
                             display: 'flex',
                             justifyContent: 'center',
                             gap: `${seatGap}px`,
-                            marginBottom: '2px',
-                            transform: `translateX(${shiftAmount}px)`
+                            marginBottom: '2px'
                           }}
                         >
                           {Array.from({ length: 5 }, (_, col) => {
@@ -695,14 +689,10 @@ const Booking = () => {
                     }}
                   >
                     {Array.from({ length: 7 }, (_, rowIndex) => {
-                      // Define seats per row for Block B
                       const seatsPerRow = [8, 8, 9, 10, 11, 12, 12];
-                      // Progressive seat sizing: smaller at front, larger at back
-                      const baseSize = 22;
-                      const sizeIncrement = 2;
-                      const seatSize = baseSize + (rowIndex * sizeIncrement); // 22, 24, 26, 28, 30, 32, 34
-                      const fontSize = 8.5 + (rowIndex * 0.3); // 8.5, 8.8, 9.1, 9.4, 9.7, 10.0, 10.3
-                      const seatGap = 3 + (rowIndex * 0.2); // 3, 3.2, 3.4, 3.6, 3.8, 4.0, 4.2
+                      const seatSize = 28;
+                      const fontSize = 10;
+                      const seatGap = 4;
 
                       return (
                         <div
@@ -754,7 +744,7 @@ const Booking = () => {
                     Block C
                   </div>
                   <div
-                    className="seat-block pushkar-side-seat-block"
+                    className="seat-block"
                     style={{
                       display: 'flex',
                       flexDirection: 'column',
@@ -766,14 +756,9 @@ const Booking = () => {
                     }}
                   >
                     {Array.from({ length: 5 }, (_, rowIndex) => {
-                      // Progressive seat sizing: smaller at front, larger at back
-                      const baseSize = 24;
-                      const sizeIncrement = 2.5;
-                      const seatSize = baseSize + (rowIndex * sizeIncrement); // 24, 26.5, 29, 31.5, 34
-                      const fontSize = 9 + (rowIndex * 0.4); // 9, 9.4, 9.8, 10.2, 10.6
-                      const seatGap = 4 + (rowIndex * 0.4); // 4, 4.4, 4.8, 5.2, 5.6
-                      // First row left, last row right for Block C
-                      const shiftAmount = rowIndex === 0 ? -20 : rowIndex === 4 ? 20 : 0; // Row 1: -20px, Row 5: +20px, others: 0
+                      const seatSize = 28;
+                      const fontSize = 10;
+                      const seatGap = 4;
 
                       return (
                         <div
@@ -782,8 +767,7 @@ const Booking = () => {
                             display: 'flex',
                             justifyContent: 'center',
                             gap: `${seatGap}px`,
-                            marginBottom: '2px',
-                            transform: `translateX(${shiftAmount}px)`
+                            marginBottom: '2px'
                           }}
                         >
                           {Array.from({ length: 5 }, (_, col) => {
