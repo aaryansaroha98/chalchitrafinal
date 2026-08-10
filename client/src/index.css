@@ -602,12 +602,6 @@ a:hover {
   flex: 0 0 auto;
 }
 
-/* Pushkar side rows move by 20px to create the auditorium curve. Reserve
-   enough in-border space on both sides so shifted and hovered seats stay in it. */
-.pushkar-side-seat-block {
-  padding-inline: 50px !important;
-}
-
 @keyframes pulse-selected {
   0%, 100% {
     box-shadow: 0 4px 12px rgba(0, 255, 255, 0.4);
@@ -2170,19 +2164,14 @@ a:hover {
     transform: none;
   }
 
-  .pushkar-side-seat-block {
-    padding: 16px 36px !important;
-  }
-
   .seat-block-wrap {
     flex: 0 0 auto;
     min-width: max-content;
     scroll-snap-align: center;
   }
 
-  /* Let the inline progressive seat sizes (22-34px set in Booking.js) render
-     at full size on mobile so seats stay large and tappable. Only round the
-     corners here; do not override width/height/font-size. */
+  /* Keep the 28px dimensions supplied by Booking.js on mobile so every
+     auditorium seat remains uniform and reliably tappable. */
   .seat-button {
     border-radius: 4px !important;
     min-width: 0;
