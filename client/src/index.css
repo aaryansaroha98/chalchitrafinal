@@ -557,6 +557,57 @@ a:hover {
   opacity: 0.6;
 }
 
+/* Seat layouts use a locally scrollable canvas. Blocks never shrink or paint
+   outside the booking card, while auto margins center the full layout when it fits. */
+.booking-seat-card {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.seat-layout-scroll {
+  box-sizing: border-box;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  justify-content: flex-start !important;
+  overscroll-behavior-inline: contain;
+  scrollbar-gutter: stable;
+}
+
+.seat-layout-scroll > .seat-block-wrap {
+  flex: 0 0 auto;
+  min-width: max-content;
+}
+
+.seat-layout-scroll > .seat-block-wrap:first-child {
+  margin-inline-start: auto;
+}
+
+.seat-layout-scroll > .seat-block-wrap:last-child {
+  margin-inline-end: auto;
+}
+
+.seat-block {
+  flex: 0 0 auto;
+  width: max-content;
+  max-width: none;
+  box-sizing: border-box;
+}
+
+.seat-button {
+  flex: 0 0 auto;
+}
+
+/* Pushkar side rows move by 20px to create the auditorium curve. Reserve
+   enough in-border space on both sides so shifted and hovered seats stay in it. */
+.pushkar-side-seat-block {
+  padding-inline: 50px !important;
+}
+
 @keyframes pulse-selected {
   0%, 100% {
     box-shadow: 0 4px 12px rgba(0, 255, 255, 0.4);
@@ -2101,21 +2152,31 @@ a:hover {
     overflow-x: auto !important;
     overflow-y: hidden !important;
     justify-content: flex-start !important;
-    padding: 0 4px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    padding: 0 12px 8px !important;
     gap: 10px !important;
     -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x mandatory;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 12px;
   }
 
   .seat-block {
     flex: 0 0 auto;
+    width: max-content;
     padding: 16px !important;
     gap: 4px !important;
-    transform: scale(0.92);
-    transform-origin: top center;
+    transform: none;
+  }
+
+  .pushkar-side-seat-block {
+    padding: 16px 36px !important;
   }
 
   .seat-block-wrap {
+    flex: 0 0 auto;
+    min-width: max-content;
     scroll-snap-align: center;
   }
 
