@@ -2170,17 +2170,24 @@ a:hover {
     scroll-snap-align: center;
   }
 
-  /* Keep the full Pushkar A-B-C plan visible on phones with desktop-like,
-     even spacing. Scale every seat uniformly instead of separating blocks. */
+  /* Keep the full Pushkar A-B-C plan visible on phones with deterministic
+     columns. Explicit widths prevent Block B from retaining desktop intrinsic
+     space after its seats have been reduced for mobile. */
   .pushkar-seat-layout {
+    display: grid !important;
+    grid-template-columns: 71px 148px 71px;
     justify-content: center !important;
-    gap: 6px !important;
+    align-items: start !important;
+    column-gap: 6px !important;
     padding: 0 4px 8px !important;
     scroll-snap-type: none;
   }
 
+  .pushkar-seat-layout > .seat-block-wrap,
   .pushkar-seat-layout > .seat-block-wrap:first-child,
   .pushkar-seat-layout > .seat-block-wrap:last-child {
+    width: 100% !important;
+    min-width: 0 !important;
     margin-inline: 0 !important;
   }
 
@@ -2190,6 +2197,8 @@ a:hover {
   }
 
   .pushkar-seat-layout .seat-block {
+    width: 100% !important;
+    min-width: 0 !important;
     padding: 8px !important;
     gap: 2px !important;
   }
@@ -2200,9 +2209,9 @@ a:hover {
   }
 
   .pushkar-seat-layout .seat-button {
-    width: clamp(8px, 2.3vw, 12px) !important;
-    height: clamp(8px, 2.3vw, 12px) !important;
-    font-size: clamp(4px, 1.2vw, 6px) !important;
+    width: 9px !important;
+    height: 9px !important;
+    font-size: 5px !important;
     border-radius: 2px !important;
   }
 
