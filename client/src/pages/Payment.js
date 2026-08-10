@@ -426,7 +426,7 @@ const Payment = () => {
                       }
                     }, 300);
                   } catch (err) {
-                    setError('Booking failed. Please try again.');
+                    setError(err.response?.data?.message || err.response?.data?.error || 'Booking failed. Please try again.');
                   } finally {
                     setProcessing(false);
                   }
@@ -475,7 +475,7 @@ const Payment = () => {
                       }
                     }, 300);
                   } catch (err) {
-                    setError(err.response?.data?.error || 'Coin payment failed. Please try again.');
+                    setError(err.response?.data?.message || err.response?.data?.error || 'Coin payment failed. Please try again.');
                   } finally {
                     setProcessing(false);
                   }

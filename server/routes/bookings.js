@@ -264,10 +264,16 @@ router.post('/', async (req, res) => {
   if (!req.user) return res.status(401).json({ error: 'Authentication required' });
 
   const { movie_id, selectedSeats, food_option, coupon_code } = req.body;
-  const num_people = selectedSeats ? selectedSeats.length : 0;
+  const num_people = Array.isArray(selectedSeats) ? selectedSeats.length : 0;
+
+  if (!Number.isInteger(Number(movie_id)) || Number(movie_id) <= 0) {
+    return res.status(400).json({ error: 'Invalid movie ID' });
+  }
 
   // Validate selectedSeats - use movie's booking_limit instead of hardcoded 6
-  if (!selectedSeats || selectedSeats.length === 0) return res.status(400).json({ error: 'Please select at least one seat' });
+  if (!Array.isArray(selectedSeats) || selectedSeats.length === 0) {
+    return res.status(400).json({ error: 'Please select at least one seat' });
+  }
   
   // Check movie-specific booking limit later after fetching movie data
 
@@ -298,9 +304,28 @@ router.post('/', async (req, res) => {
       }
 
       // Get movie details
-    db.get('SELECT * FROM movies WHERE id = ? AND is_upcoming = 1', [movie_id], (err, movie) => {
+    db.get('SELECT * FROM movies WHERE id = ?', [movie_id], (err, movie) => {
       if (err) return res.status(500).json({ error: err.message });
-      if (!movie) return res.status(404).json({ error: 'Movie not found or not upcoming' });
+      if (!movie) return res.status(404).json({ error: 'Movie not found' });
+
+      const now = new Date();
+      const screeningTime = new Date(movie.date);
+      if (Number.isNaN(screeningTime.getTime()) || screeningTime <= now) {
+        return res.status(403).json({
+          error: 'BOOKING_CLOSED',
+          message: 'Booking is closed because the movie screening has started or ended.'
+        });
+      }
+
+      const bookingStart = movie.booking_starts_at ? new Date(movie.booking_starts_at) : null;
+      if (bookingStart && !Number.isNaN(bookingStart.getTime()) && bookingStart > now) {
+        return res.status(403).json({
+          error: 'BOOKING_NOT_OPEN',
+          message: `Booking opens on ${bookingStart.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' })}`,
+          booking_starts_at: movie.booking_starts_at
+        });
+      }
+
       if (Number(movie.booking_stopped) === 1) {
         return res.status(403).json({
           error: 'BOOKING_CLOSED',
