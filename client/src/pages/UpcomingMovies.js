@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api/axios';
 import Loader from '../components/Loader';
 import { useAuth } from '../contexts/AuthContext';
-import { isUpcomingMovie, compareMovieDatesAsc } from '../utils/movieStatus';
+import { compareMovieDatesAsc, formatAppDateTime, getBookingAvailability, isUpcomingMovie } from '../utils/movieStatus';
 
 const UpcomingMovies = () => {
   const navigate = useNavigate();
@@ -16,6 +16,8 @@ const UpcomingMovies = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showBookingClosedModal, setShowBookingClosedModal] = useState(false);
   const [bookingClosedMovieTitle, setBookingClosedMovieTitle] = useState('');
+  const [bookingStatusHeading, setBookingStatusHeading] = useState('Booking Closed');
+  const [bookingStatusMessage, setBookingStatusMessage] = useState('Movie booking time is complete.');
 
   useEffect(() => {
     fetchMovies();
@@ -36,16 +38,22 @@ const UpcomingMovies = () => {
     }
   };
 
-  const isBookingStoppedForMovie = (movie) => Number(movie?.booking_stopped) === 1 || movie?.booking_stopped === true;
-
   const handleMovieCardClick = (movie) => {
     if (!isAuthenticated) {
       setShowLoginModal(true);
       return;
     }
 
-    if (isBookingStoppedForMovie(movie)) {
+    const availability = getBookingAvailability(movie);
+    if (availability.status !== 'open') {
       setBookingClosedMovieTitle(movie?.title || 'This movie');
+      if (availability.status === 'not_open') {
+        setBookingStatusHeading('Booking Starts Soon');
+        setBookingStatusMessage(`Booking opens on ${formatAppDateTime(movie.booking_starts_at)}.`);
+      } else {
+        setBookingStatusHeading('Booking Closed');
+        setBookingStatusMessage('Movie booking time is complete.');
+      }
       setShowBookingClosedModal(true);
       return;
     }
@@ -703,7 +711,7 @@ const UpcomingMovies = () => {
                 fontWeight: 'bold',
                 marginBottom: '12px'
               }}>
-                Booking Closed
+                {bookingStatusHeading}
               </h2>
 
               <p style={{
@@ -712,7 +720,8 @@ const UpcomingMovies = () => {
                 marginBottom: '20px',
                 lineHeight: '1.6'
               }}>
-                Movie booking time is complete for <strong style={{ color: '#0b0e17' }}>{bookingClosedMovieTitle}</strong>.
+                <strong style={{ color: '#0b0e17' }}>{bookingClosedMovieTitle}</strong><br />
+                {bookingStatusMessage}
               </p>
 
               <button

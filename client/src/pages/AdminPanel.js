@@ -5,7 +5,7 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import autoTable from 'jspdf-autotable';
 import Loader from '../components/Loader';
-import { getMovieStatus } from '../utils/movieStatus';
+import { appDateTimeLocalToIso, getMovieStatus, toAppDateTimeLocal } from '../utils/movieStatus';
 
 // Configure axios to send cookies with requests
 api.defaults.withCredentials = true;
@@ -266,6 +266,7 @@ const AdminPanel = () => {
     title: '',
     description: '',
     date: '',
+    booking_starts_at: '',
     venue: '',
     price: '',
     coin_price: 20,
@@ -786,11 +787,26 @@ const AdminPanel = () => {
     // Isolate the movie update in a completely separate try/catch to prevent any component remounting
     const performMovieUpdate = async () => {
       try {
-        // Prepare movie data with selected foods
+        // Normalize IIT Jammu wall-clock values to UTC before sending them.
+        // This keeps add/edit behavior identical regardless of server timezone.
         const movieData = {
           ...movieForm,
+          date: appDateTimeLocalToIso(movieForm.date),
+          booking_starts_at: movieForm.booking_starts_at
+            ? appDateTimeLocalToIso(movieForm.booking_starts_at)
+            : '',
           availableFoods: selectedFoodsForMovie
         };
+
+        if (!movieData.date) {
+          throw new Error('Please enter a valid movie date and time');
+        }
+        if (movieForm.booking_starts_at && !movieData.booking_starts_at) {
+          throw new Error('Please enter a valid booking start date and time');
+        }
+        if (movieData.booking_starts_at && new Date(movieData.booking_starts_at) >= new Date(movieData.date)) {
+          throw new Error('Booking start time must be before the movie screening time');
+        }
 
         if (editingMovie) {
           // For editing, always use FormData to handle file uploads
@@ -864,7 +880,7 @@ const AdminPanel = () => {
         // Close modal and reset form
         setShowMovieModal(false);
         setEditingMovie(null);
-        setMovieForm({ title: '', description: '', date: '', venue: '', price: 0, category: '', duration: '', imdb_rating: '', language: '', poster: null, availableFoods: [], is_special: 0, special_message: '' });
+        setMovieForm({ title: '', description: '', date: '', booking_starts_at: '', venue: '', price: 0, coin_price: 20, booking_limit: 6, category: '', duration: '', imdb_rating: '', language: '', poster: null, availableFoods: [], is_special: 0, special_message: '' });
         setSelectedFoodsForMovie([]);
         setFreeFoodIds([]);
 
@@ -2260,8 +2276,11 @@ const AdminPanel = () => {
                     title: '',
                     description: '',
                     date: '',
+                    booking_starts_at: '',
                     venue: '',
-    price: 0,
+                    price: 0,
+                    coin_price: 20,
+                    booking_limit: 6,
                     category: '',
                     duration: '',
                     imdb_rating: '',
@@ -2496,7 +2515,8 @@ const AdminPanel = () => {
                                   setMovieForm({
                                     title: movie.title,
                                     description: movie.description || '',
-                                    date: new Date(movie.date).toISOString().slice(0, 16),
+                                    date: toAppDateTimeLocal(movie.date),
+                                    booking_starts_at: toAppDateTimeLocal(movie.booking_starts_at),
                                     venue: movie.venue,
                                     price: movie.price ?? 0,
                                     coin_price: movie.coin_price ?? 20,
@@ -6442,7 +6462,7 @@ const AdminPanel = () => {
           onHide={() => {
             setShowMovieModal(false);
             setEditingMovie(null);
-            setMovieForm({ title: '', description: '', date: '', venue: '', price: '', category: '', duration: '', imdb_rating: '', language: '', poster: null });
+            setMovieForm({ title: '', description: '', date: '', booking_starts_at: '', venue: '', price: '', coin_price: 20, booking_limit: 6, category: '', duration: '', imdb_rating: '', language: '', poster: null });
             setSelectedFoodsForMovie([]);
           }}
           size="lg"
@@ -6495,6 +6515,22 @@ const AdminPanel = () => {
                       <option value="Pushkar 11AC2022">Pushkar 11AC2022</option>
                       <option value="Pushkar 11AC3027">Pushkar 11AC3027</option>
                     </Form.Select>
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Booking Starts At (IST)</Form.Label>
+                    <Form.Control
+                      type="datetime-local"
+                      value={movieForm.booking_starts_at}
+                      onChange={(e) => setMovieForm({ ...movieForm, booking_starts_at: e.target.value })}
+                      max={movieForm.date || undefined}
+                    />
+                    <Form.Text className="text-muted">
+                      Before this time, clicking the movie will show when booking opens. Leave blank to open immediately.
+                    </Form.Text>
                   </Form.Group>
                 </Col>
               </Row>
@@ -6679,7 +6715,7 @@ const AdminPanel = () => {
               <Button variant="secondary" onClick={() => {
                 setShowMovieModal(false);
                 setEditingMovie(null);
-                setMovieForm({ title: '', description: '', date: '', venue: '', price: 0, category: '', duration: '', imdb_rating: '', language: '', poster: null });
+                setMovieForm({ title: '', description: '', date: '', booking_starts_at: '', venue: '', price: 0, coin_price: 20, booking_limit: 6, category: '', duration: '', imdb_rating: '', language: '', poster: null });
                 setSelectedFoodsForMovie([]);
                 setFreeFoodIds([]);
               }}>
