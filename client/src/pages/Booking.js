@@ -116,7 +116,7 @@ const Booking = () => {
 
   useEffect(() => {
     if (!seatScrollRef.current || !blockBRef.current) return;
-    if (typeof window !== 'undefined' && window.innerWidth > 576) return;
+    if (typeof window !== 'undefined' && window.innerWidth > 768) return;
 
     const centerBlockB = () => {
       const container = seatScrollRef.current;
