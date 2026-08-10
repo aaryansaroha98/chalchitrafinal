@@ -2170,6 +2170,42 @@ a:hover {
     scroll-snap-align: center;
   }
 
+  /* Keep the full Pushkar A-B-C plan visible on phones with desktop-like,
+     even spacing. Scale every seat uniformly instead of separating blocks. */
+  .pushkar-seat-layout {
+    justify-content: center !important;
+    gap: 6px !important;
+    padding: 0 4px 8px !important;
+    scroll-snap-type: none;
+  }
+
+  .pushkar-seat-layout > .seat-block-wrap:first-child,
+  .pushkar-seat-layout > .seat-block-wrap:last-child {
+    margin-inline: 0 !important;
+  }
+
+  .pushkar-seat-layout .seat-block-wrap > div:first-child {
+    font-size: 12px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .pushkar-seat-layout .seat-block {
+    padding: 8px !important;
+    gap: 2px !important;
+  }
+
+  .pushkar-seat-layout .seat-block > div {
+    gap: 2px !important;
+    margin-bottom: 1px !important;
+  }
+
+  .pushkar-seat-layout .seat-button {
+    width: clamp(8px, 2.3vw, 12px) !important;
+    height: clamp(8px, 2.3vw, 12px) !important;
+    font-size: clamp(4px, 1.2vw, 6px) !important;
+    border-radius: 2px !important;
+  }
+
   /* Keep the 28px dimensions supplied by Booking.js on mobile so every
      auditorium seat remains uniform and reliably tappable. */
   .seat-button {
