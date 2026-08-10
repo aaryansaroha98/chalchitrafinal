@@ -12,9 +12,26 @@ console.log('🎬 Movies routes file loaded');
 // Use Cloudinary in production, local disk in development
 const upload = getUpload('posters', 'uploads');
 
+// Admin datetime-local values represent IIT Jammu local time (IST).
+// Explicitly attach the offset so production server timezone cannot shift them.
+const parseAppDateTime = (value) => {
+  if (value === null || value === undefined || String(value).trim() === '') return null;
+  const raw = String(value).trim();
+  const localDateTime = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?$/;
+  const parsed = new Date(localDateTime.test(raw) ? `${raw}+05:30` : raw);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
+const normalizeAppDateTime = (value) => {
+  const parsed = parseAppDateTime(value);
+  return parsed ? parsed.toISOString() : null;
+};
+
 // Helper function to validate movie data
 const validateMovieData = (data) => {
   const errors = [];
+  const movieDate = parseAppDateTime(data.date);
+  const bookingStart = parseAppDateTime(data.booking_starts_at);
   
   if (!data.title || data.title.trim() === '') {
     errors.push('Movie title is required');
@@ -22,11 +39,14 @@ const validateMovieData = (data) => {
   
   if (!data.date || data.date.trim() === '') {
     errors.push('Movie date is required');
-  } else {
-    const date = new Date(data.date);
-    if (isNaN(date.getTime())) {
-      errors.push('Invalid date format');
-    }
+  } else if (!movieDate) {
+    errors.push('Invalid movie date format');
+  }
+
+  if (data.booking_starts_at && !bookingStart) {
+    errors.push('Invalid booking start date and time');
+  } else if (movieDate && bookingStart && bookingStart >= movieDate) {
+    errors.push('Booking start time must be before the movie screening time');
   }
   
   if (!data.venue || data.venue.trim() === '') {
@@ -119,16 +139,16 @@ router.get('/:id', (req, res) => {
   // If this is a booking request (not admin), only return upcoming movies
   const isBookingRequest = req.query.booking === 'true';
 
-  const query = isBookingRequest
-    ? 'SELECT * FROM movies WHERE id = ? AND is_upcoming = 1'
-    : 'SELECT * FROM movies WHERE id = ?';
+  // Fetch by ID first so a future movie can still explain when booking opens.
+  // Availability is derived from the actual screening timestamp, not stale is_upcoming data.
+  const query = 'SELECT * FROM movies WHERE id = ?';
 
   db.get(query, [movieId], (err, movie) => {
     if (err) {
       console.error('❌ Database error in GET /:id:', err);
       return res.status(500).json({ error: 'Failed to fetch movie' });
     }
-    if (!movie) {
+    if (!movie || (isBookingRequest && (!parseAppDateTime(movie.date) || parseAppDateTime(movie.date) <= new Date()))) {
       return res.status(404).json({ error: 'Movie not found or not available' });
     }
     res.json(movie);
@@ -183,11 +203,13 @@ router.post('/', (req, res) => {
     return res.status(400).json({ error: 'Validation failed', details: validationErrors });
   }
 
-  const { title, description, date, venue, price, availableFoods, category, duration, imdb_rating, language, is_special, special_message, coin_price, booking_limit } = body;
+  const { title, description, date, booking_starts_at, venue, price, availableFoods, category, duration, imdb_rating, language, is_special, special_message, coin_price, booking_limit } = body;
   const poster_url = getUploadUrl(req.file, '/uploads');
+  const normalizedMovieDate = normalizeAppDateTime(date);
+  const normalizedBookingStart = normalizeAppDateTime(booking_starts_at);
 
   // Determine is_upcoming based on date
-  const movieDate = new Date(date);
+  const movieDate = parseAppDateTime(date);
   const now = new Date();
   const isUpcoming = !isNaN(movieDate.getTime()) && movieDate > now ? 1 : 0;
 
@@ -207,9 +229,9 @@ router.post('/', (req, res) => {
   const finalCoinPrice = coin_price !== undefined && coin_price !== '' ? parseInt(coin_price) : 20;
   const finalBookingLimit = booking_limit !== undefined && booking_limit !== '' ? parseInt(booking_limit) : 6;
 
-  const sql = `INSERT INTO movies (title, description, poster_url, date, venue, price, is_upcoming, available_foods, category, duration, imdb_rating, language, is_special, special_message, coin_price, booking_limit) 
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-  const params = [title || '', description || '', poster_url || '', date || '', venue || '', 
+  const sql = `INSERT INTO movies (title, description, poster_url, date, booking_starts_at, venue, price, is_upcoming, available_foods, category, duration, imdb_rating, language, is_special, special_message, coin_price, booking_limit)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const params = [title || '', description || '', poster_url || '', normalizedMovieDate, normalizedBookingStart, venue || '',
     price !== undefined && price !== '' ? parseFloat(price) : 0, 
     isUpcoming, availableFoodsString, category || '', duration || '', imdb_rating || '', language || '',
     is_special ? parseInt(is_special) : 0, special_message || '', finalCoinPrice, finalBookingLimit];
@@ -279,7 +301,7 @@ router.put('/:id', (req, res) => {
     hasPoster: !!req.file
   });
 
-  const { title, description, date, venue, price, coin_price, availableFoods, category, duration, imdb_rating, language, is_special, special_message, booking_limit } = body;
+  const { title, description, date, booking_starts_at, venue, price, coin_price, availableFoods, category, duration, imdb_rating, language, is_special, special_message, booking_limit } = body;
   
   // Validate required fields
   const validationErrors = validateMovieData(body);
@@ -311,9 +333,11 @@ router.put('/:id', (req, res) => {
   }
 
   // Always determine is_upcoming based on date for consistency
+  const normalizedMovieDate = normalizeAppDateTime(date);
+  const normalizedBookingStart = normalizeAppDateTime(booking_starts_at);
   let finalIsUpcoming = 1; // Default to upcoming
   if (date && date.trim() !== '') {
-    const movieDate = new Date(date);
+    const movieDate = parseAppDateTime(date);
     const now = new Date();
     if (!isNaN(movieDate.getTime())) {
       finalIsUpcoming = movieDate > now ? 1 : 0;
@@ -328,13 +352,13 @@ router.put('/:id', (req, res) => {
   // Ensure finalIsUpcoming is always 0 or 1
   finalIsUpcoming = finalIsUpcoming === 1 ? 1 : 0;
 
-  const sql = `UPDATE movies SET 
-               title = ?, description = ?, poster_url = ?, date = ?, venue = ?, price = ?, 
-               coin_price = ?, is_upcoming = ?, available_foods = ?, category = ?, duration = ?, 
-               imdb_rating = ?, language = ?, is_special = ?, special_message = ?, booking_limit = ? 
+  const sql = `UPDATE movies SET
+               title = ?, description = ?, poster_url = ?, date = ?, booking_starts_at = ?, venue = ?, price = ?,
+               coin_price = ?, is_upcoming = ?, available_foods = ?, category = ?, duration = ?,
+               imdb_rating = ?, language = ?, is_special = ?, special_message = ?, booking_limit = ?
                WHERE id = ?`;
   const params = [
-    title || '', description || '', poster_url || '', date || '', venue || '', 
+    title || '', description || '', poster_url || '', normalizedMovieDate, normalizedBookingStart, venue || '',
     price !== undefined && price !== '' ? parseFloat(price) : 0, 
     coin_price !== undefined && coin_price !== '' ? parseInt(coin_price) : 20,
     finalIsUpcoming, availableFoodsString, category || '', duration || '', 

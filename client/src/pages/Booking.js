@@ -7,6 +7,7 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { useAuth } from '../contexts/AuthContext';
 import Loader from '../components/Loader';
+import { formatAppDateTime, getBookingAvailability } from '../utils/movieStatus';
 
 const Booking = () => {
   const { movieId } = useParams();
@@ -26,8 +27,10 @@ const Booking = () => {
   const [hasExistingBooking, setHasExistingBooking] = useState(false);
   const [existingBooking, setExistingBooking] = useState(null);
   const [showAlreadyBookedModal, setShowAlreadyBookedModal] = useState(false);
+  const [currentTime, setCurrentTime] = useState(() => new Date());
   const seatScrollRef = useRef(null);
   const blockBRef = useRef(null);
+  const bookingAvailability = getBookingAvailability(movie, currentTime);
 
   // API base URL for building absolute URLs to /uploads assets
   const apiBaseUrl = process.env.REACT_APP_API_URL ||
@@ -52,15 +55,31 @@ const Booking = () => {
 
   useEffect(() => {
     fetchMovie();
+  }, [movieId]);
+
+  // Load seats, foods, and existing-booking state only when booking is open.
+  useEffect(() => {
+    if (bookingAvailability.status !== 'open') return;
     fetchOccupiedSeats();
     fetchAvailableFoods();
     fetchUserBookings();
-  }, [movieId]);
+  }, [movieId, bookingAvailability.status]);
+
+  // Automatically unlock the page when the configured opening instant arrives.
+  useEffect(() => {
+    if (bookingAvailability.status !== 'not_open' || !bookingAvailability.bookingStart) return;
+    const intervalId = setInterval(() => {
+      const nextNow = new Date();
+      setCurrentTime(nextNow);
+      if (nextNow >= bookingAvailability.bookingStart) clearInterval(intervalId);
+    }, 1000);
+    return () => clearInterval(intervalId);
+  }, [movie?.booking_starts_at, bookingAvailability.status]);
 
   // Real-time seat sync: poll occupied seats while the page is open so seats
   // booked by other users show up as grayed-out without a manual refresh.
   useEffect(() => {
-    if (!movieId) return;
+    if (!movieId || bookingAvailability.status !== 'open') return;
 
     const POLL_MS = 12000;
     let intervalId = null;
@@ -93,7 +112,7 @@ const Booking = () => {
       stopPolling();
       document.removeEventListener('visibilitychange', handleVisibility);
     };
-  }, [movieId]);
+  }, [movieId, bookingAvailability.status]);
 
   useEffect(() => {
     if (!seatScrollRef.current || !blockBRef.current) return;
@@ -214,6 +233,16 @@ const Booking = () => {
   };
 
   const handleBook = () => {
+    const availability = getBookingAvailability(movie);
+    if (availability.status !== 'open') {
+      setToastMessage(availability.status === 'not_open'
+        ? `Booking opens on ${formatAppDateTime(movie.booking_starts_at)}`
+        : 'Booking is closed for this movie');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 2500);
+      return;
+    }
+
     if (selectedSeats.length === 0) {
       setToastMessage('Please select at least one seat');
       setShowToast(true);
@@ -291,6 +320,44 @@ const Booking = () => {
         >
           <h2 className="font-cinzel" style={{fontSize: '24px', color: '#0b0e17', marginBottom: '16px'}}>Movie Not Found</h2>
           <p style={{color: '#5c6270'}}>The requested movie could not be loaded.</p>
+        </motion.div>
+      </div>
+    );
+  }
+
+  if (bookingAvailability.status !== 'open') {
+    const waitingToOpen = bookingAvailability.status === 'not_open';
+    return (
+      <div className="bg-void" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{
+            background: '#ffffff',
+            border: '1px solid #e5e7eb',
+            padding: '36px',
+            maxWidth: '520px',
+            width: '100%',
+            textAlign: 'center'
+          }}
+        >
+          <div style={{ fontSize: '42px', marginBottom: '14px' }}>{waitingToOpen ? '⏳' : '🎬'}</div>
+          <h2 className="font-cinzel" style={{ fontSize: '24px', color: '#0b0e17', marginBottom: '12px' }}>
+            {waitingToOpen ? 'Booking Starts Soon' : 'Booking Closed'}
+          </h2>
+          <p style={{ color: '#0b0e17', fontWeight: '600', marginBottom: '8px' }}>{movie.title}</p>
+          <p style={{ color: '#5c6270', lineHeight: '1.6', marginBottom: '22px' }}>
+            {waitingToOpen
+              ? `Booking will open on ${formatAppDateTime(movie.booking_starts_at)}.`
+              : 'Booking is currently closed for this movie.'}
+          </p>
+          <button
+            type="button"
+            onClick={() => navigate('/upcoming-movies')}
+            style={{ background: '#0b0e17', color: '#ffffff', border: 0, padding: '11px 22px', fontWeight: '600', cursor: 'pointer' }}
+          >
+            Back to Movies
+          </button>
         </motion.div>
       </div>
     );

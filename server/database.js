@@ -146,6 +146,7 @@ if (usePostgres) {
         language TEXT,
         is_upcoming INTEGER DEFAULT 1,
         booking_stopped INTEGER DEFAULT 0,
+        booking_starts_at TEXT,
         is_special INTEGER DEFAULT 0,
         special_message TEXT,
         coin_price INTEGER DEFAULT 0,
@@ -404,6 +405,7 @@ if (usePostgres) {
     // Ensure movies.is_special and special_message columns exist for older databases
     try {
       await pool.query('ALTER TABLE movies ADD COLUMN IF NOT EXISTS booking_stopped INTEGER DEFAULT 0');
+      await pool.query('ALTER TABLE movies ADD COLUMN IF NOT EXISTS booking_starts_at TEXT');
       await pool.query('ALTER TABLE movies ADD COLUMN IF NOT EXISTS is_special INTEGER DEFAULT 0');
       await pool.query('ALTER TABLE movies ADD COLUMN IF NOT EXISTS special_message TEXT');
       await pool.query('ALTER TABLE movies ADD COLUMN IF NOT EXISTS coin_price INTEGER DEFAULT 0');
@@ -522,6 +524,7 @@ if (usePostgres) {
         language TEXT,
         is_upcoming INTEGER DEFAULT 1,
         booking_stopped INTEGER DEFAULT 0,
+        booking_starts_at TEXT,
         is_special INTEGER DEFAULT 0,
         special_message TEXT,
         coin_price INTEGER DEFAULT 0,
@@ -923,6 +926,16 @@ if (usePostgres) {
             console.error('⚠️  Could not add movies.booking_stopped:', alterErr.message);
           } else {
             console.log('✅ movies.booking_stopped column added');
+          }
+        });
+      }
+
+      if (!colNames.includes('booking_starts_at')) {
+        db.run('ALTER TABLE movies ADD COLUMN booking_starts_at TEXT', (alterErr) => {
+          if (alterErr) {
+            console.error('⚠️  Could not add movies.booking_starts_at:', alterErr.message);
+          } else {
+            console.log('✅ movies.booking_starts_at column added');
           }
         });
       }
