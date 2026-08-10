@@ -118,16 +118,29 @@ const Booking = () => {
     if (!seatScrollRef.current || !blockBRef.current) return;
     if (typeof window !== 'undefined' && window.innerWidth > 576) return;
 
-    const container = seatScrollRef.current;
-    const target = blockBRef.current;
-    const containerRect = container.getBoundingClientRect();
-    const targetRect = target.getBoundingClientRect();
-    const offset = targetRect.left - containerRect.left - (containerRect.width - targetRect.width) / 2;
+    const centerBlockB = () => {
+      const container = seatScrollRef.current;
+      const target = blockBRef.current;
+      if (!container || !target) return;
 
-    container.scrollTo({
-      left: container.scrollLeft + offset,
-      behavior: 'auto'
-    });
+      const containerRect = container.getBoundingClientRect();
+      const targetRect = target.getBoundingClientRect();
+      const desiredLeft = container.scrollLeft
+        + (targetRect.left - containerRect.left)
+        - ((container.clientWidth - targetRect.width) / 2);
+      const maxLeft = Math.max(0, container.scrollWidth - container.clientWidth);
+      container.scrollTo({
+        left: Math.max(0, Math.min(desiredLeft, maxLeft)),
+        behavior: 'auto'
+      });
+    };
+
+    const frameId = window.requestAnimationFrame(centerBlockB);
+    window.addEventListener('resize', centerBlockB);
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.removeEventListener('resize', centerBlockB);
+    };
   }, [movie?.venue, loading]);
 
   const fetchOccupiedSeats = async (silent = false) => {
@@ -576,14 +589,18 @@ const Booking = () => {
 
             {/* Pushkar Layout with Separate Block Containers */}
             {['Pushkar 11AC2022', 'Pushkar 11AC3027'].includes(movie.venue) ? (
-              <div className="seat-layout-scroll" ref={seatScrollRef} style={{
+              <div className="seat-layout-scroll pushkar-seat-layout" ref={seatScrollRef} style={{
                 display: 'flex',
-                justifyContent: 'center',
+                justifyContent: 'flex-start',
                 alignItems: 'flex-start',
                 gap: '20px',
                 flexWrap: 'nowrap',
                 marginTop: '32px',
-                overflowX: 'hidden',
+                overflowX: 'auto',
+                overflowY: 'hidden',
+                width: '100%',
+                maxWidth: '100%',
+                minWidth: 0,
                 padding: '0 20px'
               }}>
                 {/* Block A - 5 rows × 5 seats */}
@@ -597,7 +614,7 @@ const Booking = () => {
                     Block A
                   </div>
                   <div
-                    className="seat-block"
+                    className="seat-block pushkar-side-seat-block"
                     style={{
                       display: 'flex',
                       flexDirection: 'column',
@@ -737,7 +754,7 @@ const Booking = () => {
                     Block C
                   </div>
                   <div
-                    className="seat-block"
+                    className="seat-block pushkar-side-seat-block"
                     style={{
                       display: 'flex',
                       flexDirection: 'column',
@@ -797,14 +814,18 @@ const Booking = () => {
               </div>
             ) : (
               // Mansar Auditorium Layout (existing)
-              <div className="seat-layout-scroll" ref={seatScrollRef} style={{
+              <div className="seat-layout-scroll mansar-seat-layout" ref={seatScrollRef} style={{
                 display: 'flex',
-                justifyContent: 'center',
+                justifyContent: 'flex-start',
                 alignItems: 'flex-start',
                 gap: '12px',
                 flexWrap: 'nowrap',
                 marginTop: '32px',
-                overflowX: 'hidden',
+                overflowX: 'auto',
+                overflowY: 'hidden',
+                width: '100%',
+                maxWidth: '100%',
+                minWidth: 0,
                 padding: '0 20px'
               }}>
                 {/* Left Block - Block A */}
