@@ -2374,21 +2374,20 @@ a:hover {
   transition: transform 0.2s ease;
 }
 
-/* Preserve the desktop Pushkar geometry on narrow windows and expose it
-   through a local horizontal scroller instead of shrinking or overlapping it. */
+/* Keep Pushkar compact on narrow screens while retaining horizontal scrolling. */
 @media (max-width: 768px) {
   .pushkar-seat-layout {
     display: flex !important;
     justify-content: flex-start !important;
     align-items: flex-start !important;
-    gap: 20px !important;
+    gap: 12px !important;
     width: 100% !important;
     max-width: 100% !important;
     overflow-x: scroll !important;
     overflow-y: hidden !important;
-    padding: 0 20px 12px !important;
+    padding: 0 12px 8px !important;
     scroll-snap-type: x proximity;
-    scroll-padding-inline: 20px;
+    scroll-padding-inline: 12px;
     scrollbar-gutter: stable;
     -webkit-overflow-scrolling: touch;
   }
@@ -2404,33 +2403,44 @@ a:hover {
   }
 
   .pushkar-seat-layout .seat-block-wrap > div:first-child {
-    font-size: 18px !important;
-    margin-bottom: 16px !important;
+    font-size: 16px !important;
+    margin-bottom: 10px !important;
   }
 
   .pushkar-seat-layout .seat-block {
     width: max-content !important;
     min-width: max-content !important;
-    padding: 10px !important;
-    gap: 4px !important;
   }
 
-  .pushkar-seat-layout .seat-block > div {
-    gap: 2px !important;
-    margin-bottom: 1px !important;
+  .pushkar-seat-layout > .seat-block-wrap:nth-child(1) .seat-block,
+  .pushkar-seat-layout > .seat-block-wrap:nth-child(3) .seat-block {
+    padding: 0 !important;
+    gap: 1px !important;
+  }
+
+  .pushkar-seat-layout > .seat-block-wrap:nth-child(2) .seat-block {
+    padding: 4px !important;
+    gap: 1px !important;
+  }
+
+  .pushkar-seat-layout > .seat-block-wrap:nth-child(1) .seat-block > div,
+  .pushkar-seat-layout > .seat-block-wrap:nth-child(2) .seat-block > div,
+  .pushkar-seat-layout > .seat-block-wrap:nth-child(3) .seat-block > div {
+    gap: 1px !important;
+    margin-bottom: 0 !important;
   }
 
   .pushkar-seat-layout .seat-button,
   .pushkar-seat-layout > .seat-block-wrap:nth-child(2) .seat-button {
-    width: 27px !important;
-    height: 27px !important;
-    min-width: 27px !important;
-    max-width: 27px !important;
-    flex: 0 0 27px !important;
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    max-width: 24px !important;
+    flex: 0 0 24px !important;
     aspect-ratio: 1 / 1;
     padding: 0 !important;
     line-height: 1 !important;
-    font-size: 10px !important;
+    font-size: 8px !important;
     border-radius: 2px !important;
   }
 
