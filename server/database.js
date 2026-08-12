@@ -299,6 +299,7 @@ if (usePostgres) {
         id SERIAL PRIMARY KEY,
         admin_user_id INTEGER NOT NULL UNIQUE,
         allowed_tabs TEXT NOT NULL DEFAULT '{"dashboard": true, "movies": true, "bookings": true, "foods": true, "team": true, "gallery": true, "coupons": true, "coupon-winners": true, "feedback": true, "mail": true, "settings": true, "config": true}',
+        can_manage_scanners INTEGER NOT NULL DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         created_by INTEGER
@@ -368,6 +369,14 @@ if (usePostgres) {
       console.log('✅ users.last_seen column ensured');
     } catch (err) {
       console.log('users.last_seen ensure warning:', err.message);
+    }
+
+    // Scanner management is a separate delegated admin capability.
+    try {
+      await pool.query('ALTER TABLE admin_permissions ADD COLUMN IF NOT EXISTS can_manage_scanners INTEGER NOT NULL DEFAULT 0');
+      console.log('✅ admin_permissions.can_manage_scanners column ensured');
+    } catch (err) {
+      console.log('admin_permissions.can_manage_scanners ensure warning:', err.message);
     }
 
     // Ensure users.coins column exists for older databases
@@ -670,6 +679,7 @@ if (usePostgres) {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         admin_user_id INTEGER NOT NULL UNIQUE,
         allowed_tabs TEXT NOT NULL DEFAULT '{"dashboard": true, "movies": true, "bookings": true, "foods": true, "team": true, "gallery": true, "coupons": true, "coupon-winners": true, "feedback": true, "mail": true, "settings": true, "config": true}',
+        can_manage_scanners INTEGER NOT NULL DEFAULT 0,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         created_by INTEGER
@@ -710,6 +720,7 @@ if (usePostgres) {
           createIndices();
           ensureUserCreatedAtColumn();
           ensureUserLastSeenColumn();
+          ensureAdminPermissionsScannerManagementColumn();
           ensureTeamDisplayOrderColumn();
           ensureGalleryEventDateColumn();
           ensureEmailHistoryBookingId();
@@ -784,6 +795,29 @@ if (usePostgres) {
         });
       } else {
         db.run('UPDATE users SET last_seen = CURRENT_TIMESTAMP WHERE last_seen IS NULL');
+      }
+    });
+  }
+
+  function ensureAdminPermissionsScannerManagementColumn() {
+    db.all('PRAGMA table_info(admin_permissions)', [], (err, columns) => {
+      if (err) {
+        console.log('⚠️  Could not inspect admin_permissions columns:', err.message);
+        return;
+      }
+
+      const hasCapability = Array.isArray(columns) && columns.some((col) => col.name === 'can_manage_scanners');
+      if (!hasCapability) {
+        db.run(
+          'ALTER TABLE admin_permissions ADD COLUMN can_manage_scanners INTEGER NOT NULL DEFAULT 0',
+          (alterErr) => {
+            if (alterErr) {
+              console.log('⚠️  Could not add admin_permissions.can_manage_scanners:', alterErr.message);
+              return;
+            }
+            console.log('✅ admin_permissions.can_manage_scanners column added');
+          }
+        );
       }
     });
   }

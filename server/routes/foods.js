@@ -4,6 +4,7 @@ const db = require('../database');
 const multer = require('multer');
 const path = require('path');
 const { getUpload, getUploadUrl } = require('../utils/cloudinary');
+const requireScannerAccess = require('../middleware/scannerAccess');
 
 // Use Cloudinary in production, local disk in development
 const upload = getUpload('foods', 'uploads');
@@ -280,11 +281,7 @@ router.delete('/:id/force', requireAdmin, (req, res) => {
 });
 
 // Get food orders for a specific booking
-router.get('/booking/:bookingId', (req, res) => {
-  if (!req.user) return res.status(401).json({ error: 'Authentication required' });
-  const isAdminOrScanner = req.user.is_admin || req.user.code_scanner ||
-    (req.user.team_scanner !== undefined ? req.user.team_scanner : false);
-  if (!isAdminOrScanner) return res.status(403).json({ error: 'Scanner or admin access required' });
+router.get('/booking/:bookingId', requireScannerAccess, (req, res) => {
   const { bookingId } = req.params;
 
   // Determine if bookingId is numeric (database ID) or alphanumeric (booking code)
@@ -334,11 +331,7 @@ router.get('/booking/:bookingId', (req, res) => {
 });
 
 // Get food status for a specific booking (which items have been given)
-router.get('/status/:bookingId', (req, res) => {
-  if (!req.user) return res.status(401).json({ error: 'Authentication required' });
-  const isAdminOrScanner = req.user.is_admin || req.user.code_scanner ||
-    (req.user.team_scanner !== undefined ? req.user.team_scanner : false);
-  if (!isAdminOrScanner) return res.status(403).json({ error: 'Scanner or admin access required' });
+router.get('/status/:bookingId', requireScannerAccess, (req, res) => {
   const { bookingId } = req.params;
 
   // Determine if bookingId is numeric (database ID) or alphanumeric (booking code)
@@ -397,11 +390,7 @@ router.get('/status/:bookingId', (req, res) => {
 });
 
 // Mark food as given for a booking
-router.post('/mark-given/:bookingId/:foodId', (req, res) => {
-  if (!req.user) return res.status(401).json({ error: 'Authentication required' });
-  const isAdminOrScanner = req.user.is_admin || req.user.code_scanner ||
-    (req.user.team_scanner !== undefined ? req.user.team_scanner : false);
-  if (!isAdminOrScanner) return res.status(403).json({ error: 'Scanner or admin access required' });
+router.post('/mark-given/:bookingId/:foodId', requireScannerAccess, (req, res) => {
   const { bookingId, foodId } = req.params;
   const { quantity = 1, given_by } = req.body;
 
@@ -521,11 +510,7 @@ router.post('/mark-given/:bookingId/:foodId', (req, res) => {
 });
 
 // Get pending food items for a booking (not yet fully given)
-router.get('/pending/:bookingId', (req, res) => {
-  if (!req.user) return res.status(401).json({ error: 'Authentication required' });
-  const isAdminOrScanner = req.user.is_admin || req.user.code_scanner ||
-    (req.user.team_scanner !== undefined ? req.user.team_scanner : false);
-  if (!isAdminOrScanner) return res.status(403).json({ error: 'Scanner or admin access required' });
+router.get('/pending/:bookingId', requireScannerAccess, (req, res) => {
   const { bookingId } = req.params;
 
   // Determine if bookingId is numeric (database ID) or alphanumeric (booking code)

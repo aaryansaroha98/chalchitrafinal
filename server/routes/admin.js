@@ -89,16 +89,46 @@ const requireAdmin = (req, res, next) => {
 };
 
 // Middleware to restrict an action to the super admin only
-const SUPER_ADMIN_EMAIL = '2025uee0154@iitjammu.ac.in';
+const SUPER_ADMIN_EMAIL = (process.env.SUPER_ADMIN_EMAIL || '2025uee0154@iitjammu.ac.in').trim().toLowerCase();
+const getRequestActor = (req) => req.user || req.session?.adminUser || null;
+const isSuperAdminEmail = (email) => typeof email === 'string' && email.trim().toLowerCase() === SUPER_ADMIN_EMAIL;
+
 const requireSuperAdmin = (req, res, next) => {
-  const email =
-    (req.user && req.user.email) ||
-    (req.session && req.session.adminUser && req.session.adminUser.email) ||
-    null;
-  if (email && email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) {
+  const actor = getRequestActor(req);
+  if (actor && isSuperAdminEmail(actor.email)) {
     return next();
   }
   return res.status(403).json({ error: 'Super admin access required' });
+};
+
+// Scanner managers must be admins with the explicit database-backed capability.
+// The super admin always has this capability even if no permissions row exists.
+const requireScannerManager = (req, res, next) => {
+  const actor = getRequestActor(req);
+  if (!actor) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+  if (isSuperAdminEmail(actor.email)) {
+    return next();
+  }
+
+  const actorId = Number(actor.id);
+  if (!Number.isInteger(actorId) || actorId <= 0) {
+    return res.status(403).json({ error: 'Scanner management access required' });
+  }
+
+  db.get(`
+    SELECT u.is_admin, COALESCE(ap.can_manage_scanners, 0) AS can_manage_scanners
+    FROM users u
+    LEFT JOIN admin_permissions ap ON ap.admin_user_id = u.id
+    WHERE u.id = ?
+  `, [actorId], (err, permission) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (!permission || !permission.is_admin || Number(permission.can_manage_scanners) !== 1) {
+      return res.status(403).json({ error: 'Scanner management access required' });
+    }
+    return next();
+  });
 };
 
 // Middleware to check user authentication
@@ -377,18 +407,37 @@ router.post('/track-visit', (req, res) => {
 });
 
 // Manage users (make admin)
-router.put('/users/:id/make_admin', requireAdmin, (req, res) => {
-  db.run('UPDATE users SET is_admin = 1 WHERE id = ?', [req.params.id], function (err) {
+router.put('/users/:id/make_admin', requireSuperAdmin, (req, res) => {
+  const userId = parsePositiveId(req.params.id);
+  if (!userId) return res.status(400).json({ error: 'Invalid user id' });
+
+  db.run('UPDATE users SET is_admin = 1 WHERE id = ?', [userId], function (err) {
     if (err) return res.status(500).json({ error: err.message });
+    if (!this.changes) return res.status(404).json({ error: 'User not found' });
     res.json({ changes: this.changes });
   });
 });
 
-// Remove admin privileges
-router.put('/users/:id/remove_admin', requireAdmin, (req, res) => {
-  db.run('UPDATE users SET is_admin = 0 WHERE id = ?', [req.params.id], function (err) {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ changes: this.changes });
+// Remove admin privileges (super admin only)
+router.put('/users/:id/remove_admin', requireSuperAdmin, (req, res) => {
+  const userId = parsePositiveId(req.params.id);
+  if (!userId) return res.status(400).json({ error: 'Invalid user id' });
+
+  db.get('SELECT email FROM users WHERE id = ?', [userId], (findErr, user) => {
+    if (findErr) return res.status(500).json({ error: findErr.message });
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (isSuperAdminEmail(user.email)) {
+      return res.status(403).json({ error: 'Cannot remove super admin privileges' });
+    }
+
+    db.run('UPDATE users SET is_admin = 0 WHERE id = ?', [userId], function (updateErr) {
+      if (updateErr) return res.status(500).json({ error: updateErr.message });
+      const changes = this.changes;
+      db.run('DELETE FROM admin_permissions WHERE admin_user_id = ?', [userId], (permissionErr) => {
+        if (permissionErr) return res.status(500).json({ error: permissionErr.message });
+        res.json({ changes });
+      });
+    });
   });
 });
 
@@ -401,48 +450,83 @@ router.put('/users/:id/admin_tag', requireAdmin, (req, res) => {
   });
 });
 
-// Make user code scanner
-router.put('/users/:id/make_scanner', requireAdmin, (req, res) => {
-  const admin_tag = req.body && req.body.admin_tag;
+const parsePositiveId = (value) => {
+  const id = Number(value);
+  return Number.isInteger(id) && id > 0 ? id : null;
+};
 
-  // Check if this is specifically a scanner permission request
-  // If admin_tag is explicitly provided, treat as admin tag update
-  // If admin_tag is not provided or is null/undefined, treat as scanner permission update
-  if (admin_tag !== undefined && admin_tag !== null && admin_tag !== '') {
-    // This is an admin tag update request
-    db.run('UPDATE users SET admin_tag = ? WHERE id = ?', [admin_tag, req.params.id], function (err) {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json({ changes: this.changes, admin_tag });
-    });
-  } else {
-    // This is the original make scanner request (no admin_tag in body)
-    db.run('UPDATE users SET code_scanner = 1 WHERE id = ?', [req.params.id], function (err) {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json({ changes: this.changes });
-    });
-  }
-});
+const updateUserScannerAccess = (req, res, enabled) => {
+  const userId = parsePositiveId(req.params.id);
+  if (!userId) return res.status(400).json({ error: 'Invalid user id' });
 
-// Remove user code scanner access
-router.put('/users/:id/remove_scanner', requireAdmin, (req, res) => {
-  db.run('UPDATE users SET code_scanner = 0 WHERE id = ?', [req.params.id], function (err) {
+  db.get('SELECT id, email FROM users WHERE id = ?', [userId], (err, user) => {
     if (err) return res.status(500).json({ error: err.message });
-    res.json({ changes: this.changes });
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (!enabled && isSuperAdminEmail(user.email)) {
+      return res.status(403).json({ error: 'Cannot remove scanner access from the super admin' });
+    }
+
+    db.run('UPDATE users SET code_scanner = ? WHERE id = ?', [enabled ? 1 : 0, userId], function (updateErr) {
+      if (updateErr) return res.status(500).json({ error: updateErr.message });
+      res.json({
+        message: enabled ? 'Scanner access granted' : 'Scanner access removed',
+        changes: this.changes,
+        user_id: userId,
+        code_scanner: enabled
+      });
+    });
+  });
+};
+
+// Scanner-management list. This endpoint is intentionally narrower than the
+// general Users tab and is available only to delegated scanner managers.
+router.get('/scanner-users', requireScannerManager, (req, res) => {
+  db.all(`
+    SELECT id, name, email, is_admin, code_scanner, last_seen, created_at
+    FROM users
+    ORDER BY LOWER(name), LOWER(email)
+  `, [], (err, users) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(users || []);
   });
 });
 
+router.put('/scanner-users/:id', requireScannerManager, (req, res) => {
+  if (typeof req.body?.enabled !== 'boolean') {
+    return res.status(400).json({ error: 'enabled must be a boolean' });
+  }
+  return updateUserScannerAccess(req, res, req.body.enabled);
+});
+
+// Backward-compatible scanner access routes used by existing admin controls.
+router.put('/users/:id/make_scanner', requireScannerManager, (req, res) => {
+  return updateUserScannerAccess(req, res, true);
+});
+
+router.put('/users/:id/remove_scanner', requireScannerManager, (req, res) => {
+  return updateUserScannerAccess(req, res, false);
+});
+
 // Grant scanner access to team member
-router.put('/team/:id/grant_scanner', requireAdmin, (req, res) => {
-  db.run('UPDATE team SET scanner_access = 1 WHERE id = ?', [req.params.id], function (err) {
+router.put('/team/:id/grant_scanner', requireScannerManager, (req, res) => {
+  const teamId = parsePositiveId(req.params.id);
+  if (!teamId) return res.status(400).json({ error: 'Invalid team member id' });
+
+  db.run('UPDATE team SET scanner_access = 1 WHERE id = ?', [teamId], function (err) {
     if (err) return res.status(500).json({ error: err.message });
+    if (!this.changes) return res.status(404).json({ error: 'Team member not found' });
     res.json({ changes: this.changes });
   });
 });
 
 // Remove scanner access from team member
-router.put('/team/:id/remove_scanner', requireAdmin, (req, res) => {
-  db.run('UPDATE team SET scanner_access = 0 WHERE id = ?', [req.params.id], function (err) {
+router.put('/team/:id/remove_scanner', requireScannerManager, (req, res) => {
+  const teamId = parsePositiveId(req.params.id);
+  if (!teamId) return res.status(400).json({ error: 'Invalid team member id' });
+
+  db.run('UPDATE team SET scanner_access = 0 WHERE id = ?', [teamId], function (err) {
     if (err) return res.status(500).json({ error: err.message });
+    if (!this.changes) return res.status(404).json({ error: 'Team member not found' });
     res.json({ changes: this.changes });
   });
 });
@@ -2285,13 +2369,14 @@ Generated on: ${new Date().toLocaleString('en-IN')}
 // ==================== PERMISSION MANAGEMENT ENDPOINTS ====================
 
 // Get all admin users (for permission management)
-router.get('/permission-admins', requireAdmin, (req, res) => {
+router.get('/permission-admins', requireSuperAdmin, (req, res) => {
   console.log('🔍 Fetching admin users for permission management...');
 
   // Get all admin users with their permissions
   db.all(`
     SELECT u.id, u.name, u.email, u.is_admin, u.code_scanner, u.admin_tag,
-           ap.allowed_tabs, ap.created_at, ap.updated_at,
+           ap.allowed_tabs, COALESCE(ap.can_manage_scanners, 0) AS can_manage_scanners,
+           ap.created_at, ap.updated_at,
            creator.name as created_by_name
     FROM users u
     LEFT JOIN admin_permissions ap ON u.id = ap.admin_user_id
@@ -2310,7 +2395,8 @@ router.get('/permission-admins', requireAdmin, (req, res) => {
     // Parse allowed_tabs JSON for each admin
     const result = admins.map(admin => ({
       ...admin,
-      allowed_tabs: admin.allowed_tabs ? JSON.parse(admin.allowed_tabs) : []
+      allowed_tabs: admin.allowed_tabs ? JSON.parse(admin.allowed_tabs) : [],
+      can_manage_scanners: isSuperAdminEmail(admin.email) || Number(admin.can_manage_scanners) === 1
     }));
 
     console.log('📋 Admin users with parsed tabs:', result.map(a => ({ id: a.id, name: a.name, email: a.email, admin_tag: a.admin_tag })));
@@ -2320,7 +2406,7 @@ router.get('/permission-admins', requireAdmin, (req, res) => {
 });
 
 // Get permissions for a specific admin
-router.get('/permissions/:adminId', requireAdmin, (req, res) => {
+router.get('/permissions/:adminId', requireSuperAdmin, (req, res) => {
   const adminId = req.params.adminId;
 
   db.get(`
@@ -2342,88 +2428,85 @@ router.get('/permissions/:adminId', requireAdmin, (req, res) => {
       return res.json({
         admin_user_id: adminId,
         allowed_tabs: defaultTabs,
+        can_manage_scanners: false,
         is_default: true
       });
     }
 
     res.json({
       ...permissions,
-      allowed_tabs: permissions.allowed_tabs ? JSON.parse(permissions.allowed_tabs) : []
+      allowed_tabs: permissions.allowed_tabs ? JSON.parse(permissions.allowed_tabs) : [],
+      can_manage_scanners: isSuperAdminEmail(permissions.email) || Number(permissions.can_manage_scanners) === 1
     });
   });
 });
 
-// Update permissions for an admin
-router.put('/permissions/:adminId', requireAdmin, (req, res) => {
-  const adminId = req.params.adminId;
-  const { allowed_tabs } = req.body;
+// Update permissions for an admin (super admin only)
+router.put('/permissions/:adminId', requireSuperAdmin, (req, res) => {
+  const adminId = parsePositiveId(req.params.adminId);
+  const { allowed_tabs, can_manage_scanners } = req.body || {};
 
+  if (!adminId) {
+    return res.status(400).json({ error: 'Invalid admin id' });
+  }
   if (!Array.isArray(allowed_tabs)) {
     return res.status(400).json({ error: 'allowed_tabs must be an array' });
   }
+  if (typeof can_manage_scanners !== 'boolean') {
+    return res.status(400).json({ error: 'can_manage_scanners must be a boolean' });
+  }
 
-  // Validate all tabs are valid
-  const validTabs = ['dashboard', 'movies', 'foods', 'bookings', 'users', 'team', 'gallery', 'coupons', 'coupon-winners', 'feedback', 'mail', 'settings', 'config'];
-  const invalidTabs = allowed_tabs.filter(tab => !validTabs.includes(tab));
-
+  const validTabs = ['dashboard', 'movies', 'foods', 'bookings', 'users', 'team', 'gallery', 'coupons', 'coupon-winners', 'feedback', 'mail', 'settings'];
+  const invalidTabs = allowed_tabs.filter(tab => typeof tab !== 'string' || !validTabs.includes(tab));
   if (invalidTabs.length > 0) {
     return res.status(400).json({ error: `Invalid tabs: ${invalidTabs.join(', ')}` });
   }
+  if (new Set(allowed_tabs).size !== allowed_tabs.length) {
+    return res.status(400).json({ error: 'allowed_tabs cannot contain duplicates' });
+  }
 
   const currentUserId = req.user?.id || req.session?.adminUser?.id;
-
-  // Check if permissions record exists
-  db.get('SELECT id FROM admin_permissions WHERE admin_user_id = ?', [adminId], (err, existing) => {
-    if (err) return res.status(500).json({ error: err.message });
+  db.get('SELECT id, email, is_admin FROM users WHERE id = ?', [adminId], (userErr, adminUser) => {
+    if (userErr) return res.status(500).json({ error: userErr.message });
+    if (!adminUser) return res.status(404).json({ error: 'Admin user not found' });
+    if (!adminUser.is_admin) return res.status(400).json({ error: 'Scanner management can only be delegated to an admin' });
+    if (isSuperAdminEmail(adminUser.email)) {
+      return res.status(400).json({ error: 'Super admin permissions cannot be changed' });
+    }
 
     const tabsJson = JSON.stringify(allowed_tabs);
+    const scannerCapability = can_manage_scanners ? 1 : 0;
 
-    if (existing) {
-      // Update existing permissions
-      db.run(`
-        UPDATE admin_permissions 
-        SET allowed_tabs = ?, updated_at = CURRENT_TIMESTAMP, created_by = ?
-        WHERE admin_user_id = ?
-      `, [tabsJson, currentUserId, adminId], function (err) {
-        if (err) return res.status(500).json({ error: err.message });
+    db.get('SELECT id FROM admin_permissions WHERE admin_user_id = ?', [adminId], (err, existing) => {
+      if (err) return res.status(500).json({ error: err.message });
 
-        // Update scanner permission based on config tab access
-        const hasConfigAccess = allowed_tabs.includes('config');
-        db.run('UPDATE users SET code_scanner = ? WHERE id = ?', [hasConfigAccess ? 1 : 0, adminId], (scannerErr) => {
-          if (scannerErr) {
-            console.error('Error updating scanner permission:', scannerErr);
-            // Don't fail the entire request, just log the error
-          }
+      if (existing) {
+        db.run(`
+          UPDATE admin_permissions
+          SET allowed_tabs = ?, can_manage_scanners = ?, updated_at = CURRENT_TIMESTAMP, created_by = ?
+          WHERE admin_user_id = ?
+        `, [tabsJson, scannerCapability, currentUserId, adminId], function (updateErr) {
+          if (updateErr) return res.status(500).json({ error: updateErr.message });
+          res.json({
+            message: 'Permissions updated successfully',
+            changes: this.changes,
+            can_manage_scanners
+          });
         });
-
-        res.json({
-          message: 'Permissions updated successfully',
-          changes: this.changes
+      } else {
+        db.run(`
+          INSERT INTO admin_permissions (admin_user_id, allowed_tabs, can_manage_scanners, created_by)
+          VALUES (?, ?, ?, ?)
+        `, [adminId, tabsJson, scannerCapability, currentUserId], function (insertErr) {
+          if (insertErr) return res.status(500).json({ error: insertErr.message });
+          res.json({
+            message: 'Permissions created successfully',
+            id: this.lastID,
+            can_manage_scanners
+          });
         });
-      });
-    } else {
-      // Create new permissions record
-      db.run(`
-        INSERT INTO admin_permissions (admin_user_id, allowed_tabs, created_by)
-        VALUES (?, ?, ?)
-      `, [adminId, tabsJson, currentUserId], function (err) {
-        if (err) return res.status(500).json({ error: err.message });
-
-        // Update scanner permission based on config tab access
-        const hasConfigAccess = allowed_tabs.includes('config');
-        db.run('UPDATE users SET code_scanner = ? WHERE id = ?', [hasConfigAccess ? 1 : 0, adminId], (scannerErr) => {
-          if (scannerErr) {
-            console.error('Error updating scanner permission:', scannerErr);
-            // Don't fail the entire request, just log the error
-          }
-        });
-
-        res.json({
-          message: 'Permissions created successfully',
-          id: this.lastID
-        });
-      });
-    }
+      }
+    });
   });
 });
 
@@ -2435,12 +2518,11 @@ router.get('/my-permissions', requireAdmin, (req, res) => {
     return res.status(401).json({ error: 'User not authenticated' });
   }
 
-  // First check if this is the super admin (config access)
-  db.get('SELECT email, code_scanner FROM users WHERE id = ?', [userId], (err, user) => {
+  db.get('SELECT email FROM users WHERE id = ?', [userId], (err, user) => {
     if (err) return res.status(500).json({ error: err.message });
+    if (!user) return res.status(404).json({ error: 'User not found' });
 
-    // Super admin always has full access
-    if (user.email === '2025uee0154@iitjammu.ac.in') {
+    if (isSuperAdminEmail(user.email)) {
       const allTabs = [
         'dashboard', 'movies', 'foods', 'bookings', 'users',
         'team', 'gallery', 'coupons', 'coupon-winners', 'feedback', 'mail', 'settings', 'config'
@@ -2448,31 +2530,41 @@ router.get('/my-permissions', requireAdmin, (req, res) => {
       return res.json({
         is_super_admin: true,
         allowed_tabs: allTabs,
-        can_manage_permissions: true
+        can_manage_permissions: true,
+        can_manage_scanners: true
       });
     }
 
-    // Check custom permissions
-    db.get('SELECT allowed_tabs FROM admin_permissions WHERE admin_user_id = ?', [userId], (permErr, permissions) => {
+    db.get('SELECT allowed_tabs, can_manage_scanners FROM admin_permissions WHERE admin_user_id = ?', [userId], (permErr, permissions) => {
       if (permErr) return res.status(500).json({ error: permErr.message });
 
+      const defaultTabs = [
+        'dashboard', 'movies', 'foods', 'bookings', 'users',
+        'team', 'gallery', 'coupons', 'coupon-winners', 'feedback', 'mail', 'settings'
+      ];
+
       if (!permissions) {
-        // No custom permissions, give default access (all tabs except config)
-        const defaultTabs = [
-          'dashboard', 'movies', 'foods', 'bookings', 'users',
-          'team', 'gallery', 'coupons', 'coupon-winners', 'feedback', 'mail', 'settings'
-        ];
         return res.json({
           is_super_admin: false,
           allowed_tabs: defaultTabs,
-          can_manage_permissions: false
+          can_manage_permissions: false,
+          can_manage_scanners: false
         });
+      }
+
+      let allowedTabs = defaultTabs;
+      try {
+        const parsedTabs = JSON.parse(permissions.allowed_tabs);
+        if (Array.isArray(parsedTabs)) allowedTabs = parsedTabs;
+      } catch (parseErr) {
+        console.error('Invalid admin allowed_tabs JSON for user', userId, parseErr);
       }
 
       res.json({
         is_super_admin: false,
-        allowed_tabs: JSON.parse(permissions.allowed_tabs),
-        can_manage_permissions: permissions.allowed_tabs.includes('config')
+        allowed_tabs: allowedTabs,
+        can_manage_permissions: false,
+        can_manage_scanners: Number(permissions.can_manage_scanners) === 1
       });
     });
   });
@@ -2516,14 +2608,16 @@ router.delete('/coupon-winners', requireAdmin, (req, res) => {
 });
 
 // Reset permissions to default for an admin
-router.delete('/permissions/:adminId', requireAdmin, (req, res) => {
-  const adminId = req.params.adminId;
+router.delete('/permissions/:adminId', requireSuperAdmin, (req, res) => {
+  const adminId = parsePositiveId(req.params.adminId);
+  if (!adminId) return res.status(400).json({ error: 'Invalid admin id' });
 
   // Don't allow removing super admin's permissions
   db.get('SELECT email FROM users WHERE id = ?', [adminId], (err, user) => {
     if (err) return res.status(500).json({ error: err.message });
+    if (!user) return res.status(404).json({ error: 'Admin user not found' });
 
-    if (user.email === '2025uee0154@iitjammu.ac.in') {
+    if (isSuperAdminEmail(user.email)) {
       return res.status(400).json({ error: 'Cannot reset permissions for super admin' });
     }
 

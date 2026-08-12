@@ -378,14 +378,23 @@ const AdminPanel = () => {
     : 0;
 
   // Permission management state
-  const [myPermissions, setMyPermissions] = useState({ allowed_tabs: [], is_super_admin: false, can_manage_permissions: false });
+  const [myPermissions, setMyPermissions] = useState({
+    allowed_tabs: [],
+    is_super_admin: false,
+    can_manage_permissions: false,
+    can_manage_scanners: false
+  });
   const [adminUsers, setAdminUsers] = useState([]);
   const [availableTabs, setAvailableTabs] = useState([]);
   const [showPermissionModal, setShowPermissionModal] = useState(false);
   const [selectedAdminForPermission, setSelectedAdminForPermission] = useState(null);
   const [selectedAdminTabs, setSelectedAdminTabs] = useState([]);
   const [selectedAdminScanner, setSelectedAdminScanner] = useState(false);
+  const [selectedAdminCanManageScanners, setSelectedAdminCanManageScanners] = useState(false);
   const [permissionLoading, setPermissionLoading] = useState(false);
+  const [scannerManagementUsers, setScannerManagementUsers] = useState([]);
+  const [scannerManagementLoading, setScannerManagementLoading] = useState(false);
+  const [scannerManagementSearch, setScannerManagementSearch] = useState('');
   const [selectedAdminIdsForBulkRemove, setSelectedAdminIdsForBulkRemove] = useState([]);
   const [bulkRemovingAdmins, setBulkRemovingAdmins] = useState(false);
 
@@ -441,6 +450,40 @@ const AdminPanel = () => {
     }
   }, [activeTab]);
 
+  // Refresh delegated permissions when an already-open admin panel becomes active.
+  useEffect(() => {
+    if (!currentUser?.id) return undefined;
+
+    const refreshDelegatedPermissions = async () => {
+      try {
+        const response = await api.get('/api/admin/my-permissions');
+        const permissions = response.data || {};
+        setMyPermissions(permissions);
+
+        if (permissions.is_super_admin || permissions.can_manage_scanners) {
+          const scannerUsersResponse = await api.get('/api/admin/scanner-users');
+          setScannerManagementUsers(Array.isArray(scannerUsersResponse.data) ? scannerUsersResponse.data : []);
+        } else {
+          setScannerManagementUsers([]);
+          setActiveTab(previousTab => previousTab === 'manage-scanners' ? 'dashboard' : previousTab);
+        }
+      } catch (err) {
+        console.error('Error refreshing delegated admin permissions:', err);
+      }
+    };
+
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === 'visible') refreshDelegatedPermissions();
+    };
+
+    window.addEventListener('focus', refreshDelegatedPermissions);
+    document.addEventListener('visibilitychange', refreshWhenVisible);
+    return () => {
+      window.removeEventListener('focus', refreshDelegatedPermissions);
+      document.removeEventListener('visibilitychange', refreshWhenVisible);
+    };
+  }, [currentUser?.id]);
+
   const checkAuthAndLoadData = async () => {
     try {
       console.log('Checking authentication...');
@@ -468,6 +511,11 @@ const AdminPanel = () => {
         const permRes = await api.get('/api/admin/my-permissions');
         setMyPermissions(permRes.data);
         console.log('User permissions loaded:', permRes.data);
+
+        if (permRes.data?.is_super_admin || permRes.data?.can_manage_scanners) {
+          const scannerUsersRes = await api.get('/api/admin/scanner-users');
+          setScannerManagementUsers(Array.isArray(scannerUsersRes.data) ? scannerUsersRes.data : []);
+        }
 
         // Fetch available tabs for permission management
         const tabsRes = await api.get('/api/admin/available-tabs');
@@ -1766,6 +1814,7 @@ const AdminPanel = () => {
       const res = await api.get(`/api/admin/permissions/${admin.id}`);
       setSelectedAdminTabs(res.data.allowed_tabs || []);
       setSelectedAdminScanner(admin.code_scanner === 1 || admin.code_scanner === true);
+      setSelectedAdminCanManageScanners(Boolean(res.data.can_manage_scanners));
     } catch (err) {
       console.error('Error fetching admin permissions:', err);
       // Set default tabs if fetch fails
@@ -1774,6 +1823,7 @@ const AdminPanel = () => {
         'team', 'gallery', 'coupons', 'coupon-winners', 'feedback', 'mail', 'settings'
       ]);
       setSelectedAdminScanner(admin.code_scanner === 1 || admin.code_scanner === true);
+      setSelectedAdminCanManageScanners(Boolean(admin.can_manage_scanners));
     } finally {
       setPermissionLoading(false);
     }
@@ -1793,9 +1843,10 @@ const AdminPanel = () => {
     if (!selectedAdminForPermission) return;
 
     try {
-      // Save tab permissions
+      // Save tab permissions and the separate scanner-management capability.
       await api.put(`/api/admin/permissions/${selectedAdminForPermission.id}`, {
-        allowed_tabs: selectedAdminTabs
+        allowed_tabs: selectedAdminTabs,
+        can_manage_scanners: selectedAdminCanManageScanners
       });
 
       // Save scanner permission
@@ -1815,6 +1866,7 @@ const AdminPanel = () => {
       setSelectedAdminForPermission(null);
       setSelectedAdminTabs([]);
       setSelectedAdminScanner(false);
+      setSelectedAdminCanManageScanners(false);
     } catch (err) {
       console.error('Error saving permissions:', err);
       alert('Error saving permissions: ' + (err.response?.data?.error || err.message));
@@ -1999,6 +2051,39 @@ const AdminPanel = () => {
     }
   };
 
+  const loadScannerManagementUsers = async () => {
+    setScannerManagementLoading(true);
+    try {
+      const response = await api.get('/api/admin/scanner-users');
+      setScannerManagementUsers(Array.isArray(response.data) ? response.data : []);
+    } catch (err) {
+      console.error('Error loading scanner users:', err);
+      alert('Error loading scanner users: ' + (err.response?.data?.error || err.message));
+    } finally {
+      setScannerManagementLoading(false);
+    }
+  };
+
+  const updateManagedScannerAccess = async (user, enabled) => {
+    const action = enabled ? 'add scanner access for' : 'remove scanner access from';
+    if (!window.confirm(`${action.charAt(0).toUpperCase() + action.slice(1)} ${user.name || user.email}?`)) {
+      return;
+    }
+
+    try {
+      await api.put(`/api/admin/scanner-users/${user.id}`, { enabled });
+      setScannerManagementUsers(prev => prev.map(item =>
+        item.id === user.id ? { ...item, code_scanner: enabled ? 1 : 0 } : item
+      ));
+      setUsers(prev => prev.map(item =>
+        item.id === user.id ? { ...item, code_scanner: enabled ? 1 : 0 } : item
+      ));
+    } catch (err) {
+      console.error('Error updating managed scanner access:', err);
+      alert('Error updating scanner access: ' + (err.response?.data?.error || err.message));
+    }
+  };
+
   const deleteUser = async (userId, userEmail, userName) => {
     if (userEmail === SUPER_ADMIN_EMAIL) {
       alert('Cannot delete the super admin account.');
@@ -2050,7 +2135,7 @@ const AdminPanel = () => {
       console.log('🔄 Updating admin tag for user:', adminId, 'to:', newTag);
 
       // Make the API call to update the tag
-      const response = await api.put(`/api/admin/users/${adminId}/make_scanner`, { admin_tag: newTag });
+      const response = await api.put(`/api/admin/users/${adminId}/admin_tag`, { admin_tag: newTag });
       console.log('✅ Admin tag update response:', response.data);
 
       alert('Admin tag updated successfully!');
@@ -2088,7 +2173,7 @@ const AdminPanel = () => {
       console.log('🔄 Updating my tag to:', newTag);
 
       // Make the API call to update the tag
-      const response = await api.put(`/api/admin/users/${currentUser.id}/make_scanner`, { admin_tag: newTag });
+      const response = await api.put(`/api/admin/users/${currentUser.id}/admin_tag`, { admin_tag: newTag });
       console.log('✅ Tag update response:', response.data);
 
       alert('Your tag name updated successfully!');
@@ -2118,6 +2203,7 @@ const AdminPanel = () => {
     { id: 'foods', name: 'Foods', icon: '🍿' },
     { id: 'bookings', name: 'Bookings', icon: '🎫' },
     { id: 'users', name: 'Users', icon: '👥' },
+    { id: 'manage-scanners', name: 'Manage Scanner', icon: '📱' },
     { id: 'team', name: 'Team', icon: '👨‍💼' },
     { id: 'gallery', name: 'Gallery', icon: '🖼️' },
     { id: 'coupons', name: 'Coupons', icon: '🎟️' },
@@ -2130,6 +2216,13 @@ const AdminPanel = () => {
 
   // Super admin email constant
   const SUPER_ADMIN_EMAIL = '2025uee0154@iitjammu.ac.in';
+  const canManageScanners = Boolean(myPermissions.is_super_admin || myPermissions.can_manage_scanners);
+  const normalizedScannerSearch = scannerManagementSearch.trim().toLowerCase();
+  const filteredScannerManagementUsers = scannerManagementUsers.filter(user => {
+    if (!normalizedScannerSearch) return true;
+    return (user.name || '').toLowerCase().includes(normalizedScannerSearch) ||
+      (user.email || '').toLowerCase().includes(normalizedScannerSearch);
+  });
   const removableAdmins = adminUsers.filter(admin => admin.email !== SUPER_ADMIN_EMAIL);
   const scannerOnlyUsers = users
     .filter(user => {
@@ -2155,11 +2248,15 @@ const AdminPanel = () => {
   // Show all tabs by default until permissions are loaded
   // Super admin always gets all tabs, others get only their allowed tabs
   const visibleTabs = (
-    !currentUser || // Show all until user data loads
+    !currentUser ||
     currentUser?.email === SUPER_ADMIN_EMAIL ||
     myPermissions.is_super_admin
   ) ? allTabsConfig
-    : allTabsConfig.filter(tab => myPermissions.allowed_tabs.includes(tab.id));
+    : allTabsConfig.filter(tab => {
+      if (tab.id === 'manage-scanners') return canManageScanners;
+      if (tab.id === 'config') return false;
+      return myPermissions.allowed_tabs.includes(tab.id);
+    });
 
   // ==================== END PERMISSION MANAGEMENT ====================
 
@@ -3229,6 +3326,112 @@ const AdminPanel = () => {
                 )}
               </tbody>
             </Table>
+          </div>
+        )}
+
+        {activeTab === 'manage-scanners' && (
+          <div className="py-4">
+            {!canManageScanners ? (
+              <Alert variant="danger">You do not have permission to manage scanners.</Alert>
+            ) : (
+              <>
+                <div className="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+                  <div>
+                    <h2 style={{ color: '#0b0e17', marginBottom: '0.4rem' }}>
+                      <i className="fas fa-qrcode me-2"></i>
+                      Manage Scanner
+                    </h2>
+                    <p style={{ color: '#5c6270', margin: 0 }}>
+                      Add or remove ticket-scanner access for registered users.
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline-dark"
+                    onClick={loadScannerManagementUsers}
+                    disabled={scannerManagementLoading}
+                  >
+                    <i className="fas fa-sync-alt me-2"></i>
+                    {scannerManagementLoading ? 'Refreshing...' : 'Refresh Users'}
+                  </Button>
+                </div>
+
+                <Card style={{ border: '1px solid #e5e7eb', borderRadius: 0, boxShadow: 'none' }}>
+                  <Card.Body>
+                    <div className="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
+                      <Form.Control
+                        type="search"
+                        value={scannerManagementSearch}
+                        onChange={(event) => setScannerManagementSearch(event.target.value)}
+                        placeholder="Search users by name or email"
+                        style={{ maxWidth: '420px', borderRadius: 0 }}
+                      />
+                      <Badge bg="dark" style={{ fontSize: '0.85rem', padding: '8px 12px' }}>
+                        {scannerManagementUsers.filter(user => Boolean(user.code_scanner)).length} active scanners
+                      </Badge>
+                    </div>
+
+                    {scannerManagementLoading ? (
+                      <div className="text-center py-5">
+                        <div className="spinner-border text-dark" role="status">
+                          <span className="visually-hidden">Loading...</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <Table striped bordered hover responsive style={{ marginBottom: 0 }}>
+                        <thead>
+                          <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Account</th>
+                            <th>Scanner Access</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {filteredScannerManagementUsers.length > 0 ? filteredScannerManagementUsers.map(user => {
+                            const scannerEnabled = user.code_scanner === 1 || user.code_scanner === true;
+                            const isProtectedSuperAdmin = user.email === SUPER_ADMIN_EMAIL;
+                            return (
+                              <tr key={user.id}>
+                                <td><strong>{user.name || 'Unnamed User'}</strong></td>
+                                <td><code>{user.email}</code></td>
+                                <td>
+                                  <Badge bg={user.is_admin ? 'primary' : 'secondary'}>
+                                    {user.is_admin ? 'Admin' : 'User'}
+                                  </Badge>
+                                </td>
+                                <td>
+                                  <Badge bg={scannerEnabled ? 'success' : 'secondary'}>
+                                    {scannerEnabled ? 'Enabled' : 'Disabled'}
+                                  </Badge>
+                                </td>
+                                <td>
+                                  <Button
+                                    size="sm"
+                                    variant={scannerEnabled ? 'outline-danger' : 'success'}
+                                    disabled={isProtectedSuperAdmin && scannerEnabled}
+                                    onClick={() => updateManagedScannerAccess(user, !scannerEnabled)}
+                                  >
+                                    <i className={`fas ${scannerEnabled ? 'fa-user-minus' : 'fa-user-plus'} me-1`}></i>
+                                    {scannerEnabled ? 'Remove Scanner' : 'Add Scanner'}
+                                  </Button>
+                                </td>
+                              </tr>
+                            );
+                          }) : (
+                            <tr>
+                              <td colSpan="5" className="text-center text-muted py-4">
+                                No users match your search.
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </Table>
+                    )}
+                  </Card.Body>
+                </Card>
+              </>
+            )}
           </div>
         )}
 
@@ -6079,6 +6282,7 @@ const AdminPanel = () => {
                     <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>Tag Name</th>
                     <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>Email</th>
                     <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>Scanner</th>
+                    <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>Scanner Management</th>
                     <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>Tabs Access</th>
                     <th style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>Actions</th>
                   </tr>
@@ -6134,6 +6338,11 @@ const AdminPanel = () => {
                           )}
                         </Badge>
                       </td>
+                      <td style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>
+                        <Badge bg={admin.can_manage_scanners ? 'success' : 'secondary'} style={{ fontSize: '0.75rem', padding: '4px 8px' }}>
+                          {admin.can_manage_scanners ? 'Granted' : 'Not Granted'}
+                        </Badge>
+                      </td>
                       <td style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>
                         <div className="d-flex flex-wrap gap-1">
                           {admin.allowed_tabs && admin.allowed_tabs.length > 0 ? (
@@ -6164,6 +6373,7 @@ const AdminPanel = () => {
                               variant="outline-primary"
                               size="sm"
                               onClick={() => openPermissionModal(admin)}
+                              disabled={admin.email === SUPER_ADMIN_EMAIL}
                             >
                               <i className="fas fa-edit me-1"></i>
                               Edit
@@ -6180,6 +6390,7 @@ const AdminPanel = () => {
                               variant="outline-warning"
                               size="sm"
                               onClick={() => resetAdminPermissions(admin.id)}
+                              disabled={admin.email === SUPER_ADMIN_EMAIL}
                             >
                               <i className="fas fa-undo me-1"></i>
                               Reset
@@ -6190,7 +6401,7 @@ const AdminPanel = () => {
                     </tr>
                   )) : (
                     <tr>
-                      <td colSpan="7" className="text-center py-5" style={{ border: '1px solid #e5e7eb' }}>
+                      <td colSpan="8" className="text-center py-5" style={{ border: '1px solid #e5e7eb' }}>
                         <div className="text-white-50">
                           <i className="fas fa-users fa-3x mb-3"></i>
                           <h5>No Admin Users Found</h5>
@@ -6298,6 +6509,7 @@ const AdminPanel = () => {
             setSelectedAdminForPermission(null);
             setSelectedAdminTabs([]);
             setSelectedAdminScanner(false);
+            setSelectedAdminCanManageScanners(false);
           }}
           size="lg"
         >
@@ -6380,12 +6592,66 @@ const AdminPanel = () => {
                   </div>
                 </div>
 
+                {/* Scanner Management Capability Toggle */}
+                <div
+                  role="switch"
+                  aria-checked={selectedAdminCanManageScanners}
+                  tabIndex={0}
+                  onClick={() => setSelectedAdminCanManageScanners(!selectedAdminCanManageScanners)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      setSelectedAdminCanManageScanners(!selectedAdminCanManageScanners);
+                    }
+                  }}
+                  style={{
+                    background: selectedAdminCanManageScanners ? '#f6f6f7' : '#ffffff',
+                    border: selectedAdminCanManageScanners ? '1px solid #0b0e17' : '1px solid #e5e7eb',
+                    borderRadius: '0',
+                    padding: '16px',
+                    marginBottom: '1.5rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ fontSize: '1.8rem' }}>🛠️</div>
+                    <div>
+                      <div style={{ color: '#0b0e17', fontWeight: '600', fontSize: '1rem' }}>Scanner Management</div>
+                      <div style={{ color: '#5c6270', fontSize: '0.85rem' }}>
+                        Show Manage Scanner and allow this admin to add or remove scanner users
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{
+                    width: '50px',
+                    height: '26px',
+                    borderRadius: '0',
+                    background: selectedAdminCanManageScanners ? '#0b0e17' : '#e5e7eb',
+                    position: 'relative',
+                    transition: 'all 0.3s ease'
+                  }}>
+                    <div style={{
+                      position: 'absolute',
+                      top: '3px',
+                      left: selectedAdminCanManageScanners ? '27px' : '3px',
+                      width: '20px',
+                      height: '20px',
+                      borderRadius: '0',
+                      background: '#ffffff',
+                      transition: 'all 0.3s ease'
+                    }}></div>
+                  </div>
+                </div>
+
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
                   gap: '10px'
                 }}>
-                  {allTabsConfig.filter(tab => tab.id !== 'config').map(tab => (
+                  {allTabsConfig.filter(tab => !['config', 'manage-scanners'].includes(tab.id)).map(tab => (
                     <div
                       key={tab.id}
                       onClick={() => toggleAdminTab(tab.id)}
@@ -6427,7 +6693,7 @@ const AdminPanel = () => {
 
                 <div className="mt-3 text-center">
                   <small className="text-muted">
-                    Selected: {selectedAdminTabs.length} / {allTabsConfig.length - 1} tabs
+                    Selected: {selectedAdminTabs.length} / {allTabsConfig.filter(tab => !['config', 'manage-scanners'].includes(tab.id)).length} tabs
                   </small>
                 </div>
               </>
@@ -6441,6 +6707,7 @@ const AdminPanel = () => {
                 setSelectedAdminForPermission(null);
                 setSelectedAdminTabs([]);
                 setSelectedAdminScanner(false);
+                setSelectedAdminCanManageScanners(false);
               }}
             >
               Cancel

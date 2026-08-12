@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 const jsPDF = require('jspdf');
+const requireScannerAccess = require('../middleware/scannerAccess');
 
 const router = express.Router();
 
@@ -533,11 +534,7 @@ router.get('/my', (req, res) => {
 });
 
 // Scanner dashboard overview (all-time totals)
-router.get('/scanner-overview', (req, res) => {
-  if (!req.user) return res.status(401).json({ error: 'Authentication required' });
-  const hasScannerAccess = req.user.is_admin || req.user.code_scanner ||
-    (req.user.team_scanner !== undefined ? req.user.team_scanner : false);
-  if (!hasScannerAccess) return res.status(403).json({ error: 'Scanner access required' });
+router.get('/scanner-overview', requireScannerAccess, (req, res) => {
   const scannerStatsQuery = `
     SELECT
       COUNT(*) AS total_bookings,
@@ -576,12 +573,7 @@ router.get('/scanner-overview', (req, res) => {
 });
 
 // Scan QR code (scanner access required)
-router.post('/scan', (req, res) => {
-  if (!req.user) return res.status(401).json({ error: 'Authentication required' });
-  const hasScannerAccess = req.user.is_admin || req.user.code_scanner ||
-    (req.user.team_scanner !== undefined ? req.user.team_scanner : false);
-  if (!hasScannerAccess) return res.status(403).json({ error: 'Scanner access required' });
-
+router.post('/scan', requireScannerAccess, (req, res) => {
   const { qr_code, num_people } = req.body;
   console.log('Received scan request:', { qr_code, num_people });
 
