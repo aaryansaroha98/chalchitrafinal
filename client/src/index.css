@@ -605,8 +605,8 @@ a:hover {
   flex: 0 0 auto;
 }
 
-/* Pushkar Block B has more seats per row than A/C. Use a compact, uniform
-   center-block scale so it does not dominate either Pushkar venue layout. */
+/* Pushkar Block B has more seats per row than A/C. Keep its container
+   compact while using the same seat dimensions as the side blocks. */
 .pushkar-seat-layout > .seat-block-wrap:nth-child(2) .seat-block {
   padding: 16px !important;
   gap: 4px !important;
@@ -618,17 +618,17 @@ a:hover {
 }
 
 .pushkar-seat-layout > .seat-block-wrap:nth-child(2) .seat-button {
-  width: 22px !important;
-  height: 22px !important;
-  min-width: 22px !important;
-  max-width: 22px !important;
-  flex: 0 0 22px !important;
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  max-width: 28px !important;
+  flex: 0 0 28px !important;
   padding: 0 !important;
-  font-size: 8px !important;
+  font-size: 10px !important;
 }
 
 /* Pushkar: enlarge desktop seats without enlarging the section outlines.
-   A/C stay tightly wrapped, while the wider B block remains slightly smaller. */
+   All three blocks use matching seats while retaining compact containers. */
 @media (min-width: 769px) {
   .pushkar-seat-layout > .seat-block-wrap:nth-child(1) .seat-block,
   .pushkar-seat-layout > .seat-block-wrap:nth-child(3) .seat-block {
@@ -654,12 +654,12 @@ a:hover {
   }
 
   .pushkar-seat-layout > .seat-block-wrap:nth-child(2) .seat-button {
-    width: 26px !important;
-    height: 26px !important;
-    min-width: 26px !important;
-    max-width: 26px !important;
-    flex: 0 0 26px !important;
-    font-size: 9px !important;
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+    flex: 0 0 32px !important;
+    font-size: 11px !important;
   }
 }
 
