@@ -608,23 +608,23 @@ a:hover {
 /* Pushkar Block B has more seats per row than A/C. Use a compact, uniform
    center-block scale so it does not dominate either Pushkar venue layout. */
 .pushkar-seat-layout > .seat-block-wrap:nth-child(2) .seat-block {
-  padding: 20px !important;
-  gap: 5px !important;
+  padding: 16px !important;
+  gap: 4px !important;
 }
 
 .pushkar-seat-layout > .seat-block-wrap:nth-child(2) .seat-block > div {
-  gap: 3px !important;
+  gap: 2px !important;
   margin-bottom: 1px !important;
 }
 
 .pushkar-seat-layout > .seat-block-wrap:nth-child(2) .seat-button {
-  width: 24px !important;
-  height: 24px !important;
-  min-width: 24px !important;
-  max-width: 24px !important;
-  flex: 0 0 24px !important;
+  width: 22px !important;
+  height: 22px !important;
+  min-width: 22px !important;
+  max-width: 22px !important;
+  flex: 0 0 22px !important;
   padding: 0 !important;
-  font-size: 9px !important;
+  font-size: 8px !important;
 }
 
 @keyframes pulse-selected {
@@ -2381,7 +2381,7 @@ a:hover {
   /* Mansar keeps horizontal scrolling but removes the oversized whitespace
      between A, B, and C and trims excess padding inside each section. */
   .mansar-seat-layout {
-    gap: 4px !important;
+    gap: 8px !important;
     padding: 0 4px 12px !important;
     overflow-x: scroll !important;
     overflow-y: hidden !important;
