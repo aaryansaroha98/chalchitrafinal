@@ -4,19 +4,29 @@ const passport = require('passport');
 const router = express.Router();
 const db = require('../database');
 
+const normalizeOrigin = (value) => typeof value === 'string' ? value.trim().replace(/\/+$/, '') : '';
+const getPublicOrigin = () => normalizeOrigin(
+  process.env.PUBLIC_ORIGIN ||
+  process.env.FRONTEND_URL ||
+  process.env.BACKEND_URL ||
+  `http://localhost:${process.env.PORT || 3000}`
+);
+const getGoogleCallbackUrl = () => normalizeOrigin(process.env.GOOGLE_CALLBACK_URL) ||
+  `${getPublicOrigin()}/api/auth/google/callback`;
+
 function initializeGoogleStrategy() {
   const passport = require('passport');
   const GoogleStrategy = require('passport-google-oauth20').Strategy;
   const db = require('../database');
 
-  const port = process.env.PORT || 3000;
-  // Use BACKEND_URL or FRONTEND_URL for production (Vercel proxy), otherwise localhost
-  const baseUrl = process.env.BACKEND_URL || process.env.FRONTEND_URL || `http://localhost:${port}`;
+  const baseUrl = getPublicOrigin();
+  const callbackUrl = getGoogleCallbackUrl();
 
   console.log('=== AUTH.JS ENVIRONMENT VARIABLES ===');
   console.log('GOOGLE_CLIENT_ID in auth.js:', process.env.GOOGLE_CLIENT_ID);
   console.log('GOOGLE_CLIENT_SECRET in auth.js:', process.env.GOOGLE_CLIENT_SECRET ? '[SET]' : '[NOT SET]');
-  console.log('BACKEND_URL:', baseUrl);
+  console.log('PUBLIC_ORIGIN:', baseUrl);
+  console.log('GOOGLE_CALLBACK_URL:', callbackUrl);
   console.log('=====================================');
 
   const clientId = process.env.GOOGLE_CLIENT_ID || 'your-google-client-id';
@@ -43,7 +53,7 @@ function initializeGoogleStrategy() {
   passport.use(new GoogleStrategy({
     clientID: clientId,
     clientSecret: clientSecret,
-    callbackURL: `${baseUrl}/api/auth/google/callback`
+    callbackURL: callbackUrl
   }, (accessToken, refreshToken, profile, done) => {
     // Restrict to IIT Jammu student emails only
     const email = profile.emails[0].value;
@@ -219,19 +229,16 @@ router.get('/google', (req, res) => {
   }
 
   const clientId = process.env.GOOGLE_CLIENT_ID || 'your-google-client-id';
-  const port = process.env.PORT || 3000;
-  
-  // Use BACKEND_URL or FRONTEND_URL for production (Vercel proxy), otherwise localhost
-  const baseUrl = process.env.BACKEND_URL || process.env.FRONTEND_URL || `http://localhost:${port}`;
+  const baseUrl = getPublicOrigin();
+  const callbackUrl = getGoogleCallbackUrl();
 
   console.log('=== GOOGLE LOGIN ROUTE EXECUTED AT', new Date().toISOString(), '===');
   console.log('Using clientId:', clientId);
-  console.log('Base URL:', baseUrl);
-  console.log('Callback URL:', `${baseUrl}/api/auth/google/callback`);
+  console.log('Public origin:', baseUrl);
+  console.log('Callback URL:', callbackUrl);
   console.log('============================================================');
 
   // Manual redirect to Google OAuth
-  const callbackUrl = `${baseUrl}/api/auth/google/callback`;
   const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&redirect_uri=${encodeURIComponent(callbackUrl)}&scope=profile%20email&client_id=${clientId}`;
 
   console.log('=== FINAL GOOGLE AUTH URL ===');
@@ -255,8 +262,8 @@ router.get('/google/callback', (req, res, next) => {
     return res.redirect(redirectTo);
   }
 
-  // Use FRONTEND_URL for production, otherwise use request host
-  const frontendUrl = process.env.FRONTEND_URL;
+  // Return to the same canonical frontend origin used for OAuth.
+  const frontendUrl = normalizeOrigin(process.env.PUBLIC_ORIGIN || process.env.FRONTEND_URL);
   if (frontendUrl) {
     res.redirect(frontendUrl);
   } else {

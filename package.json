@@ -7,7 +7,7 @@
     "start": "node --max-old-space-size=2048 server/index.js",
     "dev": "node --max-old-space-size=2048 server/index.js",
     "server": "node --max-old-space-size=2048 server/index.js",
-    "client": "cd client && PORT=3000 npm start",
+    "client": "cd client && PORT=3001 HOST=0.0.0.0 npm start",
     "build": "cd client && npm run build",
     "fullstack": "concurrently \"npm run server\" \"npm run client\"",
     "test": "echo \"Error: no test specified\" && exit 1"

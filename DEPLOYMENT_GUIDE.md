@@ -226,18 +226,11 @@ On the next screen, configure exactly like this:
 
 ⏳ This takes 3-5 minutes. You'll see a progress bar.
 
-### 5.4 Add Environment Variable
+### 5.4 Keep Frontend Requests Same-Origin
 
-1. After deployment, click **Site settings** (left sidebar)
-2. Click **Environment variables**
-3. Click **Add variable**
-4. Add:
-   - Key: `REACT_APP_API_URL`
-   - Value: Your backend URL from Step 3.4 (like `https://chalchitra-backend.onrender.com`)
-5. Click **Save**
-6. Go back to **Deploys** (left sidebar)
-7. Click **Trigger deploy** → **Deploy site**
-8. Wait 2-3 minutes for redeploy
+Do **not** add `REACT_APP_API_URL`. The checked-in Vercel/Netlify rewrites proxy `/api`, `/uploads`, and other media paths to Render while the browser stays on the frontend domain. This is required for networks that block direct Render traffic.
+
+If `REACT_APP_API_URL` was configured previously, remove it and trigger a fresh deploy.
 
 ### 5.5 Get Your Frontend URL
 
@@ -245,14 +238,19 @@ On the next screen, configure exactly like this:
 2. You'll see something like: `https://random-name.netlify.app`
 3. This is your website URL!
 
-### 5.6 Update Backend with Frontend URL
+### 5.6 Update Backend with the Public Frontend URL
 
 1. Go back to **Render Dashboard**
-2. Click your backend service
-3. Click **Environment**
-4. Find `FRONTEND_URL` and update it with your Netlify URL
-5. Click **Save Changes**
-6. Wait for redeploy
+2. Click your backend service, then **Environment**
+3. Set these values to the working public frontend origin (currently `https://chalchitrafinal.vercel.app`):
+   ```text
+   PUBLIC_ORIGIN=https://chalchitrafinal.vercel.app
+   FRONTEND_URL=https://chalchitrafinal.vercel.app
+   GOOGLE_CALLBACK_URL=https://chalchitrafinal.vercel.app/api/auth/google/callback
+   ALLOWED_ORIGINS=https://chalchitrafinal.vercel.app,https://chalchitraiitjammu.in,https://www.chalchitraiitjammu.in
+   ```
+4. Keep `BACKEND_URL=https://chalchitra-backend.onrender.com` for server-side reference only; the browser should not call it directly.
+5. Click **Save Changes** and wait for redeployment.
 
 **🎉 Frontend is deployed! Now connect your domain!**
 
@@ -328,8 +326,9 @@ Once your domain is active:
 ### If Something Doesn't Work...
 
 **Frontend shows "loading" or error:**
-- Check if Netlify deployed correctly
-- Verify `REACT_APP_API_URL` is set
+- Check whether the frontend deployed correctly
+- Open `/health` and `/api/movies/upcoming` on the frontend domain; both must be proxied without contacting Render directly from the browser
+- Remove any deployed `REACT_APP_API_URL` variable and redeploy
 
 **Backend not responding:**
 - Check Render logs (click "Logs" in left sidebar)
@@ -369,13 +368,13 @@ Once your domain is active:
    - Name: `Chalchitra Web`
    - Authorized redirect URIs:
      ```
-     https://your-backend.onrender.com/api/auth/google/callback
-     http://localhost:3000/api/auth/google/callback
+     https://chalchitrafinal.vercel.app/api/auth/google/callback
+     http://localhost:3001/api/auth/google/callback
      ```
    - Authorized JavaScript origins:
      ```
-     https://your-backend.onrender.com
-     http://localhost:3000
+     https://chalchitrafinal.vercel.app
+     http://localhost:3001
      ```
 
 5. Click **Create**
@@ -388,7 +387,9 @@ Once your domain is active:
    ```
    GOOGLE_CLIENT_ID = your-client-id-here
    GOOGLE_CLIENT_SECRET = your-client-secret-here
-   GOOGLE_CALLBACK_URL = https://your-backend.onrender.com/api/auth/google/callback
+   GOOGLE_CALLBACK_URL = https://chalchitrafinal.vercel.app/api/auth/google/callback
+   PUBLIC_ORIGIN = https://chalchitrafinal.vercel.app
+   FRONTEND_URL = https://chalchitrafinal.vercel.app
    ```
 3. Click **Save Changes**
 4. Wait for redeploy
@@ -405,8 +406,8 @@ Once your domain is active:
 - Common cause: Missing environment variable
 
 ### "Cannot Read Property of Undefined"
-- Frontend can't connect to backend
-- Check `REACT_APP_API_URL` in Netlify environment variables
+- Confirm `/health` and the failing `/api/...` URL work on the frontend domain
+- Confirm the hosting rewrites are deployed and `REACT_APP_API_URL` is not configured
 
 ### Google Login Shows Error
 - Google OAuth not configured correctly
@@ -434,15 +435,16 @@ Once your domain is active:
 | `SESSION_SECRET` | Type any random words |
 | `NODE_ENV` | `production` |
 | `PORT` | `3000` |
-| `FRONTEND_URL` | Your Netlify URL |
+| `FRONTEND_URL` | Working public frontend origin |
+| `PUBLIC_ORIGIN` | Working public frontend origin |
+| `GOOGLE_CALLBACK_URL` | Public origin + `/api/auth/google/callback` |
+| `ALLOWED_ORIGINS` | Comma-separated approved frontend origins |
 | `GOOGLE_CLIENT_ID` | From Google Cloud Console |
 | `GOOGLE_CLIENT_SECRET` | From Google Cloud Console |
 
-### Netlify (Frontend)
+### Frontend hosting
 
-| Variable | Value |
-|----------|-------|
-| `REACT_APP_API_URL` | Your Render backend URL |
+No backend URL environment variable is required. Keep API and media requests relative so the checked-in Vercel/Netlify rewrites handle them on the frontend origin.
 
 ---
 

@@ -6,11 +6,9 @@ import Loader from '../components/Loader';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
-// Derive API base URL to build absolute URLs for poster assets
-const apiBaseUrl = process.env.REACT_APP_API_URL ||
-  process.env.REACT_APP_API_BASE_URL ||
-  process.env.VITE_API_BASE_URL ||
-  'http://localhost:3000';
+// Keep relative assets on the frontend origin so hosting rewrites proxy them.
+// This avoids direct browser requests to Render, which some campus networks block.
+const apiBaseUrl = typeof window !== 'undefined' ? window.location.origin : '';
 
 const MyBookings = () => {
   const [bookings, setBookings] = useState([]);

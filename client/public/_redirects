@@ -1,1 +1,11 @@
+/api/* https://chalchitra-backend.onrender.com/api/:splat 200
+/uploads/* https://chalchitra-backend.onrender.com/uploads/:splat 200
+/hero/* https://chalchitra-backend.onrender.com/hero/:splat 200
+/about/* https://chalchitra-backend.onrender.com/about/:splat 200
+/gallery/* https://chalchitra-backend.onrender.com/gallery/:splat 200
+/team/* https://chalchitra-backend.onrender.com/team/:splat 200
+/logos/* https://chalchitra-backend.onrender.com/logos/:splat 200
+/misc/* https://chalchitra-backend.onrender.com/misc/:splat 200
+/favicons/* https://chalchitra-backend.onrender.com/favicons/:splat 200
+/health https://chalchitra-backend.onrender.com/health 200
 /* /index.html 200

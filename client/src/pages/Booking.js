@@ -32,11 +32,9 @@ const Booking = () => {
   const blockBRef = useRef(null);
   const bookingAvailability = getBookingAvailability(movie, currentTime);
 
-  // API base URL for building absolute URLs to /uploads assets
-  const apiBaseUrl = process.env.REACT_APP_API_URL ||
-    process.env.REACT_APP_API_BASE_URL ||
-    process.env.VITE_API_BASE_URL ||
-    'http://localhost:3000';
+  // Keep relative assets on the frontend origin so hosting rewrites proxy them.
+  // This avoids direct browser requests to Render, which some campus networks block.
+  const apiBaseUrl = typeof window !== 'undefined' ? window.location.origin : '';
 
   // Check if user has already booked this movie
   const fetchUserBookings = async () => {

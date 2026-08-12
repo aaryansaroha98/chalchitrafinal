@@ -73,14 +73,22 @@ const db = new sqlite3.Database(dbPath, (err) => {
 // Make db available globally
 global.db = db;
 
-// CORS configuration
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
-const allowedOrigins = [
+// CORS configuration. Browser traffic should normally be same-origin through
+// Vercel/Netlify rewrites, while this allowlist supports intentional direct API use.
+const normalizeOrigin = (value) => typeof value === 'string' ? value.trim().replace(/\/+$/, '') : '';
+const configuredOrigins = (process.env.ALLOWED_ORIGINS || '')
+  .split(',')
+  .map(normalizeOrigin)
+  .filter(Boolean);
+const allowedOrigins = Array.from(new Set([
   'http://localhost:3000',
   'http://localhost:3001',
   'https://chalchitrafinal.vercel.app',
-  FRONTEND_URL
-].filter(Boolean);
+  'https://chalchitraiitjammu.in',
+  'https://www.chalchitraiitjammu.in',
+  normalizeOrigin(process.env.FRONTEND_URL),
+  ...configuredOrigins
+].filter(Boolean)));
 
 console.log('Allowed CORS origins:', allowedOrigins);
 
