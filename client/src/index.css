@@ -627,48 +627,35 @@ a:hover {
   font-size: 10px !important;
 }
 
-/* Pushkar: enlarge desktop seats without enlarging the section outlines.
-   All three blocks use matching seats while retaining compact containers. */
+/* Pushkar uses the same responsive seat scale as Mansar while keeping
+   every seat in A, B, and C uniform. */
 @media (min-width: 769px) {
-  .pushkar-seat-layout > .seat-block-wrap:nth-child(1) .seat-block,
-  .pushkar-seat-layout > .seat-block-wrap:nth-child(3) .seat-block {
-    padding: 10px !important;
-    gap: 4px !important;
-  }
-
-  .pushkar-seat-layout > .seat-block-wrap:nth-child(1) .seat-block > div,
-  .pushkar-seat-layout > .seat-block-wrap:nth-child(3) .seat-block > div {
-    gap: 2px !important;
-    margin-bottom: 1px !important;
-  }
-
   .pushkar-seat-layout > .seat-block-wrap:nth-child(1) .seat-button,
   .pushkar-seat-layout > .seat-block-wrap:nth-child(3) .seat-button {
-    width: 30px !important;
-    height: 30px !important;
-    min-width: 30px !important;
-    max-width: 30px !important;
-    flex: 0 0 30px !important;
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+    flex: 0 0 32px !important;
     padding: 0 !important;
-    font-size: 10px !important;
+    font-size: 11px !important;
   }
 
   .pushkar-seat-layout > .seat-block-wrap:nth-child(2) .seat-button {
-    width: 30px !important;
-    height: 30px !important;
-    min-width: 30px !important;
-    max-width: 30px !important;
-    flex: 0 0 30px !important;
-    font-size: 10px !important;
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+    flex: 0 0 32px !important;
+    font-size: 11px !important;
   }
 }
 
-/* Pushkar container proportions shared by desktop and mobile: tightly wrap
-   A/C around their seats while giving the denser B section more breathing room. */
+/* Keep every Pushkar outline tightly wrapped around its seats. */
 .pushkar-seat-layout > .seat-block-wrap:nth-child(1) .seat-block,
 .pushkar-seat-layout > .seat-block-wrap:nth-child(3) .seat-block {
-  padding: 4px !important;
-  gap: 2px !important;
+  padding: 2px !important;
+  gap: 1px !important;
 }
 
 .pushkar-seat-layout > .seat-block-wrap:nth-child(1) .seat-block > div,
@@ -678,7 +665,13 @@ a:hover {
 }
 
 .pushkar-seat-layout > .seat-block-wrap:nth-child(2) .seat-block {
-  padding: 18px !important;
+  padding: 12px !important;
+  gap: 2px !important;
+}
+
+.pushkar-seat-layout > .seat-block-wrap:nth-child(2) .seat-block > div {
+  gap: 1px !important;
+  margin-bottom: 0 !important;
 }
 
 /* Mansar: desktop and mobile share the same compact section padding and
@@ -2429,11 +2422,11 @@ a:hover {
 
   .pushkar-seat-layout .seat-button,
   .pushkar-seat-layout > .seat-block-wrap:nth-child(2) .seat-button {
-    width: 30px !important;
-    height: 30px !important;
-    min-width: 30px !important;
-    max-width: 30px !important;
-    flex: 0 0 30px !important;
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+    flex: 0 0 28px !important;
     aspect-ratio: 1 / 1;
     padding: 0 !important;
     line-height: 1 !important;
