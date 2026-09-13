@@ -6,6 +6,7 @@ import api from '../api/axios';
 import Loader from '../components/Loader';
 import { useAuth } from '../contexts/AuthContext';
 import { isPastMovie, compareMovieDatesDesc } from '../utils/movieStatus';
+import AgeRatingBadge from '../components/AgeRatingBadge';
 
 const PastMovies = () => {
   const navigate = useNavigate();
@@ -136,6 +137,8 @@ const PastMovies = () => {
                     alignSelf: movie.poster_url ? 'center' : 'stretch',
                     maxWidth: movie.poster_url ? '100%' : 'none'
                   }}>
+                    <AgeRatingBadge movie={movie} variant="poster" />
+
                     {movie.poster_url ? (
                       <img
                         src={movie.poster_url.startsWith('http') ? movie.poster_url : `${window.location.origin}${movie.poster_url}`}

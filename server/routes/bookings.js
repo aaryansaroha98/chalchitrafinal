@@ -6,6 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const jsPDF = require('jspdf');
 const requireScannerAccess = require('../middleware/scannerAccess');
+const { requiresAgeGate, getRequiredAge, getAgeRating, isTruthyFlag } = require('../utils/ageRating');
 
 const router = express.Router();
 
@@ -334,6 +335,22 @@ router.post('/', async (req, res) => {
         });
       }
 
+      // Age-restricted screening: the client must have shown the gate and sent
+      // back the confirmation. Without it the booking does not happen, so the
+      // popup cannot be skipped by calling the API directly.
+      const ageGated = requiresAgeGate(movie);
+      const ageConfirmed = isTruthyFlag(req.body.age_confirmed);
+      if (ageGated && !ageConfirmed) {
+        const requiredAge = getRequiredAge(movie);
+        return res.status(403).json({
+          error: 'AGE_CONFIRMATION_REQUIRED',
+          message: `This movie is rated "${getAgeRating(movie.age_rating).badge}". Confirm you are ${requiredAge} or older before booking.`,
+          age_rating: movie.age_rating,
+          required_age: requiredAge
+        });
+      }
+      const ageConfirmedFlag = ageGated && ageConfirmed ? 1 : 0;
+
       // Check movie-specific booking limit
       const movieBookingLimit = movie.booking_limit || 6;
       if (selectedSeats.length > movieBookingLimit) {
@@ -420,8 +437,8 @@ router.post('/', async (req, res) => {
               console.log(`✅ ${total_coins} coins deducted from user ${userId} for booking ${customBookingId}`);
 
               // Insert booking with custom booking code
-              db.run('INSERT INTO bookings (user_id, movie_id, num_people, food_option, coupon_code, total_price, discount_amount, payment_method, payment_id, payment_amount, selected_seats, admitted_people, remaining_people, booking_code, coin_amount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                [userId, movie_id, num_people, food_option, coupon_code, total_coins, req.body.discount_amount || 0, 'coins', 'COINS_PAYMENT', total_coins, JSON.stringify(req.body.selectedSeats || []), 0, num_people, customBookingId, total_coins], function(err) {
+              db.run('INSERT INTO bookings (user_id, movie_id, num_people, food_option, coupon_code, total_price, discount_amount, payment_method, payment_id, payment_amount, selected_seats, admitted_people, remaining_people, booking_code, coin_amount, age_confirmed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                [userId, movie_id, num_people, food_option, coupon_code, total_coins, req.body.discount_amount || 0, 'coins', 'COINS_PAYMENT', total_coins, JSON.stringify(req.body.selectedSeats || []), 0, num_people, customBookingId, total_coins, ageConfirmedFlag], function(err) {
               if (err) return res.status(500).json({ error: err.message });
 
               const databaseId = this.lastID; // Get the auto-generated database ID

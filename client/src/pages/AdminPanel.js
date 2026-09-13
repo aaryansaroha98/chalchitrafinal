@@ -6,6 +6,8 @@ import html2canvas from 'html2canvas';
 import autoTable from 'jspdf-autotable';
 import Loader from '../components/Loader';
 import { appDateTimeLocalToIso, getMovieStatus, toAppDateTimeLocal } from '../utils/movieStatus';
+import AgeRatingBadge from '../components/AgeRatingBadge';
+import { AGE_RATINGS, getAgeRating, normalizeAgeRating, requiresAgeGate } from '../utils/ageRating';
 
 // Configure axios to send cookies with requests
 api.defaults.withCredentials = true;
@@ -278,7 +280,10 @@ const AdminPanel = () => {
     poster: null,
     availableFoods: [],
     is_special: 0,
-    special_message: ''
+    special_message: '',
+    age_rating: 'U',
+    age_gate_enabled: 0,
+    age_gate_note: ''
   });
   const [selectedFoodsForMovie, setSelectedFoodsForMovie] = useState([]);
   const [freeFoodIds, setFreeFoodIds] = useState([]);
@@ -928,7 +933,7 @@ const AdminPanel = () => {
         // Close modal and reset form
         setShowMovieModal(false);
         setEditingMovie(null);
-        setMovieForm({ title: '', description: '', date: '', booking_starts_at: '', venue: '', price: 0, coin_price: 20, booking_limit: 6, category: '', duration: '', imdb_rating: '', language: '', poster: null, availableFoods: [], is_special: 0, special_message: '' });
+        setMovieForm({ title: '', description: '', date: '', booking_starts_at: '', venue: '', price: 0, coin_price: 20, booking_limit: 6, category: '', duration: '', imdb_rating: '', language: '', poster: null, availableFoods: [], is_special: 0, special_message: '', age_rating: 'U', age_gate_enabled: 0, age_gate_note: '' });
         setSelectedFoodsForMovie([]);
         setFreeFoodIds([]);
 
@@ -2384,7 +2389,10 @@ const AdminPanel = () => {
                     language: '',
                     poster: null,
                     is_special: 0,
-                    special_message: ''
+                    special_message: '',
+                    age_rating: 'U',
+                    age_gate_enabled: 0,
+                    age_gate_note: ''
                   });
                   setSelectedFoodsForMovie([]);
                   setShowMovieModal(true);
@@ -2599,6 +2607,9 @@ const AdminPanel = () => {
                                 Booking Stopped
                               </Badge>
                             )}
+                            {requiresAgeGate(movie) && (
+                              <AgeRatingBadge movie={movie} />
+                            )}
                           </div>
                         </td>
                         <td style={{ padding: '15px', verticalAlign: 'middle', border: '1px solid #e5e7eb', textAlign: 'center' }}>
@@ -2624,7 +2635,10 @@ const AdminPanel = () => {
                                     poster: null,
                                     is_special: movie.is_special || 0,
                                     special_message: movie.special_message || '',
-                                    booking_limit: movie.booking_limit ?? 6
+                                    booking_limit: movie.booking_limit ?? 6,
+                                    age_rating: normalizeAgeRating(movie.age_rating),
+                                    age_gate_enabled: requiresAgeGate(movie) ? 1 : 0,
+                                    age_gate_note: movie.age_gate_note || ''
                                   });
                                   // Load existing food links
                                   api.get(`/api/foods/movie/${movie.id}`)
@@ -6729,7 +6743,7 @@ const AdminPanel = () => {
           onHide={() => {
             setShowMovieModal(false);
             setEditingMovie(null);
-            setMovieForm({ title: '', description: '', date: '', booking_starts_at: '', venue: '', price: '', coin_price: 20, booking_limit: 6, category: '', duration: '', imdb_rating: '', language: '', poster: null });
+            setMovieForm({ title: '', description: '', date: '', booking_starts_at: '', venue: '', price: '', coin_price: 20, booking_limit: 6, category: '', duration: '', imdb_rating: '', language: '', poster: null, is_special: 0, special_message: '', age_rating: 'U', age_gate_enabled: 0, age_gate_note: '' });
             setSelectedFoodsForMovie([]);
           }}
           size="lg"
@@ -6899,6 +6913,88 @@ const AdminPanel = () => {
                 </Col>
               </Row>
               
+              {/* Age certificate. Picking 'A' turns the gate on and locks it on:
+                  an adults-only screening cannot be served without the warning. */}
+              <Row className="mb-3">
+                <Col md={12}>
+                  <div style={{ border: '1px solid #e5e7eb', padding: '16px', background: '#fafafa' }}>
+                    <div className="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                      <Form.Label className="mb-0 fw-bold" style={{ color: '#0b0e17' }}>
+                        <i className="fas fa-id-card me-2"></i>
+                        Age Certificate
+                      </Form.Label>
+                      <AgeRatingBadge
+                        movie={{
+                          age_rating: movieForm.age_rating,
+                          age_gate_enabled: movieForm.age_gate_enabled
+                        }}
+                      />
+                    </div>
+
+                    <Row>
+                      <Col md={6}>
+                        <Form.Group className="mb-3">
+                          <Form.Label>Certificate</Form.Label>
+                          <Form.Select
+                            value={movieForm.age_rating}
+                            onChange={(e) => {
+                              const nextRating = e.target.value;
+                              const locked = getAgeRating(nextRating).alwaysGated;
+                              setMovieForm({
+                                ...movieForm,
+                                age_rating: nextRating,
+                                age_gate_enabled: locked ? 1 : movieForm.age_gate_enabled
+                              });
+                            }}
+                          >
+                            {AGE_RATINGS.map((rating) => (
+                              <option key={rating.code} value={rating.code}>
+                                {rating.label} — {rating.audience}
+                              </option>
+                            ))}
+                          </Form.Select>
+                          <Form.Text className="text-muted">
+                            Shown on the movie card and the booking page. &quot;U&quot; shows nothing.
+                          </Form.Text>
+                        </Form.Group>
+                      </Col>
+                      <Col md={6}>
+                        <Form.Group className="mb-3">
+                          <Form.Label>Before booking</Form.Label>
+                          <Form.Check
+                            type="switch"
+                            id="age-gate-switch"
+                            label={`Show the ${getAgeRating(movieForm.age_rating).minAge || 18}+ age warning popup`}
+                            checked={movieForm.age_gate_enabled === 1}
+                            disabled={getAgeRating(movieForm.age_rating).alwaysGated}
+                            onChange={(e) => setMovieForm({ ...movieForm, age_gate_enabled: e.target.checked ? 1 : 0 })}
+                          />
+                          <Form.Text className="text-muted">
+                            {getAgeRating(movieForm.age_rating).alwaysGated
+                              ? 'Always on for an "A" certificate — viewers must confirm their age before they can book.'
+                              : 'Turn on to make viewers confirm their age before they can book this screening.'}
+                          </Form.Text>
+                        </Form.Group>
+                      </Col>
+                    </Row>
+
+                    {movieForm.age_gate_enabled === 1 && (
+                      <Form.Group>
+                        <Form.Label>Extra line in the popup (optional)</Form.Label>
+                        <Form.Control
+                          as="textarea"
+                          rows={2}
+                          maxLength={500}
+                          value={movieForm.age_gate_note}
+                          onChange={(e) => setMovieForm({ ...movieForm, age_gate_note: e.target.value })}
+                          placeholder="e.g., Institute ID will be checked at the auditorium door."
+                        />
+                      </Form.Group>
+                    )}
+                  </div>
+                </Col>
+              </Row>
+
               <Row className="mb-3">
                 <Col md={12}>
                   <Form.Check 
@@ -6982,7 +7078,7 @@ const AdminPanel = () => {
               <Button variant="secondary" onClick={() => {
                 setShowMovieModal(false);
                 setEditingMovie(null);
-                setMovieForm({ title: '', description: '', date: '', booking_starts_at: '', venue: '', price: 0, coin_price: 20, booking_limit: 6, category: '', duration: '', imdb_rating: '', language: '', poster: null });
+                setMovieForm({ title: '', description: '', date: '', booking_starts_at: '', venue: '', price: 0, coin_price: 20, booking_limit: 6, category: '', duration: '', imdb_rating: '', language: '', poster: null, is_special: 0, special_message: '', age_rating: 'U', age_gate_enabled: 0, age_gate_note: '' });
                 setSelectedFoodsForMovie([]);
                 setFreeFoodIds([]);
               }}>

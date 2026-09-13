@@ -3122,3 +3122,307 @@ a:hover {
     transform-origin: 1.25px 17px; /* half of 34px */
   }
 }
+
+/* ==========================================================================
+   Age gate — the certificate popup shown before an age-restricted booking.
+   Same language as the rest of the console: white sheet, hairline borders,
+   square corners, ink type, one red accent reserved for the certificate.
+   ========================================================================== */
+
+.age-gate-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(11, 14, 23, 0.55);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+
+.age-gate-sheet {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 24px 60px rgba(11, 14, 23, 0.22);
+  text-align: left;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+}
+
+/* Red hairline across the top: the only colour the sheet spends. */
+.age-gate-sheet::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #d64545;
+}
+
+.age-gate-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid #eef0f2;
+}
+
+.age-gate-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #d64545;
+}
+
+.age-gate-close {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f6f6f7;
+  border: 1px solid #e5e7eb;
+  color: #0b0e17;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.age-gate-close:hover {
+  background: #0b0e17;
+  border-color: #0b0e17;
+  color: #ffffff;
+}
+
+.age-gate-body {
+  display: flex;
+  gap: 20px;
+  padding: 22px 20px;
+}
+
+/* The certificate mark: ringed, red, unmistakable at a glance. */
+.age-gate-mark {
+  flex: 0 0 auto;
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  border: 3px solid #d64545;
+  color: #d64545;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.age-gate-mark-age {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.age-gate-mark-code {
+  margin-top: 4px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.age-gate-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.age-gate-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0b0e17;
+  line-height: 1.25;
+  margin: 0 0 10px;
+}
+
+.age-gate-text {
+  font-size: 0.875rem;
+  color: #5c6270;
+  line-height: 1.6;
+  margin: 0 0 10px;
+}
+
+.age-gate-text:last-child {
+  margin-bottom: 0;
+}
+
+.age-gate-note {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: #f6f6f7;
+  border-left: 2px solid #d64545;
+  font-size: 0.82rem;
+  color: #0b0e17;
+  line-height: 1.5;
+}
+
+.age-gate-movie {
+  padding: 12px 20px;
+  border-top: 1px solid #eef0f2;
+  border-bottom: 1px solid #eef0f2;
+  background: #fafafa;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.age-gate-movie-label {
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8b909c;
+}
+
+.age-gate-movie-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0b0e17;
+}
+
+.age-gate-actions {
+  display: flex;
+  gap: 10px;
+  padding: 16px 20px 20px;
+}
+
+.age-gate-btn {
+  flex: 1 1 auto;
+  padding: 13px 18px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.age-gate-btn-primary {
+  background: #0b0e17;
+  border: 1px solid #0b0e17;
+  color: #ffffff;
+}
+
+.age-gate-btn-primary:hover {
+  background: #d64545;
+  border-color: #d64545;
+}
+
+.age-gate-btn-secondary {
+  flex: 0 0 auto;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  color: #5c6270;
+}
+
+.age-gate-btn-secondary:hover {
+  border-color: #0b0e17;
+  color: #0b0e17;
+}
+
+.age-gate-btn:focus-visible,
+.age-gate-close:focus-visible {
+  outline: 2px solid #d64545;
+  outline-offset: 2px;
+}
+
+/* Phones get the bottom-sheet treatment the pattern is known for. */
+@media (max-width: 576px) {
+  .age-gate-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .age-gate-sheet {
+    max-width: 100%;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    max-height: 92vh;
+  }
+
+  .age-gate-body {
+    gap: 16px;
+    padding: 20px 16px;
+  }
+
+  .age-gate-mark {
+    width: 74px;
+    height: 74px;
+    border-width: 2px;
+  }
+
+  .age-gate-mark-age {
+    font-size: 1.4rem;
+  }
+
+  .age-gate-title {
+    font-size: 1.1rem;
+  }
+
+  .age-gate-head,
+  .age-gate-movie {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .age-gate-actions {
+    flex-direction: column-reverse;
+    padding: 14px 16px 18px;
+  }
+
+  .age-gate-btn-secondary {
+    flex: 1 1 auto;
+  }
+}
+
+/* The certificate chip that rides on posters and headers. */
+.age-rating-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 7px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  color: #5c6270;
+  white-space: nowrap;
+}
+
+.age-rating-chip-restricted {
+  background: #d64545;
+  border-color: #d64545;
+  color: #ffffff;
+}
+
+.age-rating-chip-poster {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(11, 14, 23, 0.18);
+}

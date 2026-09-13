@@ -8,6 +8,9 @@ import html2canvas from 'html2canvas';
 import { useAuth } from '../contexts/AuthContext';
 import Loader from '../components/Loader';
 import { formatAppDateTime, getBookingAvailability } from '../utils/movieStatus';
+import AgeGateModal from '../components/AgeGateModal';
+import AgeRatingBadge from '../components/AgeRatingBadge';
+import { hasAgeAck, rememberAgeAck, requiresAgeGate } from '../utils/ageRating';
 
 const Booking = () => {
   const { movieId } = useParams();
@@ -28,6 +31,7 @@ const Booking = () => {
   const [existingBooking, setExistingBooking] = useState(null);
   const [showAlreadyBookedModal, setShowAlreadyBookedModal] = useState(false);
   const [currentTime, setCurrentTime] = useState(() => new Date());
+  const [ageAcknowledged, setAgeAcknowledged] = useState(false);
   const seatScrollRef = useRef(null);
   const blockBRef = useRef(null);
   const bookingAvailability = getBookingAvailability(movie, currentTime);
@@ -168,6 +172,8 @@ const Booking = () => {
     try {
       const res = await api.get(`/api/movies/${movieId}?booking=true`);
       setMovie(res.data);
+      // A viewer who already passed the gate on a card keeps walking.
+      setAgeAcknowledged(!requiresAgeGate(res.data) || hasAgeAck(res.data.id ?? movieId));
       setLoading(false);
     } catch (err) {
       setError('Movie not found');
@@ -182,6 +188,17 @@ const Booking = () => {
     } catch (err) {
       console.error('Failed to fetch available foods:', err);
     }
+  };
+
+  const ageGateOpen = !!movie && requiresAgeGate(movie) && !ageAcknowledged;
+
+  const handleAgeGateConfirm = () => {
+    rememberAgeAck(movie?.id ?? movieId);
+    setAgeAcknowledged(true);
+  };
+
+  const handleAgeGateCancel = () => {
+    navigate('/upcoming-movies');
   };
 
   const TICKET_PRICE = parseInt(movie?.coin_price) || 20;
@@ -376,6 +393,14 @@ const Booking = () => {
 
   return (
     <div className="bg-void" style={{ minHeight: '100vh' }}>
+      <AgeGateModal
+        show={ageGateOpen}
+        movie={movie}
+        onConfirm={handleAgeGateConfirm}
+        onCancel={handleAgeGateCancel}
+        cancelLabel="Back to movies"
+      />
+
       <div className="booking-page">
         {/* Page Title */}
         <div className="booking-title-wrap" style={{textAlign: 'center', marginBottom: '48px', marginTop: '-10px'}}>
@@ -423,6 +448,7 @@ const Booking = () => {
               <div className="booking-summary">
                 <h1 className="booking-movie-title">
                   {movie.title}
+                  <AgeRatingBadge movie={movie} style={{ marginLeft: '10px', verticalAlign: 'middle' }} />
                 </h1>
 
                 <p className="booking-movie-description">

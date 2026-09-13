@@ -4,6 +4,13 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { getUpload, getUploadUrl, deleteImage } = require('../utils/cloudinary');
+const {
+  AGE_RATING_CODES,
+  DEFAULT_AGE_RATING,
+  normalizeAgeRating,
+  getAgeRating,
+  isTruthyFlag
+} = require('../utils/ageRating');
 
 const router = express.Router();
 
@@ -25,6 +32,17 @@ const parseAppDateTime = (value) => {
 const normalizeAppDateTime = (value) => {
   const parsed = parseAppDateTime(value);
   return parsed ? parsed.toISOString() : null;
+};
+
+// Resolve the certificate + gate trio from a request body.
+// An 'A' certificate gates regardless of the switch — the switch only exists
+// so a softer certificate (or an unrated one) can be gated deliberately.
+const resolveAgeGateFields = (data) => {
+  const age_rating = normalizeAgeRating(data.age_rating);
+  const rating = getAgeRating(age_rating);
+  const age_gate_enabled = rating.alwaysGated || isTruthyFlag(data.age_gate_enabled) ? 1 : 0;
+  const age_gate_note = age_gate_enabled && data.age_gate_note ? String(data.age_gate_note).trim().slice(0, 500) : '';
+  return { age_rating, age_gate_enabled, age_gate_note };
 };
 
 // Helper function to validate movie data
@@ -53,6 +71,12 @@ const validateMovieData = (data) => {
     errors.push('Venue is required');
   }
   
+  if (data.age_rating !== undefined && data.age_rating !== '' && data.age_rating !== null) {
+    if (normalizeAgeRating(data.age_rating) === DEFAULT_AGE_RATING && String(data.age_rating).trim().toUpperCase() !== DEFAULT_AGE_RATING) {
+      errors.push(`Age rating must be one of: ${AGE_RATING_CODES.join(', ')}`);
+    }
+  }
+
   if (data.price !== undefined && data.price !== '' && data.price !== null) {
     if (isNaN(parseFloat(data.price)) || parseFloat(data.price) < 0) {
       errors.push('Price must be a valid number');
@@ -228,13 +252,15 @@ router.post('/', (req, res) => {
   // Use coin_price if provided, otherwise convert price to coins (or default to 20)
   const finalCoinPrice = coin_price !== undefined && coin_price !== '' ? parseInt(coin_price) : 20;
   const finalBookingLimit = booking_limit !== undefined && booking_limit !== '' ? parseInt(booking_limit) : 6;
+  const { age_rating, age_gate_enabled, age_gate_note } = resolveAgeGateFields(body);
 
-  const sql = `INSERT INTO movies (title, description, poster_url, date, booking_starts_at, venue, price, is_upcoming, available_foods, category, duration, imdb_rating, language, is_special, special_message, coin_price, booking_limit)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const sql = `INSERT INTO movies (title, description, poster_url, date, booking_starts_at, venue, price, is_upcoming, available_foods, category, duration, imdb_rating, language, is_special, special_message, coin_price, booking_limit, age_rating, age_gate_enabled, age_gate_note)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
   const params = [title || '', description || '', poster_url || '', normalizedMovieDate, normalizedBookingStart, venue || '',
     price !== undefined && price !== '' ? parseFloat(price) : 0, 
     isUpcoming, availableFoodsString, category || '', duration || '', imdb_rating || '', language || '',
-    is_special ? parseInt(is_special) : 0, special_message || '', finalCoinPrice, finalBookingLimit];
+    is_special ? parseInt(is_special) : 0, special_message || '', finalCoinPrice, finalBookingLimit,
+    age_rating, age_gate_enabled, age_gate_note];
 
   console.log('💾 Executing INSERT query...');
   
@@ -352,10 +378,13 @@ router.put('/:id', (req, res) => {
   // Ensure finalIsUpcoming is always 0 or 1
   finalIsUpcoming = finalIsUpcoming === 1 ? 1 : 0;
 
+  const updateAgeGate = resolveAgeGateFields(body);
+
   const sql = `UPDATE movies SET
                title = ?, description = ?, poster_url = ?, date = ?, booking_starts_at = ?, venue = ?, price = ?,
                coin_price = ?, is_upcoming = ?, available_foods = ?, category = ?, duration = ?,
-               imdb_rating = ?, language = ?, is_special = ?, special_message = ?, booking_limit = ?
+               imdb_rating = ?, language = ?, is_special = ?, special_message = ?, booking_limit = ?,
+               age_rating = ?, age_gate_enabled = ?, age_gate_note = ?
                WHERE id = ?`;
   const params = [
     title || '', description || '', poster_url || '', normalizedMovieDate, normalizedBookingStart, venue || '',
@@ -363,7 +392,8 @@ router.put('/:id', (req, res) => {
     coin_price !== undefined && coin_price !== '' ? parseInt(coin_price) : 20,
     finalIsUpcoming, availableFoodsString, category || '', duration || '', 
     imdb_rating || '', language || '', is_special ? parseInt(is_special) : 0, 
-    special_message || '', booking_limit !== undefined && booking_limit !== '' ? parseInt(booking_limit) : 6, movieId
+    special_message || '', booking_limit !== undefined && booking_limit !== '' ? parseInt(booking_limit) : 6,
+    updateAgeGate.age_rating, updateAgeGate.age_gate_enabled, updateAgeGate.age_gate_note, movieId
   ];
 
   console.log('💾 Executing UPDATE query for movie ID:', movieId);

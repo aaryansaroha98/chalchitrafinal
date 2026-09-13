@@ -5,6 +5,8 @@ import api from '../api/axios';
 import { useAuth } from '../contexts/AuthContext';
 import Loader from '../components/Loader';
 import CoinIcon from '../components/CoinIcon';
+import AgeGateModal from '../components/AgeGateModal';
+import { hasAgeAck, rememberAgeAck, requiresAgeGate } from '../utils/ageRating';
 
 // Keep relative assets on the frontend origin so hosting rewrites proxy them.
 // This avoids direct browser requests to Render, which some campus networks block.
@@ -45,6 +47,10 @@ const Payment = () => {
   const [foodData, setFoodData] = useState({});
   const [coinBalance, setCoinBalance] = useState(20); // Default 20 coins
   const [useCoins, setUseCoins] = useState(true);
+  // Refreshing this page loses the in-memory confirmation, so re-read the
+  // session record and ask again if it is gone. The server refuses the
+  // booking without it, so this has to be settled before paying.
+  const [ageAcknowledged, setAgeAcknowledged] = useState(false);
 
   // Use coin_price from movie instead of rupee price
   const TICKET_COIN_PRICE = parseInt(movie?.coin_price) || 20;
@@ -78,9 +84,20 @@ const Payment = () => {
       console.log('Fetched movie data:', res.data);
       console.log('Movie price:', res.data.price, 'Type:', typeof res.data.price);
       setMovie(res.data);
+      setAgeAcknowledged(!requiresAgeGate(res.data) || hasAgeAck(res.data.id ?? movieIdToUse));
     } catch (err) {
       setError('Movie not found');
     }
+  };
+
+  const ageGateOpen = !!movie && requiresAgeGate(movie) && !ageAcknowledged;
+  // Only ever claim a confirmation the viewer actually gave. For an ungated
+  // screening the flag is 0 and the server ignores it.
+  const ageConfirmedForBooking = !!movie && requiresAgeGate(movie) && ageAcknowledged ? 1 : 0;
+
+  const handleAgeGateConfirm = () => {
+    rememberAgeAck(movie?.id ?? (movieIdFromState || movieId));
+    setAgeAcknowledged(true);
   };
 
   const fetchFoodData = async () => {
@@ -138,6 +155,14 @@ const Payment = () => {
 
   return (
     <div className="payment-page">
+      <AgeGateModal
+        show={ageGateOpen}
+        movie={movie}
+        onConfirm={handleAgeGateConfirm}
+        onCancel={() => navigate(`/booking/${movieIdFromState || movieId}`)}
+        cancelLabel="Back to seats"
+      />
+
       <div className="payment-container">
         <div className="payment-card">
           {/* Header */}
@@ -392,7 +417,8 @@ const Payment = () => {
                       payment_id: 'FREE_BOOKING',
                       customer_details: customerDetails,
                       food_orders: selectedFoods,
-                      coupon_code: couponCode
+                      coupon_code: couponCode,
+                      age_confirmed: ageConfirmedForBooking
                     });
 
                     refreshGlobalCoinBalance();
@@ -442,7 +468,8 @@ const Payment = () => {
                       food_orders: selectedFoods,
                       coupon_code: couponCode,
                       use_coins: true,
-                      customer_details: customerDetails
+                      customer_details: customerDetails,
+                      age_confirmed: ageConfirmedForBooking
                     });
 
                     refreshGlobalCoinBalance();

@@ -151,6 +151,9 @@ if (usePostgres) {
         special_message TEXT,
         coin_price INTEGER DEFAULT 0,
         booking_limit INTEGER DEFAULT 6,
+        age_rating TEXT DEFAULT 'U',
+        age_gate_enabled INTEGER DEFAULT 0,
+        age_gate_note TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`,
       `CREATE TABLE IF NOT EXISTS bookings (
@@ -177,6 +180,7 @@ if (usePostgres) {
         is_used INTEGER DEFAULT 0,
         coin_amount INTEGER DEFAULT 0,
         coins_refunded INTEGER DEFAULT 0,
+        age_confirmed INTEGER DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`,
       `CREATE TABLE IF NOT EXISTS feedback (
@@ -419,6 +423,10 @@ if (usePostgres) {
       await pool.query('ALTER TABLE movies ADD COLUMN IF NOT EXISTS special_message TEXT');
       await pool.query('ALTER TABLE movies ADD COLUMN IF NOT EXISTS coin_price INTEGER DEFAULT 0');
       await pool.query('ALTER TABLE movies ADD COLUMN IF NOT EXISTS booking_limit INTEGER DEFAULT 6');
+      await pool.query(`ALTER TABLE movies ADD COLUMN IF NOT EXISTS age_rating TEXT DEFAULT 'U'`);
+      await pool.query('ALTER TABLE movies ADD COLUMN IF NOT EXISTS age_gate_enabled INTEGER DEFAULT 0');
+      await pool.query('ALTER TABLE movies ADD COLUMN IF NOT EXISTS age_gate_note TEXT');
+      await pool.query('ALTER TABLE bookings ADD COLUMN IF NOT EXISTS age_confirmed INTEGER DEFAULT 0');
       await pool.query('ALTER TABLE movie_foods ADD COLUMN IF NOT EXISTS is_free INTEGER DEFAULT 0');
       await pool.query('ALTER TABLE team ADD COLUMN IF NOT EXISTS section TEXT DEFAULT \'current_team\'');
       await pool.query('ALTER TABLE team ADD COLUMN IF NOT EXISTS display_order INTEGER DEFAULT 0');
@@ -538,6 +546,9 @@ if (usePostgres) {
         special_message TEXT,
         coin_price INTEGER DEFAULT 0,
         booking_limit INTEGER DEFAULT 6,
+        age_rating TEXT DEFAULT 'U',
+        age_gate_enabled INTEGER DEFAULT 0,
+        age_gate_note TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )`,
       `CREATE TABLE IF NOT EXISTS bookings (
@@ -564,6 +575,7 @@ if (usePostgres) {
         is_used INTEGER DEFAULT 0,
         coin_amount INTEGER DEFAULT 0,
         coins_refunded INTEGER DEFAULT 0,
+        age_confirmed INTEGER DEFAULT 0,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )`,
       `CREATE TABLE IF NOT EXISTS feedback (
@@ -730,6 +742,7 @@ if (usePostgres) {
           ensureUserCoinsColumn();
           ensureBookingCoinAmountColumn();
           ensureBookingCoinsRefundedColumn();
+          ensureBookingAgeConfirmedColumn();
           fixAboutText();
           createDefaultData();
         }
@@ -885,6 +898,26 @@ if (usePostgres) {
     });
   }
 
+  function ensureBookingAgeConfirmedColumn() {
+    db.all('PRAGMA table_info(bookings)', [], (err, columns) => {
+      if (err) {
+        console.log('⚠️  Could not inspect bookings table columns:', err.message);
+        return;
+      }
+
+      const hasAgeConfirmed = Array.isArray(columns) && columns.some((col) => col.name === 'age_confirmed');
+      if (!hasAgeConfirmed) {
+        db.run('ALTER TABLE bookings ADD COLUMN age_confirmed INTEGER DEFAULT 0', (alterErr) => {
+          if (alterErr) {
+            console.log('⚠️  Could not add bookings.age_confirmed:', alterErr.message);
+            return;
+          }
+          console.log('✅ bookings.age_confirmed column added');
+        });
+      }
+    });
+  }
+
   function ensureGalleryEventDateColumn() {
     db.all('PRAGMA table_info(gallery)', [], (err, columns) => {
       if (err) {
@@ -973,6 +1006,56 @@ if (usePostgres) {
           }
         });
       }
+
+      if (!colNames.includes('coin_price')) {
+        db.run('ALTER TABLE movies ADD COLUMN coin_price INTEGER DEFAULT 0', (alterErr) => {
+          if (alterErr) {
+            console.error('⚠️  Could not add movies.coin_price:', alterErr.message);
+          } else {
+            console.log('✅ movies.coin_price column added');
+          }
+        });
+      }
+
+      if (!colNames.includes('booking_limit')) {
+        db.run('ALTER TABLE movies ADD COLUMN booking_limit INTEGER DEFAULT 6', (alterErr) => {
+          if (alterErr) {
+            console.error('⚠️  Could not add movies.booking_limit:', alterErr.message);
+          } else {
+            console.log('✅ movies.booking_limit column added');
+          }
+        });
+      }
+
+      if (!colNames.includes('age_rating')) {
+        db.run("ALTER TABLE movies ADD COLUMN age_rating TEXT DEFAULT 'U'", (alterErr) => {
+          if (alterErr) {
+            console.error('⚠️  Could not add movies.age_rating:', alterErr.message);
+          } else {
+            console.log('✅ movies.age_rating column added');
+          }
+        });
+      }
+
+      if (!colNames.includes('age_gate_enabled')) {
+        db.run('ALTER TABLE movies ADD COLUMN age_gate_enabled INTEGER DEFAULT 0', (alterErr) => {
+          if (alterErr) {
+            console.error('⚠️  Could not add movies.age_gate_enabled:', alterErr.message);
+          } else {
+            console.log('✅ movies.age_gate_enabled column added');
+          }
+        });
+      }
+
+      if (!colNames.includes('age_gate_note')) {
+        db.run('ALTER TABLE movies ADD COLUMN age_gate_note TEXT', (alterErr) => {
+          if (alterErr) {
+            console.error('⚠️  Could not add movies.age_gate_note:', alterErr.message);
+          } else {
+            console.log('✅ movies.age_gate_note column added');
+          }
+        });
+      }
     });
   }
 
@@ -1034,9 +1117,7 @@ if (usePostgres) {
 
       const hasDisplayOrder = Array.isArray(columns) && columns.some((col) => col.name === 'display_order');
       if (!hasDisplayOrder) {
-        db.run('ALTER TABLE movies ADD COLUMN coin_price INTEGER DEFAULT 0', (alterErr) => { if (alterErr) console.log('coin_price:', alterErr.message); else console.log('✅ movies.coin_price added'); });
-      db.run('ALTER TABLE movies ADD COLUMN booking_limit INTEGER DEFAULT 6', (alterErr) => { if (alterErr) console.log('booking_limit:', alterErr.message); else console.log('✅ movies.booking_limit added'); });
-      db.run('ALTER TABLE team ADD COLUMN display_order INTEGER DEFAULT 0', (alterErr) => {
+        db.run('ALTER TABLE team ADD COLUMN display_order INTEGER DEFAULT 0', (alterErr) => {
           if (alterErr) {
             console.log('⚠️  Could not add team.display_order:', alterErr.message);
           } else {

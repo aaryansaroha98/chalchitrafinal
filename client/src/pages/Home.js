@@ -6,6 +6,9 @@ import api from '../api/axios';
 import { useAuth } from '../contexts/AuthContext';
 import { compareMovieDatesAsc, formatAppDateTime, getBookingAvailability, isUpcomingMovie } from '../utils/movieStatus';
 import Loader from '../components/Loader';
+import AgeGateModal from '../components/AgeGateModal';
+import AgeRatingBadge from '../components/AgeRatingBadge';
+import { needsAgeConfirmation, rememberAgeAck } from '../utils/ageRating';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -19,6 +22,7 @@ const Home = () => {
   const [bookingClosedMovieTitle, setBookingClosedMovieTitle] = useState('');
   const [bookingStatusHeading, setBookingStatusHeading] = useState('Booking Closed');
   const [bookingStatusMessage, setBookingStatusMessage] = useState('Movie booking time is complete.');
+  const [ageGateMovie, setAgeGateMovie] = useState(null);
   const [settings, setSettings] = useState({
     tagline: 'Student-led movie screening initiative at IIT Jammu',
     hero_background: '#ffffff',
@@ -125,6 +129,19 @@ const Home = () => {
       return;
     }
 
+    if (needsAgeConfirmation(movie)) {
+      setAgeGateMovie(movie);
+      return;
+    }
+
+    navigate(`/booking/${movie.id}`);
+  };
+
+  const handleAgeGateConfirm = () => {
+    const movie = ageGateMovie;
+    if (!movie) return;
+    rememberAgeAck(movie.id);
+    setAgeGateMovie(null);
     navigate(`/booking/${movie.id}`);
   };
 
@@ -376,6 +393,8 @@ const Home = () => {
                       }}></i>
                     </div>
                   )}
+
+                  <AgeRatingBadge movie={movie} variant="poster" />
 
                   {/* Date Badge */}
                   <div className="home-featured-badge" style={{
@@ -1556,6 +1575,14 @@ const Home = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Age Gate */}
+      <AgeGateModal
+        show={!!ageGateMovie}
+        movie={ageGateMovie}
+        onConfirm={handleAgeGateConfirm}
+        onCancel={() => setAgeGateMovie(null)}
+      />
 
       {/* Booking Closed Modal */}
       <AnimatePresence>
