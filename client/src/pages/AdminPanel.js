@@ -298,7 +298,8 @@ const AdminPanel = () => {
     hero_background_image: null,
     hero_background_video: null,
     about_text: 'Chalchitra Series is a pioneering student-led initiative at IIT Jammu dedicated to bringing world-class cinematic experiences to our vibrant campus community. Founded with the vision to create a cultural hub on campus, we organize premium movie screenings featuring a diverse collection of films - from timeless classics to contemporary blockbusters, independent gems to international masterpieces.\n\nOur mission goes beyond entertainment; we strive to foster a thriving cultural atmosphere that enriches the lives of IIT Jammu students, providing inclusive access to quality cinema while creating memorable experiences that bring our community together. Through innovation, dedication, and a passion for storytelling, Chalchitra Series continues to be the heartbeat of cinematic culture at IIT Jammu, creating lasting memories one screening at a time.',
-    about_image: null
+    about_image: null,
+    horror_theme: 0
   });
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [singleEmailSearch, setSingleEmailSearch] = useState('');
@@ -4929,6 +4930,7 @@ const AdminPanel = () => {
                 formData.append('tagline', settingsForm.tagline);
                 formData.append('hero_background', settingsForm.hero_background);
                 formData.append('about_text', settingsForm.about_text);
+                formData.append('horror_theme', Number(settingsForm.horror_theme) === 1 ? '1' : '0');
 
                 if (settingsForm.hero_background_image) {
                   formData.append('hero_background_image', settingsForm.hero_background_image);
@@ -5016,6 +5018,26 @@ const AdminPanel = () => {
                 />
                 <Form.Text className="text-muted">
                   Upload an image for the about section (optional)
+                </Form.Text>
+              </Form.Group>
+
+              <Form.Group className="mb-4" style={{ border: '1px solid #e5e7eb', padding: '1rem' }}>
+                <Form.Label className="d-block mb-2">
+                  <i className="fas fa-ghost me-2"></i>
+                  Screening Skin &mdash; <em>Obsession</em> / One Wish Willow
+                </Form.Label>
+                <Form.Check
+                  type="switch"
+                  id="horror-theme-switch"
+                  label="Turn the public site dark and haunted for this screening"
+                  checked={Number(settingsForm.horror_theme) === 1}
+                  onChange={(e) => setSettingsForm({ ...settingsForm, horror_theme: e.target.checked ? 1 : 0 })}
+                />
+                <Form.Text className="text-muted">
+                  Applies to the public pages only &mdash; this admin panel and the scanner stay
+                  readable. Switch it off after the screening and the normal site returns
+                  instantly; nothing needs redeploying. Visitors who have reduced-motion turned on
+                  in their OS keep the look but get no animation or jump scare.
                 </Form.Text>
               </Form.Group>
 

@@ -209,7 +209,7 @@ const MyBookings = () => {
         scale: 2,
         useCORS: true,
         allowTaint: true,
-        backgroundColor: '#ffffff',
+        backgroundColor: 'var(--qt-surface)',
         logging: false,
         width: 800,
         height: ticketElement.scrollHeight,
@@ -287,19 +287,19 @@ const MyBookings = () => {
             gap: 0.75rem;
             font-size: 2.5rem;
             font-weight: 600;
-            color: #0b0e17;
+            color: var(--qt-text);
             margin-bottom: 0.85rem;
             letter-spacing: -0.025em;
           }
 
           .my-bookings-title i {
-            color: #0b0e17;
+            color: var(--qt-text);
             font-size: 2rem;
           }
 
           .my-bookings-subtitle {
             font-size: 1.05rem;
-            color: #5c6270;
+            color: var(--qt-muted);
             max-width: 620px;
             margin: 0 auto;
             line-height: 1.6;
@@ -354,14 +354,14 @@ const MyBookings = () => {
           <Card style={{
             padding: '3rem',
             textAlign: 'center',
-            background: '#ffffff',
-            border: '1px solid #e5e7eb',
-            color: '#0b0e17'
+            background: 'var(--qt-surface)',
+            border: '1px solid var(--qt-line)',
+            color: 'var(--qt-text)'
           }}>
             <Card.Body>
               <i className="fas fa-ticket-alt" style={{
                 fontSize: '4rem',
-                color: '#8b909c',
+                color: 'var(--qt-quiet)',
                 marginBottom: '1.5rem',
                 display: 'block'
               }}></i>
@@ -371,7 +371,7 @@ const MyBookings = () => {
                 marginBottom: '1rem'
               }}>No Bookings Yet</h3>
               <p style={{
-                color: '#5c6270',
+                color: 'var(--qt-muted)',
                 fontSize: '1.1rem',
                 marginBottom: '2rem',
                 maxWidth: '500px',
@@ -391,8 +391,8 @@ const MyBookings = () => {
               {bookings.map((booking) => (
                 <Col lg={3} md={4} sm={6} xs={6} key={booking.id} className="mb-4">
                   <Card className="h-100 border-0 my-booking-card" style={{
-                  background: '#ffffff',
-                  border: '1px solid #e5e7eb',
+                  background: 'var(--qt-surface)',
+                  border: '1px solid var(--qt-line)',
                   overflow: 'hidden',
                   position: 'relative',
                   transition: 'all 0.2s ease'
@@ -411,7 +411,7 @@ const MyBookings = () => {
                         height: '60px',
                         overflow: 'hidden',
                         flexShrink: 0,
-                        border: '1px solid #e5e7eb'
+                        border: '1px solid var(--qt-line)'
                       }}>
                         {booking.poster_url ? (
                           <img
@@ -427,14 +427,14 @@ const MyBookings = () => {
                           <div style={{
                             width: '100%',
                             height: '100%',
-                            background: '#f6f6f7',
+                            background: 'var(--qt-panel-soft)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center'
                           }}>
                             <i className="fas fa-film" style={{
                               fontSize: '1.2rem',
-                              color: '#8b909c'
+                              color: 'var(--qt-quiet)'
                             }}></i>
                           </div>
                         )}
@@ -445,7 +445,7 @@ const MyBookings = () => {
                         <h6 className="my-booking-title-text" style={{
                           fontSize: '0.95rem',
                           fontWeight: '700',
-                          color: '#0b0e17',
+                          color: 'var(--qt-text)',
                           marginBottom: '0.25rem',
                           lineHeight: '1.2'
                         }}>
@@ -459,7 +459,7 @@ const MyBookings = () => {
                           fontWeight: '700',
                           textTransform: 'uppercase',
                           letterSpacing: '0.5px',
-                          background: '#ffffff',
+                          background: 'var(--qt-surface)',
                           border: booking.is_used ?
                             '1px solid #d64545' :
                             '1px solid #0f9d63',
@@ -478,8 +478,8 @@ const MyBookings = () => {
                         <div className="my-booking-info-box my-booking-info-date" style={{
                           flex: '1 1 auto',
                           minWidth: '100px',
-                          background: '#f6f6f7',
-                          border: '1px solid #e5e7eb',
+                          background: 'var(--qt-panel-soft)',
+                          border: '1px solid var(--qt-line)',
                           padding: '0.4rem 0.6rem',
                           textAlign: 'center',
                           display: 'flex',
@@ -488,12 +488,12 @@ const MyBookings = () => {
                           justifyContent: 'center'
                         }}>
                           <i className="fas fa-calendar" style={{
-                            color: '#5c6270',
+                            color: 'var(--qt-muted)',
                             marginBottom: '0.2rem',
                             fontSize: '0.8rem',
                             display: 'block'
                           }}></i>
-                          <span style={{color: '#0b0e17', fontSize: '0.8rem', fontWeight: '600'}}>
+                          <span style={{color: 'var(--qt-text)', fontSize: '0.8rem', fontWeight: '600'}}>
                             {new Date(booking.date).toLocaleDateString('en-IN', {
                               month: 'short',
                               day: 'numeric'
@@ -505,8 +505,8 @@ const MyBookings = () => {
                         <div className="my-booking-info-box my-booking-info-time" style={{
                           flex: '1 1 auto',
                           minWidth: '100px',
-                          background: '#f6f6f7',
-                          border: '1px solid #e5e7eb',
+                          background: 'var(--qt-panel-soft)',
+                          border: '1px solid var(--qt-line)',
                           padding: '0.4rem 0.6rem',
                           textAlign: 'center',
                           display: 'flex',
@@ -515,12 +515,12 @@ const MyBookings = () => {
                           justifyContent: 'center'
                         }}>
                           <i className="fas fa-clock" style={{
-                            color: '#5c6270',
+                            color: 'var(--qt-muted)',
                             marginBottom: '0.2rem',
                             fontSize: '0.8rem',
                             display: 'block'
                           }}></i>
-                          <span style={{color: '#0b0e17', fontSize: '0.75rem', fontWeight: '600'}}>
+                          <span style={{color: 'var(--qt-text)', fontSize: '0.75rem', fontWeight: '600'}}>
                             {new Date(booking.date).toLocaleTimeString('en-IN', {
                               hour: '2-digit',
                               minute: '2-digit'
@@ -532,8 +532,8 @@ const MyBookings = () => {
                         <div className="my-booking-info-box my-booking-info-venue" style={{
                           flex: '1 1 auto',
                           minWidth: '100px',
-                          background: '#f6f6f7',
-                          border: '1px solid #e5e7eb',
+                          background: 'var(--qt-panel-soft)',
+                          border: '1px solid var(--qt-line)',
                           padding: '0.4rem 0.6rem',
                           textAlign: 'center',
                           display: 'flex',
@@ -542,13 +542,13 @@ const MyBookings = () => {
                           justifyContent: 'center'
                         }}>
                           <i className="fas fa-map-marker-alt" style={{
-                            color: '#5c6270',
+                            color: 'var(--qt-muted)',
                             marginBottom: '0.2rem',
                             fontSize: '0.8rem',
                             display: 'block'
                           }}></i>
                           <span style={{
-                            color: '#0b0e17',
+                            color: 'var(--qt-text)',
                             fontSize: '0.7rem',
                             fontWeight: '600',
                             display: 'block',
@@ -574,12 +574,12 @@ const MyBookings = () => {
                           <Button
                             size="sm"
                             style={{
-                              background: '#0b0e17',
-                              border: '1px solid #0b0e17',
+                              background: 'var(--qt-ink)',
+                              border: '1px solid var(--qt-ink)',
                               padding: '0.5rem 1rem',
                               fontWeight: '600',
                               fontSize: '0.8rem',
-                              color: '#ffffff',
+                              color: 'var(--qt-on-ink)',
                               transition: 'all 0.2s ease'
                             }}
                             onClick={() => {
@@ -599,12 +599,12 @@ const MyBookings = () => {
                             size="sm"
                             disabled={downloadingTicket === booking.id}
                             style={{
-                              background: '#0b0e17',
-                              border: '1px solid #0b0e17',
+                              background: 'var(--qt-ink)',
+                              border: '1px solid var(--qt-ink)',
                               padding: '0.5rem 1rem',
                               fontWeight: '600',
                               fontSize: '0.8rem',
-                              color: '#ffffff',
+                              color: 'var(--qt-on-ink)',
                               transition: 'all 0.2s ease',
                               opacity: downloadingTicket === booking.id ? 0.6 : 1,
                               cursor: downloadingTicket === booking.id ? 'not-allowed' : 'pointer'
@@ -654,8 +654,8 @@ const MyBookings = () => {
           }}
         >
           <div style={{
-            background: '#ffffff',
-            border: '1px solid #e5e7eb',
+            background: 'var(--qt-surface)',
+            border: '1px solid var(--qt-line)',
             position: 'relative',
             overflow: 'hidden',
             width: '95%',
@@ -665,8 +665,8 @@ const MyBookings = () => {
             {/* Modal Header */}
             <Modal.Header closeButton style={{
               background: 'transparent',
-              borderBottom: '1px solid #eef0f2',
-              color: '#0b0e17',
+              borderBottom: '1px solid var(--qt-line-soft)',
+              color: 'var(--qt-text)',
               position: 'relative',
               zIndex: 2,
               padding: '1.25rem 1.5rem 1rem'
@@ -677,7 +677,7 @@ const MyBookings = () => {
                 textAlign: 'left',
                 width: '100%',
                 margin: 0,
-                color: '#0b0e17'
+                color: 'var(--qt-text)'
               }}>
                 Share Your Experience
               </Modal.Title>
@@ -698,19 +698,19 @@ const MyBookings = () => {
                   marginBottom: '1rem'
                 }}>
                   <span style={{
-                    color: '#5c6270',
+                    color: 'var(--qt-muted)',
                     fontSize: '0.9rem',
                     fontWeight: '500'
                   }}>
                     Rating
                   </span>
                   <span style={{
-                    color: '#0b0e17',
+                    color: 'var(--qt-text)',
                     fontSize: '0.9rem',
                     fontWeight: '600',
-                    background: '#f6f6f7',
+                    background: 'var(--qt-panel-soft)',
                     padding: '0.25rem 0.75rem',
-                    border: '1px solid #e5e7eb'
+                    border: '1px solid var(--qt-line)'
                   }}>
                     {feedbackRating} / 5
                   </span>
@@ -719,8 +719,8 @@ const MyBookings = () => {
                 {/* Slider Container */}
                 <div style={{
                   padding: '0.5rem 0',
-                  background: '#f6f6f7',
-                  border: '1px solid #e5e7eb',
+                  background: 'var(--qt-panel-soft)',
+                  border: '1px solid var(--qt-line)',
                   paddingLeft: '1rem',
                   paddingRight: '1rem'
                 }}>
@@ -770,11 +770,11 @@ const MyBookings = () => {
                   display: 'block',
                   marginBottom: '0.5rem',
                   fontWeight: '500',
-                  color: '#5c6270',
+                  color: 'var(--qt-muted)',
                   fontSize: '0.9rem'
                 }}>
                   Comment
-                  <span style={{ color: '#8b909c', fontWeight: '400', marginLeft: '0.5rem' }}>(optional)</span>
+                  <span style={{ color: 'var(--qt-quiet)', fontWeight: '400', marginLeft: '0.5rem' }}>(optional)</span>
                 </label>
                 <textarea
                   value={feedbackComment}
@@ -784,12 +784,12 @@ const MyBookings = () => {
                   style={{
                     width: '100%',
                     padding: '0.85rem',
-                    background: '#ffffff',
-                    border: '1px solid #e5e7eb',
+                    background: 'var(--qt-surface)',
+                    border: '1px solid var(--qt-line)',
                     fontSize: '0.9rem',
                     resize: 'vertical',
                     outline: 'none',
-                    color: '#0b0e17',
+                    color: 'var(--qt-text)',
                     transition: 'all 0.3s ease',
                     fontFamily: 'inherit'
                   }}
@@ -807,7 +807,7 @@ const MyBookings = () => {
 
             {/* Modal Footer */}
             <Modal.Footer style={{
-              borderTop: '1px solid #eef0f2',
+              borderTop: '1px solid var(--qt-line-soft)',
               padding: '1rem 1.5rem 1.25rem',
               background: 'transparent',
               position: 'relative',
@@ -821,9 +821,9 @@ const MyBookings = () => {
                 style={{
                   padding: '0.7rem 1.25rem',
                   fontWeight: '600',
-                  background: '#ffffff',
-                  border: '1px solid #e5e7eb',
-                  color: '#0b0e17',
+                  background: 'var(--qt-surface)',
+                  border: '1px solid var(--qt-line)',
+                  color: 'var(--qt-text)',
                   fontSize: '0.9rem',
                   transition: 'all 0.3s ease',
                   flex: 1
@@ -843,11 +843,11 @@ const MyBookings = () => {
               </Button>
               <Button
                 style={{
-                  background: '#0b0e17',
-                  border: '1px solid #0b0e17',
+                  background: 'var(--qt-ink)',
+                  border: '1px solid var(--qt-ink)',
                   padding: '0.7rem 1.25rem',
                   fontWeight: '600',
-                  color: '#ffffff',
+                  color: 'var(--qt-on-ink)',
                   fontSize: '0.9rem',
                   transition: 'all 0.3s ease',
                   flex: 1.5
@@ -877,7 +877,7 @@ const MyBookings = () => {
             appearance: none;
             width: 18px;
             height: 18px;
-            background: #0b0e17;
+            background: var(--qt-ink);
             border-radius: 50%;
             cursor: pointer;
             border: 2px solid #ffffff;
@@ -885,7 +885,7 @@ const MyBookings = () => {
           input[type="range"]::-moz-range-thumb {
             width: 18px;
             height: 18px;
-            background: #0b0e17;
+            background: var(--qt-ink);
             border-radius: 50%;
             cursor: pointer;
             border: 2px solid #ffffff;

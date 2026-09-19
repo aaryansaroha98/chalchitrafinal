@@ -47,6 +47,15 @@
 
   --qt-font: 'Space Grotesk', ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Arial, sans-serif;
 
+  /* Surface/ink pairings. Inline styles reference these so a theme can
+     repaint the app by redefining tokens rather than editing components. */
+  --qt-on-ink: #ffffff;        /* text that sits ON --qt-ink, stays light */
+  --qt-danger-bg: #f8d7da;
+  --qt-danger-fg: #721c24;
+  --qt-placeholder-bg: #e9ecef; /* poster/image placeholder */
+  --qt-placeholder-fg: #adb5bd;
+  --qt-seat-taken: #b8bcc4;
+
   /* Legacy variable bridges — old code references these */
   --primary-color: var(--qt-ink);
   --bg-primary: var(--qt-bg);
@@ -141,7 +150,7 @@ a:hover { color: var(--qt-ink-hover); }
   align-items: center;
   justify-content: center;
   border: 1px solid var(--qt-line);
-  background: #fff;
+  background: var(--qt-surface);
   color: var(--qt-text);
   box-shadow: none !important;
   transition: border-color 160ms ease, background 160ms ease, color 160ms ease;
@@ -149,7 +158,7 @@ a:hover { color: var(--qt-ink-hover); }
 .btn:hover,
 .btn:focus {
   border-color: var(--qt-text);
-  background: #fff;
+  background: var(--qt-surface);
   color: var(--qt-text);
 }
 
@@ -157,7 +166,7 @@ a:hover { color: var(--qt-ink-hover); }
 .btn.btn-primary {
   background: var(--qt-ink) !important;
   border-color: var(--qt-ink) !important;
-  color: #fff !important;
+  color: var(--qt-on-ink) !important;
 }
 .btn-primary:hover,
 .btn.btn-primary:hover,
@@ -165,14 +174,14 @@ a:hover { color: var(--qt-ink-hover); }
 .btn.btn-primary:focus {
   background: var(--qt-ink-hover) !important;
   border-color: var(--qt-ink-hover) !important;
-  color: #fff !important;
+  color: var(--qt-on-ink) !important;
 }
 
 .btn-secondary,
 .btn.btn-secondary,
 .btn-light,
 .btn-outline-secondary {
-  background: #fff !important;
+  background: var(--qt-surface) !important;
   border-color: var(--qt-line) !important;
   color: var(--qt-text) !important;
 }
@@ -180,7 +189,7 @@ a:hover { color: var(--qt-ink-hover); }
 .btn.btn-secondary:hover,
 .btn-outline-secondary:hover {
   border-color: var(--qt-text) !important;
-  background: #fff !important;
+  background: var(--qt-surface) !important;
   color: var(--qt-text) !important;
 }
 
@@ -195,48 +204,48 @@ a:hover { color: var(--qt-ink-hover); }
 .btn.btn-outline-primary:hover,
 .btn-outline-dark:hover {
   background: var(--qt-ink) !important;
-  color: #fff !important;
+  color: var(--qt-on-ink) !important;
 }
 
 .btn-danger,
 .btn.btn-danger {
-  background: #fff !important;
+  background: var(--qt-surface) !important;
   border-color: var(--qt-red) !important;
   color: var(--qt-red) !important;
 }
 .btn-danger:hover,
 .btn.btn-danger:hover {
   background: var(--qt-red) !important;
-  color: #fff !important;
+  color: var(--qt-on-ink) !important;
 }
 
 .btn-success,
 .btn.btn-success {
-  background: #fff !important;
+  background: var(--qt-surface) !important;
   border-color: var(--qt-green) !important;
   color: var(--qt-green) !important;
 }
 .btn-success:hover,
 .btn.btn-success:hover {
   background: var(--qt-green) !important;
-  color: #fff !important;
+  color: var(--qt-on-ink) !important;
 }
 
 .btn-info,
 .btn.btn-info {
-  background: #fff !important;
+  background: var(--qt-surface) !important;
   border-color: var(--qt-blue) !important;
   color: var(--qt-blue) !important;
 }
 .btn-info:hover,
 .btn.btn-info:hover {
   background: var(--qt-blue) !important;
-  color: #fff !important;
+  color: var(--qt-on-ink) !important;
 }
 
 .btn-warning,
 .btn.btn-warning {
-  background: #fff !important;
+  background: var(--qt-surface) !important;
   border-color: var(--qt-amber) !important;
   color: var(--qt-amber) !important;
 }
@@ -301,7 +310,7 @@ a:hover { color: var(--qt-ink-hover); }
 input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
 select,
 textarea {
-  background: #fff;
+  background: var(--qt-surface);
   border: 1px solid var(--qt-line);
   color: var(--qt-text);
   font-family: var(--qt-font);
@@ -313,7 +322,7 @@ textarea {
 input:focus,
 select:focus,
 textarea:focus {
-  background: #fff;
+  background: var(--qt-surface);
   border-color: var(--qt-text);
   color: var(--qt-text);
   box-shadow: none !important;
@@ -343,7 +352,7 @@ label {
    MODALS
    ============================================================ */
 .modal-content {
-  background: #fff;
+  background: var(--qt-surface);
   border: 1px solid var(--qt-text);
   box-shadow: var(--qt-shadow);
   color: var(--qt-text);
@@ -366,7 +375,7 @@ label {
    OFFCANVAS (mobile nav)
    ============================================================ */
 .offcanvas {
-  background: #fff;
+  background: var(--qt-surface);
   color: var(--qt-text);
   border-left: 1px solid var(--qt-line);
 }
@@ -414,8 +423,8 @@ label {
   border: 1px solid transparent;
 }
 .badge.bg-primary,
-.badge.bg-dark { background: var(--qt-ink) !important; color: #fff; }
-.badge.bg-secondary { background: #fff !important; border-color: var(--qt-line); color: var(--qt-muted); }
+.badge.bg-dark { background: var(--qt-ink) !important; color: var(--qt-on-ink); }
+.badge.bg-secondary { background: var(--qt-surface) !important; border-color: var(--qt-line); color: var(--qt-muted); }
 .badge.bg-success { background: transparent !important; border-color: var(--qt-green); color: var(--qt-green); }
 .badge.bg-danger { background: transparent !important; border-color: var(--qt-red); color: var(--qt-red); }
 .badge.bg-warning { background: transparent !important; border-color: var(--qt-amber); color: var(--qt-amber) !important; }
@@ -455,13 +464,13 @@ label {
   border-bottom: 2px solid var(--qt-text);
 }
 .nav-pills .nav-link { color: var(--qt-muted); }
-.nav-pills .nav-link.active { background: var(--qt-ink); color: #fff; }
+.nav-pills .nav-link.active { background: var(--qt-ink); color: var(--qt-on-ink); }
 
 /* ============================================================
    DROPDOWNS
    ============================================================ */
 .dropdown-menu {
-  background: #fff;
+  background: var(--qt-surface);
   border: 1px solid var(--qt-text);
   box-shadow: var(--qt-shadow);
 }
@@ -477,13 +486,13 @@ label {
    PAGINATION
    ============================================================ */
 .page-link {
-  background: #fff;
+  background: var(--qt-surface);
   border-color: var(--qt-line);
   color: var(--qt-muted);
   font-family: var(--qt-font);
 }
 .page-link:hover { background: var(--qt-panel-soft); border-color: var(--qt-text); color: var(--qt-text); }
-.page-item.active .page-link { background: var(--qt-ink); border-color: var(--qt-ink); color: #fff; }
+.page-item.active .page-link { background: var(--qt-ink); border-color: var(--qt-ink); color: var(--qt-on-ink); }
 
 /* ============================================================
    PROGRESS / LIST GROUP
@@ -491,7 +500,7 @@ label {
 .progress { background: var(--qt-line-soft); }
 .progress-bar { background: var(--qt-ink); }
 .list-group-item {
-  background: #fff;
+  background: var(--qt-surface);
   border-color: var(--qt-line);
   color: var(--qt-text);
 }
@@ -503,7 +512,7 @@ label {
 .spinner-grow,
 .loading-spinner { color: var(--qt-ink); }
 .toast {
-  background: #fff;
+  background: var(--qt-surface);
   border: 1px solid var(--qt-text);
   color: var(--qt-text);
 }
@@ -525,7 +534,7 @@ label {
 .text-primary { color: var(--qt-ink) !important; }
 .text-secondary { color: var(--qt-muted) !important; }
 .bg-dark { background: var(--qt-panel-soft) !important; }
-.bg-black { background: #fff !important; }
+.bg-black { background: var(--qt-surface) !important; }
 .bg-light { background: var(--qt-panel-soft) !important; }
 
 /* Legacy Cinzel references → Space Grotesk */
@@ -559,7 +568,7 @@ label {
   min-height: 100vh;
 }
 .bg-glass {
-  background: #fff !important;
+  background: var(--qt-surface) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
@@ -580,7 +589,7 @@ label {
   transition: border-color 160ms ease, background 160ms ease, color 160ms ease;
 }
 .seat-button.available {
-  background: #fff;
+  background: var(--qt-surface);
   border-color: var(--qt-line);
   color: var(--qt-text);
   backdrop-filter: none;
@@ -595,7 +604,7 @@ label {
 .seat-button.selected {
   background: var(--qt-ink) !important;
   border-color: var(--qt-ink) !important;
-  color: #fff !important;
+  color: var(--qt-on-ink) !important;
   backdrop-filter: none;
   box-shadow: none;
 }
@@ -623,7 +632,7 @@ label {
 
 /* ---------- Booking info text (light-theme overrides) ---------- */
 .booking-header-card {
-  background: #fff !important;
+  background: var(--qt-surface) !important;
   backdrop-filter: none !important;
   border-color: var(--qt-line) !important;
   box-shadow: none !important;
@@ -662,7 +671,7 @@ label {
 .notice-card,
 .payment-container,
 .success-container {
-  background: #fff !important;
+  background: var(--qt-surface) !important;
   border: 1px solid var(--qt-line) !important;
   box-shadow: none !important;
   color: var(--qt-text);
@@ -681,19 +690,19 @@ label {
 .pay-btn,
 .action-btn {
   border: 1px solid var(--qt-line) !important;
-  background: #fff !important;
+  background: var(--qt-surface) !important;
   color: var(--qt-text) !important;
 }
 .pay-btn.primary,
 .action-btn.primary {
   background: var(--qt-ink) !important;
   border-color: var(--qt-ink) !important;
-  color: #fff !important;
+  color: var(--qt-on-ink) !important;
 }
 
 /* ---------- Loader ---------- */
 .loader-glass-card {
-  background: #fff !important;
+  background: var(--qt-surface) !important;
   border: 1px solid var(--qt-line) !important;
   box-shadow: var(--qt-shadow) !important;
   backdrop-filter: none !important;
@@ -854,7 +863,7 @@ footer, .footer {
   width: 42px;
   height: 42px;
   border: 1px solid var(--qt-line);
-  background: #ffffff;
+  background: var(--qt-surface);
   cursor: pointer;
   flex-shrink: 0;
 }
@@ -896,7 +905,7 @@ footer, .footer {
   justify-content: center;
   gap: 2px;
   padding: 72px 24px 48px;
-  background: #ffffff;
+  background: var(--qt-surface);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -1085,7 +1094,7 @@ footer a:hover, .footer a:hover { color: var(--qt-text) !important; }
   z-index: 1;
 }
 .payment-card {
-  background: #fff !important;
+  background: var(--qt-surface) !important;
   border: 1px solid var(--qt-line) !important;
   box-shadow: none !important;
   overflow: hidden;
@@ -1095,7 +1104,7 @@ footer a:hover, .footer a:hover { color: var(--qt-text) !important; }
   padding: 1.1rem 1.4rem !important;
 }
 .header-title {
-  color: #fff !important;
+  color: var(--qt-on-ink) !important;
   font-size: 13px !important;
   font-weight: 600 !important;
   letter-spacing: 0.1em !important;
@@ -1154,7 +1163,7 @@ footer a:hover, .footer a:hover { color: var(--qt-text) !important; }
 .coupon-form { display: flex; gap: 0.5rem; }
 .coupon-input {
   flex: 1; padding: 0.65rem 0.85rem !important;
-  border: 1px solid var(--qt-line) !important; background: #fff !important;
+  border: 1px solid var(--qt-line) !important; background: var(--qt-surface) !important;
   color: var(--qt-text) !important; font-size: 0.9rem; outline: none;
   font-family: var(--qt-font);
 }
@@ -1163,7 +1172,7 @@ footer a:hover, .footer a:hover { color: var(--qt-text) !important; }
 .coupon-input:disabled { background: var(--qt-panel-soft) !important; cursor: not-allowed; }
 .coupon-btn {
   padding: 0.65rem 1.25rem !important;
-  background: var(--qt-ink) !important; color: #fff !important;
+  background: var(--qt-ink) !important; color: var(--qt-on-ink) !important;
   border: 1px solid var(--qt-ink) !important; font-weight: 600 !important;
   font-size: 11px !important; letter-spacing: 0.08em; text-transform: uppercase;
   cursor: pointer;
@@ -1180,7 +1189,7 @@ footer a:hover, .footer a:hover { color: var(--qt-text) !important; }
 .pay-section { margin-top: 1.5rem; }
 .pay-btn {
   width: 100%; max-width: none !important; padding: 0.95rem !important;
-  background: var(--qt-ink) !important; color: #fff !important;
+  background: var(--qt-ink) !important; color: var(--qt-on-ink) !important;
   border: 1px solid var(--qt-ink) !important;
   font-size: 12px !important; font-weight: 600 !important;
   letter-spacing: 0.1em !important; text-transform: uppercase !important;
@@ -1191,11 +1200,11 @@ footer a:hover, .footer a:hover { color: var(--qt-text) !important; }
 .btn-spinner {
   width: 18px; height: 18px;
   border: 2px solid rgba(255, 255, 255, 0.4);
-  border-top-color: #fff; border-radius: 50% !important;
+  border-top-color: var(--qt-on-ink); border-radius: 50% !important;
   animation: spin 0.8s linear infinite;
 }
 .error-card {
-  background: #fff !important; border: 1px solid var(--qt-line) !important;
+  background: var(--qt-surface) !important; border: 1px solid var(--qt-line) !important;
   padding: 2.5rem !important; text-align: center;
 }
 .error-card p { color: var(--qt-red) !important; font-size: 1rem !important; margin: 0; }

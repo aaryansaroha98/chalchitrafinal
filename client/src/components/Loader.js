@@ -3,7 +3,7 @@ import React from 'react';
 const Loader = () => {
   return (
     <div style={{
-      background: '#ffffff',
+      background: 'var(--qt-surface)',
       minHeight: '100vh',
       position: 'fixed',
       top: 0,

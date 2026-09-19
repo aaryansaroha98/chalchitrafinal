@@ -131,7 +131,7 @@ const Login = () => {
 
       <style>{`
         .login-page {
-          background: #f6f6f7;
+          background: var(--qt-panel-soft);
           min-height: 100vh;
         }
 
@@ -150,14 +150,14 @@ const Login = () => {
         }
 
         .login-card {
-          background: #ffffff;
-          border: 1px solid #e5e7eb;
+          background: var(--qt-surface);
+          border: 1px solid var(--qt-line);
           min-height: 400px;
         }
 
         .login-brand-col {
           display: none;
-          background: #f6f6f7;
+          background: var(--qt-panel-soft);
           position: relative;
           overflow: hidden;
         }
@@ -192,7 +192,7 @@ const Login = () => {
         }
 
         .login-brand-title {
-          color: #0b0e17;
+          color: var(--qt-text);
           font-size: 2rem;
           font-weight: 300;
           margin-bottom: 0.75rem;
@@ -200,7 +200,7 @@ const Login = () => {
         }
 
         .login-brand-subtitle {
-          color: #5c6270;
+          color: var(--qt-muted);
           font-size: 1.1rem;
           font-weight: 300;
           margin: 0;
@@ -221,7 +221,7 @@ const Login = () => {
         }
 
         .login-heading {
-          color: #0b0e17;
+          color: var(--qt-text);
           font-size: 2.6rem;
           font-weight: 600;
           margin-bottom: 0.35rem;
@@ -232,14 +232,14 @@ const Login = () => {
         .login-divider {
           width: 52px;
           height: 1.5px;
-          background: #0b0e17;
+          background: var(--qt-ink);
           margin: 0 auto 1.5rem;
         }
 
         .login-info-box {
           width: 100%;
-          background: #f6f6f7;
-          border: 1px solid #e5e7eb;
+          background: var(--qt-panel-soft);
+          border: 1px solid var(--qt-line);
           padding: 0.75rem;
           margin-bottom: 1rem;
           text-align: center;
@@ -248,19 +248,19 @@ const Login = () => {
         .login-info-title {
           font-size: 1.35rem;
           font-weight: 600;
-          color: #0b0e17;
+          color: var(--qt-text);
           margin-bottom: 0.2rem;
         }
 
         .login-info-subtitle {
           font-size: 0.95rem;
           font-weight: 400;
-          color: #5c6270;
+          color: var(--qt-muted);
           margin-bottom: 0.6rem;
         }
 
         .login-info-text {
-          color: #5c6270;
+          color: var(--qt-muted);
           font-size: 0.75rem;
           margin: 0;
           line-height: 1.5;
@@ -280,21 +280,21 @@ const Login = () => {
 
         .login-google-btn {
           width: 100%;
-          background: #0b0e17;
-          border: 1px solid #0b0e17;
+          background: var(--qt-ink);
+          border: 1px solid var(--qt-ink);
           padding: clamp(0.38rem, 2vw, 0.55rem) 1.6rem;
           font-size: 12px;
           font-weight: 500;
           letter-spacing: 0.09em;
           text-transform: uppercase;
-          color: #ffffff;
+          color: var(--qt-on-ink);
           transition: all 0.2s ease;
           margin-bottom: 1rem;
         }
 
         .login-google-btn:hover {
-          background: #ffffff;
-          color: #0b0e17;
+          background: var(--qt-surface);
+          color: var(--qt-text);
         }
 
         .login-google-btn-inner {
@@ -315,28 +315,28 @@ const Login = () => {
 
         .login-terms-text {
           font-size: 0.82rem;
-          color: #5c6270;
+          color: var(--qt-muted);
           margin: 0;
           line-height: 1.5;
         }
 
         .login-link {
-          color: #0b0e17;
+          color: var(--qt-text);
           cursor: pointer;
           text-decoration: underline;
           font-weight: 400;
         }
 
         .login-link:hover {
-          color: #5c6270;
+          color: var(--qt-muted);
         }
 
         .login-security-box {
           margin-top: 1.25rem;
           padding: 0.75rem 0.85rem;
           width: 100%;
-          background: #f6f6f7;
-          border: 1px solid #e5e7eb;
+          background: var(--qt-panel-soft);
+          border: 1px solid var(--qt-line);
         }
 
         .login-security-header {
@@ -345,7 +345,7 @@ const Login = () => {
           justify-content: center;
           gap: 0.5rem;
           margin-bottom: 0.5rem;
-          color: #5c6270;
+          color: var(--qt-muted);
         }
 
         .login-security-label {
@@ -355,7 +355,7 @@ const Login = () => {
 
         .login-security-text {
           font-size: 0.75rem;
-          color: #8b909c;
+          color: var(--qt-quiet);
           margin: 0;
           text-align: center;
           line-height: 1.4;
@@ -389,8 +389,8 @@ const Login = () => {
           }
           .login-info-box {
             display: block !important;
-            background: #f6f6f7 !important;
-            border: 1px solid #e5e7eb !important;
+            background: var(--qt-panel-soft) !important;
+            border: 1px solid var(--qt-line) !important;
             padding: 1rem 0.75rem !important;
             margin-bottom: 1.5rem !important;
           }

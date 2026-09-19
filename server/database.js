@@ -428,6 +428,7 @@ if (usePostgres) {
       await pool.query('ALTER TABLE movies ADD COLUMN IF NOT EXISTS age_gate_note TEXT');
       await pool.query('ALTER TABLE bookings ADD COLUMN IF NOT EXISTS age_confirmed INTEGER DEFAULT 0');
       await pool.query('ALTER TABLE movie_foods ADD COLUMN IF NOT EXISTS is_free INTEGER DEFAULT 0');
+      await pool.query('ALTER TABLE settings ADD COLUMN IF NOT EXISTS horror_theme INTEGER DEFAULT 0');
       await pool.query('ALTER TABLE team ADD COLUMN IF NOT EXISTS section TEXT DEFAULT \'current_team\'');
       await pool.query('ALTER TABLE team ADD COLUMN IF NOT EXISTS display_order INTEGER DEFAULT 0');
       console.log('✅ movies/movie_foods/team columns ensured');
@@ -739,6 +740,7 @@ if (usePostgres) {
           ensureMovieSpecialColumns();
           ensureCouponWinnerColumns();
           ensureMovieFoodIsFreeColumn();
+          ensureSettingsHorrorThemeColumn();
           ensureUserCoinsColumn();
           ensureBookingCoinAmountColumn();
           ensureBookingCoinsRefundedColumn();
@@ -775,7 +777,10 @@ if (usePostgres) {
 
       const hasCreatedAt = Array.isArray(columns) && columns.some((col) => col.name === 'created_at');
       if (!hasCreatedAt) {
-        db.run('ALTER TABLE users ADD COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP', (alterErr) => {
+        // SQLite rejects a non-constant DEFAULT on ADD COLUMN, so the column is
+        // added bare and the UPDATE below backfills it. Without this the column
+        // never existed locally and the first write to it killed the server.
+        db.run('ALTER TABLE users ADD COLUMN created_at DATETIME', (alterErr) => {
           if (alterErr) {
             console.log('⚠️  Could not add users.created_at:', alterErr.message);
             return;
@@ -798,7 +803,10 @@ if (usePostgres) {
 
       const hasLastSeen = Array.isArray(columns) && columns.some((col) => col.name === 'last_seen');
       if (!hasLastSeen) {
-        db.run('ALTER TABLE users ADD COLUMN last_seen DATETIME DEFAULT CURRENT_TIMESTAMP', (alterErr) => {
+        // SQLite rejects a non-constant DEFAULT on ADD COLUMN, so the column is
+        // added bare and the UPDATE below backfills it. Without this the column
+        // never existed locally and the first write to it killed the server.
+        db.run('ALTER TABLE users ADD COLUMN last_seen DATETIME', (alterErr) => {
           if (alterErr) {
             console.log('⚠️  Could not add users.last_seen:', alterErr.message);
             return;
@@ -1053,6 +1061,27 @@ if (usePostgres) {
             console.error('⚠️  Could not add movies.age_gate_note:', alterErr.message);
           } else {
             console.log('✅ movies.age_gate_note column added');
+          }
+        });
+      }
+    });
+  }
+
+  // Screening skin switch. A column rather than a constant so the theme can be
+  // turned off from the admin panel the moment the run ends, without a deploy.
+  function ensureSettingsHorrorThemeColumn() {
+    db.all('PRAGMA table_info(settings)', [], (err, columns) => {
+      if (err) {
+        console.log('\u26a0\ufe0f  Could not inspect settings table columns:', err.message);
+        return;
+      }
+      const colNames = Array.isArray(columns) ? columns.map(c => c.name) : [];
+      if (!colNames.includes('horror_theme')) {
+        db.run('ALTER TABLE settings ADD COLUMN horror_theme INTEGER DEFAULT 0', (alterErr) => {
+          if (alterErr) {
+            console.log('\u26a0\ufe0f  Could not add settings.horror_theme:', alterErr.message);
+          } else {
+            console.log('\u2705 settings.horror_theme column added');
           }
         });
       }

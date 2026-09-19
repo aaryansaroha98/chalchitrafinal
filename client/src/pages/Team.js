@@ -40,7 +40,7 @@ const Team = () => {
           <h1 className="team-title" style={{
             fontSize: '2.5rem',
             fontWeight: '600',
-            color: '#0b0e17',
+            color: 'var(--qt-text)',
             marginBottom: '1rem',
             letterSpacing: '-0.025em'
           }}>
@@ -48,7 +48,7 @@ const Team = () => {
           </h1>
           <p className="team-subtitle" style={{
             fontSize: '1.1rem',
-            color: '#5c6270',
+            color: 'var(--qt-muted)',
             maxWidth: '600px',
             margin: '0 auto',
             lineHeight: '1.6',
@@ -60,20 +60,20 @@ const Team = () => {
 
         {error && (
           <div style={{
-            background: '#ffffff',
-            border: '1px solid #e5e7eb',
+            background: 'var(--qt-surface)',
+            border: '1px solid var(--qt-line)',
             padding: '2rem',
             textAlign: 'center',
             marginBottom: '3rem'
           }}>
             <i className="fas fa-exclamation-triangle" style={{
               fontSize: '2rem',
-              color: '#d64545',
+              color: 'var(--qt-red)',
               marginBottom: '1rem',
               display: 'block'
             }}></i>
-            <h4 style={{color: '#d64545', marginBottom: '0.5rem'}}>Unable to Load Team</h4>
-            <p style={{color: '#5c6270', margin: 0}}>{error}</p>
+            <h4 style={{color: 'var(--qt-red)', marginBottom: '0.5rem'}}>Unable to Load Team</h4>
+            <p style={{color: 'var(--qt-muted)', margin: 0}}>{error}</p>
           </div>
         )}
 
@@ -94,18 +94,18 @@ const Team = () => {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '0.35rem',
-                  background: '#ffffff',
+                  background: 'var(--qt-surface)',
                   padding: '0.35rem 0.75rem',
-                  border: '1px solid #e5e7eb'
+                  border: '1px solid var(--qt-line)'
                 }}>
                   <i className={`team-section-icon ${icon}`} style={{
                     fontSize: '0.85rem',
-                    color: '#5c6270'
+                    color: 'var(--qt-muted)'
                   }}></i>
                   <h2 className="team-section-title" style={{
                     fontSize: '1.1rem',
                     fontWeight: '600',
-                    color: '#0b0e17',
+                    color: 'var(--qt-text)',
                     margin: 0
                   }}>
                     {sectionTitle}
@@ -115,21 +115,21 @@ const Team = () => {
 
               {sectionMembers.length === 0 ? (
                 <div style={{
-                  background: '#ffffff',
-                  border: '1px solid #e5e7eb',
+                  background: 'var(--qt-surface)',
+                  border: '1px solid var(--qt-line)',
                   padding: '3rem 2rem',
                   textAlign: 'center'
                 }}>
                   <i className={icon} style={{
                     fontSize: '3rem',
-                    color: '#8b909c',
+                    color: 'var(--qt-quiet)',
                     marginBottom: '1rem',
                     display: 'block'
                   }}></i>
-                  <h4 style={{color: '#0b0e17', marginBottom: '0.5rem'}}>
+                  <h4 style={{color: 'var(--qt-text)', marginBottom: '0.5rem'}}>
                     {sectionTitle} - Coming Soon
                   </h4>
-                  <p style={{color: '#5c6270', margin: 0}}>
+                  <p style={{color: 'var(--qt-muted)', margin: 0}}>
                     We're building an amazing team for this section.
                   </p>
                 </div>
@@ -176,7 +176,7 @@ const getImageUrl = (url) => {
                           fontSize: nameFontSize,
                           fontWeight: '500',
                           marginBottom: '0.5rem',
-                          color: '#0b0e17',
+                          color: 'var(--qt-text)',
                           lineHeight: '1.2',
                           wordBreak: 'break-word',
                           overflowWrap: 'anywhere'
@@ -185,7 +185,7 @@ const getImageUrl = (url) => {
                         </h4>
                         <p className="team-member-role" style={{
                           fontSize: '0.9rem',
-                          color: '#5c6270',
+                          color: 'var(--qt-muted)',
                           fontWeight: '600',
                           marginBottom: '0.25rem',
                           textTransform: 'uppercase',

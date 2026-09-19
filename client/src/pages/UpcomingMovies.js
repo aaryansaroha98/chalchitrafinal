@@ -172,7 +172,7 @@ const UpcomingMovies = () => {
               line-height: 1.4 !important;
               max-width: 100% !important;
               margin-top: -0.2rem !important;
-              color: #6c757d !important;
+              color: var(--qt-muted) !important;
             }
 
             .upcoming-card {
@@ -200,9 +200,9 @@ const UpcomingMovies = () => {
               left: 6px !important;
               padding: clamp(2px, 2vw, 5px) clamp(6px, 3.5vw, 10px) !important;
               font-size: clamp(0.65rem, 3vw, 0.85rem) !important;
-              background-color: #ffffff !important;
-              color: #0b0e17 !important;
-              border: 1px solid #e5e7eb !important;
+              background-color: var(--qt-surface) !important;
+              color: var(--qt-text) !important;
+              border: 1px solid var(--qt-line) !important;
             }
 
             .upcoming-btn {
@@ -265,9 +265,9 @@ const UpcomingMovies = () => {
               padding: clamp(2px, 2vw, 5px) clamp(6px, 3.5vw, 10px) !important;
               font-size: clamp(0.65rem, 3vw, 0.85rem) !important;
               border-radius: 6px !important;
-              border: 1px solid #e5e7eb !important;
-              background-color: #ffffff !important;
-              color: #0b0e17 !important;
+              border: 1px solid var(--qt-line) !important;
+              background-color: var(--qt-surface) !important;
+              color: var(--qt-text) !important;
             }
 
             .home-featured-btn {
@@ -289,7 +289,7 @@ const UpcomingMovies = () => {
           <h1 className="upcoming-heading" style={{
             fontSize: '2.5rem',
             fontWeight: '600',
-            color: '#0b0e17',
+            color: 'var(--qt-text)',
             marginBottom: '1rem',
             letterSpacing: '-0.025em'
           }}>
@@ -297,7 +297,7 @@ const UpcomingMovies = () => {
           </h1>
           <p className="upcoming-subtitle" style={{
             fontSize: '1.1rem',
-            color: '#5c6270',
+            color: 'var(--qt-muted)',
             maxWidth: '600px',
             margin: '0 auto',
             lineHeight: '1.6',
@@ -311,8 +311,8 @@ const UpcomingMovies = () => {
           <Alert variant="danger" style={{
             borderRadius: '8px',
             border: 'none',
-            backgroundColor: '#f8d7da',
-            color: '#721c24',
+            backgroundColor: 'var(--qt-danger-bg)',
+            color: 'var(--qt-danger-fg)',
             padding: '1rem 1.5rem',
             marginBottom: '2rem'
           }}>
@@ -325,19 +325,19 @@ const UpcomingMovies = () => {
           <div style={{
             textAlign: 'center',
             padding: '4rem 2rem',
-            background: '#ffffff',
-            border: '1px solid #e5e7eb'
+            background: 'var(--qt-surface)',
+            border: '1px solid var(--qt-line)'
           }}>
             <i className="fas fa-film" style={{
               fontSize: '4rem',
-              color: '#8b909c',
+              color: 'var(--qt-quiet)',
               marginBottom: '1.5rem',
               display: 'block'
             }}></i>
             <p style={{
               fontFamily: '"Times New Roman", Times, Georgia, serif',
               fontSize: '1.5rem',
-              color: '#0b0e17',
+              color: 'var(--qt-text)',
               fontStyle: 'italic',
               margin: 0,
               lineHeight: '1.6'
@@ -350,8 +350,8 @@ const UpcomingMovies = () => {
             {upcomingMovies.map((movie) => (
               <Col xl={4} lg={4} md={4} sm={6} xs={6} key={movie.id} style={{ alignSelf: 'flex-start' }}>
                 <div className="upcoming-card" style={{
-                  background: '#ffffff',
-                  border: '1px solid #e5e7eb',
+                  background: 'var(--qt-surface)',
+                  border: '1px solid var(--qt-line)',
                   overflow: 'hidden',
                   transition: 'border-color 0.2s ease',
                   position: 'relative',
@@ -368,8 +368,8 @@ const UpcomingMovies = () => {
                   {/* Movie Poster */}
                   <div style={{
                     position: 'relative',
-                    backgroundColor: '#f6f6f7',
-                    borderBottom: '1px solid #eef0f2'
+                    backgroundColor: 'var(--qt-panel-soft)',
+                    borderBottom: '1px solid var(--qt-line-soft)'
                   }}>
                   {movie.poster_url ? (
                     <img
@@ -383,7 +383,7 @@ const UpcomingMovies = () => {
                     />
                   ) : (
                       <div style={{
-                        backgroundColor: '#e9ecef',
+                        backgroundColor: 'var(--qt-placeholder-bg)',
                         width: '100%',
                         aspectRatio: '2 / 3',
                         display: 'flex',
@@ -392,7 +392,7 @@ const UpcomingMovies = () => {
                       }}>
                         <i className="fas fa-film" style={{
                           fontSize: '3rem',
-                          color: '#adb5bd'
+                          color: 'var(--qt-placeholder-fg)'
                         }}></i>
                       </div>
                     )}
@@ -404,9 +404,9 @@ const UpcomingMovies = () => {
                       position: 'absolute',
                       top: '12px',
                       left: '12px',
-                      backgroundColor: '#ffffff',
-                      color: '#0b0e17',
-                      border: '1px solid #e5e7eb',
+                      backgroundColor: 'var(--qt-surface)',
+                      color: 'var(--qt-text)',
+                      border: '1px solid var(--qt-line)',
                       padding: '4px 8px',
                       fontSize: '0.75rem',
                       fontWeight: '600'
@@ -430,7 +430,7 @@ const UpcomingMovies = () => {
                     fontSize: '1.05rem',
                     fontWeight: '600',
                     marginBottom: '0.25rem',
-                    color: '#0b0e17',
+                    color: 'var(--qt-text)',
                     lineHeight: '1.2',
                     display: '-webkit-box',
                     WebkitLineClamp: 1,
@@ -442,7 +442,7 @@ const UpcomingMovies = () => {
 
                     {/* Description */}
                     <p className="upcoming-desc" style={{
-                      color: '#5c6270',
+                      color: 'var(--qt-muted)',
                       fontSize: '0.65rem',
                       marginBottom: '0.4rem',
                       lineHeight: '1.3',
@@ -468,7 +468,7 @@ const UpcomingMovies = () => {
                           marginLeft: '0px'
                         }}>
                           <i className="fas fa-map-marker-alt" style={{
-                            color: '#8b909c',
+                            color: 'var(--qt-quiet)',
                             fontSize: '0.7rem',
                             marginRight: '0.5rem',
                             minWidth: '14px'
@@ -476,7 +476,7 @@ const UpcomingMovies = () => {
                         <div>
                           <div className="upcoming-label" style={{
                             fontSize: '0.6rem',
-                            color: '#8b909c',
+                            color: 'var(--qt-quiet)',
                             fontWeight: '500',
                             textTransform: 'uppercase',
                             letterSpacing: '0.5px',
@@ -484,7 +484,7 @@ const UpcomingMovies = () => {
                           }}>Venue</div>
                           <div className="upcoming-value" style={{
                             fontSize: '0.85rem',
-                            color: '#0b0e17',
+                            color: 'var(--qt-text)',
                             fontWeight: '500'
                           }}>{movie.venue}</div>
                         </div>
@@ -497,7 +497,7 @@ const UpcomingMovies = () => {
                           right: '0'
                         }}>
                           <i className="fas fa-clock" style={{
-                            color: '#8b909c',
+                            color: 'var(--qt-quiet)',
                             fontSize: '0.7rem',
                             marginRight: '0.5rem',
                             minWidth: '14px'
@@ -505,7 +505,7 @@ const UpcomingMovies = () => {
                           <div>
                             <div className="upcoming-label" style={{
                               fontSize: '0.6rem',
-                              color: '#8b909c',
+                              color: 'var(--qt-quiet)',
                               fontWeight: '500',
                               textTransform: 'uppercase',
                               letterSpacing: '0.5px',
@@ -513,7 +513,7 @@ const UpcomingMovies = () => {
                             }}>Show Time</div>
                             <div className="upcoming-value" style={{
                               fontSize: '0.85rem',
-                              color: '#0b0e17',
+                              color: 'var(--qt-text)',
                               fontWeight: '500'
                             }}>{new Date(movie.date).toLocaleTimeString('en-IN', {
                               hour: '2-digit',
@@ -559,8 +559,8 @@ const UpcomingMovies = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               style={{
-                background: '#ffffff',
-                border: '1px solid #e5e7eb',
+                background: 'var(--qt-surface)',
+                border: '1px solid var(--qt-line)',
                 padding: '24px',
                 maxWidth: '360px',
                 textAlign: 'center',
@@ -575,14 +575,14 @@ const UpcomingMovies = () => {
                   position: 'absolute',
                   top: '14px',
                   right: '14px',
-                  background: '#ffffff',
-                  border: '1px solid #e5e7eb',
+                  background: 'var(--qt-surface)',
+                  border: '1px solid var(--qt-line)',
                   width: '32px',
                   height: '32px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#0b0e17',
+                  color: 'var(--qt-text)',
                   cursor: 'pointer',
                   fontSize: '16px'
                 }}
@@ -605,7 +605,7 @@ const UpcomingMovies = () => {
 
               {/* Main message */}
               <h2 style={{
-                color: '#0b0e17',
+                color: 'var(--qt-text)',
                 fontSize: '22px',
                 fontWeight: 'bold',
                 marginBottom: '12px'
@@ -614,12 +614,12 @@ const UpcomingMovies = () => {
               </h2>
 
               <p style={{
-                color: '#5c6270',
+                color: 'var(--qt-muted)',
                 fontSize: '14px',
                 marginBottom: '20px',
                 lineHeight: '1.6'
               }}>
-                Please login with your <strong style={{color: '#0b0e17'}}>IIT Jammu email</strong> to book movie tickets.
+                Please login with your <strong style={{color: 'var(--qt-text)'}}>IIT Jammu email</strong> to book movie tickets.
               </p>
 
               {/* Login button */}
@@ -629,9 +629,9 @@ const UpcomingMovies = () => {
                   navigate('/login');
                 }}
                 style={{
-                  background: '#0b0e17',
-                  border: '1px solid #0b0e17',
-                  color: '#ffffff',
+                  background: 'var(--qt-ink)',
+                  border: '1px solid var(--qt-ink)',
+                  color: 'var(--qt-on-ink)',
                   fontSize: '12px',
                   fontWeight: 'bold',
                   letterSpacing: '0.09em',
@@ -655,7 +655,7 @@ const UpcomingMovies = () => {
 
               {/* Additional info */}
               <p style={{
-                color: '#8b909c',
+                color: 'var(--qt-quiet)',
                 fontSize: '12px',
                 marginTop: '14px',
                 lineHeight: '1.5'
@@ -702,8 +702,8 @@ const UpcomingMovies = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               style={{
-                background: '#ffffff',
-                border: '1px solid #e5e7eb',
+                background: 'var(--qt-surface)',
+                border: '1px solid var(--qt-line)',
                 padding: '24px',
                 maxWidth: '360px',
                 textAlign: 'center',
@@ -717,14 +717,14 @@ const UpcomingMovies = () => {
                   position: 'absolute',
                   top: '14px',
                   right: '14px',
-                  background: '#f6f6f7',
-                  border: '1px solid #e5e7eb',
+                  background: 'var(--qt-panel-soft)',
+                  border: '1px solid var(--qt-line)',
                   width: '32px',
                   height: '32px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#0b0e17',
+                  color: 'var(--qt-text)',
                   cursor: 'pointer',
                   fontSize: '16px'
                 }}
@@ -733,7 +733,7 @@ const UpcomingMovies = () => {
               </button>
 
               <h2 style={{
-                color: '#0b0e17',
+                color: 'var(--qt-text)',
                 fontSize: '22px',
                 fontWeight: 'bold',
                 marginBottom: '12px'
@@ -742,21 +742,21 @@ const UpcomingMovies = () => {
               </h2>
 
               <p style={{
-                color: '#5c6270',
+                color: 'var(--qt-muted)',
                 fontSize: '14px',
                 marginBottom: '20px',
                 lineHeight: '1.6'
               }}>
-                <strong style={{ color: '#0b0e17' }}>{bookingClosedMovieTitle}</strong><br />
+                <strong style={{ color: 'var(--qt-text)' }}>{bookingClosedMovieTitle}</strong><br />
                 {bookingStatusMessage}
               </p>
 
               <button
                 onClick={() => setShowBookingClosedModal(false)}
                 style={{
-                  background: '#0b0e17',
-                  border: '1px solid #0b0e17',
-                  color: '#ffffff',
+                  background: 'var(--qt-ink)',
+                  border: '1px solid var(--qt-ink)',
+                  color: 'var(--qt-on-ink)',
                   fontSize: '12px',
                   fontWeight: 'bold',
                   letterSpacing: '0.09em',

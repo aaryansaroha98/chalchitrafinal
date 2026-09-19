@@ -170,7 +170,7 @@ const PaymentSuccess = () => {
           scale: 2,
           useCORS: true,
           allowTaint: true,
-          backgroundColor: '#ffffff',
+          backgroundColor: 'var(--qt-surface)',
           logging: false,
           width: 800,
           height: ticketElement.scrollHeight,
@@ -294,7 +294,7 @@ const PaymentSuccess = () => {
                   {emailStatus === 'sent' && (
                     <>
                       <div className="email-status-title">Ticket email sent successfully!</div>
-                      <div className="email-status-sub">Check spam/junk if it's not in your inbox and mark it as <span style={{ color: '#b7791f', fontWeight: 'bold' }}>"Not Spam"</span>.</div>
+                      <div className="email-status-sub">Check spam/junk if it's not in your inbox and mark it as <span style={{ color: 'var(--qt-amber)', fontWeight: 'bold' }}>"Not Spam"</span>.</div>
                     </>
                   )}
                   {emailStatus === 'failed' && (

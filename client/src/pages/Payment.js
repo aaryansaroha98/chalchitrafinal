@@ -343,7 +343,7 @@ const Payment = () => {
               alignItems: 'center',
               justifyContent: 'space-between',
               padding: '12px 16px',
-              background: '#f6f6f7',
+              background: 'var(--qt-panel-soft)',
               borderRadius: '0',
               border: coinBalance >= getTotalCoins() ? '1px solid #0b0e17' : '1px solid #e5e7eb',
               cursor: coinBalance >= getTotalCoins() ? 'pointer' : 'not-allowed',
@@ -356,10 +356,10 @@ const Payment = () => {
             }}
             >
               <div>
-                <div style={{color: '#0b0e17', fontWeight: '600', fontSize: '14px'}}>
+                <div style={{color: 'var(--qt-text)', fontWeight: '600', fontSize: '14px'}}>
                   <CoinIcon size={14} /> Your Balance: {coinBalance}
                 </div>
-                <div style={{color: '#5c6270', fontSize: '12px', marginTop: '4px'}}>
+                <div style={{color: 'var(--qt-muted)', fontSize: '12px', marginTop: '4px'}}>
                   {coinBalance >= getTotalCoins()
                     ? `Enough coins to cover this booking`
                     : `Need ${getTotalCoins() - coinBalance} more coins`}
@@ -369,24 +369,24 @@ const Payment = () => {
                 width: '24px',
                 height: '24px',
                 borderRadius: '0',
-                border: '1px solid #0b0e17',
+                border: '1px solid var(--qt-ink)',
                 background: useCoins ? '#0b0e17' : 'transparent',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>
-                {useCoins && <span style={{color: '#fff', fontSize: '14px', fontWeight: 'bold'}}>✓</span>}
+                {useCoins && <span style={{color: 'var(--qt-on-ink)', fontSize: '14px', fontWeight: 'bold'}}>✓</span>}
               </div>
             </div>
             {useCoins && (
               <div style={{
                 marginTop: '8px',
                 padding: '8px 12px',
-                background: '#f6f6f7',
-                border: '1px solid #e5e7eb',
+                background: 'var(--qt-panel-soft)',
+                border: '1px solid var(--qt-line)',
                 borderRadius: '0',
                 fontSize: '12px',
-                color: '#5c6270',
+                color: 'var(--qt-muted)',
                 textAlign: 'center'
               }}>
                 <CoinIcon size={14} /> You will pay {getTotalCoins()} coins now. Coins will be refunded after you attend the movie!
@@ -538,10 +538,10 @@ const Payment = () => {
           }}>
             <div style={{
               padding: '12px 28px',
-              background: '#f6f6f7',
-              border: '1px dashed #0b0e17',
+              background: 'var(--qt-panel-soft)',
+              border: '1px dashed var(--qt-ink)',
               borderRadius: '0',
-              color: '#0b0e17',
+              color: 'var(--qt-text)',
               fontSize: '14px',
               fontWeight: '600',
               letterSpacing: '1px',

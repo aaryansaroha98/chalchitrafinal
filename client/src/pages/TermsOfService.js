@@ -19,7 +19,7 @@ const TermsOfService = () => {
   return (
     <div style={{
       minHeight: '100vh',
-      backgroundColor: '#ffffff',
+      backgroundColor: 'var(--qt-surface)',
       padding: '2rem 0'
     }}>
       <Container>
@@ -28,7 +28,7 @@ const TermsOfService = () => {
             {/* Header */}
             <div className="policy-header terms-header" style={{ textAlign: 'center', marginBottom: '1.5rem', marginTop: '0', padding: '0 1rem' }}>
               <h1 className="policy-title terms-title" style={{
-                color: '#0b0e17',
+                color: 'var(--qt-text)',
                 fontSize: '2.5rem',
                 fontWeight: '600',
                 marginBottom: '1rem',
@@ -40,13 +40,13 @@ const TermsOfService = () => {
 
             {/* Content */}
             <div style={{
-              backgroundColor: '#ffffff',
-              border: '1px solid #e5e7eb',
+              backgroundColor: 'var(--qt-surface)',
+              border: '1px solid var(--qt-line)',
               padding: '2rem',
               marginBottom: '2rem'
             }}>
               <h2 style={{
-                color: '#0b0e17',
+                color: 'var(--qt-text)',
                 fontSize: '1.5rem',
                 fontWeight: 'bold',
                 marginBottom: '1rem'
@@ -54,7 +54,7 @@ const TermsOfService = () => {
                 Terms and Conditions
               </h2>
               <p style={{
-                color: '#5c6270',
+                color: 'var(--qt-muted)',
                 lineHeight: '1.6',
                 marginBottom: '2rem'
               }}>
@@ -62,7 +62,7 @@ const TermsOfService = () => {
               </p>
 
               <h2 style={{
-                color: '#0b0e17',
+                color: 'var(--qt-text)',
                 fontSize: '1.5rem',
                 fontWeight: 'bold',
                 marginBottom: '1rem'
@@ -70,7 +70,7 @@ const TermsOfService = () => {
                 Description of Services
               </h2>
               <p style={{
-                 color: '#5c6270',
+                 color: 'var(--qt-muted)',
                  lineHeight: '1.6',
                  marginBottom: '2rem'
               }}>
@@ -87,7 +87,7 @@ const TermsOfService = () => {
               </p>
 
               <h2 style={{
-                color: '#0b0e17',
+                color: 'var(--qt-text)',
                 fontSize: '1.5rem',
                 fontWeight: 'bold',
                 marginBottom: '1rem'
@@ -95,7 +95,7 @@ const TermsOfService = () => {
                 General Terms
               </h2>
               <p style={{
-                color: '#5c6270',
+                color: 'var(--qt-muted)',
                 lineHeight: '1.6',
                 marginBottom: '2rem'
               }}>
@@ -103,7 +103,7 @@ const TermsOfService = () => {
               </p>
 
               <h2 style={{
-                color: '#0b0e17',
+                color: 'var(--qt-text)',
                 fontSize: '1.5rem',
                 fontWeight: 'bold',
                 marginBottom: '1rem'
@@ -111,7 +111,7 @@ const TermsOfService = () => {
                 Chalchitra Coins and Bookings
               </h2>
               <p style={{
-                color: '#5c6270',
+                color: 'var(--qt-muted)',
                 lineHeight: '1.6',
                 marginBottom: '2rem'
               }}>
@@ -119,7 +119,7 @@ const TermsOfService = () => {
               </p>
 
               <h2 style={{
-                color: '#0b0e17',
+                color: 'var(--qt-text)',
                 fontSize: '1.5rem',
                 fontWeight: 'bold',
                 marginBottom: '1rem'
@@ -127,7 +127,7 @@ const TermsOfService = () => {
                 Liability
               </h2>
               <p style={{
-                color: '#5c6270',
+                color: 'var(--qt-muted)',
                 lineHeight: '1.6',
                 marginBottom: '2rem'
               }}>
@@ -135,7 +135,7 @@ const TermsOfService = () => {
               </p>
 
               <h2 style={{
-                color: '#0b0e17',
+                color: 'var(--qt-text)',
                 fontSize: '1.5rem',
                 fontWeight: 'bold',
                 marginBottom: '1rem'
@@ -143,7 +143,7 @@ const TermsOfService = () => {
                 Account Termination
               </h2>
               <p style={{
-                color: '#5c6270',
+                color: 'var(--qt-muted)',
                 lineHeight: '1.6',
                 marginBottom: '2rem'
               }}>
@@ -151,7 +151,7 @@ const TermsOfService = () => {
               </p>
 
               <h2 style={{
-                color: '#0b0e17',
+                color: 'var(--qt-text)',
                 fontSize: '1.5rem',
                 fontWeight: 'bold',
                 marginBottom: '1rem'
@@ -159,7 +159,7 @@ const TermsOfService = () => {
                 Privacy Policy
               </h2>
               <p style={{
-                color: '#5c6270',
+                color: 'var(--qt-muted)',
                 lineHeight: '1.6',
                 marginBottom: '2rem'
               }}>
@@ -167,7 +167,7 @@ const TermsOfService = () => {
               </p>
 
               <h2 style={{
-                color: '#0b0e17',
+                color: 'var(--qt-text)',
                 fontSize: '1.5rem',
                 fontWeight: 'bold',
                 marginBottom: '1rem'
@@ -175,7 +175,7 @@ const TermsOfService = () => {
                 Coin Refunds
               </h2>
               <p style={{
-                color: '#5c6270',
+                color: 'var(--qt-muted)',
                 lineHeight: '1.6',
                 marginBottom: '2rem'
               }}>
@@ -183,7 +183,7 @@ const TermsOfService = () => {
               </p>
 
               <h2 style={{
-                color: '#0b0e17',
+                color: 'var(--qt-text)',
                 fontSize: '1.5rem',
                 fontWeight: 'bold',
                 marginBottom: '1rem'
@@ -191,19 +191,19 @@ const TermsOfService = () => {
                 Contact Us
               </h2>
               <p style={{
-                color: '#5c6270',
+                color: 'var(--qt-muted)',
                 lineHeight: '1.6',
                 marginBottom: '1rem'
               }}>
                 If you have any questions about these terms and conditions, please contact us:
               </p>
               <div style={{
-                color: '#5c6270',
+                color: 'var(--qt-muted)',
                 lineHeight: '1.6'
               }}>
-                <p style={{margin: '0.5rem 0', color: '#5c6270'}}><strong>Phone:</strong> +91 9569579671</p>
-                <p style={{margin: '0.5rem 0', color: '#5c6270'}}><strong>Email:</strong> chalchitra@iitjammu.ac.in</p>
-                <p style={{margin: '0.5rem 0', color: '#5c6270'}}>
+                <p style={{margin: '0.5rem 0', color: 'var(--qt-muted)'}}><strong>Phone:</strong> +91 9569579671</p>
+                <p style={{margin: '0.5rem 0', color: 'var(--qt-muted)'}}><strong>Email:</strong> chalchitra@iitjammu.ac.in</p>
+                <p style={{margin: '0.5rem 0', color: 'var(--qt-muted)'}}>
                   <strong>Address:</strong> Indian Institute of Technology Jammu, Jagti, PO Nagrota, NH-44, Jammu - 181221, J&K, India.
                 </p>
               </div>

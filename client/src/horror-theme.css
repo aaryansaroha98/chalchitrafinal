@@ -1,0 +1,529 @@
+/* ============================================================
+   OBSESSION — "ONE WISH WILLOW" SCREENING SKIN
+   A temporary, movie-scoped theme. Everything here is scoped to
+   html[data-horror="on"], which HorrorThemeContext sets only while
+   an admin has the screening skin switched on. Remove the switch
+   and the site returns to the permanent light design untouched.
+
+   Concept: the site is lit by one failing bulb. Bone-white text on
+   void black, blood for anything you commit to, and a sickly gold
+   for the wish itself — the willow grants it, and takes something back.
+   ============================================================ */
+
+html[data-horror="on"] {
+  /* --- the dark --- */
+  --h-void: #050508;
+  --h-pitch: #08080c;
+  --h-panel: #0d0d13;
+  --h-panel-raised: #13131c;
+
+  /* --- what little light there is --- */
+  --h-bone: #ded8cc;       /* aged paper, never pure white */
+  --h-ash: #948e83;
+  --h-dust: #625d55;
+  --h-line: #24242e;
+  --h-line-soft: #17171f;
+
+  /* --- the curse --- */
+  --h-blood: #8e1116;
+  --h-blood-bright: #c4161d;
+  --h-willow: #b9a24a;     /* the wish-gold */
+  --h-willow-dim: rgba(185, 162, 74, 0.22);
+
+  /* ---- repaint the design system by redefining its tokens ---- */
+  --qt-bg: var(--h-void);
+  --qt-surface: var(--h-panel);
+  --qt-panel: var(--h-panel);
+  --qt-panel-raised: var(--h-panel-raised);
+  --qt-panel-soft: var(--h-pitch);
+  --qt-text: var(--h-bone);
+  --qt-muted: var(--h-ash);
+  --qt-quiet: var(--h-dust);
+  --qt-line: var(--h-line);
+  --qt-line-soft: var(--h-line-soft);
+  --qt-ink: var(--h-blood);
+  --qt-ink-hover: var(--h-blood-bright);
+  --qt-on-ink: #f2ece0;
+  --qt-red: var(--h-blood-bright);
+  --qt-amber: var(--h-willow);
+  --qt-green: #4f7a52;
+  --qt-blue: #4a6b8a;
+  --qt-danger-bg: #2a0c0e;
+  --qt-danger-fg: #e8a5a8;
+  --qt-placeholder-bg: #101017;
+  --qt-placeholder-fg: #3d3d49;
+  --qt-seat-taken: #1b1b24;
+
+  --primary-color: var(--h-blood);
+  --bg-primary: var(--h-void);
+  --text-primary: var(--h-bone);
+  --border-color: var(--h-line);
+
+  color-scheme: dark;
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+html[data-horror="on"],
+html[data-horror="on"] body {
+  background: var(--h-void) !important;
+  color: var(--h-bone);
+}
+
+/* The bulb. Sits over the page, never over the atmosphere layers,
+   and dims the whole site a hair every few seconds. */
+html[data-horror="on"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+  background: #000;
+  opacity: 0;
+  animation: h-flicker 9s steps(1, end) infinite;
+}
+
+html[data-horror="on"] h1,
+html[data-horror="on"] h2,
+html[data-horror="on"] h3,
+html[data-horror="on"] .h1,
+html[data-horror="on"] .h2 {
+  font-family: 'Cinzel', 'Space Grotesk', serif !important;
+  color: var(--h-bone);
+  letter-spacing: 0.01em;
+  text-shadow: 0 0 22px rgba(0, 0, 0, 0.9);
+}
+
+html[data-horror="on"] ::selection {
+  background: var(--h-blood);
+  color: #f2ece0;
+}
+
+/* ============================================================
+   BUTTONS — the base theme hardcodes #fff, so each is re-stated.
+   Hover fills from the bottom like something rising.
+   ============================================================ */
+html[data-horror="on"] .btn {
+  background: transparent !important;
+  border-color: var(--h-line) !important;
+  color: var(--h-bone) !important;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  transition: border-color 200ms ease, color 200ms ease, letter-spacing 200ms ease;
+}
+html[data-horror="on"] .btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(to top, var(--h-blood), #5c0a0e);
+  transform: translateY(101%);
+  transition: transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+html[data-horror="on"] .btn:hover::before,
+html[data-horror="on"] .btn:focus-visible::before { transform: translateY(0); }
+html[data-horror="on"] .btn:hover,
+html[data-horror="on"] .btn:focus-visible {
+  border-color: var(--h-blood-bright) !important;
+  color: #f4ece2 !important;
+  letter-spacing: 0.13em;
+}
+
+html[data-horror="on"] .btn-primary,
+html[data-horror="on"] .btn.btn-primary {
+  background: var(--h-blood) !important;
+  border-color: var(--h-blood) !important;
+  color: #f4ece2 !important;
+  box-shadow: 0 0 0 0 rgba(196, 22, 29, 0.5) !important;
+  animation: h-heartbeat 3.2s ease-out infinite;
+}
+html[data-horror="on"] .btn-primary::before {
+  background: linear-gradient(to top, var(--h-blood-bright), var(--h-blood));
+}
+html[data-horror="on"] .btn-primary:hover,
+html[data-horror="on"] .btn.btn-primary:hover,
+html[data-horror="on"] .btn-primary:focus,
+html[data-horror="on"] .btn.btn-primary:focus {
+  background: var(--h-blood-bright) !important;
+  border-color: var(--h-blood-bright) !important;
+  color: #fff !important;
+}
+
+html[data-horror="on"] .btn-secondary,
+html[data-horror="on"] .btn.btn-secondary,
+html[data-horror="on"] .btn-light,
+html[data-horror="on"] .btn-outline-secondary,
+html[data-horror="on"] .btn-danger,
+html[data-horror="on"] .btn.btn-danger,
+html[data-horror="on"] .btn-success,
+html[data-horror="on"] .btn.btn-success,
+html[data-horror="on"] .btn-info,
+html[data-horror="on"] .btn.btn-info,
+html[data-horror="on"] .btn-warning,
+html[data-horror="on"] .btn.btn-warning,
+html[data-horror="on"] .btn-outline-primary,
+html[data-horror="on"] .btn.btn-outline-primary,
+html[data-horror="on"] .btn-outline-dark {
+  background: transparent !important;
+}
+html[data-horror="on"] .btn-danger,
+html[data-horror="on"] .btn.btn-danger { border-color: var(--h-blood-bright) !important; color: #e89a9e !important; }
+html[data-horror="on"] .btn-success,
+html[data-horror="on"] .btn.btn-success { border-color: #4f7a52 !important; color: #9dc4a0 !important; }
+html[data-horror="on"] .btn-warning,
+html[data-horror="on"] .btn.btn-warning { border-color: var(--h-willow) !important; color: var(--h-willow) !important; }
+html[data-horror="on"] .btn-outline-primary:hover,
+html[data-horror="on"] .btn.btn-outline-primary:hover,
+html[data-horror="on"] .btn-outline-dark:hover { color: #f4ece2 !important; }
+html[data-horror="on"] .btn-link { color: var(--h-willow); }
+
+/* ============================================================
+   SURFACES
+   ============================================================ */
+html[data-horror="on"] .card {
+  background: var(--h-panel);
+  border-color: var(--h-line);
+  transition: border-color 220ms ease, box-shadow 220ms ease;
+}
+html[data-horror="on"] .card:hover {
+  border-color: var(--h-blood);
+  box-shadow: 0 0 34px rgba(142, 17, 22, 0.16) !important;
+}
+html[data-horror="on"] .card-header,
+html[data-horror="on"] .card-footer { background: var(--h-pitch); border-color: var(--h-line); }
+html[data-horror="on"] .bg-void { background: var(--h-void) !important; }
+html[data-horror="on"] .bg-glass { background: var(--h-panel) !important; }
+
+html[data-horror="on"] .form-control,
+html[data-horror="on"] .form-select,
+html[data-horror="on"] .input-group-text {
+  background: var(--h-pitch) !important;
+  border-color: var(--h-line) !important;
+  color: var(--h-bone) !important;
+}
+html[data-horror="on"] .form-control:focus,
+html[data-horror="on"] .form-select:focus {
+  border-color: var(--h-blood) !important;
+  box-shadow: 0 0 0 3px rgba(142, 17, 22, 0.18) !important;
+}
+html[data-horror="on"] .form-control::placeholder { color: var(--h-dust) !important; }
+
+html[data-horror="on"] .modal-content {
+  background: var(--h-panel);
+  border: 1px solid var(--h-line);
+  box-shadow: 0 0 80px rgba(0, 0, 0, 0.9);
+}
+html[data-horror="on"] .modal-header,
+html[data-horror="on"] .modal-footer { background: var(--h-pitch); border-color: var(--h-line); }
+html[data-horror="on"] .modal-backdrop.show { opacity: 0.86; }
+html[data-horror="on"] .btn-close { filter: invert(1) grayscale(1) brightness(1.6); }
+
+html[data-horror="on"] .qt-nav {
+  background: rgba(5, 5, 8, 0.86) !important;
+  border-bottom-color: var(--h-line) !important;
+}
+html[data-horror="on"] .qt-brand-name { color: var(--h-bone); }
+html[data-horror="on"] .qt-brand-logo { filter: invert(1) hue-rotate(180deg) brightness(1.15); }
+html[data-horror="on"] .qt-footer { background: var(--h-void); border-top-color: var(--h-line); }
+html[data-horror="on"] .qt-nav-link.nav-link:hover { color: var(--h-willow) !important; }
+
+/* The hero video is graded, not hidden — it should look like footage running
+   in a room with the lights off. */
+html[data-horror="on"] .video-section > video,
+html[data-horror="on"] .video-section > div[style*="background-image"] {
+  filter: grayscale(0.6) contrast(1.22) brightness(0.44) sepia(0.18) hue-rotate(-10deg);
+}
+html[data-horror="on"] .video-section::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;            /* over the media, under the copy */
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 42%, rgba(5, 5, 8, 0.15), rgba(5, 5, 8, 0.88) 78%),
+    linear-gradient(to bottom, rgba(5, 5, 8, 0.72), rgba(5, 5, 8, 0.3) 45%, var(--h-void) 99%);
+}
+
+/* Posters stay lit, but colder and harder — like old film stock. */
+html[data-horror="on"] .movie-card img,
+html[data-horror="on"] .qt-movie-poster img,
+html[data-horror="on"] img.movie-poster {
+  filter: grayscale(0.45) contrast(1.16) brightness(0.82) sepia(0.12);
+  transition: filter 400ms ease;
+}
+html[data-horror="on"] .card:hover img.movie-poster,
+html[data-horror="on"] .movie-card:hover img { filter: grayscale(0) contrast(1.08) brightness(0.95); }
+
+/* ============================================================
+   SEAT MAP — taken seats are claimed, yours beats like a pulse
+   ============================================================ */
+html[data-horror="on"] .seat-button.available {
+  background: var(--h-panel-raised);
+  border-color: var(--h-line);
+  color: var(--h-ash);
+}
+html[data-horror="on"] .seat-button.available:hover {
+  background: rgba(142, 17, 22, 0.28);
+  border-color: var(--h-blood-bright);
+  color: #f2e6e6;
+  box-shadow: 0 0 16px rgba(196, 22, 29, 0.45);
+}
+html[data-horror="on"] .seat-button.selected {
+  background: var(--h-blood) !important;
+  border-color: var(--h-blood-bright) !important;
+  color: #f7ece9 !important;
+  animation: h-seat-pulse 2s ease-in-out infinite;
+}
+html[data-horror="on"] .seat-button.occupied {
+  background: var(--h-seat-taken, #1b1b24) !important;
+  border-color: #262630 !important;
+  color: #45454f !important;
+  opacity: 1;
+}
+html[data-horror="on"] .booking-seat-screen {
+  background: linear-gradient(to bottom, rgba(185, 162, 74, 0.16), transparent) !important;
+  border-color: var(--h-willow-dim) !important;
+  color: var(--h-willow) !important;
+}
+
+/* ============================================================
+   BOOTSTRAP COMPONENTS
+   Alerts, badges and spinners ship their own light palette and are
+   the only things the token pass could not reach — they never read
+   a --qt-* value. Public pages use Alert, Modal, Nav, Spinner, Badge.
+   ============================================================ */
+html[data-horror="on"] .alert {
+  background: var(--h-panel) !important;
+  border: 1px solid var(--h-line) !important;
+  color: var(--h-bone) !important;
+}
+html[data-horror="on"] .alert-danger {
+  background: #1d0708 !important;
+  border-color: rgba(196, 22, 29, 0.55) !important;
+  color: #f0a8ab !important;
+}
+html[data-horror="on"] .alert-warning {
+  background: #17130a !important;
+  border-color: rgba(185, 162, 74, 0.5) !important;
+  color: #e0cd8e !important;
+}
+html[data-horror="on"] .alert-success {
+  background: #0a1410 !important;
+  border-color: rgba(79, 122, 82, 0.5) !important;
+  color: #9dc4a0 !important;
+}
+html[data-horror="on"] .alert-info,
+html[data-horror="on"] .alert-primary,
+html[data-horror="on"] .alert-secondary,
+html[data-horror="on"] .alert-light {
+  background: var(--h-panel-raised) !important;
+  border-color: var(--h-line) !important;
+  color: var(--h-bone) !important;
+}
+html[data-horror="on"] .alert .alert-link,
+html[data-horror="on"] .alert a { color: var(--h-willow) !important; }
+
+html[data-horror="on"] .badge {
+  background: var(--h-panel-raised) !important;
+  border: 1px solid var(--h-line);
+  color: var(--h-bone) !important;
+}
+html[data-horror="on"] .badge.bg-danger,
+html[data-horror="on"] .badge.bg-primary { background: var(--h-blood) !important; color: #f4ece2 !important; }
+html[data-horror="on"] .badge.bg-warning { background: transparent !important; border-color: var(--h-willow); color: var(--h-willow) !important; }
+
+html[data-horror="on"] .spinner-border,
+html[data-horror="on"] .spinner-grow { color: var(--h-blood-bright) !important; }
+
+html[data-horror="on"] .table { --bs-table-bg: transparent; color: var(--h-bone); }
+html[data-horror="on"] .table > :not(caption) > * > * {
+  background: transparent !important;
+  border-color: var(--h-line) !important;
+  color: var(--h-bone);
+}
+html[data-horror="on"] .list-group-item {
+  background: var(--h-panel) !important;
+  border-color: var(--h-line) !important;
+  color: var(--h-bone) !important;
+}
+html[data-horror="on"] .dropdown-menu {
+  background: var(--h-panel) !important;
+  border-color: var(--h-line) !important;
+}
+html[data-horror="on"] .dropdown-item { color: var(--h-bone) !important; }
+html[data-horror="on"] .dropdown-item:hover,
+html[data-horror="on"] .dropdown-item:focus {
+  background: rgba(142, 17, 22, 0.3) !important;
+  color: #f4ece2 !important;
+}
+html[data-horror="on"] .offcanvas {
+  background: var(--h-void) !important;
+  border-color: var(--h-line) !important;
+  color: var(--h-bone);
+}
+
+/* ============================================================
+   ATMOSPHERE — injected once by <HorrorAtmosphere />
+   ============================================================ */
+.h-atmos {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2147482000;
+  overflow: hidden;
+}
+
+/* Film grain. Self-contained SVG turbulence — no asset to ship. */
+.h-grain {
+  position: absolute;
+  inset: -50%;
+  opacity: 0.16;
+  will-change: transform;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  animation: h-grain-shift 700ms steps(6, end) infinite;
+}
+
+/* Vignette that breathes, so the dark never sits still. */
+.h-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 42%, transparent 34%, rgba(0, 0, 0, 0.62) 82%, rgba(0, 0, 0, 0.92) 100%);
+  animation: h-breathe 7s ease-in-out infinite;
+}
+
+.h-fog {
+  position: absolute;
+  left: -30%;
+  width: 160%;
+  height: 46vh;
+  background: radial-gradient(ellipse at center, rgba(150, 150, 168, 0.09), transparent 68%);
+  filter: blur(26px);
+}
+.h-fog-low { bottom: -14vh; animation: h-drift 41s linear infinite; }
+.h-fog-high { top: -12vh; animation: h-drift 61s linear infinite reverse; opacity: 0.6; }
+
+/* The lantern: a weak light that follows the cursor, so the page
+   only ever feels half-seen. Position comes from JS custom props. */
+.h-lantern {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle 280px at var(--h-mx, 50%) var(--h-my, 40%),
+    rgba(185, 162, 74, 0.10),
+    transparent 70%
+  );
+  will-change: background;
+}
+
+/* Willow branches creeping in from the top corners, swaying. */
+.h-willow-branch {
+  position: absolute;
+  top: 58px;             /* clears the sticky navbar so the brand stays legible */
+  width: min(360px, 38vw);
+  opacity: 0.85;
+  color: #0e1016;
+  filter: drop-shadow(0 1px 0 rgba(185, 162, 74, 0.20))
+          drop-shadow(0 0 14px rgba(0, 0, 0, 0.9));
+  transform-origin: 50% 0;
+}
+.h-willow-left  { left: -18px; animation: h-sway 11s ease-in-out infinite; }
+.h-willow-right { right: -18px; transform: scaleX(-1); animation: h-willow-sway-right 13s ease-in-out infinite; }
+
+/* ============================================================
+   THE SCARE
+   ============================================================ */
+.h-scare {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483600;
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+  background: #000;
+  animation: h-scare-bg 900ms ease-out forwards;
+}
+.h-scare-figure {
+  width: min(62vmin, 520px);
+  color: #cdc6b8;
+  filter: drop-shadow(0 0 40px rgba(0, 0, 0, 1));
+  animation: h-scare-figure 900ms cubic-bezier(0.15, 0.9, 0.25, 1) forwards;
+}
+
+/* ============================================================
+   KEYFRAMES
+   ============================================================ */
+@keyframes h-flicker {
+  0%, 96%  { opacity: 0; }
+  96.4%    { opacity: 0.55; }
+  96.8%    { opacity: 0; }
+  97.3%    { opacity: 0.72; }
+  97.6%    { opacity: 0.04; }
+  98.1%    { opacity: 0.42; }
+  98.5%, 100% { opacity: 0; }
+}
+@keyframes h-grain-shift {
+  0%   { transform: translate(0, 0); }
+  20%  { transform: translate(-6%, 3%); }
+  40%  { transform: translate(4%, -5%); }
+  60%  { transform: translate(-3%, 6%); }
+  80%  { transform: translate(5%, 2%); }
+  100% { transform: translate(0, 0); }
+}
+@keyframes h-breathe {
+  0%, 100% { opacity: 0.86; transform: scale(1); }
+  50%      { opacity: 1;    transform: scale(1.035); }
+}
+@keyframes h-drift {
+  0%   { transform: translateX(-12%); }
+  100% { transform: translateX(12%); }
+}
+@keyframes h-sway {
+  0%, 100% { transform: rotate(-1.6deg); }
+  50%      { transform: rotate(2.4deg); }
+}
+@keyframes h-willow-sway-right {
+  0%, 100% { transform: scaleX(-1) rotate(-1.6deg); }
+  50%      { transform: scaleX(-1) rotate(2.4deg); }
+}
+@keyframes h-seat-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(196, 22, 29, 0.55); }
+  50%      { box-shadow: 0 0 14px 4px rgba(196, 22, 29, 0.12); }
+}
+@keyframes h-heartbeat {
+  0%, 82%, 100% { box-shadow: 0 0 0 0 rgba(196, 22, 29, 0.45) !important; }
+  86%  { box-shadow: 0 0 0 7px rgba(196, 22, 29, 0) !important; }
+  90%  { box-shadow: 0 0 0 0 rgba(196, 22, 29, 0.45) !important; }
+  94%  { box-shadow: 0 0 0 9px rgba(196, 22, 29, 0) !important; }
+}
+@keyframes h-scare-bg {
+  0%   { background: rgba(0, 0, 0, 0); }
+  8%   { background: rgba(0, 0, 0, 0.98); }
+  70%  { background: rgba(0, 0, 0, 0.98); }
+  100% { background: rgba(0, 0, 0, 0); }
+}
+@keyframes h-scare-figure {
+  0%   { opacity: 0; transform: scale(0.72) translateY(14px); filter: blur(10px); }
+  9%   { opacity: 1; transform: scale(1.14) translateY(0);    filter: blur(0); }
+  14%  { opacity: 1; transform: scale(1.05) translateX(-9px); }
+  19%  { opacity: 1; transform: scale(1.12) translateX(7px); }
+  26%  { opacity: 1; transform: scale(1.06) translateX(0); }
+  70%  { opacity: 0.9; transform: scale(1.02); }
+  100% { opacity: 0;  transform: scale(1.3);  filter: blur(6px); }
+}
+
+/* ============================================================
+   REDUCED MOTION — the look survives, the movement does not.
+   The scare is suppressed entirely in HorrorAtmosphere.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  html[data-horror="on"] body::after,
+  .h-grain, .h-vignette, .h-fog, .h-willow-branch,
+  html[data-horror="on"] .btn-primary,
+  html[data-horror="on"] .seat-button.selected {
+    animation: none !important;
+  }
+  .h-lantern { display: none; }
+  html[data-horror="on"] .btn::before { transition: none; }
+}

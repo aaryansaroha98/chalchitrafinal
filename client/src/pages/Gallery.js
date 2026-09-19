@@ -71,51 +71,51 @@ const Gallery = () => {
       <Container className="gallery-container" style={{ padding: '6rem 2rem 4rem' }}>
         {/* Professional Header */}
         <div className="gallery-header" style={{ textAlign: 'center', marginBottom: '1.5rem', marginTop: '-5rem', padding: '0 1rem' }}>
-          <h1 className="gallery-title" style={{ fontSize: '2.5rem', fontWeight: '600', color: '#0b0e17', marginBottom: '1rem', letterSpacing: '-0.025em' }}>
+          <h1 className="gallery-title" style={{ fontSize: '2.5rem', fontWeight: '600', color: 'var(--qt-text)', marginBottom: '1rem', letterSpacing: '-0.025em' }}>
             EVENT GALLERY
           </h1>
-          <p className="gallery-subtitle" style={{ fontSize: '1.1rem', color: '#5c6270', maxWidth: '600px', margin: '0 auto', lineHeight: '1.6', fontWeight: '400' }}>
+          <p className="gallery-subtitle" style={{ fontSize: '1.1rem', color: 'var(--qt-muted)', maxWidth: '600px', margin: '0 auto', lineHeight: '1.6', fontWeight: '400' }}>
             Relive the magical moments from our cinematic events
           </p>
         </div>
 
         {error && (
           <div style={{
-            background: '#ffffff',
-            border: '1px solid #e5e7eb',
+            background: 'var(--qt-surface)',
+            border: '1px solid var(--qt-line)',
             padding: '2rem',
             textAlign: 'center',
             marginBottom: '3rem'
           }}>
             <i className="fas fa-exclamation-triangle" style={{
               fontSize: '2rem',
-              color: '#d64545',
+              color: 'var(--qt-red)',
               marginBottom: '1rem',
               display: 'block'
             }}></i>
-            <h4 style={{ color: '#d64545', marginBottom: '0.5rem' }}>Unable to Load Gallery</h4>
-            <p style={{ color: '#5c6270', margin: 0 }}>{error}</p>
+            <h4 style={{ color: 'var(--qt-red)', marginBottom: '0.5rem' }}>Unable to Load Gallery</h4>
+            <p style={{ color: 'var(--qt-muted)', margin: 0 }}>{error}</p>
           </div>
         )}
 
         {gallery.length === 0 && !error ? (
           <div style={{
-            background: '#ffffff',
-            border: '1px solid #e5e7eb',
+            background: 'var(--qt-surface)',
+            border: '1px solid var(--qt-line)',
             padding: '4rem 2rem',
             textAlign: 'center'
           }}>
             <i className="fas fa-camera" style={{
               fontSize: '4rem',
-              color: '#8b909c',
+              color: 'var(--qt-quiet)',
               marginBottom: '1.5rem',
               display: 'block'
             }}></i>
-            <h3 style={{ color: '#0b0e17', marginBottom: '1rem', fontWeight: '600' }}>
+            <h3 style={{ color: 'var(--qt-text)', marginBottom: '1rem', fontWeight: '600' }}>
               Gallery Coming Soon
             </h3>
             <p style={{
-              color: '#5c6270',
+              color: 'var(--qt-muted)',
               margin: 0,
               fontSize: '1.1rem',
               maxWidth: '400px',
@@ -129,8 +129,8 @@ const Gallery = () => {
             {gallery.map((image, index) => (
               <Col xl={4} lg={6} md={6} sm={12} key={image.id} className="mb-4" style={{ alignSelf: 'flex-start' }}>
                 <div className="gallery-card" style={{
-                  background: '#ffffff',
-                  border: '1px solid #e5e7eb',
+                  background: 'var(--qt-surface)',
+                  border: '1px solid var(--qt-line)',
                   overflow: 'hidden',
                   transition: 'all 0.2s ease',
                   position: 'relative'
@@ -167,14 +167,14 @@ const Gallery = () => {
                       fontSize: '1rem',
                       fontWeight: '700',
                       marginBottom: '0.5rem',
-                      color: '#0b0e17',
+                      color: 'var(--qt-text)',
                       lineHeight: '1.3'
                     }}>
                       {image.event_name || 'Gallery Image'}
                     </h5>
                     <p className="gallery-card-date" style={{
                       fontSize: '0.8rem',
-                      color: '#5c6270',
+                      color: 'var(--qt-muted)',
                       margin: 0,
                       fontWeight: '500'
                     }}>
@@ -198,7 +198,7 @@ const Gallery = () => {
         style={{ zIndex: 9999 }}
       >
         <Modal.Body style={{
-          background: '#ffffff',
+          background: 'var(--qt-surface)',
           padding: '2rem',
           textAlign: 'center'
         }}>
@@ -211,12 +211,12 @@ const Gallery = () => {
                   maxWidth: '100%',
                   maxHeight: '70vh',
                   objectFit: 'contain',
-                  border: '1px solid #e5e7eb'
+                  border: '1px solid var(--qt-line)'
                 }}
               />
               <div style={{ marginTop: '2rem' }}>
                 <h3 style={{
-                  color: '#0b0e17',
+                  color: 'var(--qt-text)',
                   marginBottom: '0.5rem',
                   fontSize: '1.8rem',
                   fontWeight: '700'
@@ -224,7 +224,7 @@ const Gallery = () => {
                   {selectedImage.event_name || 'Gallery Image'}
                 </h3>
                 <p style={{
-                  color: '#5c6270',
+                  color: 'var(--qt-muted)',
                   margin: 0,
                   fontSize: '1.1rem'
                 }}>

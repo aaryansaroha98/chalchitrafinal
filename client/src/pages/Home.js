@@ -279,7 +279,7 @@ const Home = () => {
           <h1 style={{
             fontSize: '2.5rem',
             fontWeight: '700',
-            color: '#0b0e17',
+            color: 'var(--qt-text)',
             marginBottom: '0.3rem',
             letterSpacing: '0.02em'
           }}>
@@ -287,7 +287,7 @@ const Home = () => {
           </h1>
           <p style={{
             fontSize: 'clamp(1.1rem, 2.6vw, 1.4rem)',
-            color: '#5c6270',
+            color: 'var(--qt-muted)',
             maxWidth: 'none',
             width: '100%',
             margin: 0,
@@ -305,7 +305,7 @@ const Home = () => {
             margin: '0 auto 1.25rem',
             fontSize: '1.65rem',
             fontWeight: '600',
-            color: '#0b0e17',
+            color: 'var(--qt-text)',
             letterSpacing: '0.02em',
             display: 'none'
           }}
@@ -319,7 +319,7 @@ const Home = () => {
             margin: '0 auto 1.25rem',
             fontSize: '1.18rem',
             lineHeight: '1.4',
-            color: '#5c6270',
+            color: 'var(--qt-muted)',
             display: 'none'
           }}
         >
@@ -330,8 +330,8 @@ const Home = () => {
           <Alert variant="danger" style={{
             borderRadius: '8px',
             border: 'none',
-            backgroundColor: '#f8d7da',
-            color: '#721c24',
+            backgroundColor: 'var(--qt-danger-bg)',
+            color: 'var(--qt-danger-fg)',
             padding: '1rem 1.5rem',
             marginBottom: '2rem'
           }}>
@@ -345,8 +345,8 @@ const Home = () => {
           {upcomingMovies.slice(0, 3).map((movie) => (
             <Col xl={4} lg={4} md={4} sm={6} xs={6} key={movie.id} style={{ alignSelf: 'flex-start' }} className="home-featured-col">
               <div className="home-featured-card" style={{
-                background: '#ffffff',
-                border: '1px solid #e5e7eb',
+                background: 'var(--qt-surface)',
+                border: '1px solid var(--qt-line)',
                 overflow: 'hidden',
                 transition: 'all 0.25s ease',
                 position: 'relative',
@@ -363,8 +363,8 @@ const Home = () => {
                 {/* Movie Poster */}
                 <div style={{
                   position: 'relative',
-                  backgroundColor: '#f6f6f7',
-                  borderBottom: '1px solid #eef0f2'
+                  backgroundColor: 'var(--qt-panel-soft)',
+                  borderBottom: '1px solid var(--qt-line-soft)'
                 }}>
                   {movie.poster_url ? (
                     <img
@@ -380,7 +380,7 @@ const Home = () => {
                     />
                   ) : (
                     <div style={{
-                      backgroundColor: '#e9ecef',
+                      backgroundColor: 'var(--qt-placeholder-bg)',
                       width: '100%',
                       aspectRatio: '2 / 3',
                       display: 'flex',
@@ -389,7 +389,7 @@ const Home = () => {
                     }}>
                       <i className="fas fa-film" style={{
                         fontSize: '3rem',
-                        color: '#adb5bd'
+                        color: 'var(--qt-placeholder-fg)'
                       }}></i>
                     </div>
                   )}
@@ -401,8 +401,8 @@ const Home = () => {
                     position: 'absolute',
                     top: '12px',
                     left: '12px',
-                    backgroundColor: '#0b0e17',
-                    color: '#ffffff',
+                    backgroundColor: 'var(--qt-ink)',
+                    color: 'var(--qt-on-ink)',
                     padding: '4px 8px',
                     borderRadius: '6px',
                     fontSize: '0.75rem',
@@ -427,7 +427,7 @@ const Home = () => {
                     fontSize: '1.05rem',
                     fontWeight: '600',
                     marginBottom: '0.25rem',
-                    color: '#0b0e17',
+                    color: 'var(--qt-text)',
                     lineHeight: '1.2',
                     display: '-webkit-box',
                     WebkitLineClamp: 1,
@@ -439,7 +439,7 @@ const Home = () => {
 
                   {/* Description */}
                   <p className="home-featured-desc" style={{
-                    color: '#5c6270',
+                    color: 'var(--qt-muted)',
                     fontSize: '0.65rem',
                     marginBottom: '0.4rem',
                     lineHeight: '1.3',
@@ -465,7 +465,7 @@ const Home = () => {
                         marginLeft: '0px'
                       }}>
                         <i className="fas fa-map-marker-alt" style={{
-                          color: '#8b909c',
+                          color: 'var(--qt-quiet)',
                           fontSize: '0.7rem',
                           marginRight: '0.5rem',
                           minWidth: '14px'
@@ -475,7 +475,7 @@ const Home = () => {
                             className="home-featured-label"
                             style={{
                               fontSize: '0.6rem',
-                              color: '#8b909c',
+                              color: 'var(--qt-quiet)',
                               fontWeight: '500',
                               textTransform: 'uppercase',
                               letterSpacing: '0.5px',
@@ -488,7 +488,7 @@ const Home = () => {
                             className="home-featured-value"
                             style={{
                               fontSize: '0.85rem',
-                              color: '#0b0e17',
+                              color: 'var(--qt-text)',
                               fontWeight: '500'
                             }}
                           >
@@ -504,7 +504,7 @@ const Home = () => {
                         right: '0'
                       }}>
                         <i className="fas fa-clock" style={{
-                          color: '#8b909c',
+                          color: 'var(--qt-quiet)',
                           fontSize: '0.7rem',
                           marginRight: '0.5rem',
                           minWidth: '14px'
@@ -514,7 +514,7 @@ const Home = () => {
                             className="home-featured-label"
                             style={{
                               fontSize: '0.6rem',
-                              color: '#8b909c',
+                              color: 'var(--qt-quiet)',
                               fontWeight: '500',
                               textTransform: 'uppercase',
                               letterSpacing: '0.5px',
@@ -527,7 +527,7 @@ const Home = () => {
                             className="home-featured-value"
                             style={{
                               fontSize: '0.85rem',
-                              color: '#0b0e17',
+                              color: 'var(--qt-text)',
                               fontWeight: '500'
                             }}
                           >
@@ -557,9 +557,9 @@ const Home = () => {
               alignItems: 'center',
               gap: '0.5rem',
               padding: '0.6rem 1.1rem',
-              background: '#0b0e17',
-              border: '1px solid #0b0e17',
-              color: '#ffffff',
+              background: 'var(--qt-ink)',
+              border: '1px solid var(--qt-ink)',
+              color: 'var(--qt-on-ink)',
               textDecoration: 'none',
               fontSize: '12px',
               fontWeight: '600',
@@ -585,8 +585,8 @@ const Home = () => {
         {/* About Us Section */}
         <div style={{marginTop: '2.5rem'}}>
           <div className="about-card" style={{
-            background: '#ffffff',
-            border: '1px solid #e5e7eb',
+            background: 'var(--qt-surface)',
+            border: '1px solid var(--qt-line)',
             overflow: 'hidden',
             padding: '3rem'
           }}>
@@ -596,7 +596,7 @@ const Home = () => {
                 <h2 className="about-heading" style={{
                   fontSize: '2.5rem',
                   fontWeight: '700',
-                  color: '#0b0e17',
+                  color: 'var(--qt-text)',
                   marginTop: '-0.3rem',
                   marginBottom: '1.5rem',
                   letterSpacing: '-0.025em'
@@ -605,7 +605,7 @@ const Home = () => {
                 </h2>
                 <div className="about-text" style={{
                   fontSize: '1.18rem',
-                  color: '#5c6270',
+                  color: 'var(--qt-muted)',
                   lineHeight: '1.4',
                   marginBottom: '2rem'
                 }}>
@@ -614,18 +614,18 @@ const Home = () => {
                       key={index}
                       style={{
                         marginBottom: index === settings.about_text.split('\n\n').length - 1 ? '0' : '1.5rem',
-                        color: '#5c6270'
+                        color: 'var(--qt-muted)'
                       }}
                     >
                       {paragraph}
                     </p>
                   )) : (
                     <>
-                      <p style={{marginBottom: '1.5rem', color: '#5c6270'}}>
+                      <p style={{marginBottom: '1.5rem', color: 'var(--qt-muted)'}}>
                         <strong>Chalchitra Series</strong> is a pioneering student-led initiative at <strong>Indian Institute of Technology Jammu</strong>,
                         dedicated to bringing world-class cinematic experiences to our vibrant campus community.
                       </p>
-                      <p style={{marginBottom: '0', color: '#5c6270'}}>
+                      <p style={{marginBottom: '0', color: 'var(--qt-muted)'}}>
                         Our mission goes beyond entertainment; we strive to foster a thriving cultural atmosphere that enriches
                         the lives of IIT Jammu students, providing inclusive access to quality cinema while creating memorable
                         experiences that bring our community together.
@@ -636,12 +636,12 @@ const Home = () => {
 
                 <div className="about-badges" style={{display: 'flex', gap: '1rem', flexWrap: 'wrap'}}>
                   <div className="about-badge" style={{
-                    background: '#f6f6f7',
-                    border: '1px solid #e5e7eb',
+                    background: 'var(--qt-panel-soft)',
+                    border: '1px solid var(--qt-line)',
                     padding: '0.75rem 1.25rem',
                     fontSize: '0.9rem',
                     fontWeight: '600',
-                    color: '#0b0e17',
+                    color: 'var(--qt-text)',
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.5rem'
@@ -650,12 +650,12 @@ const Home = () => {
                     Student-Led Initiative
                   </div>
                   <div className="about-badge" style={{
-                    background: '#f6f6f7',
-                    border: '1px solid #e5e7eb',
+                    background: 'var(--qt-panel-soft)',
+                    border: '1px solid var(--qt-line)',
                     padding: '0.75rem 1.25rem',
                     fontSize: '0.9rem',
                     fontWeight: '600',
-                    color: '#0b0e17',
+                    color: 'var(--qt-text)',
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.5rem'
@@ -664,12 +664,12 @@ const Home = () => {
                     Premium Experience
                   </div>
                   <div className="about-badge" style={{
-                    background: '#f6f6f7',
-                    border: '1px solid #e5e7eb',
+                    background: 'var(--qt-panel-soft)',
+                    border: '1px solid var(--qt-line)',
                     padding: '0.75rem 1.25rem',
                     fontSize: '0.9rem',
                     fontWeight: '600',
-                    color: '#0b0e17',
+                    color: 'var(--qt-text)',
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.5rem'
@@ -701,8 +701,8 @@ const Home = () => {
         {/* Founder's Note Section */}
         <div className="founder-note-section" style={{marginTop: '2.5rem'}}>
           <div className="founder-note-card" style={{
-            background: '#ffffff',
-            border: '1px solid #e5e7eb',
+            background: 'var(--qt-surface)',
+            border: '1px solid var(--qt-line)',
             overflow: 'hidden',
             padding: '3rem'
           }}>
@@ -719,7 +719,7 @@ const Home = () => {
                       height: '220px',
                       objectFit: 'cover',
                       borderRadius: '50%',
-                      border: '3px solid #e5e7eb'
+                      border: '3px solid var(--qt-line)'
                     }}
                   />
                 ) : (
@@ -727,14 +727,14 @@ const Home = () => {
                     width: '220px',
                     height: '220px',
                     borderRadius: '50%',
-                    backgroundColor: '#f6f6f7',
-                    border: '3px solid #e5e7eb',
+                    backgroundColor: 'var(--qt-panel-soft)',
+                    border: '3px solid var(--qt-line)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     margin: '0 auto',
                     fontSize: '4rem',
-                    color: '#8b909c',
+                    color: 'var(--qt-quiet)',
                     fontWeight: '300'
                   }}>
                     <i className="fas fa-user"></i>
@@ -745,34 +745,34 @@ const Home = () => {
                 <h3 className="founder-note-heading" style={{
                   fontSize: '1.8rem',
                   fontWeight: '700',
-                  color: '#0b0e17',
+                  color: 'var(--qt-text)',
                   marginBottom: '1.5rem',
                   letterSpacing: '-0.025em'
                 }}>
-                  <i className="fas fa-feather-alt" style={{marginRight: '0.75rem', color: '#5c6270'}}></i>
+                  <i className="fas fa-feather-alt" style={{marginRight: '0.75rem', color: 'var(--qt-muted)'}}></i>
                   Founder's Note
                 </h3>
                 <div className="founder-note-text" style={{
                   fontSize: '1.05rem',
-                  color: '#5c6270',
+                  color: 'var(--qt-muted)',
                   lineHeight: '1.5',
                   fontStyle: 'italic',
                   marginBottom: '1rem'
                 }}>
-                  <p style={{marginBottom: '0', color: '#5c6270'}}>
+                  <p style={{marginBottom: '0', color: 'var(--qt-muted)'}}>
                     Some of the best memories on campus are made when people come together, and I've always believed that cinema is one of the simplest ways to make that happen. Watching people laugh, cheer, clap, react to every twist, and leave with a smile has been the most rewarding part of this journey. It has been my privilege to be part of founding Chalchitra alongside everyone who believed in this vision. No matter how your day has been, I hope Chalchitra will always be a place where you can pause, share a few laughs, and leave feeling a little lighter. More than just another campus event, I hope it becomes a tradition that brings people together, where everyone feels welcome and every movie creates a memory.
                   </p>
                 </div>
                 {founder && founder.name && (
                   <div className="founder-note-sign" style={{
                     marginTop: '1.5rem',
-                    borderTop: '1px solid #e5e7eb',
+                    borderTop: '1px solid var(--qt-line)',
                     paddingTop: '1rem'
                   }}>
                     <p style={{
                       fontSize: '1rem',
                       fontWeight: '600',
-                      color: '#0b0e17',
+                      color: 'var(--qt-text)',
                       margin: 0,
                       fontStyle: 'normal'
                     }}>
@@ -1105,7 +1105,7 @@ const Home = () => {
               display: block !important;
               font-size: 1.18rem !important;
               line-height: 1.4 !important;
-              color: #5c6270 !important;
+              color: var(--qt-muted) !important;
               margin: 0 auto 0.6rem !important;
               text-align: center !important;
             }
@@ -1165,7 +1165,7 @@ const Home = () => {
               padding: clamp(2px, 2vw, 5px) clamp(6px, 3.5vw, 10px) !important;
               font-size: clamp(0.65rem, 3vw, 0.85rem) !important;
               border-radius: 6px !important;
-              background-color: #0b0e17 !important;
+              background-color: var(--qt-ink) !important;
             }
 
             .home-featured-btn {
@@ -1467,8 +1467,8 @@ const Home = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               style={{
-                background: '#ffffff',
-                border: '1px solid #e5e7eb',
+                background: 'var(--qt-surface)',
+                border: '1px solid var(--qt-line)',
                 padding: '24px',
                 maxWidth: '360px',
                 textAlign: 'center',
@@ -1483,14 +1483,14 @@ const Home = () => {
                   position: 'absolute',
                   top: '14px',
                   right: '14px',
-                  background: '#ffffff',
-                  border: '1px solid #e5e7eb',
+                  background: 'var(--qt-surface)',
+                  border: '1px solid var(--qt-line)',
                   width: '32px',
                   height: '32px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#0b0e17',
+                  color: 'var(--qt-text)',
                   cursor: 'pointer',
                   fontSize: '16px'
                 }}
@@ -1513,7 +1513,7 @@ const Home = () => {
 
               {/* Main message */}
               <h2 style={{
-                color: '#0b0e17',
+                color: 'var(--qt-text)',
                 fontSize: '22px',
                 fontWeight: 'bold',
                 marginBottom: '12px'
@@ -1522,12 +1522,12 @@ const Home = () => {
               </h2>
 
               <p style={{
-                color: '#5c6270',
+                color: 'var(--qt-muted)',
                 fontSize: '14px',
                 marginBottom: '20px',
                 lineHeight: '1.6'
               }}>
-                Please login with your <strong style={{color: '#0b0e17'}}>IIT Jammu email</strong> to book movie tickets.
+                Please login with your <strong style={{color: 'var(--qt-text)'}}>IIT Jammu email</strong> to book movie tickets.
               </p>
 
               {/* Login button */}
@@ -1537,9 +1537,9 @@ const Home = () => {
                   navigate('/login');
                 }}
                 style={{
-                  background: '#0b0e17',
-                  border: '1px solid #0b0e17',
-                  color: '#ffffff',
+                  background: 'var(--qt-ink)',
+                  border: '1px solid var(--qt-ink)',
+                  color: 'var(--qt-on-ink)',
                   fontSize: '12px',
                   fontWeight: 'bold',
                   letterSpacing: '0.09em',
@@ -1563,7 +1563,7 @@ const Home = () => {
 
               {/* Additional info */}
               <p style={{
-                color: '#8b909c',
+                color: 'var(--qt-quiet)',
                 fontSize: '12px',
                 marginTop: '14px',
                 lineHeight: '1.5'
@@ -1610,8 +1610,8 @@ const Home = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               style={{
-                background: '#ffffff',
-                border: '1px solid #e5e7eb',
+                background: 'var(--qt-surface)',
+                border: '1px solid var(--qt-line)',
                 padding: '24px',
                 maxWidth: '360px',
                 textAlign: 'center',
@@ -1625,14 +1625,14 @@ const Home = () => {
                   position: 'absolute',
                   top: '14px',
                   right: '14px',
-                  background: '#f6f6f7',
-                  border: '1px solid #e5e7eb',
+                  background: 'var(--qt-panel-soft)',
+                  border: '1px solid var(--qt-line)',
                   width: '32px',
                   height: '32px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#0b0e17',
+                  color: 'var(--qt-text)',
                   cursor: 'pointer',
                   fontSize: '16px'
                 }}
@@ -1641,7 +1641,7 @@ const Home = () => {
               </button>
 
               <h2 style={{
-                color: '#0b0e17',
+                color: 'var(--qt-text)',
                 fontSize: '22px',
                 fontWeight: 'bold',
                 marginBottom: '12px'
@@ -1650,21 +1650,21 @@ const Home = () => {
               </h2>
 
               <p style={{
-                color: '#5c6270',
+                color: 'var(--qt-muted)',
                 fontSize: '14px',
                 marginBottom: '20px',
                 lineHeight: '1.6'
               }}>
-                <strong style={{ color: '#0b0e17' }}>{bookingClosedMovieTitle}</strong><br />
+                <strong style={{ color: 'var(--qt-text)' }}>{bookingClosedMovieTitle}</strong><br />
                 {bookingStatusMessage}
               </p>
 
               <button
                 onClick={() => setShowBookingClosedModal(false)}
                 style={{
-                  background: '#0b0e17',
-                  border: '1px solid #0b0e17',
-                  color: '#ffffff',
+                  background: 'var(--qt-ink)',
+                  border: '1px solid var(--qt-ink)',
+                  color: 'var(--qt-on-ink)',
                   fontSize: '12px',
                   fontWeight: '600',
                   letterSpacing: '0.09em',

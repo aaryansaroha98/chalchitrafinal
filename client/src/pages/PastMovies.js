@@ -55,7 +55,7 @@ const PastMovies = () => {
           <h1 className="past-movies-title" style={{
             fontSize: '2.5rem',
             fontWeight: '600',
-            color: '#0b0e17',
+            color: 'var(--qt-text)',
             marginBottom: '1rem',
             letterSpacing: '-0.025em'
           }}>
@@ -63,7 +63,7 @@ const PastMovies = () => {
           </h1>
           <p className="past-movies-subtitle" style={{
             fontSize: '1.1rem',
-            color: '#5c6270',
+            color: 'var(--qt-muted)',
             maxWidth: '600px',
             margin: '0 auto',
             lineHeight: '1.6',
@@ -77,8 +77,8 @@ const PastMovies = () => {
           <Alert variant="danger" style={{
             borderRadius: '8px',
             border: 'none',
-            backgroundColor: '#f8d7da',
-            color: '#721c24',
+            backgroundColor: 'var(--qt-danger-bg)',
+            color: 'var(--qt-danger-fg)',
             padding: '1rem 1.5rem',
             marginBottom: '2rem'
           }}>
@@ -91,19 +91,19 @@ const PastMovies = () => {
           <div style={{
             textAlign: 'center',
             padding: '4rem 2rem',
-            background: '#ffffff',
-            border: '1px solid #e5e7eb'
+            background: 'var(--qt-surface)',
+            border: '1px solid var(--qt-line)'
           }}>
             <i className="fas fa-film" style={{
               fontSize: '4rem',
-              color: '#8b909c',
+              color: 'var(--qt-quiet)',
               marginBottom: '1.5rem',
               display: 'block'
             }}></i>
             <p style={{
               fontFamily: '"Times New Roman", Times, Georgia, serif',
               fontSize: '1.5rem',
-              color: '#0b0e17',
+              color: 'var(--qt-text)',
               fontStyle: 'italic',
               margin: 0,
               lineHeight: '1.6'
@@ -116,8 +116,8 @@ const PastMovies = () => {
             {pastMovies.map((movie) => (
               <Col xl={3} lg={3} md={4} sm={6} xs={12} key={movie.id} style={{ alignSelf: 'flex-start' }}>
                 <div style={{
-                  background: '#ffffff',
-                  border: '1px solid #e5e7eb',
+                  background: 'var(--qt-surface)',
+                  border: '1px solid var(--qt-line)',
                   overflow: 'hidden',
                   transition: 'border-color 0.2s ease',
                   position: 'relative'
@@ -132,8 +132,8 @@ const PastMovies = () => {
                   {/* Movie Poster Only */}
                   <div style={{
                     position: 'relative',
-                    backgroundColor: '#f6f6f7',
-                    borderBottom: '1px solid #eef0f2',
+                    backgroundColor: 'var(--qt-panel-soft)',
+                    borderBottom: '1px solid var(--qt-line-soft)',
                     alignSelf: movie.poster_url ? 'center' : 'stretch',
                     maxWidth: movie.poster_url ? '100%' : 'none'
                   }}>
@@ -153,7 +153,7 @@ const PastMovies = () => {
                       />
                     ) : (
                       <div style={{
-                        backgroundColor: '#e9ecef',
+                        backgroundColor: 'var(--qt-placeholder-bg)',
                         width: '100%',
                         aspectRatio: '2 / 3',
                         display: 'flex',
@@ -162,7 +162,7 @@ const PastMovies = () => {
                       }}>
                         <i className="fas fa-film" style={{
                           fontSize: '3rem',
-                          color: '#adb5bd'
+                          color: 'var(--qt-placeholder-fg)'
                         }}></i>
                       </div>
                     )}

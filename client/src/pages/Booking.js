@@ -340,14 +340,14 @@ const Booking = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           style={{
-            background: '#ffffff',
-            border: '1px solid #e5e7eb',
+            background: 'var(--qt-surface)',
+            border: '1px solid var(--qt-line)',
             padding: '32px',
             textAlign: 'center'
           }}
         >
-          <h2 className="font-cinzel" style={{fontSize: '24px', color: '#0b0e17', marginBottom: '16px'}}>Movie Not Found</h2>
-          <p style={{color: '#5c6270'}}>The requested movie could not be loaded.</p>
+          <h2 className="font-cinzel" style={{fontSize: '24px', color: 'var(--qt-text)', marginBottom: '16px'}}>Movie Not Found</h2>
+          <p style={{color: 'var(--qt-muted)'}}>The requested movie could not be loaded.</p>
         </motion.div>
       </div>
     );
@@ -361,8 +361,8 @@ const Booking = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           style={{
-            background: '#ffffff',
-            border: '1px solid #e5e7eb',
+            background: 'var(--qt-surface)',
+            border: '1px solid var(--qt-line)',
             padding: '36px',
             maxWidth: '520px',
             width: '100%',
@@ -370,11 +370,11 @@ const Booking = () => {
           }}
         >
           <div style={{ fontSize: '42px', marginBottom: '14px' }}>{waitingToOpen ? '⏳' : '🎬'}</div>
-          <h2 className="font-cinzel" style={{ fontSize: '24px', color: '#0b0e17', marginBottom: '12px' }}>
+          <h2 className="font-cinzel" style={{ fontSize: '24px', color: 'var(--qt-text)', marginBottom: '12px' }}>
             {waitingToOpen ? 'Booking Starts Soon' : 'Booking Closed'}
           </h2>
-          <p style={{ color: '#0b0e17', fontWeight: '600', marginBottom: '8px' }}>{movie.title}</p>
-          <p style={{ color: '#5c6270', lineHeight: '1.6', marginBottom: '22px' }}>
+          <p style={{ color: 'var(--qt-text)', fontWeight: '600', marginBottom: '8px' }}>{movie.title}</p>
+          <p style={{ color: 'var(--qt-muted)', lineHeight: '1.6', marginBottom: '22px' }}>
             {waitingToOpen
               ? `Booking will open on ${formatAppDateTime(movie.booking_starts_at)}.`
               : 'Booking is currently closed for this movie.'}
@@ -382,7 +382,7 @@ const Booking = () => {
           <button
             type="button"
             onClick={() => navigate('/upcoming-movies')}
-            style={{ background: '#0b0e17', color: '#ffffff', border: 0, padding: '11px 22px', fontWeight: '600', cursor: 'pointer' }}
+            style={{ background: 'var(--qt-ink)', color: 'var(--qt-on-ink)', border: 0, padding: '11px 22px', fontWeight: '600', cursor: 'pointer' }}
           >
             Back to Movies
           </button>
@@ -407,7 +407,7 @@ const Booking = () => {
           <h1 className="booking-title" style={{
             fontSize: '2.5rem',
             fontWeight: '600',
-            color: '#0b0e17',
+            color: 'var(--qt-text)',
             margin: '0',
             marginTop: '-6px',
             letterSpacing: '-0.025em'
@@ -554,8 +554,8 @@ const Booking = () => {
         {/* Seat Selection */}
           <div style={{marginBottom: '48px'}}>
           <div className="booking-seat-card" style={{
-            background: '#ffffff',
-            border: '1px solid #e5e7eb',
+            background: 'var(--qt-surface)',
+            border: '1px solid var(--qt-line)',
             padding: '32px'
           }}>
             <div style={{
@@ -566,7 +566,7 @@ const Booking = () => {
                 fontSize: '24px',
                 textAlign: 'center',
                 marginBottom: 0,
-                color: '#0b0e17',
+                color: 'var(--qt-text)',
                 fontWeight: 'bold'
               }}>
                 Select Your Seats
@@ -600,7 +600,7 @@ const Booking = () => {
                   className="font-cinzel"
                   style={{
                     fontSize: '24px',
-                    color: '#5c6270',
+                    color: 'var(--qt-muted)',
                     textTransform: 'uppercase',
                     letterSpacing: '0.2em',
                     marginTop: '-10px'
@@ -632,7 +632,7 @@ const Booking = () => {
                   <div style={{
                     fontSize: '18px',
                     fontWeight: 'bold',
-                    color: '#0b0e17',
+                    color: 'var(--qt-text)',
                     marginBottom: '16px'
                   }}>
                     Block A
@@ -644,8 +644,8 @@ const Booking = () => {
                       flexDirection: 'column',
                       gap: '8px',
                       padding: '30px',
-                      background: '#f6f6f7',
-                      border: '1px solid #e5e7eb',
+                      background: 'var(--qt-panel-soft)',
+                      border: '1px solid var(--qt-line)',
                       position: 'relative'
                     }}
                   >
@@ -695,7 +695,7 @@ const Booking = () => {
                   <div style={{
                     fontSize: '18px',
                     fontWeight: 'bold',
-                    color: '#0b0e17',
+                    color: 'var(--qt-text)',
                     marginBottom: '16px'
                   }}>
                     Block B
@@ -707,8 +707,8 @@ const Booking = () => {
                       flexDirection: 'column',
                       gap: '8px',
                       padding: '30px',
-                      background: '#f6f6f7',
-                      border: '1px solid #e5e7eb',
+                      background: 'var(--qt-panel-soft)',
+                      border: '1px solid var(--qt-line)',
                       position: 'relative'
                     }}
                   >
@@ -762,7 +762,7 @@ const Booking = () => {
                   <div style={{
                     fontSize: '18px',
                     fontWeight: 'bold',
-                    color: '#0b0e17',
+                    color: 'var(--qt-text)',
                     marginBottom: '16px'
                   }}>
                     Block C
@@ -774,8 +774,8 @@ const Booking = () => {
                       flexDirection: 'column',
                       gap: '8px',
                       padding: '30px',
-                      background: '#f6f6f7',
-                      border: '1px solid #e5e7eb',
+                      background: 'var(--qt-panel-soft)',
+                      border: '1px solid var(--qt-line)',
                       position: 'relative'
                     }}
                   >
@@ -841,7 +841,7 @@ const Booking = () => {
                   <div style={{
                     fontSize: '18px',
                     fontWeight: 'bold',
-                    color: '#0b0e17',
+                    color: 'var(--qt-text)',
                     marginBottom: '16px'
                   }}>
                     Block A
@@ -853,8 +853,8 @@ const Booking = () => {
                       flexDirection: 'column',
                       gap: '5px',
                       padding: '40px',
-                      background: '#f6f6f7',
-                      border: '1px solid #e5e7eb',
+                      background: 'var(--qt-panel-soft)',
+                      border: '1px solid var(--qt-line)',
                       position: 'relative'
                     }}
                   >
@@ -872,7 +872,7 @@ const Booking = () => {
                             textAlign: 'center',
                             fontSize: '12px',
                             fontWeight: 'bold',
-                            color: '#0b0e17',
+                            color: 'var(--qt-text)',
                             marginRight: '8px'
                           }}>
                             {rowIndex + 1}
@@ -918,7 +918,7 @@ const Booking = () => {
                   <div style={{
                     fontSize: '18px',
                     fontWeight: 'bold',
-                    color: '#0b0e17',
+                    color: 'var(--qt-text)',
                     marginBottom: '16px'
                   }}>
                     Block B
@@ -930,8 +930,8 @@ const Booking = () => {
                       flexDirection: 'column',
                       gap: '5px',
                       padding: '48px',
-                      background: '#f6f6f7',
-                      border: '1px solid #e5e7eb',
+                      background: 'var(--qt-panel-soft)',
+                      border: '1px solid var(--qt-line)',
                       position: 'relative'
                     }}
                   >
@@ -985,7 +985,7 @@ const Booking = () => {
                   <div style={{
                     fontSize: '18px',
                     fontWeight: 'bold',
-                    color: '#0b0e17',
+                    color: 'var(--qt-text)',
                     marginBottom: '16px'
                   }}>
                     Block C
@@ -997,8 +997,8 @@ const Booking = () => {
                       flexDirection: 'column',
                       gap: '5px',
                       padding: '40px',
-                      background: '#f6f6f7',
-                      border: '1px solid #e5e7eb',
+                      background: 'var(--qt-panel-soft)',
+                      border: '1px solid var(--qt-line)',
                       position: 'relative'
                     }}
                   >
@@ -1057,39 +1057,36 @@ const Booking = () => {
               }}
             >
               <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-                <div style={{
+                <div className="seat-button available" aria-hidden="true" style={{
                   width: '16px',
                   height: '16px',
-                  background: '#ffffff',
-                  border: '1px solid #e5e7eb'
+                  pointerEvents: 'none'
                 }}></div>
                 <span className="font-inter booking-seat-legend-text" style={{
                   fontSize: '14px',
-                  color: '#5c6270'
+                  color: 'var(--qt-muted)'
                 }}>Available</span>
               </div>
               <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-                <div style={{
+                <div className="seat-button selected" aria-hidden="true" style={{
                   width: '16px',
                   height: '16px',
-                  background: '#0b0e17',
-                  border: '1px solid #0b0e17'
+                  pointerEvents: 'none'
                 }}></div>
                 <span className="font-inter booking-seat-legend-text" style={{
                   fontSize: '14px',
-                  color: '#5c6270'
+                  color: 'var(--qt-muted)'
                 }}>Selected</span>
               </div>
               <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-                <div style={{
+                <div className="seat-button occupied" aria-hidden="true" style={{
                   width: '16px',
                   height: '16px',
-                  background: '#b8bcc4',
-                  border: '1px solid #a1a6af'
+                  pointerEvents: 'none'
                 }}></div>
                 <span className="font-inter booking-seat-legend-text" style={{
                   fontSize: '14px',
-                  color: '#5c6270'
+                  color: 'var(--qt-muted)'
                 }}>Occupied</span>
               </div>
             </div>
@@ -1100,15 +1097,15 @@ const Booking = () => {
         {availableFoods && availableFoods.length > 0 && (
           <div style={{marginBottom: '48px'}}>
             <div className="booking-food-panel" style={{
-              background: '#ffffff',
-              border: '1px solid #e5e7eb',
+              background: 'var(--qt-surface)',
+              border: '1px solid var(--qt-line)',
               padding: '32px'
             }}>
               <h2 className="booking-food-title" style={{
                 fontSize: '24px',
                 textAlign: 'center',
                 marginBottom: '32px',
-                color: '#0b0e17',
+                color: 'var(--qt-text)',
                 fontWeight: 'bold'
               }}>
                 Available Food
@@ -1120,8 +1117,8 @@ const Booking = () => {
                     key={food.id}
                     className="booking-food-card"
                     style={{
-                      background: '#f6f6f7',
-                      border: '1px solid #e5e7eb',
+                      background: 'var(--qt-panel-soft)',
+                      border: '1px solid var(--qt-line)',
                       padding: '12px',
                       minHeight: '140px',
                       display: 'flex',
@@ -1138,14 +1135,14 @@ const Booking = () => {
                         style={{
                           width: '50px',
                           height: '50px',
-                          border: '1px solid #e5e7eb',
+                          border: '1px solid var(--qt-line)',
                           marginBottom: '8px',
                           objectFit: 'cover'
                         }}
                       />
                       <div>
                         <h4 className="booking-food-name" style={{
-                          color: '#0b0e17',
+                          color: 'var(--qt-text)',
                           fontSize: '16px',
                           fontWeight: 'bold',
                           marginBottom: '4px'
@@ -1153,14 +1150,14 @@ const Booking = () => {
                           {food.name}
                         </h4>
                         <p className="booking-food-desc" style={{
-                          color: '#5c6270',
+                          color: 'var(--qt-muted)',
                           fontSize: '14px',
                           marginBottom: '8px'
                         }}>
                           {food.description}
                         </p>
                         <p className="booking-food-price" style={{
-                          color: '#0b0e17',
+                          color: 'var(--qt-text)',
                           fontSize: '16px',
                           fontWeight: 'bold'
                         }}>
@@ -1226,9 +1223,9 @@ const Booking = () => {
                             disabled={!selectedFoods[food.id] || selectedFoods[food.id] <= 0}
                             className="booking-food-btn"
                             style={{
-                              background: '#ffffff',
-                              border: '1px solid #e5e7eb',
-                              color: '#0b0e17',
+                              background: 'var(--qt-surface)',
+                              border: '1px solid var(--qt-line)',
+                              color: 'var(--qt-text)',
                               width: '28px',
                               height: '28px',
                               display: 'flex',
@@ -1243,7 +1240,7 @@ const Booking = () => {
                           </button>
 
                           <span className="booking-food-qty" style={{
-                            color: '#0b0e17',
+                            color: 'var(--qt-text)',
                             fontSize: '16px',
                             fontWeight: 'bold',
                             minWidth: '30px',
@@ -1259,9 +1256,9 @@ const Booking = () => {
                             }}
                             className="booking-food-btn"
                             style={{
-                              background: '#ffffff',
-                              border: '1px solid #e5e7eb',
-                              color: '#0b0e17',
+                              background: 'var(--qt-surface)',
+                              border: '1px solid var(--qt-line)',
+                              color: 'var(--qt-text)',
                               width: '28px',
                               height: '28px',
                               display: 'flex',
@@ -1288,8 +1285,8 @@ const Booking = () => {
         {selectedSeats.length > 0 && (
           <div style={{marginBottom: '48px'}}>
             <div className="booking-selected-panel" style={{
-              background: '#ffffff',
-              border: '1px solid #e5e7eb',
+              background: 'var(--qt-surface)',
+              border: '1px solid var(--qt-line)',
               padding: '24px',
               maxWidth: '600px',
               margin: '0 auto'
@@ -1298,7 +1295,7 @@ const Booking = () => {
                 fontSize: '24px',
                 textAlign: 'center',
                 marginBottom: '32px',
-                color: '#0b0e17',
+                color: 'var(--qt-text)',
                 fontWeight: 'bold'
               }}>
                 Selected Items
@@ -1308,7 +1305,7 @@ const Booking = () => {
                 {/* Selected Seats */}
                 <div style={{marginBottom: '24px'}}>
                   <h4 className="booking-selected-subtitle" style={{
-                    color: '#0b0e17',
+                    color: 'var(--qt-text)',
                     fontSize: '18px',
                     fontWeight: 'bold',
                     marginBottom: '12px'
@@ -1316,8 +1313,8 @@ const Booking = () => {
                     Selected Seats ({selectedSeats.length})
                   </h4>
                   <div className="booking-selected-card" style={{
-                    background: '#f6f6f7',
-                    border: '1px solid #e5e7eb',
+                    background: 'var(--qt-panel-soft)',
+                    border: '1px solid var(--qt-line)',
                     padding: '16px'
                   }}>
                     <div style={{
@@ -1330,9 +1327,9 @@ const Booking = () => {
                           key={seat}
                           className="booking-selected-tag"
                           style={{
-                            background: '#0b0e17',
-                            border: '1px solid #0b0e17',
-                            color: '#ffffff',
+                            background: 'var(--qt-ink)',
+                            border: '1px solid var(--qt-ink)',
+                            color: 'var(--qt-on-ink)',
                             padding: '6px 10px',
                             fontSize: '12px',
                             fontWeight: 'bold',
@@ -1350,7 +1347,7 @@ const Booking = () => {
                 {Object.keys(selectedFoods).length > 0 && (
                   <div style={{marginBottom: '24px'}}>
                     <h4 className="booking-selected-subtitle" style={{
-                      color: '#0b0e17',
+                      color: 'var(--qt-text)',
                       fontSize: '18px',
                       fontWeight: 'bold',
                       marginBottom: '12px'
@@ -1358,8 +1355,8 @@ const Booking = () => {
                       Selected Food Items
                     </h4>
                     <div className="booking-selected-card" style={{
-                      background: '#f6f6f7',
-                      border: '1px solid #e5e7eb',
+                      background: 'var(--qt-panel-soft)',
+                      border: '1px solid var(--qt-line)',
                       padding: '16px'
                     }}>
                       {Object.entries(selectedFoods).map(([foodId, quantity]) => {
@@ -1375,12 +1372,12 @@ const Booking = () => {
                               alignItems: 'center',
                               marginBottom: '6px',
                               padding: '6px',
-                              background: '#f6f6f7'
+                              background: 'var(--qt-panel-soft)'
                             }}
                           >
                             <div>
                               <span style={{
-                                color: '#0b0e17',
+                                color: 'var(--qt-text)',
                                 fontSize: '14px',
                                 fontWeight: 'bold',
                                 fontFamily: 'Arial, sans-serif'
@@ -1388,7 +1385,7 @@ const Booking = () => {
                                 {food.name}
                               </span>
                               <span style={{
-                                color: '#8b909c',
+                                color: 'var(--qt-quiet)',
                                 marginLeft: '6px',
                                 fontSize: '12px'
                               }}>
@@ -1396,7 +1393,7 @@ const Booking = () => {
                               </span>
                             </div>
                             <span style={{
-                              color: '#0b0e17',
+                              color: 'var(--qt-text)',
                               fontSize: '14px',
                               fontWeight: 'bold',
                               fontFamily: 'Arial, sans-serif'
@@ -1419,7 +1416,7 @@ const Booking = () => {
                   marginBottom: '32px'
                 }}>
                   <div className="booking-total-box" style={{
-                    color: '#0b0e17',
+                    color: 'var(--qt-text)',
                     fontSize: '18px',
                     fontWeight: '700',
                     fontFamily: 'Arial, sans-serif',
@@ -1430,7 +1427,7 @@ const Booking = () => {
                       display: 'block',
                       fontSize: '12px',
                       fontWeight: '500',
-                      color: '#5c6270',
+                      color: 'var(--qt-muted)',
                       marginBottom: '4px',
                       textTransform: 'uppercase',
                       letterSpacing: '0.5px'
@@ -1444,9 +1441,9 @@ const Booking = () => {
                     onClick={handleBook}
                     className="booking-book-btn"
                     style={{
-                      background: '#0b0e17',
-                      border: '1px solid #0b0e17',
-                      color: '#ffffff',
+                      background: 'var(--qt-ink)',
+                      border: '1px solid var(--qt-ink)',
+                      color: 'var(--qt-on-ink)',
                       fontSize: '12px',
                       fontWeight: '600',
                       textTransform: 'uppercase',
@@ -1484,7 +1481,7 @@ const Booking = () => {
                       padding: '12px 28px',
                       background: 'transparent',
                       border: '2px dotted #b7791f',
-                      color: '#b7791f',
+                      color: 'var(--qt-amber)',
                       fontSize: '14px',
                       fontWeight: '600',
                       letterSpacing: '1px',
@@ -1513,10 +1510,10 @@ const Booking = () => {
                 bottom: '96px',
                 left: '50%',
                 transform: 'translateX(-50%)',
-                background: '#0b0e17',
-                border: '1px solid #0b0e17',
+                background: 'var(--qt-ink)',
+                border: '1px solid var(--qt-ink)',
                 padding: '16px',
-                color: '#ffffff',
+                color: 'var(--qt-on-ink)',
                 fontFamily: 'Inter, sans-serif'
               }}
             >
@@ -1552,8 +1549,8 @@ const Booking = () => {
                 exit={{ scale: 0.8, opacity: 0 }}
                 transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                 style={{
-                  background: '#ffffff',
-                  border: '1px solid #e5e7eb',
+                  background: 'var(--qt-surface)',
+                  border: '1px solid var(--qt-line)',
                   padding: '20px',
                   maxWidth: '350px',
                   width: '90%',
@@ -1569,15 +1566,15 @@ const Booking = () => {
                     position: 'absolute',
                     top: '16px',
                     right: '16px',
-                    background: '#ffffff',
-                    border: '1px solid #e5e7eb',
+                    background: 'var(--qt-surface)',
+                    border: '1px solid var(--qt-line)',
                     borderRadius: '50%',
                     width: '36px',
                     height: '36px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: '#0b0e17',
+                    color: 'var(--qt-text)',
                     cursor: 'pointer',
                     fontSize: '20px',
                     transition: 'all 0.3s ease'
@@ -1596,7 +1593,7 @@ const Booking = () => {
 
                 {/* Main Message */}
                 <h2 style={{
-                  color: '#0b0e17',
+                  color: 'var(--qt-text)',
                   fontSize: '20px',
                   fontWeight: 'bold',
                   marginBottom: '12px',
@@ -1606,14 +1603,14 @@ const Booking = () => {
                 </h2>
 
                 <p style={{
-                  color: '#5c6270',
+                  color: 'var(--qt-muted)',
                   fontSize: '14px',
                   marginBottom: '24px',
                   lineHeight: '1.6',
                   fontFamily: 'Inter, sans-serif'
                 }}>
                   You have already booked tickets for this movie. <br/>
-                  <strong style={{color: '#0b0e17'}}>Check your email for the ticket or go to My Bookings page!</strong>
+                  <strong style={{color: 'var(--qt-text)'}}>Check your email for the ticket or go to My Bookings page!</strong>
                 </p>
 
                 {/* View My Bookings Button */}
@@ -1627,9 +1624,9 @@ const Booking = () => {
                   style={{
                     width: '100%',
                     padding: '12px 20px',
-                    background: '#0b0e17',
-                    border: '1px solid #0b0e17',
-                    color: '#ffffff',
+                    background: 'var(--qt-ink)',
+                    border: '1px solid var(--qt-ink)',
+                    color: 'var(--qt-on-ink)',
                     fontSize: '12px',
                     fontWeight: 'bold',
                     textTransform: 'uppercase',
@@ -1658,9 +1655,9 @@ const Booking = () => {
                   style={{
                     width: '100%',
                     padding: '12px 24px',
-                    background: '#ffffff',
-                    border: '1px solid #e5e7eb',
-                    color: '#5c6270',
+                    background: 'var(--qt-surface)',
+                    border: '1px solid var(--qt-line)',
+                    color: 'var(--qt-muted)',
                     fontSize: '12px',
                     fontWeight: '600',
                     textTransform: 'uppercase',
