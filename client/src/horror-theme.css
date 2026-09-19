@@ -432,6 +432,197 @@ html[data-horror="on"] .offcanvas {
 .h-willow-right { right: -18px; transform: scaleX(-1); animation: h-willow-sway-right 13s ease-in-out infinite; }
 
 /* ============================================================
+   MOVING THINGS
+   Ambient motion runs forever (leaves); everything else is a timed
+   event that mounts, plays once and unmounts, scheduled from JS so
+   the site is never doing all of it at the same moment. Every layer
+   is pointer-events:none and lives in .h-atmos, so none of it can
+   swallow a click or shift the page.
+   ============================================================ */
+
+/* --- willow leaves, always falling --- */
+.h-leaf {
+  position: absolute;
+  top: -6vh;
+  left: var(--h-leaf-x, 50%);
+  width: var(--h-leaf-size, 11px);
+  height: calc(var(--h-leaf-size, 11px) * 2.1);
+  /* the base theme squares every corner globally; a leaf is the one place
+     that has to win that argument */
+  border-radius: 62% 4% 62% 4% !important;
+  background: linear-gradient(150deg, #3c3a26, #15180f);
+  opacity: 0;
+  animation: h-leaf-fall var(--h-leaf-dur, 15s) linear var(--h-leaf-delay, 0s) infinite;
+}
+@keyframes h-leaf-fall {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
+  6%   { opacity: 0.34; }
+  88%  { opacity: 0.26; }
+  100% { transform: translate3d(var(--h-leaf-drift, 60px), 112vh, 0) rotate(var(--h-leaf-spin, 540deg)); opacity: 0; }
+}
+
+/* --- something in the dark blinks --- */
+.h-eyes {
+  position: absolute;
+  left: var(--h-eye-x, 20%);
+  top: var(--h-eye-y, 40%);
+  /* at 92px these read as two dashes; they have to be big enough to feel
+     like something is at that distance looking back */
+  width: clamp(120px, 15vw, 230px);
+  filter: drop-shadow(0 0 30px rgba(0, 0, 0, 1))
+          drop-shadow(0 0 20px rgba(185, 162, 74, 0.34));
+  animation: h-eyes-life 4.4s ease-in-out forwards;
+}
+.h-eyes .h-pupil { animation: h-blink 4.4s steps(1, end) forwards; transform-origin: center; }
+@keyframes h-eyes-life {
+  0%, 100% { opacity: 0; }
+  14%, 74% { opacity: 1; }
+}
+@keyframes h-blink {
+  0%, 26%, 34%, 61%, 69%, 100% { transform: scaleY(1); }
+  30%, 65% { transform: scaleY(0.05); }
+}
+
+/* --- hands coming up out of the floor --- */
+.h-hands {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 34vh;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  padding: 0 4vw;
+}
+.h-hand {
+  width: clamp(52px, 7vw, 96px);
+  color: #04040a;
+  opacity: 0.9;
+  filter: drop-shadow(0 0 12px rgba(0, 0, 0, 0.95))
+          drop-shadow(0 -1px 0 rgba(185, 162, 74, 0.18));
+  transform: translateY(105%);
+  animation: h-hand-rise 5.2s cubic-bezier(0.25, 0.9, 0.3, 1) var(--h-hand-delay, 0s) forwards;
+}
+@keyframes h-hand-rise {
+  0%   { transform: translateY(105%) rotate(var(--h-hand-tilt, 0deg)); }
+  22%  { transform: translateY(8%)   rotate(var(--h-hand-tilt, 0deg)); }
+  34%  { transform: translateY(18%)  rotate(calc(var(--h-hand-tilt, 0deg) + 3deg)); }
+  46%  { transform: translateY(4%)   rotate(var(--h-hand-tilt, 0deg)); }
+  70%  { transform: translateY(12%)  rotate(calc(var(--h-hand-tilt, 0deg) - 2deg)); }
+  100% { transform: translateY(105%) rotate(var(--h-hand-tilt, 0deg)); }
+}
+
+/* --- a whisper, read before you are sure you read it --- */
+.h-whisper {
+  position: absolute;
+  left: var(--h-wh-x, 12%);
+  top: var(--h-wh-y, 30%);
+  max-width: 44vw;
+  font-family: 'Cinzel', serif;
+  font-size: clamp(15px, 2.1vw, 27px);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(222, 216, 204, 0.5);
+  text-shadow: 0 0 26px rgba(0, 0, 0, 1), 0 0 60px rgba(185, 162, 74, 0.25);
+  white-space: nowrap;
+  animation: h-whisper-life 5.4s ease-in-out forwards;
+}
+@keyframes h-whisper-life {
+  0%   { opacity: 0; filter: blur(9px); letter-spacing: 0.5em; }
+  22%  { opacity: 0.82; filter: blur(0);  letter-spacing: 0.22em; }
+  68%  { opacity: 0.7;  filter: blur(0); }
+  100% { opacity: 0; filter: blur(7px); letter-spacing: 0.34em; }
+}
+
+/* --- claw marks tear across the screen ---
+   A gash needs a controlled thickness in pixels, so it is a thin bar with a
+   clip-path lens: pointed where the claw entered, widest mid-stroke, torn at
+   the exit. Scaling this as SVG made 90px banana shapes. --- */
+.h-claw { position: absolute; inset: 0; overflow: hidden; }
+.h-claw span {
+  position: absolute;
+  top: var(--h-claw-top, 34%);
+  left: -14%;
+  width: 128%;
+  height: var(--h-claw-h, 8px);
+  /* Cross-section of a wound, not a line: red where the skin split, near
+     black down the middle where it is open. The mask fades both ends so the
+     stroke enters and leaves rather than stopping dead. */
+  background: linear-gradient(to bottom,
+    rgba(212, 39, 47, 0.95) 0%, #4a070b 30%, #120203 48%,
+    #120203 54%, #5c0a0e 76%, rgba(163, 19, 25, 0.9) 100%);
+  clip-path: polygon(0% 50%, 9% 20%, 34% 3%, 62% 0%, 87% 22%, 100% 50%, 87% 78%, 62% 100%, 34% 97%, 9% 80%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 9%, #000 88%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 9%, #000 88%, transparent 100%);
+  filter: drop-shadow(0 0 5px rgba(120, 12, 16, 0.5));
+  transform: rotate(var(--h-claw-rot, -13deg)) scaleX(0);
+  transform-origin: left center;
+  animation: h-claw-rip 1.55s cubic-bezier(0.05, 0.85, 0.2, 1) var(--h-claw-delay, 0s) forwards;
+}
+@keyframes h-claw-rip {
+  0%   { transform: rotate(var(--h-claw-rot, -13deg)) scaleX(0); opacity: 0; }
+  10%  { opacity: 1; }
+  34%  { transform: rotate(var(--h-claw-rot, -13deg)) scaleX(1); opacity: 1; }
+  70%  { opacity: 0.8; }
+  100% { transform: rotate(var(--h-claw-rot, -13deg)) scaleX(1); opacity: 0; }
+}
+
+/* --- a shape crosses the room, between you and the light --- */
+.h-passerby {
+  position: absolute;
+  bottom: -2vh;
+  left: -22vw;
+  height: min(74vh, 620px);
+  color: #030307;
+  opacity: 0.94;
+  filter: drop-shadow(0 0 60px rgba(0, 0, 0, 1));
+  animation: h-cross 7.5s linear forwards;
+}
+@keyframes h-cross {
+  0%   { transform: translateX(0) scaleX(1); }
+  100% { transform: translateX(150vw) scaleX(1); }
+}
+
+/* --- the room itself flinches --- */
+html[data-horror="on"][data-horror-shudder="1"] .App {
+  animation: h-shudder 460ms cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+@keyframes h-shudder {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  12% { transform: translate3d(-5px, 2px, 0) rotate(-0.22deg); }
+  26% { transform: translate3d(4px, -3px, 0) rotate(0.2deg); }
+  41% { transform: translate3d(-4px, 1px, 0) rotate(-0.16deg); }
+  57% { transform: translate3d(3px, 2px, 0) rotate(0.13deg); }
+  74% { transform: translate3d(-2px, -1px, 0) rotate(-0.08deg); }
+}
+
+/* --- headings lose their nerve now and then --- */
+html[data-horror="on"] h1,
+html[data-horror="on"] h2 {
+  animation: h-text-glitch 17s steps(1, end) infinite;
+}
+@keyframes h-text-glitch {
+  0%, 92%, 100% { transform: translate3d(0, 0, 0); text-shadow: 0 0 22px rgba(0, 0, 0, 0.9); }
+  92.6% { transform: translate3d(-3px, 1px, 0); text-shadow: 3px 0 var(--h-blood-bright), -3px 0 #2f6f8a, 0 0 22px rgba(0,0,0,.9); }
+  93.2% { transform: translate3d(3px, -1px, 0);  text-shadow: -4px 0 var(--h-blood-bright), 3px 0 #2f6f8a, 0 0 22px rgba(0,0,0,.9); }
+  93.8% { transform: translate3d(-2px, 0, 0);    text-shadow: 2px 0 var(--h-blood-bright), -2px 0 #2f6f8a, 0 0 22px rgba(0,0,0,.9); }
+  94.4% { transform: translate3d(0, 0, 0);       text-shadow: 0 0 22px rgba(0, 0, 0, 0.9); }
+}
+
+/* --- occupied seats: someone is already sitting there --- */
+html[data-horror="on"] .seat-button.occupied {
+  animation: h-taken 6s steps(1, end) infinite;
+  animation-delay: calc(var(--h-seat-i, 0) * -137ms);
+}
+@keyframes h-taken {
+  0%, 95%, 100% { color: #45454f !important; }
+  96%  { color: #8a3b3f !important; }
+  97%  { color: #45454f !important; }
+  98%  { color: #7a3438 !important; }
+}
+
+/* ============================================================
    THE SCARE
    ============================================================ */
 .h-scare {
@@ -520,7 +711,13 @@ html[data-horror="on"] .offcanvas {
 @media (prefers-reduced-motion: reduce) {
   html[data-horror="on"] body::after,
   .h-grain, .h-vignette, .h-fog, .h-willow-branch,
+  .h-leaf, .h-eyes, .h-eyes .h-pupil, .h-hand, .h-whisper,
+  .h-claw span, .h-passerby,
+  html[data-horror="on"][data-horror-shudder="1"] .App,
+  html[data-horror="on"] h1,
+  html[data-horror="on"] h2,
   html[data-horror="on"] .btn-primary,
+  html[data-horror="on"] .seat-button.occupied,
   html[data-horror="on"] .seat-button.selected {
     animation: none !important;
   }

@@ -84,6 +84,114 @@ const WishingStick = () => (
   </svg>
 );
 
+/* ---- the things that move ---------------------------------------- */
+
+const rand = (min, max) => min + Math.random() * (max - min);
+
+/* Leaves come off the branches and never stop. Mounted once; the drift,
+   spin, size and delay are per-leaf custom properties so sixteen elements
+   never fall in step with each other. */
+const WillowLeaves = () => {
+  const leaves = useMemo(
+    () => Array.from({ length: 16 }, (_, i) => ({
+      key: i,
+      '--h-leaf-x': `${rand(-4, 102).toFixed(1)}%`,
+      '--h-leaf-size': `${rand(7, 14).toFixed(1)}px`,
+      '--h-leaf-dur': `${rand(11, 22).toFixed(1)}s`,
+      '--h-leaf-delay': `${rand(-20, 0).toFixed(1)}s`,
+      '--h-leaf-drift': `${rand(-170, 170).toFixed(0)}px`,
+      '--h-leaf-spin': `${rand(-900, 900).toFixed(0)}deg`,
+    })),
+    []
+  );
+  return leaves.map(({ key, ...style }) => <i key={key} className="h-leaf" style={style} />);
+};
+
+/* Not round, not bright: narrow and hooded, a dim sickly iris with a heavy
+   lid over it. Round whites with a catchlight read as a cartoon. */
+const Eyes = ({ x, y }) => (
+  <svg className="h-eyes" style={{ '--h-eye-x': x, '--h-eye-y': y }}
+       viewBox="0 0 92 26" fill="none" aria-hidden="true">
+    <defs>
+      <radialGradient id="h-iris" cx="50%" cy="50%" r="55%">
+        <stop offset="0%" stopColor="#cbb377" />
+        <stop offset="62%" stopColor="#8e7b45" />
+        <stop offset="100%" stopColor="#3a3220" />
+      </radialGradient>
+    </defs>
+    {[20, 72].map((cx) => (
+      <g key={cx}>
+        {/* socket */}
+        <path d={`M${cx - 20} 13 Q${cx} 2 ${cx + 20} 13 Q${cx} 24 ${cx - 20} 13 Z`} fill="#07070b" />
+        <g className="h-pupil" style={{ transformOrigin: `${cx}px 13px` }}>
+          <path d={`M${cx - 17} 13 Q${cx} 4.5 ${cx + 17} 13 Q${cx} 21.5 ${cx - 17} 13 Z`} fill="url(#h-iris)" />
+          {/* vertical slit, like something that hunts */}
+          <ellipse cx={cx} cy="13" rx="2.1" ry="6.2" fill="#0a0203" />
+        </g>
+        {/* heavy lid, cast over the top third */}
+        <path d={`M${cx - 20} 13 Q${cx} 2 ${cx + 20} 13 Q${cx} 8 ${cx - 20} 13 Z`} fill="#05050a" opacity="0.85" />
+      </g>
+    ))}
+  </svg>
+);
+
+/* A gnarled hand — long fingers, knuckles, no palm detail. Reads as a
+   silhouette at any size, which is all it ever is. */
+const Hand = ({ delay, tilt }) => (
+  <svg className="h-hand" style={{ '--h-hand-delay': delay, '--h-hand-tilt': tilt }}
+       viewBox="0 0 100 190" fill="none" aria-hidden="true">
+    <path d="M30 190 Q26 140 30 112 Q34 92 46 84 Q60 76 70 84 Q80 92 82 112 Q86 142 82 190 Z" fill="currentColor" />
+    {[[34, 78, -10], [48, 56, -4], [62, 52, 3], [74, 70, 11]].map(([x, len, rot], i) => (
+      <g key={i} transform={`rotate(${rot} ${x} 96)`}>
+        <rect x={x - 6} y={96 - len} width="12.5" height={len + 16} rx="6" fill="currentColor" />
+        <circle cx={x} cy={96 - len} r="6.2" fill="currentColor" />
+      </g>
+    ))}
+    <g transform="rotate(-38 28 122)">
+      <rect x="20" y="82" width="12" height="52" rx="6" fill="currentColor" />
+      <circle cx="26" cy="84" r="6" fill="currentColor" />
+    </g>
+  </svg>
+);
+
+const Passerby = () => (
+  <svg className="h-passerby" viewBox="0 0 150 400" fill="none" aria-hidden="true">
+    <ellipse cx="75" cy="44" rx="27" ry="32" fill="currentColor" />
+    <path d="M75 72 Q40 86 34 150 Q30 212 40 300 L52 400 L98 400 L110 300 Q120 212 116 150 Q110 86 75 72 Z" fill="currentColor" />
+    <path d="M40 120 Q18 176 24 246" stroke="currentColor" strokeWidth="17" strokeLinecap="round" />
+    <path d="M110 120 Q132 176 126 246" stroke="currentColor" strokeWidth="17" strokeLinecap="round" />
+  </svg>
+);
+
+/* Three gashes, each a slightly different thickness, angle and height so
+   they read as one swipe of a hand rather than three parallel rules. */
+const CLAWS = [
+  { top: '26%', h: '7px', rot: '-14deg', delay: '0ms' },
+  { top: '38%', h: '10px', rot: '-12deg', delay: '80ms' },
+  { top: '51%', h: '6px', rot: '-15.5deg', delay: '150ms' },
+];
+
+const Claw = () => (
+  <div className="h-claw" aria-hidden="true">
+    {CLAWS.map((c, i) => (
+      <span key={i} style={{
+        '--h-claw-top': c.top, '--h-claw-h': c.h,
+        '--h-claw-rot': c.rot, '--h-claw-delay': c.delay,
+      }} />
+    ))}
+  </div>
+);
+
+const WHISPERS = [
+  'make a wish',
+  'one wish',
+  'it is listening',
+  'say it out loud',
+  'the willow remembers',
+  'something answered',
+  'you already asked',
+];
+
 /* A short, sharp stinger built in the browser. Shipping an mp3 for one
    moment is not worth the payload, and this cannot 404. */
 const playStinger = () => {
@@ -138,9 +246,23 @@ const playStinger = () => {
 
 const SCARE_SESSION_KEY = 'chalchitra-willow-seen';
 
+/* Each event: how long it stays up, and the gap before the next one of its
+   kind. Independent timers rather than one queue, so the page gets an
+   irregular rhythm instead of a metronome — but `cooldown` keeps any two
+   heavy events from landing together. */
+const EVENTS = {
+  eyes:     { life: 4400, gap: [11000, 24000] },
+  whisper:  { life: 5400, gap: [9000,  19000] },
+  hands:    { life: 5200, gap: [21000, 42000] },
+  claw:     { life: 1600, gap: [26000, 55000] },
+  passerby: { life: 7500, gap: [34000, 70000] },
+  shudder:  { life: 460,  gap: [24000, 52000] },
+};
+
 const HorrorAtmosphere = () => {
   const { enabled } = useHorrorTheme();
   const [scaring, setScaring] = useState(false);
+  const [events, setEvents] = useState({});
   const lanternRef = useRef(null);
   const reduced = useMemo(prefersReducedMotion, []);
 
@@ -167,6 +289,58 @@ const HorrorAtmosphere = () => {
       if (frame) window.cancelAnimationFrame(frame);
     };
   }, [enabled, reduced]);
+
+  // Event scheduler. Every timer is tracked and cleared on unmount, and each
+  // event re-arms only after it has finished, so nothing can pile up.
+  useEffect(() => {
+    if (!enabled || reduced) return undefined;
+    const timers = new Set();
+    let stopped = false;
+    const busyUntil = { at: 0 };
+
+    const after = (ms, fn) => {
+      const id = window.setTimeout(() => { timers.delete(id); if (!stopped) fn(); }, ms);
+      timers.add(id);
+      return id;
+    };
+
+    Object.entries(EVENTS).forEach(([name, cfg]) => {
+      const arm = (delay) => after(delay, () => {
+        const now = Date.now();
+        // something heavy is already on screen — wait it out rather than stack
+        if (now < busyUntil.at) { arm(1500); return; }
+        busyUntil.at = now + cfg.life;
+
+        // a key on each mount restarts the CSS animation from the top
+        setEvents((prev) => ({ ...prev, [name]: { id: now, seed: Math.random() } }));
+        after(cfg.life, () => {
+          setEvents((prev) => { const next = { ...prev }; delete next[name]; return next; });
+          arm(rand(...cfg.gap));
+        });
+      });
+      arm(rand(2500, cfg.gap[1]));
+    });
+
+    return () => {
+      stopped = true;
+      timers.forEach((id) => window.clearTimeout(id));
+      timers.clear();
+    };
+  }, [enabled, reduced]);
+
+  // The shudder moves the page itself, so it is driven by an attribute on
+  // <html> and never runs while someone is picking seats — a 5px jolt
+  // mid-tap is a wrong seat, not a scare.
+  useEffect(() => {
+    const root = document.documentElement;
+    const onSeatPage = /^\/booking\//.test(window.location.pathname);
+    if (events.shudder && !onSeatPage) {
+      root.setAttribute('data-horror-shudder', '1');
+    } else {
+      root.removeAttribute('data-horror-shudder');
+    }
+    return () => root.removeAttribute('data-horror-shudder');
+  }, [events.shudder]);
 
   // The scare: once per browser session, on the seat-selection screen, and
   // never for anyone who asked their system for reduced motion.
@@ -207,6 +381,41 @@ const HorrorAtmosphere = () => {
         <div className="h-fog h-fog-high" />
         <WillowBranch seed={3} className="h-willow-branch h-willow-left" />
         <WillowBranch seed={11} className="h-willow-branch h-willow-right" />
+        {!reduced && <WillowLeaves />}
+
+        {events.eyes && (
+          <Eyes
+            key={events.eyes.id}
+            x={`${(8 + events.eyes.seed * 78).toFixed(1)}%`}
+            y={`${(14 + ((events.eyes.seed * 7) % 1) * 62).toFixed(1)}%`}
+          />
+        )}
+
+        {events.whisper && (
+          <div
+            key={events.whisper.id}
+            className="h-whisper"
+            style={{
+              '--h-wh-x': `${(6 + events.whisper.seed * 52).toFixed(1)}%`,
+              '--h-wh-y': `${(18 + ((events.whisper.seed * 13) % 1) * 62).toFixed(1)}%`,
+            }}
+          >
+            {WHISPERS[Math.floor(events.whisper.seed * WHISPERS.length) % WHISPERS.length]}
+          </div>
+        )}
+
+        {events.hands && (
+          <div className="h-hands" key={events.hands.id}>
+            {Array.from({ length: 5 }, (_, i) => (
+              <Hand key={i} delay={`${(i * 190 + events.hands.seed * 260).toFixed(0)}ms`}
+                    tilt={`${(-14 + i * 7).toFixed(0)}deg`} />
+            ))}
+          </div>
+        )}
+
+        {events.claw && <Claw key={events.claw.id} />}
+        {events.passerby && <Passerby key={events.passerby.id} />}
+
         {!reduced && <div className="h-lantern" ref={lanternRef} />}
         <div className="h-grain" />
       </div>
