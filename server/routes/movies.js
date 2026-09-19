@@ -11,6 +11,7 @@ const {
   getAgeRating,
   isTruthyFlag
 } = require('../utils/ageRating');
+const { parseAppDateTime, normalizeAppDateTime, isUpcomingDate } = require('../utils/datetime');
 
 const router = express.Router();
 
@@ -19,20 +20,6 @@ console.log('🎬 Movies routes file loaded');
 // Use Cloudinary in production, local disk in development
 const upload = getUpload('posters', 'uploads');
 
-// Admin datetime-local values represent IIT Jammu local time (IST).
-// Explicitly attach the offset so production server timezone cannot shift them.
-const parseAppDateTime = (value) => {
-  if (value === null || value === undefined || String(value).trim() === '') return null;
-  const raw = String(value).trim();
-  const localDateTime = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?$/;
-  const parsed = new Date(localDateTime.test(raw) ? `${raw}+05:30` : raw);
-  return Number.isNaN(parsed.getTime()) ? null : parsed;
-};
-
-const normalizeAppDateTime = (value) => {
-  const parsed = parseAppDateTime(value);
-  return parsed ? parsed.toISOString() : null;
-};
 
 // Resolve the certificate + gate trio from a request body.
 // An 'A' certificate gates regardless of the switch — the switch only exists
@@ -96,8 +83,8 @@ router.get('/upcoming', (req, res) => {
     const now = new Date();
     const upcoming = (movies || [])
       .filter((movie) => {
-        const movieDate = new Date(movie.date);
-        if (Number.isNaN(movieDate.getTime())) return false;
+        const movieDate = parseAppDateTime(movie.date);
+        if (!movieDate) return false;
         return movieDate >= now;
       })
       .sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -115,8 +102,8 @@ router.get('/past', (req, res) => {
     const now = new Date();
     const past = (movies || [])
       .filter((movie) => {
-        const movieDate = new Date(movie.date);
-        if (Number.isNaN(movieDate.getTime())) return false;
+        const movieDate = parseAppDateTime(movie.date);
+        if (!movieDate) return false;
         return movieDate < now;
       })
       .sort((a, b) => new Date(b.date) - new Date(a.date));

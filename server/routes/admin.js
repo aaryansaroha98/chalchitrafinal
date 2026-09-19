@@ -3,6 +3,7 @@ const db = require('../database');
 const multer = require('multer');
 const path = require('path');
 const { isCloudinaryConfigured, getUpload, getUploadUrl, deleteImage } = require('../utils/cloudinary');
+const { isUpcomingDate } = require('../utils/datetime');
 
 const router = express.Router();
 
@@ -149,7 +150,6 @@ router.get('/stats', requireAdmin, (req, res) => {
   const queries = {
     total_users: 'SELECT COUNT(*) as count FROM users',
     total_movies: 'SELECT COUNT(*) as count FROM movies',
-    upcoming_movies: 'SELECT COUNT(*) as count FROM movies WHERE is_upcoming = 1',
     total_bookings: 'SELECT COUNT(*) as count FROM bookings',
     recent_bookings: 'SELECT COUNT(*) as count FROM bookings WHERE created_at >= datetime("now", "-7 days")'
   };
@@ -157,7 +157,7 @@ router.get('/stats', requireAdmin, (req, res) => {
   const results = {};
   let completed = 0;
   let responded = false;
-  const totalExpected = Object.keys(queries).length + 1; // + upcoming booking stats
+  const totalExpected = Object.keys(queries).length + 2; // + upcoming movie stats, + upcoming booking stats
 
   const finish = () => {
     completed++;
@@ -180,6 +180,25 @@ router.get('/stats', requireAdmin, (req, res) => {
     });
   });
 
+  // Upcoming movie count derived from the screening date, the same rule the
+  // public movie list uses. Counting `is_upcoming = 1` instead left finished
+  // screenings on the dashboard forever, since nothing clears that flag when
+  // a date passes.
+  db.all('SELECT date, is_upcoming FROM movies', [], (err, rows) => {
+    if (responded) return;
+    if (err) {
+      responded = true;
+      console.error('Stats query error for upcoming_movies:', err.message);
+      return res.status(500).json({ error: err.message });
+    }
+
+    const now = new Date();
+    results.upcoming_movies = (rows || [])
+      .filter((row) => isUpcomingDate(row.date, row.is_upcoming, now)).length;
+
+    finish();
+  });
+
   // Exact upcoming booking and seat counts (date-aware first, flag fallback).
   db.all(
     `SELECT b.id AS booking_id, b.num_people, b.selected_seats, m.date AS movie_date, m.is_upcoming
@@ -195,13 +214,8 @@ router.get('/stats', requireAdmin, (req, res) => {
       }
 
       const now = new Date();
-      const upcomingRows = (rows || []).filter((row) => {
-        const movieDate = new Date(row.movie_date);
-        if (!Number.isNaN(movieDate.getTime())) {
-          return movieDate >= now;
-        }
-        return Number(row.is_upcoming) === 1;
-      });
+      const upcomingRows = (rows || [])
+        .filter((row) => isUpcomingDate(row.movie_date, row.is_upcoming, now));
 
       results.upcoming_bookings = upcomingRows.length;
       results.upcoming_booked_seats = upcomingRows.reduce((total, row) => {

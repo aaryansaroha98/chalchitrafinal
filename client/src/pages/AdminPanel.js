@@ -5,7 +5,7 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import autoTable from 'jspdf-autotable';
 import Loader from '../components/Loader';
-import { appDateTimeLocalToIso, getMovieStatus, toAppDateTimeLocal } from '../utils/movieStatus';
+import { appDateTimeLocalToIso, compareMovieDatesAsc, getMovieStatus, isUpcomingMovie, toAppDateTimeLocal } from '../utils/movieStatus';
 import AgeRatingBadge from '../components/AgeRatingBadge';
 import { AGE_RATINGS, getAgeRating, normalizeAgeRating, requiresAgeGate } from '../utils/ageRating';
 
@@ -172,25 +172,13 @@ const getBookingSeatCount = (booking) => {
   return 0;
 };
 
+// Same rule as every other "upcoming" surface: the screening date decides,
+// not the is_upcoming flag, which nothing clears once a date passes.
 const getNextUpcomingMovie = (movies = []) => {
   const now = new Date();
-  const upcomingMovies = (movies || []).filter((movie) => {
-    const movieDate = new Date(movie?.date);
-    if (!Number.isNaN(movieDate.getTime())) {
-      return movieDate >= now;
-    }
-    return Number(movie?.is_upcoming) === 1;
-  });
-
-  return upcomingMovies
-    .slice()
-    .sort((a, b) => {
-      const aDate = new Date(a?.date);
-      const bDate = new Date(b?.date);
-      const aTime = Number.isNaN(aDate.getTime()) ? Number.POSITIVE_INFINITY : aDate.getTime();
-      const bTime = Number.isNaN(bDate.getTime()) ? Number.POSITIVE_INFINITY : bDate.getTime();
-      return aTime - bTime;
-    })[0] || null;
+  return (movies || [])
+    .filter((movie) => isUpcomingMovie(movie?.date, now))
+    .sort(compareMovieDatesAsc)[0] || null;
 };
 
 const AdminPanel = () => {
