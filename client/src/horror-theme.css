@@ -289,24 +289,6 @@ html[data-horror="on"] .booking-seat-screen {
 }
 
 /* ============================================================
-   THE TICKET IS NOT PART OF THE SITE
-   It is rendered off-screen into <body> and captured by html2canvas to a
-   PDF someone prints or shows at the door. It must look the same whether
-   the skin is on or off, so the skin is switched off inside it.
-   ============================================================ */
-[data-ticket-capture] {
-  color: #0b1a2b;
-  background: transparent;
-}
-html[data-horror="on"] [data-ticket-capture],
-html[data-horror="on"] [data-ticket-capture] * {
-  animation: none !important;
-  filter: none !important;
-  text-shadow: none !important;
-  mix-blend-mode: normal !important;
-}
-
-/* ============================================================
    BOOTSTRAP COMPONENTS
    Alerts, badges and spinners ship their own light palette and are
    the only things the token pass could not reach — they never read

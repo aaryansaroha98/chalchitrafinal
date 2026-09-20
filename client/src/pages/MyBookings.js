@@ -157,54 +157,9 @@ const MyBookings = () => {
         </div>
       `;
 
-      // Create a temporary div with the ticket HTML
-      const ticketElement = document.createElement('div');
-      ticketElement.setAttribute('data-ticket-capture', '');
-      ticketElement.style.position = 'absolute';
-      ticketElement.style.left = '-9999px';
-      ticketElement.style.top = '-9999px';
-      ticketElement.style.width = '800px'; // Set explicit width
-      ticketElement.style.height = '260px';
-      ticketElement.innerHTML = ticketHTML;
-      document.body.appendChild(ticketElement);
-
-      console.log('Ticket element created and added to DOM');
-
-      // Function to preload images
-      const preloadImages = (element) => {
-        const images = element.querySelectorAll('img');
-        const promises = Array.from(images).map(img => {
-          return new Promise((resolve, reject) => {
-            if (img.complete && img.naturalHeight !== 0) {
-              resolve();
-            } else {
-              img.onload = () => resolve();
-              img.onerror = () => {
-                console.warn('Image failed to load:', img.src);
-                // Create a placeholder for failed images
-                img.style.display = 'none';
-                resolve();
-              };
-              // Set a reasonable timeout
-              setTimeout(() => {
-                console.warn('Image load timeout:', img.src);
-                resolve();
-              }, 5000);
-            }
-          });
-        });
-        return Promise.all(promises);
-      };
-
-      // Preload all images in the ticket
-      await preloadImages(ticketElement);
-      console.log('All images preloaded');
-
-      // Additional wait for rendering
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
+      // The ticket is rendered in its own isolated surface — see utils/ticketPdf.
       console.log('Capturing ticket...');
-      const canvas = await captureTicketCanvas(ticketElement);
+      const canvas = await captureTicketCanvas(ticketHTML);
 
       console.log('Canvas created, dimensions:', canvas.width, 'x', canvas.height);
 
@@ -220,10 +175,6 @@ const MyBookings = () => {
       console.log('Saving PDF:', filename);
       pdf.save(filename);
 
-      // Clean up
-      if (ticketElement.parentNode) {
-        ticketElement.parentNode.removeChild(ticketElement);
-      }
 
     } catch (error) {
       console.error('PDF generation error:', error);

@@ -137,43 +137,11 @@ const PaymentSuccess = () => {
           </div>
         `;
 
-        const ticketElement = document.createElement('div');
-        ticketElement.setAttribute('data-ticket-capture', '');
-        ticketElement.style.position = 'absolute';
-        ticketElement.style.left = '-9999px';
-        ticketElement.style.top = '-9999px';
-        ticketElement.style.width = '800px';
-        ticketElement.style.height = '260px';
-        ticketElement.innerHTML = ticketHTML;
-        document.body.appendChild(ticketElement);
-
-        const preloadImages = (element) => {
-          const images = element.querySelectorAll('img');
-          const promises = Array.from(images).map(img => (
-            new Promise((resolve) => {
-              if (img.complete && img.naturalHeight !== 0) {
-                resolve();
-              } else {
-                img.onload = () => resolve();
-                img.onerror = () => resolve();
-                setTimeout(() => resolve(), 5000);
-              }
-            })
-          ));
-          return Promise.all(promises);
-        };
-
-        await preloadImages(ticketElement);
-        await new Promise(resolve => setTimeout(resolve, 1500));
-
-        const canvas = await captureTicketCanvas(ticketElement);
+        const canvas = await captureTicketCanvas(ticketHTML);
         const pdf = ticketCanvasToPdf(canvas);
         const pdfDataUri = pdf.output('datauristring');
         const pdfBase64 = pdfDataUri.split(',')[1];
 
-        if (ticketElement.parentNode) {
-          ticketElement.parentNode.removeChild(ticketElement);
-        }
 
         await api.post('/api/bookings/send-ticket-email', {
           booking_id: ticket.booking_id,
