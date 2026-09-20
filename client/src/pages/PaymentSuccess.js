@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../api/axios';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import { captureTicketCanvas, ticketCanvasToPdf } from '../utils/ticketPdf';
 import CoinIcon from '../components/CoinIcon';
 
 const PaymentSuccess = () => {
@@ -167,32 +166,8 @@ const PaymentSuccess = () => {
         await preloadImages(ticketElement);
         await new Promise(resolve => setTimeout(resolve, 1500));
 
-        const canvas = await html2canvas(ticketElement, {
-          scale: 2,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#ffffff', // html2canvas option, not CSS — no var() here
-          logging: false,
-          width: 800,
-          height: ticketElement.scrollHeight,
-          scrollX: 0,
-          scrollY: 0,
-          imageTimeout: 10000,
-          removeContainer: false,
-          foreignObjectRendering: false
-        });
-
-        const imgData = canvas.toDataURL('image/png', 1.0);
-        const pdfWidth = 210;
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-        const pdf = new jsPDF({
-          orientation: pdfHeight > 297 ? 'portrait' : 'landscape',
-          unit: 'mm',
-          format: [pdfWidth, Math.min(pdfHeight, 297)]
-        });
-
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+        const canvas = await captureTicketCanvas(ticketElement);
+        const pdf = ticketCanvasToPdf(canvas);
         const pdfDataUri = pdf.output('datauristring');
         const pdfBase64 = pdfDataUri.split(',')[1];
 

@@ -3,8 +3,7 @@ import { Container, Row, Col, Button, Modal, Card, Badge, Alert } from 'react-bo
 import { useSearchParams } from 'react-router-dom';
 import api from '../api/axios';
 import Loader from '../components/Loader';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+import { captureTicketCanvas, ticketCanvasToPdf } from '../utils/ticketPdf';
 
 // Keep relative assets on the frontend origin so hosting rewrites proxy them.
 // This avoids direct browser requests to Render, which some campus networks block.
@@ -204,40 +203,12 @@ const MyBookings = () => {
       // Additional wait for rendering
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // Generate PDF using html2canvas with optimized settings
-      console.log('Starting html2canvas with optimized settings...');
-      const canvas = await html2canvas(ticketElement, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff', // html2canvas option, not CSS — no var() here
-        logging: false,
-        width: 800,
-        height: ticketElement.scrollHeight,
-        scrollX: 0,
-        scrollY: 0,
-        imageTimeout: 10000,
-        removeContainer: false,
-        foreignObjectRendering: false
-      });
+      console.log('Capturing ticket...');
+      const canvas = await captureTicketCanvas(ticketElement);
 
       console.log('Canvas created, dimensions:', canvas.width, 'x', canvas.height);
 
-      // Create PDF from canvas with no margins
-      const imgData = canvas.toDataURL('image/png', 1.0);
-
-      // Calculate PDF dimensions to fit content exactly
-      const pdfWidth = 210; // A4 width in mm
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-      const pdf = new jsPDF({
-        orientation: pdfHeight > 297 ? 'portrait' : 'landscape',
-        unit: 'mm',
-        format: [pdfWidth, Math.min(pdfHeight, 297)]
-      });
-
-      // Add image to PDF with no margins (fill entire page)
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+      const pdf = ticketCanvasToPdf(canvas);
 
       console.log('PDF created with visual ticket design');
 
