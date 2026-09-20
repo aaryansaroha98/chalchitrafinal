@@ -31,7 +31,16 @@ const waitForImages = (root) => {
  * iframe, so the capture is the same everywhere: any zoom level, any device
  * pixel ratio, any window size, skin on or off.
  */
-export const captureTicketCanvas = async (ticketHTML) => {
+const EXPECTED_W = TICKET_WIDTH * CAPTURE_SCALE;
+const EXPECTED_H = TICKET_HEIGHT * CAPTURE_SCALE;
+
+// Some engines refuse document.write into a detached iframe, or report the
+// body as zero-sized before first paint. Rather than hand back a wrong-sized
+// capture, say so and let the caller fall back.
+const isSound = (canvas) =>
+  !!canvas && Math.abs(canvas.width - EXPECTED_W) <= 2 && Math.abs(canvas.height - EXPECTED_H) <= 2;
+
+const captureInIframe = async (ticketHTML) => {
   const frame = document.createElement('iframe');
   frame.setAttribute('aria-hidden', 'true');
   frame.setAttribute('title', 'ticket render surface');
@@ -82,6 +91,63 @@ export const captureTicketCanvas = async (ticketHTML) => {
   } finally {
     if (frame.parentNode) frame.parentNode.removeChild(frame);
   }
+};
+
+/* Last resort: the pre-iframe approach, kept only for engines where the
+   iframe surface does not work. It is vulnerable to an ancestor zoom, so the
+   element is measured and the factor divided back out of the scale. */
+const captureInPage = async (ticketHTML) => {
+  const host = document.createElement('div');
+  host.setAttribute('aria-hidden', 'true');
+  host.style.cssText = `position:fixed;top:0;left:-10000px;width:${TICKET_WIDTH}px;height:${TICKET_HEIGHT}px;`
+    + 'margin:0;padding:0;background:#ffffff;overflow:hidden;zoom:1;transform:none;';
+  host.innerHTML = ticketHTML;
+  document.body.appendChild(host);
+  try {
+    await waitForImages(host);
+    await new Promise((resolve) => setTimeout(resolve, 350));
+    const measured = host.getBoundingClientRect().width / TICKET_WIDTH;
+    const zoom = Number.isFinite(measured) && measured > 0.1 && measured < 10 ? measured : 1;
+    return await html2canvas(host, {
+      scale: CAPTURE_SCALE / zoom,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      logging: false,
+      width: TICKET_WIDTH * zoom,
+      height: TICKET_HEIGHT * zoom,
+      windowWidth: TICKET_WIDTH * zoom,
+      windowHeight: TICKET_HEIGHT * zoom,
+      scrollX: 0,
+      scrollY: 0,
+      imageTimeout: 10000,
+      removeContainer: false,
+      foreignObjectRendering: false,
+    });
+  } finally {
+    if (host.parentNode) host.parentNode.removeChild(host);
+  }
+};
+
+export const captureTicketCanvas = async (ticketHTML) => {
+  let canvas = null;
+  try {
+    canvas = await captureInIframe(ticketHTML);
+  } catch (err) {
+    console.warn('Ticket iframe capture failed, falling back:', err && err.message);
+  }
+  if (isSound(canvas)) return canvas;
+
+  console.warn(
+    'Ticket capture was',
+    canvas ? `${canvas.width}x${canvas.height}` : 'unavailable',
+    `- expected ${EXPECTED_W}x${EXPECTED_H}; retrying in the page.`
+  );
+  const fallback = await captureInPage(ticketHTML);
+  if (!isSound(fallback)) {
+    console.warn('Ticket fallback capture is also off-size:', fallback.width + 'x' + fallback.height);
+  }
+  return fallback;
 };
 
 /**
