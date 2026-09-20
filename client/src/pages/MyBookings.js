@@ -160,6 +160,7 @@ const MyBookings = () => {
 
       // Create a temporary div with the ticket HTML
       const ticketElement = document.createElement('div');
+      ticketElement.setAttribute('data-ticket-capture', '');
       ticketElement.style.position = 'absolute';
       ticketElement.style.left = '-9999px';
       ticketElement.style.top = '-9999px';
@@ -209,7 +210,7 @@ const MyBookings = () => {
         scale: 2,
         useCORS: true,
         allowTaint: true,
-        backgroundColor: 'var(--qt-surface)',
+        backgroundColor: '#ffffff', // html2canvas option, not CSS — no var() here
         logging: false,
         width: 800,
         height: ticketElement.scrollHeight,

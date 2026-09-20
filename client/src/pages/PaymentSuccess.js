@@ -139,6 +139,7 @@ const PaymentSuccess = () => {
         `;
 
         const ticketElement = document.createElement('div');
+        ticketElement.setAttribute('data-ticket-capture', '');
         ticketElement.style.position = 'absolute';
         ticketElement.style.left = '-9999px';
         ticketElement.style.top = '-9999px';
@@ -170,7 +171,7 @@ const PaymentSuccess = () => {
           scale: 2,
           useCORS: true,
           allowTaint: true,
-          backgroundColor: 'var(--qt-surface)',
+          backgroundColor: '#ffffff', // html2canvas option, not CSS — no var() here
           logging: false,
           width: 800,
           height: ticketElement.scrollHeight,

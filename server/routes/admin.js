@@ -695,29 +695,10 @@ router.put('/bookings/:id', requireAdmin, (req, res) => {
   });
 });
 
-// Delete individual booking (admin)
-router.delete('/bookings/:id', requireAdmin, (req, res) => {
-  const bookingId = req.params.id;
-
-  // Delete related booking_foods
-  db.run('DELETE FROM booking_foods WHERE booking_id = ?', [bookingId], function (err1) {
-    if (err1) console.error('Error deleting booking_foods:', err1.message);
-
-    // Delete related booking_food_status
-    db.run('DELETE FROM booking_food_status WHERE booking_id = ?', [bookingId], function (err2) {
-      if (err2) console.error('Error deleting booking_food_status:', err2.message);
-
-      // Delete booking
-      db.run('DELETE FROM bookings WHERE id = ?', [bookingId], function (err3) {
-        if (err3) return res.status(500).json({ error: err3.message });
-        if (this.changes === 0) return res.status(404).json({ error: 'Booking not found' });
-        res.json({ message: 'Booking deleted successfully', deleted: this.changes });
-      });
-    });
-  });
-});
-
 // Reset (delete) bookings - optionally filtered by movie_id
+// NOTE: this literal route MUST stay above '/bookings/:id'. Express matches
+// in declaration order, and with :id first a DELETE of /bookings/reset bound
+// id = 'reset' and Postgres rejected it as an integer.
 router.delete('/bookings/reset', requireAdmin, (req, res) => {
   const { movie_id } = req.body || {};
 
@@ -754,6 +735,31 @@ router.delete('/bookings/reset', requireAdmin, (req, res) => {
           console.log(`Reset ${this.changes} bookings${movie_id ? ` for movie ${movie_id}` : ''}`);
           res.json({ message: `${this.changes} booking(s) deleted successfully`, deleted: this.changes });
         });
+      });
+    });
+  });
+});
+
+// Delete individual booking (admin)
+router.delete('/bookings/:id', requireAdmin, (req, res) => {
+  const bookingId = Number(req.params.id);
+  if (!Number.isInteger(bookingId) || bookingId <= 0) {
+    return res.status(400).json({ error: 'Invalid booking id' });
+  }
+
+  // Delete related booking_foods
+  db.run('DELETE FROM booking_foods WHERE booking_id = ?', [bookingId], function (err1) {
+    if (err1) console.error('Error deleting booking_foods:', err1.message);
+
+    // Delete related booking_food_status
+    db.run('DELETE FROM booking_food_status WHERE booking_id = ?', [bookingId], function (err2) {
+      if (err2) console.error('Error deleting booking_food_status:', err2.message);
+
+      // Delete booking
+      db.run('DELETE FROM bookings WHERE id = ?', [bookingId], function (err3) {
+        if (err3) return res.status(500).json({ error: err3.message });
+        if (this.changes === 0) return res.status(404).json({ error: 'Booking not found' });
+        res.json({ message: 'Booking deleted successfully', deleted: this.changes });
       });
     });
   });
