@@ -251,6 +251,8 @@ const AdminPanel = () => {
   const [showCoinManager, setShowCoinManager] = useState(false);
   const [coinManagerSearch, setCoinManagerSearch] = useState('');
   const [coinMessage, setCoinMessage] = useState('');
+  const [coinSelectedIds, setCoinSelectedIds] = useState([]);
+  const [coinProgress, setCoinProgress] = useState(null);
   const [coinAmount, setCoinAmount] = useState('');
   const [coinNote, setCoinNote] = useState('');
   const [coinSending, setCoinSending] = useState(false);
@@ -1111,55 +1113,56 @@ const AdminPanel = () => {
       ).slice(0, 8)
     : [];
 
-  // Set a balance to an exact number. Sending coins only ever adds, so
-  // correcting a balance downwards was impossible from here.
-  const handleSetBalance = async () => {
-    if (!selectedCoinUser) {
-      setCoinFeedback({ type: 'error', text: 'Please select a user first.' });
-      return;
+  // Coin actions run over a list: the rows ticked in the table, or the single
+  // user picked by search if none are. Requests go one at a time on purpose —
+  // firing one per user in parallel is what previously burst the rate limit
+  // and produced "too many requests" followed by an empty admin panel.
+  const coinTargets = () => {
+    if (coinSelectedIds.length) {
+      return users.filter((u) => coinSelectedIds.includes(u.id));
     }
-    const target = Number(coinAmount);
-    if (!Number.isInteger(target) || target < 0 || target > 100000) {
-      setCoinFeedback({ type: 'error', text: 'Enter a whole number between 0 and 100000.' });
-      return;
-    }
-    const who = selectedCoinUser.name || selectedCoinUser.email;
-    if (!window.confirm(`Set ${who}'s balance to exactly ${target} coins? Their current balance is ${selectedCoinUser.coins ?? 0}.`)) {
-      return;
-    }
+    return selectedCoinUser ? [selectedCoinUser] : [];
+  };
+
+  const runCoinAction = async (targets, describe, apply) => {
     setCoinSending(true);
     setCoinFeedback(null);
-    try {
-      const res = await api.put(`/api/admin/users/${selectedCoinUser.id}/coins`, {
-        coins: target,
-        reason: coinNote.trim(),
-        message: coinMessage.trim()
-      });
-      setCoinFeedback({
-        type: 'success',
-        text: `${who}'s balance is now ${res.data.coins} (was ${res.data.previous}).`
-      });
-      const targetUserId = selectedCoinUser.id;
-      setUsers((prev) => prev.map((u) => (u.id === targetUserId ? { ...u, coins: res.data.coins } : u)));
+    const failures = [];
+    let done = 0;
+
+    for (const target of targets) {
+      setCoinProgress({ done, total: targets.length, name: target.name || target.email });
+      try {
+        const balance = await apply(target);
+        setUsers((prev) => prev.map((u) => (u.id === target.id ? { ...u, coins: balance } : u)));
+      } catch (err) {
+        failures.push(`${target.name || target.email}: ${err.response?.data?.error || err.message}`);
+      }
+      done += 1;
+    }
+
+    setCoinProgress(null);
+    setCoinSending(false);
+    const ok = targets.length - failures.length;
+    setCoinFeedback(failures.length
+      ? { type: 'error', text: `${describe(ok)} ${failures.length} failed — ${failures.slice(0, 3).join('; ')}` }
+      : { type: 'success', text: describe(ok) });
+
+    if (!failures.length) {
       setCoinAmount('');
       setCoinNote('');
       setCoinMessage('');
+      setCoinSelectedIds([]);
       setSelectedCoinUser(null);
       setCoinSearchTerm('');
-    } catch (err) {
-      setCoinFeedback({
-        type: 'error',
-        text: 'Error setting balance: ' + (err.response?.data?.error || err.message)
-      });
-    } finally {
-      setCoinSending(false);
     }
   };
 
-  // Send coins directly to a selected user (super admin only)
+  // Add coins, and announce them to each recipient.
   const handleSendCoins = async () => {
-    if (!selectedCoinUser) {
-      setCoinFeedback({ type: 'error', text: 'Please select a user first.' });
+    const targets = coinTargets();
+    if (!targets.length) {
+      setCoinFeedback({ type: 'error', text: 'Pick at least one user — tick rows in the table or search for someone.' });
       return;
     }
     const amount = Number(coinAmount);
@@ -1167,42 +1170,56 @@ const AdminPanel = () => {
       setCoinFeedback({ type: 'error', text: 'Enter a whole number between 1 and 100000.' });
       return;
     }
-    setCoinSending(true);
-    setCoinFeedback(null);
-    try {
-      const res = await api.post(`/api/admin/users/${selectedCoinUser.id}/grant-coins`, {
-        amount,
-        reason: coinNote.trim(),
-        message: coinMessage.trim()
-      });
-      setCoinFeedback({
-        type: 'success',
-        text: `Sent ${amount} coins to ${selectedCoinUser.name || selectedCoinUser.email}. New balance: ${res.data.coins}.`
-      });
-      // Update ONLY this user's balance locally instead of re-fetching ALL admin
-      // data. fetchAllData() fires 12 parallel requests, so sending coins to
-      // several users in a row was bursting ~13 requests per click and draining
-      // the rate-limit budget — that's what caused "too many requests" followed
-      // by "unable to load". A single targeted state update is instant and cheap.
-      const targetUserId = selectedCoinUser.id;
-      const newBalance = res.data.coins;
-      setUsers((prev) => prev.map((u) =>
-        u.id === targetUserId ? { ...u, coins: newBalance } : u
-      ));
-      setCoinAmount('');
-      setCoinNote('');
-      setCoinMessage('');
-      setSelectedCoinUser(null);
-      setCoinSearchTerm('');
-    } catch (err) {
-      setCoinFeedback({
-        type: 'error',
-        text: 'Error sending coins: ' + (err.response?.data?.error || err.message)
-      });
-    } finally {
-      setCoinSending(false);
+    if (targets.length > 1 && !window.confirm(`Send ${amount} coins to ${targets.length} users? Each of them will see a message from you.`)) {
+      return;
     }
+    await runCoinAction(
+      targets,
+      (n) => `Sent ${amount} coins to ${n} user${n === 1 ? '' : 's'}.`,
+      async (target) => {
+        const res = await api.post(`/api/admin/users/${target.id}/grant-coins`, {
+          amount,
+          reason: coinNote.trim(),
+          message: coinMessage.trim(),
+        });
+        return res.data.coins;
+      }
+    );
   };
+
+  // Overwrite the balance with an exact number. Sending only ever adds, so
+  // without this a balance could never be corrected downwards.
+  const handleSetBalance = async () => {
+    const targets = coinTargets();
+    if (!targets.length) {
+      setCoinFeedback({ type: 'error', text: 'Pick at least one user — tick rows in the table or search for someone.' });
+      return;
+    }
+    const target = Number(coinAmount);
+    if (!Number.isInteger(target) || target < 0 || target > 100000) {
+      setCoinFeedback({ type: 'error', text: 'Enter a whole number between 0 and 100000.' });
+      return;
+    }
+    const who = targets.length === 1
+      ? `${targets[0].name || targets[0].email}'s balance (currently ${targets[0].coins ?? 0})`
+      : `${targets.length} users' balances`;
+    if (!window.confirm(`Set ${who} to exactly ${target} coins? This overwrites what they have now.`)) {
+      return;
+    }
+    await runCoinAction(
+      targets,
+      (n) => `Set ${n} balance${n === 1 ? '' : 's'} to ${target}.`,
+      async (u) => {
+        const res = await api.put(`/api/admin/users/${u.id}/coins`, {
+          coins: target,
+          reason: coinNote.trim(),
+          message: coinMessage.trim(),
+        });
+        return res.data.coins;
+      }
+    );
+  };
+
 
 
   // Filter bookings based on selected movie + booking search
@@ -3526,6 +3543,24 @@ const AdminPanel = () => {
                   </div>
                 )}
 
+                {coinProgress && (
+                  <div className="mb-3 text-muted" style={{ fontSize: '0.88rem' }}>
+                    Sending to {coinProgress.name}… ({coinProgress.done + 1} of {coinProgress.total})
+                  </div>
+                )}
+
+                {coinSelectedIds.length > 0 && (
+                  <div className="mb-3" style={{
+                    padding: '0.6rem 0.9rem',
+                    border: '1px solid var(--qt-line)',
+                    background: 'var(--qt-panel-soft)',
+                    fontSize: '0.9rem'
+                  }}>
+                    Acting on <strong>{coinSelectedIds.length} selected user{coinSelectedIds.length === 1 ? '' : 's'}</strong>{' '}
+                    from the table below. Untick them to go back to sending to one person.
+                  </div>
+                )}
+
                 {/* Step 1: pick a user */}
                 {selectedCoinUser ? (
                   <div className="mb-3 d-flex align-items-center justify-content-between" style={{
@@ -3630,19 +3665,23 @@ const AdminPanel = () => {
                   <Button
                     variant="dark"
                     onClick={handleSendCoins}
-                    disabled={coinSending || !selectedCoinUser || !coinAmount}
+                    disabled={coinSending || (!selectedCoinUser && !coinSelectedIds.length) || !coinAmount}
                     style={{ borderRadius: '0' }}
                   >
-                    {coinSending ? 'Sending…' : 'Send Coins'}
+                    {coinSending
+                      ? (coinProgress ? `Sending ${coinProgress.done + 1}/${coinProgress.total}…` : 'Sending…')
+                      : (coinSelectedIds.length > 1 ? `Send Coins to ${coinSelectedIds.length} Users` : 'Send Coins')}
                   </Button>
                   <Button
                     variant="outline-dark"
                     onClick={handleSetBalance}
-                    disabled={coinSending || !selectedCoinUser || coinAmount === ''}
+                    disabled={coinSending || (!selectedCoinUser && !coinSelectedIds.length) || coinAmount === ''}
                     style={{ borderRadius: '0' }}
                     title="Overwrite the balance with this exact number instead of adding to it"
                   >
-                    Set Balance To This
+                    {coinSelectedIds.length > 1
+                      ? `Set ${coinSelectedIds.length} Balances To This`
+                      : 'Set Balance To This'}
                   </Button>
                 </div>
                 <Form.Text className="text-muted d-block mt-2">
@@ -3666,31 +3705,82 @@ const AdminPanel = () => {
 
             <input
               type="text"
-              className="form-control mb-3"
+              className="form-control mb-2"
               placeholder="Filter by name or email…"
               value={coinManagerSearch}
               onChange={(e) => setCoinManagerSearch(e.target.value)}
             />
 
+            {(() => {
+              const shown = [...users]
+                .filter((u) => {
+                  const q = coinManagerSearch.trim().toLowerCase();
+                  if (!q) return true;
+                  return (u.name || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q);
+                })
+                .sort((a, b) => (Number(b.coins) || 0) - (Number(a.coins) || 0));
+              const shownIds = shown.map((u) => u.id);
+              const allShownPicked = shownIds.length > 0 && shownIds.every((id) => coinSelectedIds.includes(id));
+              const toggleAllShown = () => setCoinSelectedIds((prev) => (
+                allShownPicked
+                  ? prev.filter((id) => !shownIds.includes(id))
+                  : [...new Set([...prev, ...shownIds])]
+              ));
+              const toggleOne = (id) => setCoinSelectedIds((prev) => (
+                prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+              ));
+
+              return (
+            <>
+            <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+              <Form.Check
+                type="checkbox"
+                id="coin-select-all"
+                checked={allShownPicked}
+                onChange={toggleAllShown}
+                label={coinManagerSearch.trim()
+                  ? `Select all ${shownIds.length} matching`
+                  : `Select all ${shownIds.length} users`}
+              />
+              {coinSelectedIds.length > 0 && (
+                <div className="d-flex align-items-center gap-2">
+                  <span style={{ fontWeight: 600 }}>{coinSelectedIds.length} selected</span>
+                  <Button size="sm" variant="outline-secondary" style={{ borderRadius: '0' }}
+                    onClick={() => setCoinSelectedIds([])}>
+                    Clear
+                  </Button>
+                </div>
+              )}
+            </div>
+
             <div style={{ maxHeight: '320px', overflowY: 'auto', border: '1px solid var(--qt-line)' }}>
               <Table hover className="mb-0" style={{ fontSize: '0.9rem' }}>
                 <thead style={{ position: 'sticky', top: 0, background: 'var(--qt-panel-soft)', zIndex: 1 }}>
                   <tr>
+                    <th style={{ width: '38px' }}>
+                      <Form.Check
+                        type="checkbox"
+                        aria-label="Select all shown"
+                        checked={allShownPicked}
+                        onChange={toggleAllShown}
+                      />
+                    </th>
                     <th>User</th>
                     <th className="text-end">Balance</th>
                     <th className="text-end">Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {[...users]
-                    .filter((u) => {
-                      const q = coinManagerSearch.trim().toLowerCase();
-                      if (!q) return true;
-                      return (u.name || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q);
-                    })
-                    .sort((a, b) => (Number(b.coins) || 0) - (Number(a.coins) || 0))
-                    .map((u) => (
-                      <tr key={u.id} className={selectedCoinUser?.id === u.id ? 'table-active' : ''}>
+                  {shown.map((u) => (
+                      <tr key={u.id} className={(coinSelectedIds.includes(u.id) || selectedCoinUser?.id === u.id) ? 'table-active' : ''}>
+                        <td style={{ verticalAlign: 'middle' }}>
+                          <Form.Check
+                            type="checkbox"
+                            aria-label={`Select ${u.name || u.email}`}
+                            checked={coinSelectedIds.includes(u.id)}
+                            onChange={() => toggleOne(u.id)}
+                          />
+                        </td>
                         <td>
                           <div style={{ fontWeight: 600 }}>{u.name || 'Unnamed'}</div>
                           <div className="text-muted" style={{ fontSize: '0.8rem' }}>{u.email}</div>
@@ -3714,12 +3804,17 @@ const AdminPanel = () => {
                         </td>
                       </tr>
                     ))}
-                  {users.length === 0 && (
-                    <tr><td colSpan="3" className="text-center text-muted py-4">No users loaded</td></tr>
+                  {shown.length === 0 && (
+                    <tr><td colSpan="4" className="text-center text-muted py-4">
+                      {users.length === 0 ? 'No users loaded' : 'No users match that filter'}
+                    </td></tr>
                   )}
                 </tbody>
               </Table>
             </div>
+            </>
+              );
+            })()}
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={() => setShowCoinManager(false)} style={{ borderRadius: '0' }}>

@@ -549,7 +549,8 @@ router.put('/team/:id/remove_scanner', requireScannerManager, (req, res) => {
 // Get all users
 router.get('/users', requireAdmin, (req, res) => {
   db.all(
-    `SELECT id, name, email, is_admin, code_scanner, last_seen, created_at
+    `SELECT id, name, email, is_admin, code_scanner, last_seen, created_at,
+            COALESCE(coins, 0) AS coins
      FROM users
      ORDER BY last_seen DESC, created_at DESC, id DESC`,
     [],
