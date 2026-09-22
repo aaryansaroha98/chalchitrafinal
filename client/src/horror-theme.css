@@ -246,15 +246,22 @@ html[data-horror="on"] .video-section::after {
     linear-gradient(to bottom, rgba(5, 5, 8, 0.72), rgba(5, 5, 8, 0.3) 45%, var(--h-void) 99%);
 }
 
-/* Posters stay lit, but colder and harder — like old film stock. */
+/* Posters are the artwork, not set dressing: shown exactly as supplied, at
+   full colour and brightness, on every screen size. The skin used to grade
+   them like old film stock, which washed out the one thing on the page people
+   are actually trying to look at. Stated explicitly so nothing inherited from
+   the atmosphere layers can dim them either. */
 html[data-horror="on"] .movie-card img,
 html[data-horror="on"] .qt-movie-poster img,
-html[data-horror="on"] img.movie-poster {
-  filter: grayscale(0.45) contrast(1.16) brightness(0.82) sepia(0.12);
-  transition: filter 400ms ease;
+html[data-horror="on"] img.movie-poster,
+html[data-horror="on"] .card img,
+html[data-horror="on"] .booking-poster,
+html[data-horror="on"] .booking-poster img {
+  filter: none !important;
+  -webkit-filter: none !important;
+  opacity: 1 !important;
+  mix-blend-mode: normal !important;
 }
-html[data-horror="on"] .card:hover img.movie-poster,
-html[data-horror="on"] .movie-card:hover img { filter: grayscale(0) contrast(1.08) brightness(0.95); }
 
 /* ============================================================
    SEAT MAP — taken seats are claimed, yours beats like a pulse
