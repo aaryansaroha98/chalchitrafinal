@@ -253,6 +253,7 @@ const AdminPanel = () => {
   const [coinMessage, setCoinMessage] = useState('');
   const [coinSelectedIds, setCoinSelectedIds] = useState([]);
   const [coinProgress, setCoinProgress] = useState(null);
+  const [coinRefreshing, setCoinRefreshing] = useState(false);
   const [coinAmount, setCoinAmount] = useState('');
   const [coinNote, setCoinNote] = useState('');
   const [coinSending, setCoinSending] = useState(false);
@@ -1113,6 +1114,27 @@ const AdminPanel = () => {
       ).slice(0, 8)
     : [];
 
+  // Read the balances back from the database rather than trusting what this
+  // page last patched into local state. One request, so it is safe to call on
+  // opening coin management and after every action — the table then always
+  // shows what is actually stored, not what we hoped we stored.
+  const refreshUserBalances = async () => {
+    setCoinRefreshing(true);
+    try {
+      const res = await api.get('/api/admin/users');
+      if (Array.isArray(res.data)) setUsers(res.data);
+      return true;
+    } catch (err) {
+      setCoinFeedback({
+        type: 'error',
+        text: 'Could not refresh balances: ' + (err.response?.data?.error || err.message)
+      });
+      return false;
+    } finally {
+      setCoinRefreshing(false);
+    }
+  };
+
   // Coin actions run over a list: the rows ticked in the table, or the single
   // user picked by search if none are. Requests go one at a time on purpose —
   // firing one per user in parallel is what previously burst the rate limit
@@ -1142,6 +1164,9 @@ const AdminPanel = () => {
     }
 
     setCoinProgress(null);
+    // Authoritative read before reporting, so the numbers on screen are the
+    // stored ones even if a response was missed or another admin was working.
+    await refreshUserBalances();
     setCoinSending(false);
     const ok = targets.length - failures.length;
     setCoinFeedback(failures.length
@@ -3697,10 +3722,22 @@ const AdminPanel = () => {
 
             <div className="d-flex flex-wrap align-items-baseline justify-content-between gap-2 mb-2">
               <h4 className="mb-0" style={{ color: 'var(--qt-text)' }}>All Balances</h4>
-              <span className="text-muted" style={{ fontSize: '0.85rem' }}>
-                {users.length} user{users.length === 1 ? '' : 's'} &middot;{' '}
-                {users.reduce((sum, u) => sum + (Number(u.coins) || 0), 0).toLocaleString('en-IN')} coins in circulation
-              </span>
+              <div className="d-flex align-items-center gap-2">
+                <span className="text-muted" style={{ fontSize: '0.85rem' }}>
+                  {users.length} user{users.length === 1 ? '' : 's'} &middot;{' '}
+                  {users.reduce((sum, u) => sum + (Number(u.coins) || 0), 0).toLocaleString('en-IN')} coins in circulation
+                </span>
+                <Button
+                  size="sm"
+                  variant="outline-secondary"
+                  style={{ borderRadius: '0' }}
+                  onClick={refreshUserBalances}
+                  disabled={coinRefreshing || coinSending}
+                  title="Re-read every balance from the database"
+                >
+                  {coinRefreshing ? 'Refreshing…' : 'Refresh'}
+                </Button>
+              </div>
             </div>
 
             <input
@@ -3868,7 +3905,12 @@ const AdminPanel = () => {
               <div className="d-flex justify-content-center mb-4">
                 <Button
                   variant="dark"
-                  onClick={() => { setShowCoinManager(true); setCoinFeedback(null); }}
+                  onClick={() => {
+                    setShowCoinManager(true);
+                    setCoinFeedback(null);
+                    setCoinSelectedIds([]);
+                    refreshUserBalances();
+                  }}
                   style={{ borderRadius: '0' }}
                 >
                   <i className="fas fa-coins me-2"></i>
