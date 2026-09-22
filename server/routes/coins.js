@@ -25,7 +25,7 @@ router.get('/announcements', (req, res) => {
   if (!userId) return res.status(401).json({ error: 'Authentication required' });
 
   db.all(
-    `SELECT id, amount, actor_name, created_at
+    `SELECT id, amount, actor_name, announce_message, created_at
      FROM coin_transactions
      WHERE user_id = ?
        AND type = 'credit'
@@ -41,6 +41,7 @@ router.get('/announcements', (req, res) => {
           id: row.id,
           amount: Number(row.amount) || 0,
           from: row.actor_name || 'Chalchitra',
+          message: row.announce_message || '',
           at: row.created_at,
         })),
       });

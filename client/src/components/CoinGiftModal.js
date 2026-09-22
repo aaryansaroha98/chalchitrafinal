@@ -122,6 +122,12 @@ const CoinGiftModal = () => {
                 {current.amount === 1 ? 'coin' : 'coins'}
               </h2>
 
+              {current.message ? (
+                <blockquote className="coin-gift-message">
+                  {current.message}
+                </blockquote>
+              ) : null}
+
               <p className="coin-gift-text">
                 They are already in your balance and can be spent on any screening.
               </p>

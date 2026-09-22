@@ -453,6 +453,8 @@ if (usePostgres) {
       await pool.query('ALTER TABLE coin_transactions ADD COLUMN IF NOT EXISTS actor_name TEXT');
       await pool.query('ALTER TABLE coin_transactions ADD COLUMN IF NOT EXISTS actor_user_id INTEGER');
       await pool.query('ALTER TABLE coin_transactions ADD COLUMN IF NOT EXISTS announced_at TIMESTAMP');
+      // A note from the sender, shown to the recipient in the popup.
+      await pool.query('ALTER TABLE coin_transactions ADD COLUMN IF NOT EXISTS announce_message TEXT');
       await pool.query('ALTER TABLE team ADD COLUMN IF NOT EXISTS section TEXT DEFAULT \'current_team\'');
       await pool.query('ALTER TABLE team ADD COLUMN IF NOT EXISTS display_order INTEGER DEFAULT 0');
       console.log('✅ movies/movie_foods/team columns ensured');
@@ -1127,6 +1129,8 @@ if (usePostgres) {
         ['actor_name', 'TEXT'],
         ['actor_user_id', 'INTEGER'],
         ['announced_at', 'DATETIME'],
+        // A note from the sender, shown to the recipient in the popup.
+        ['announce_message', 'TEXT'],
       ];
       wanted.forEach(([name, type]) => {
         if (have.includes(name)) return;

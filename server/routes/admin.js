@@ -631,6 +631,11 @@ router.post('/users/:id/grant-coins', requireSuperAdmin, (req, res) => {
   const userId = parseInt(req.params.id, 10);
   const rawAmount = req.body && req.body.amount;
   const note = (req.body && typeof req.body.reason === 'string') ? req.body.reason.trim() : '';
+  // Shown to the recipient in the popup, unlike `note`, which is for the
+  // transaction history and stays internal.
+  const message = (req.body && typeof req.body.message === 'string')
+    ? req.body.message.trim().slice(0, 200)
+    : '';
 
   const amount = Number(rawAmount);
   if (!Number.isInteger(amount) || amount <= 0 || amount > 100000) {
@@ -651,8 +656,8 @@ router.post('/users/:id/grant-coins', requireSuperAdmin, (req, res) => {
     const actorName = (actor && (actor.name || actor.email)) || 'Chalchitra';
 
     db.run(
-      'INSERT INTO coin_transactions (user_id, amount, type, reason, actor_name, actor_user_id) VALUES (?, ?, ?, ?, ?, ?)',
-      [userId, amount, 'credit', reason, actorName, (actor && actor.id) || null],
+      'INSERT INTO coin_transactions (user_id, amount, type, reason, actor_name, actor_user_id, announce_message) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [userId, amount, 'credit', reason, actorName, (actor && actor.id) || null, message || null],
       function (insertErr) {
         if (insertErr) return res.status(500).json({ error: insertErr.message });
 
@@ -679,6 +684,9 @@ router.put('/users/:id/coins', requireSuperAdmin, (req, res) => {
   const userId = parseInt(req.params.id, 10);
   const target = Number(req.body && req.body.coins);
   const note = (req.body && typeof req.body.reason === 'string') ? req.body.reason.trim() : '';
+  const message = (req.body && typeof req.body.message === 'string')
+    ? req.body.message.trim().slice(0, 200)
+    : '';
 
   if (!Number.isInteger(userId)) {
     return res.status(400).json({ error: 'Invalid user id' });
@@ -708,8 +716,8 @@ router.put('/users/:id/coins', requireSuperAdmin, (req, res) => {
     const announced = delta > 0 ? null : new Date().toISOString();
 
     db.run(
-      'INSERT INTO coin_transactions (user_id, amount, type, reason, actor_name, actor_user_id, announced_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [userId, Math.abs(delta), delta > 0 ? 'credit' : 'debit', reason, actorName, (actor && actor.id) || null, announced],
+      'INSERT INTO coin_transactions (user_id, amount, type, reason, actor_name, actor_user_id, announced_at, announce_message) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [userId, Math.abs(delta), delta > 0 ? 'credit' : 'debit', reason, actorName, (actor && actor.id) || null, announced, (delta > 0 && message) ? message : null],
       (insErr) => {
         if (insErr) return res.status(500).json({ error: insErr.message });
         finish();

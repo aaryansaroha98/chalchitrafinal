@@ -250,6 +250,7 @@ const AdminPanel = () => {
   const [selectedCoinUser, setSelectedCoinUser] = useState(null);
   const [showCoinManager, setShowCoinManager] = useState(false);
   const [coinManagerSearch, setCoinManagerSearch] = useState('');
+  const [coinMessage, setCoinMessage] = useState('');
   const [coinAmount, setCoinAmount] = useState('');
   const [coinNote, setCoinNote] = useState('');
   const [coinSending, setCoinSending] = useState(false);
@@ -1131,7 +1132,8 @@ const AdminPanel = () => {
     try {
       const res = await api.put(`/api/admin/users/${selectedCoinUser.id}/coins`, {
         coins: target,
-        reason: coinNote.trim()
+        reason: coinNote.trim(),
+        message: coinMessage.trim()
       });
       setCoinFeedback({
         type: 'success',
@@ -1141,6 +1143,7 @@ const AdminPanel = () => {
       setUsers((prev) => prev.map((u) => (u.id === targetUserId ? { ...u, coins: res.data.coins } : u)));
       setCoinAmount('');
       setCoinNote('');
+      setCoinMessage('');
       setSelectedCoinUser(null);
       setCoinSearchTerm('');
     } catch (err) {
@@ -1169,7 +1172,8 @@ const AdminPanel = () => {
     try {
       const res = await api.post(`/api/admin/users/${selectedCoinUser.id}/grant-coins`, {
         amount,
-        reason: coinNote.trim()
+        reason: coinNote.trim(),
+        message: coinMessage.trim()
       });
       setCoinFeedback({
         type: 'success',
@@ -1187,6 +1191,7 @@ const AdminPanel = () => {
       ));
       setCoinAmount('');
       setCoinNote('');
+      setCoinMessage('');
       setSelectedCoinUser(null);
       setCoinSearchTerm('');
     } catch (err) {
@@ -3590,6 +3595,23 @@ const AdminPanel = () => {
                     className="form-control"
                     style={{ maxWidth: '200px' }}
                   />
+                </div>
+                <div className="mb-3">
+                  <label className="mb-1" style={{ fontWeight: 600 }}>
+                    Message to the user <span className="text-muted" style={{ fontWeight: 400 }}>(optional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Thanks for helping at the screening!"
+                    value={coinMessage}
+                    onChange={(e) => setCoinMessage(e.target.value)}
+                    className="form-control"
+                    style={{ maxWidth: '400px' }}
+                    maxLength={200}
+                  />
+                  <Form.Text className="text-muted">
+                    Shown to them inside the &ldquo;coins received&rdquo; popup. Leave blank to send just the amount.
+                  </Form.Text>
                 </div>
                 <div className="mb-3">
                   <label className="mb-1" style={{ fontWeight: 600 }}>Note (optional)</label>

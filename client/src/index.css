@@ -3550,3 +3550,16 @@ a:hover {
   .coin-gift-foot { padding: 18px 18px 20px; }
   .coin-gift-mark { width: 74px; height: 74px; margin-bottom: 14px; }
 }
+
+/* A note from whoever sent the coins. Quoted, because the words are theirs. */
+.coin-gift-message {
+  margin: 0 0 14px;
+  padding: 10px 14px;
+  border-left: 2px solid #d4a017;
+  background: var(--qt-panel-soft);
+  text-align: left;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--qt-text);
+  overflow-wrap: anywhere;
+}

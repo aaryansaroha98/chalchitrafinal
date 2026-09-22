@@ -136,79 +136,54 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider value={value}>
       {children}
+      {/* The welcome bonus. Same sheet as the "coins received" popup, so the
+          two coin messages are one thing wearing one design rather than two
+          hand-styled cards that drift apart. */}
       {showCoinBonusPopup && (
-        <div className="coin-bonus-overlay" style={{
-          position: 'fixed',
-          top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(0,0,0,0.6)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 99999,
-          padding: '1rem'
-        }}>
-          <div className="coin-bonus-card" style={{
-            background: '#ffffff',
-            border: '1px solid #e5e7eb',
-            padding: '2.5rem 2rem',
-            textAlign: 'center',
-            maxWidth: '380px',
-            width: '100%'
-          }}>
-            <div className="coin-bonus-icon" style={{
-              width: '72px',
-              height: '72px',
-              margin: '0 auto 1.25rem',
-              background: '#f6f6f7',
-              border: '1px solid #e5e7eb',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <CoinIcon size={40} />
+        <div className="coin-gift-backdrop" onClick={() => setShowCoinBonusPopup(false)}>
+          <div
+            className="coin-gift-sheet"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="coin-bonus-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="coin-gift-head">
+              <span className="coin-gift-kicker">Welcome gift</span>
+              <button
+                type="button"
+                className="coin-gift-close"
+                onClick={() => setShowCoinBonusPopup(false)}
+                aria-label="Close"
+              >
+                ×
+              </button>
             </div>
-            <h3 style={{
-              color: '#0b0e17',
-              fontSize: '1.5rem',
-              fontWeight: '600',
-              marginBottom: '0.5rem'
-            }}>
-              Congratulations! 🎉
-            </h3>
-            <p style={{
-              color: '#5c6270',
-              fontSize: '0.95rem',
-              marginBottom: '1.5rem',
-              lineHeight: '1.6'
-            }}>
-              You got <strong style={{ color: '#0b0e17' }}>{bonusCoinAmount} bonus coins</strong> as a welcome gift!
-              Use them to book movie tickets and other stuff.
-            </p>
-            <button
-              onClick={() => setShowCoinBonusPopup(false)}
-              style={{
-                background: '#0b0e17',
-                border: '1px solid #0b0e17',
-                color: '#ffffff',
-                padding: '0.6rem 2rem',
-                fontSize: '0.85rem',
-                fontWeight: '500',
-                letterSpacing: '0.06em',
-                textTransform: 'uppercase',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#ffffff';
-                e.currentTarget.style.color = '#0b0e17';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = '#0b0e17';
-                e.currentTarget.style.color = '#ffffff';
-              }}
-            >
-              Nice!
-            </button>
+
+            <div className="coin-gift-body">
+              <div className="coin-gift-mark" aria-hidden="true">
+                <CoinIcon size={54} />
+              </div>
+
+              <h2 id="coin-bonus-title" className="coin-gift-title">
+                You have <span className="coin-gift-amount">{bonusCoinAmount}</span>{' '}
+                {bonusCoinAmount === 1 ? 'coin' : 'coins'} to start with
+              </h2>
+
+              <p className="coin-gift-text">
+                Spend them on any screening. Your balance is in the header whenever you need it.
+              </p>
+            </div>
+
+            <div className="coin-gift-foot">
+              <button
+                type="button"
+                className="btn btn-primary coin-gift-action"
+                onClick={() => setShowCoinBonusPopup(false)}
+              >
+                Thanks
+              </button>
+            </div>
           </div>
         </div>
       )}
