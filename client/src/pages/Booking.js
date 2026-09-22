@@ -7,7 +7,7 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { useAuth } from '../contexts/AuthContext';
 import Loader from '../components/Loader';
-import { formatAppDateTime, getBookingAvailability } from '../utils/movieStatus';
+import { formatAppDateTime, getBookingAvailability, istDate, istTime, istDateTime } from '../utils/movieStatus';
 import AgeGateModal from '../components/AgeGateModal';
 import AgeRatingBadge from '../components/AgeRatingBadge';
 import { hasAgeAck, rememberAgeAck, requiresAgeGate } from '../utils/ageRating';
@@ -461,7 +461,7 @@ const Booking = () => {
                   <div className="booking-info-row">
                     <span className="booking-info-label">Date:</span>
                     <span className="booking-info-value">
-                      {new Date(movie.date).toLocaleDateString('en-IN', {
+                      {istDate(movie.date, {
                         weekday: 'long',
                         year: 'numeric',
                         month: 'long',
@@ -473,7 +473,7 @@ const Booking = () => {
                   <div className="booking-info-row">
                     <span className="booking-info-label">Time:</span>
                     <span className="booking-info-value">
-                      {new Date(movie.date).toLocaleTimeString('en-IN', {
+                      {istTime(movie.date, {
                         hour: '2-digit',
                         minute: '2-digit'
                       })}

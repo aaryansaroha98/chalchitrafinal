@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Modal, Card, Badge, Alert } from 'react-bootstrap';
 import { useSearchParams } from 'react-router-dom';
 import api from '../api/axios';
+import { istDate, istTime, istDateTime } from '../utils/movieStatus';
 import Loader from '../components/Loader';
 import { buildTicketModel, renderTicketCanvas, ticketCanvasToPdf } from '../utils/ticketPdf';
 
@@ -345,7 +346,7 @@ const MyBookings = () => {
                             display: 'block'
                           }}></i>
                           <span style={{color: 'var(--qt-text)', fontSize: '0.8rem', fontWeight: '600'}}>
-                            {new Date(booking.date).toLocaleDateString('en-IN', {
+                            {istDate(booking.date, {
                               month: 'short',
                               day: 'numeric'
                             })}
@@ -372,7 +373,7 @@ const MyBookings = () => {
                             display: 'block'
                           }}></i>
                           <span style={{color: 'var(--qt-text)', fontSize: '0.75rem', fontWeight: '600'}}>
-                            {new Date(booking.date).toLocaleTimeString('en-IN', {
+                            {istTime(booking.date, {
                               hour: '2-digit',
                               minute: '2-digit'
                             })}

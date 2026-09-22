@@ -1,12 +1,21 @@
 export const APP_TIME_ZONE = 'Asia/Kolkata';
 
+// A screening time with no zone on it means IIT Jammu time, not the time zone
+// of whoever happens to be looking. Attaching the offset here is what keeps
+// the site and the confirmation email showing the same thing — the server
+// reads these values the same way, and without it a device set to another zone
+// renders every screening shifted.
+const LOCAL_DATE_TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?$/;
+const IST_OFFSET = '+05:30';
+
 const normalizeMovieDateInput = (movieDate) => {
   if (movieDate instanceof Date) return movieDate;
   if (movieDate === null || movieDate === undefined) return null;
   const raw = String(movieDate).trim();
   if (!raw) return null;
-  if (raw.includes('T')) return raw;
-  return raw + 'T00:00:00';
+  if (LOCAL_DATE_TIME.test(raw)) return raw + IST_OFFSET;
+  if (raw.includes('T')) return raw;                 // already carries Z or an offset
+  return raw + 'T00:00:00' + IST_OFFSET;             // date only
 };
 
 export const parseMovieDate = (movieDate) => {
@@ -38,6 +47,30 @@ export const isPastMovie = (movieDate, now = new Date()) =>
 export const compareMovieDatesAsc = (a, b) =>
   getMovieTimestamp(a?.date, Number.MAX_SAFE_INTEGER) -
   getMovieTimestamp(b?.date, Number.MAX_SAFE_INTEGER);
+
+// Screening times are IIT Jammu times wherever they are shown. These wrap the
+// two things that were being done wrong all over the app: reading the stored
+// value (parseMovieDate treats a naive one as IST) and printing it (timeZone,
+// without which the browser prints it in whatever zone the device is set to,
+// so the same screening read differently on different phones and disagreed
+// with the confirmation email).
+export const istDate = (value, options = {}) => {
+  const parsed = parseMovieDate(value);
+  if (!parsed) return 'N/A';
+  return parsed.toLocaleDateString('en-IN', { timeZone: APP_TIME_ZONE, ...options });
+};
+
+export const istTime = (value, options = {}) => {
+  const parsed = parseMovieDate(value);
+  if (!parsed) return 'N/A';
+  return parsed.toLocaleTimeString('en-IN', { timeZone: APP_TIME_ZONE, ...options });
+};
+
+export const istDateTime = (value, options = {}) => {
+  const parsed = parseMovieDate(value);
+  if (!parsed) return 'N/A';
+  return parsed.toLocaleString('en-IN', { timeZone: APP_TIME_ZONE, ...options });
+};
 
 export const formatAppDateTime = (value) => {
   const parsed = parseMovieDate(value);

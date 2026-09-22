@@ -5,7 +5,7 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import autoTable from 'jspdf-autotable';
 import Loader from '../components/Loader';
-import { appDateTimeLocalToIso, compareMovieDatesAsc, getMovieStatus, isUpcomingMovie, toAppDateTimeLocal } from '../utils/movieStatus';
+import { appDateTimeLocalToIso, compareMovieDatesAsc, getMovieStatus, isUpcomingMovie, toAppDateTimeLocal, istDate, istTime, istDateTime } from '../utils/movieStatus';
 import AgeRatingBadge from '../components/AgeRatingBadge';
 import { AGE_RATINGS, getAgeRating, normalizeAgeRating, requiresAgeGate } from '../utils/ageRating';
 
@@ -1580,7 +1580,7 @@ const AdminPanel = () => {
           `Rs. ${foodCost.toFixed(0)}`,
           `Rs. ${grandTotal.toFixed(0)}`,
           booking.is_used ? 'Used' : 'Active',
-          new Date(booking.created_at).toLocaleDateString('en-IN')
+          istDate(booking.created_at)
         ];
       });
 
@@ -1822,17 +1822,17 @@ const AdminPanel = () => {
           <div style="position: absolute; left: 635px; top: 62.5px; color: #1a5f7a; fontSize: 15px; fontWeight: 'bold';">:</div>
           <div style="position: absolute; right: -25px; top: 67px; width: 180px; color: #000000; textAlign: 'left'; fontFamily: 'Tahoma, Arial, sans-serif';">
             <div style="font-size: 13px; font-weight: 400; letter-spacing: 0.2px; line-height: 1.2; text-transform: uppercase;">
-              ${bookingDate ? new Date(bookingDate).toLocaleDateString('en-IN', { weekday: 'long' }) : 'N/A'}
+              ${bookingDate ? istDate(bookingDate, { weekday: 'long' }) : 'N/A'}
             </div>
             <div style="font-size: 13px; font-weight: 400; letter-spacing: 0.2px; line-height: 1.2; marginTop: '2px';">
-              ${bookingDate ? new Date(bookingDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' }) : ''}
+              ${bookingDate ? istDate(bookingDate, { year: 'numeric', month: 'short', day: 'numeric' }) : ''}
             </div>
           </div>
 
           <div style="position: absolute; left: 635px; top: 113.5px; color: #1a5f7a; fontSize: 15px; fontWeight: 'bold';">:</div>
           <div style="position: absolute; right: -25px; top: 118px; width: 180px; color: #000000; textAlign: 'left'; fontFamily: 'Tahoma, Arial, sans-serif';">
             <div style="font-size: 13px; font-weight: 400; letter-spacing: 0.2px; line-height: 1.2;">
-              ${bookingDate ? new Date(bookingDate).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : 'N/A'}
+              ${bookingDate ? istTime(bookingDate, { hour: '2-digit', minute: '2-digit' }) : 'N/A'}
             </div>
           </div>
 
@@ -2666,7 +2666,7 @@ const AdminPanel = () => {
                         <td style={{ padding: '15px', verticalAlign: 'middle', border: '1px solid #e5e7eb' }}>
                           <div className="text-dark">
                             <div style={{ fontWeight: '500' }}>
-                              {new Date(movie.date).toLocaleDateString('en-IN', {
+                              {istDate(movie.date, {
                                 weekday: 'short',
                                 year: 'numeric',
                                 month: 'short',
@@ -2674,7 +2674,7 @@ const AdminPanel = () => {
                               })}
                             </div>
                             <div style={{ fontSize: '0.85rem', opacity: 0.8 }}>
-                              {new Date(movie.date).toLocaleTimeString('en-IN', {
+                              {istTime(movie.date, {
                                 hour: '2-digit',
                                 minute: '2-digit'
                               })}
@@ -3316,7 +3316,7 @@ const AdminPanel = () => {
                     <option value="">All Movies</option>
                     {movies && movies.length > 0 && movies.map(movie => (
                       <option key={movie.id} value={movie.id}>
-                        {movie.title} ({new Date(movie.date).toLocaleDateString()})
+                        {movie.title} ({istDate(movie.date)})
                       </option>
                     ))}
                   </Form.Select>
@@ -3411,7 +3411,7 @@ const AdminPanel = () => {
                         {booking.is_used ? 'Used' : 'Active'}
                       </Badge>
                     </td>
-                    <td>{new Date(booking.created_at).toLocaleDateString()}</td>
+                    <td>{istDate(booking.created_at)}</td>
                     <td>
                       <Button
                         variant="outline-primary"
@@ -4384,7 +4384,7 @@ const AdminPanel = () => {
                             'Valid'}
                       </Badge>
                     </td>
-                    <td>{new Date(coupon.expiry_date).toLocaleDateString()}</td>
+                    <td>{istDate(coupon.expiry_date)}</td>
                     <td style={{ textAlign: 'center' }}>
                       <div className="d-flex gap-2 justify-content-center">
                         <Button
@@ -4489,7 +4489,7 @@ const AdminPanel = () => {
                           ? `${winner.discount_amount}% off`
                           : `🪙 ${winner.discount_amount} Coins`,
                         winner.is_used ? 'Used' : 'Active',
-                        new Date(winner.created_at).toLocaleDateString('en-IN')
+                        istDate(winner.created_at)
                       ]);
                       const csvContent = [headers, ...rows].map(row => row.join(',')).join('\n');
                       const blob = new Blob([csvContent], { type: 'text/csv' });
@@ -4625,7 +4625,7 @@ const AdminPanel = () => {
                       <td style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>
                         <div>
                           <div style={{ fontWeight: '600' }}>
-                            {new Date(winner.created_at).toLocaleDateString('en-IN', {
+                            {istDate(winner.created_at, {
                               weekday: 'short',
                               year: 'numeric',
                               month: 'short',
@@ -4633,7 +4633,7 @@ const AdminPanel = () => {
                             })}
                           </div>
                           <div style={{ fontSize: '0.8rem', opacity: 0.7 }}>
-                            {new Date(winner.created_at).toLocaleTimeString('en-IN', {
+                            {istTime(winner.created_at, {
                               hour: '2-digit',
                               minute: '2-digit',
                               second: '2-digit',
@@ -4649,7 +4649,7 @@ const AdminPanel = () => {
                             size="sm"
                             title="View Details"
                             onClick={() => {
-                              alert(`Winner Details:\n\nUser: ${winner.user_name || winner.user_email}\nCoupon: ${winner.coupon_code}\nCoins: ${winner.discount_type === 'percentage' ? `${winner.discount_amount}%` : `🪙 ${winner.discount_amount}`}\nExpires: ${new Date(winner.expiry_date).toLocaleDateString()}\nStatus: ${winner.is_used ? 'Used' : 'Active'}`);
+                              alert(`Winner Details:\n\nUser: ${winner.user_name || winner.user_email}\nCoupon: ${winner.coupon_code}\nCoins: ${winner.discount_type === 'percentage' ? `${winner.discount_amount}%` : `🪙 ${winner.discount_amount}`}\nExpires: ${istDate(winner.expiry_date)}\nStatus: ${winner.is_used ? 'Used' : 'Active'}`);
                             }}
                           >
                             <i className="fas fa-eye me-2"></i>
@@ -5020,7 +5020,7 @@ const AdminPanel = () => {
                           {item.comment || <span style={{ opacity: 0.5, fontStyle: 'italic' }}>No comment</span>}
                         </td>
                         <td style={{ color: '#5c6270', borderColor: '#e5e7eb' }}>
-                          {new Date(item.created_at).toLocaleDateString('en-IN', {
+                          {istDate(item.created_at, {
                             day: 'numeric',
                             month: 'short',
                             year: 'numeric'
@@ -5139,7 +5139,7 @@ const AdminPanel = () => {
                         <option value="" disabled>Select a movie</option>
                         {feedbackMovieOptions.map((movie) => (
                           <option key={movie.id} value={movie.id}>
-                            {movie.title} ({new Date(movie.date).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })})
+                            {movie.title} ({istDate(movie.date, { month: 'short', day: 'numeric' })})
                           </option>
                         ))}
                       </Form.Select>
@@ -5821,7 +5821,7 @@ const AdminPanel = () => {
                         const headers = ['Movie', 'Date', 'Bookings', 'Revenue'];
                         const rows = revenueStats.revenue_by_movie.map(m => [
                           m.title,
-                          new Date(m.date).toLocaleDateString('en-IN'),
+                          istDate(m.date),
                           m.booking_count,
                           `🪙${parseFloat(m.revenue).toLocaleString('en-IN', { maximumFractionDigits: 2 })}`
                         ]);
@@ -5858,7 +5858,7 @@ const AdminPanel = () => {
                               <strong>{movie.title}</strong>
                             </td>
                             <td style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>
-                              {new Date(movie.date).toLocaleDateString('en-IN', {
+                              {istDate(movie.date, {
                                 weekday: 'short',
                                 year: 'numeric',
                                 month: 'short',
@@ -5949,7 +5949,7 @@ const AdminPanel = () => {
                               </Badge>
                             </td>
                             <td style={{ color: '#0b0e17', border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left' }}>
-                              {new Date(tx.created_at).toLocaleDateString('en-IN', {
+                              {istDate(tx.created_at, {
                                 day: 'numeric',
                                 month: 'short',
                                 year: 'numeric',

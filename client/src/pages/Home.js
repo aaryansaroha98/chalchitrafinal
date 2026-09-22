@@ -4,7 +4,7 @@ import { Container, Row, Col, Alert } from 'react-bootstrap';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api/axios';
 import { useAuth } from '../contexts/AuthContext';
-import { compareMovieDatesAsc, formatAppDateTime, getBookingAvailability, isUpcomingMovie } from '../utils/movieStatus';
+import { compareMovieDatesAsc, formatAppDateTime, getBookingAvailability, isUpcomingMovie, istDate, istTime, istDateTime } from '../utils/movieStatus';
 import Loader from '../components/Loader';
 import AgeGateModal from '../components/AgeGateModal';
 import AgeRatingBadge from '../components/AgeRatingBadge';
@@ -409,7 +409,7 @@ const Home = () => {
                     fontWeight: '600'
                   }}>
                     <i className="fas fa-calendar" style={{marginRight: '0.25rem'}}></i>
-                    {new Date(movie.date).toLocaleDateString('en-IN', {
+                    {istDate(movie.date, {
                       month: 'short',
                       day: 'numeric'
                     })}
@@ -531,7 +531,7 @@ const Home = () => {
                               fontWeight: '500'
                             }}
                           >
-                            {new Date(movie.date).toLocaleTimeString('en-IN', {
+                            {istTime(movie.date, {
                               hour: '2-digit',
                               minute: '2-digit'
                             })}

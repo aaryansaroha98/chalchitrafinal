@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Alert, Badge, Modal } from 'react-bootstrap';
 import api from '../api/axios';
+import { istDate, istTime, istDateTime } from '../utils/movieStatus';
 import QRScanner from '../components/QRScanner';
 import Loader from '../components/Loader';
 
@@ -97,7 +98,7 @@ const TeamScanner = () => {
       // Add to scan history
       const scanRecord = {
         id: Date.now(),
-        timestamp: new Date().toLocaleString(),
+        timestamp: istDateTime(),
         result: data,
         success: data.allowed,
         partial: numPeople !== undefined,

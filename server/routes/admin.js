@@ -3,7 +3,7 @@ const db = require('../database');
 const multer = require('multer');
 const path = require('path');
 const { isCloudinaryConfigured, getUpload, getUploadUrl, deleteImage } = require('../utils/cloudinary');
-const { isUpcomingDate } = require('../utils/datetime');
+const { isUpcomingDate, formatAppDate, formatAppTime, formatAppNow } = require('../utils/datetime');
 const seatClaims = require('../utils/seatClaims');
 
 const router = express.Router();
@@ -2104,7 +2104,7 @@ router.post('/coupon-winners/send', requireAdmin, (req, res) => {
                               <div style="font-size: 24px; font-weight: bold; color: #007bff; margin: 10px 0; letter-spacing: 2px;">${couponCode}</div>
                               <p style="color: #666; margin: 10px 0 0 0;">
                                 <strong>Coins:</strong> ${discount_amount} 🪙<br>
-                                <strong>Valid until:</strong> ${expiryDate.toLocaleDateString('en-IN')}
+                                <strong>Valid until:</strong> ${formatAppDate(expiryDate)}
                               </p>
                             </div>
 
@@ -2290,16 +2290,8 @@ router.post('/email/ticket', async (req, res) => {
                 <!-- Details -->
                 <div style="flex: 1; text-align: left;">
                   <div style="font-size: 13px; color: #333; line-height: 1.5;">
-                    <p style="margin: 6px 0;"><strong>Date:</strong> ${new Date(movie_date).toLocaleDateString('en-IN', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric'
-                    })}</p>
-                    <p style="margin: 6px 0;"><strong>Time:</strong> ${new Date(movie_date).toLocaleTimeString('en-IN', {
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}</p>
+                    <p style="margin: 6px 0;"><strong>Date:</strong> ${formatAppDate(movie_date, { weekday: true })}</p>
+                    <p style="margin: 6px 0;"><strong>Time:</strong> ${formatAppTime(movie_date)}</p>
                     <p style="margin: 6px 0;"><strong>Venue:</strong> ${movie_venue}</p>
                     <p style="margin: 6px 0;"><strong>Seats:</strong> ${selected_seats.join(', ')}</p>
                     <p style="margin: 6px 0;"><strong>Tickets:</strong> ${selected_seats.length}</p>
@@ -2405,17 +2397,9 @@ ${'='.repeat(50)}
 
 Movie: ${booking.title}
 
-Date: ${booking.movie_date ? new Date(booking.movie_date).toLocaleDateString('en-IN', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    }) : 'N/A'}
+Date: ${formatAppDate(booking.movie_date, { weekday: true })}
 
-Time: ${booking.movie_date ? new Date(booking.movie_date).toLocaleTimeString('en-IN', {
-      hour: '2-digit',
-      minute: '2-digit'
-    }) : 'N/A'}
+Time: ${formatAppTime(booking.movie_date)}
 
 Venue: ${booking.venue}
 
@@ -2448,7 +2432,7 @@ Best regards,
 Chalchitra Team
 Indian Institute of Technology Jammu
 
-Generated on: ${new Date().toLocaleString('en-IN')}
+Generated on: ${formatAppNow()}
     `;
 
     console.log('Ticket content created successfully');

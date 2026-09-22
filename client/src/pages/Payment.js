@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import api from '../api/axios';
+import { istDate, istTime, istDateTime } from '../utils/movieStatus';
 import { useAuth } from '../contexts/AuthContext';
 import Loader from '../components/Loader';
 import CoinIcon from '../components/CoinIcon';
@@ -187,7 +188,7 @@ const Payment = () => {
                 <div className="info-item">
                   <span className="info-label">Date:</span>
                   <span className="info-value">
-                    {new Date(movie?.date).toLocaleDateString('en-IN', {
+                    {istDate(movie?.date, {
                       weekday: 'short',
                       month: 'short',
                       day: 'numeric'
@@ -198,7 +199,7 @@ const Payment = () => {
                 <div className="info-item">
                   <span className="info-label">Time:</span>
                   <span className="info-value">
-                    {new Date(movie?.date).toLocaleTimeString('en-IN', {
+                    {istTime(movie?.date, {
                       hour: '2-digit',
                       minute: '2-digit'
                     })}

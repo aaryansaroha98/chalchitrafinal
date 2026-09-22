@@ -1,6 +1,7 @@
 const express = require('express');
 const db = require('../database');
 const seatClaims = require('../utils/seatClaims');
+const { parseAppDateTime, formatAppDate, formatAppTime, formatAppDateTime } = require('../utils/datetime');
 const QRCode = require('qrcode');
 const crypto = require('crypto');
 const fs = require('fs');
@@ -350,7 +351,7 @@ router.post('/', async (req, res) => {
       if (bookingStart && !Number.isNaN(bookingStart.getTime()) && bookingStart > now) {
         return res.status(403).json({
           error: 'BOOKING_NOT_OPEN',
-          message: `Booking opens on ${bookingStart.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' })}`,
+          message: `Booking opens on ${formatAppDateTime(bookingStart)}`,
           booking_starts_at: movie.booking_starts_at
         });
       }
@@ -1293,19 +1294,12 @@ router.post('/generate-pdf', (req, res) => {
         doc.setFont('helvetica', 'bold');
         doc.text('Date:', middleCol, contentY + 14);
         doc.setFont('helvetica', 'normal');
-        doc.text(new Date(movie_date).toLocaleDateString('en-IN', {
-          day: 'numeric',
-          month: 'short',
-          year: 'numeric'
-        }), middleCol + 10, contentY + 14);
+        doc.text(formatAppDate(movie_date), middleCol + 10, contentY + 14);
 
         doc.setFont('helvetica', 'bold');
         doc.text('Time:', middleCol, contentY + 20);
         doc.setFont('helvetica', 'normal');
-        doc.text(new Date(movie_date).toLocaleTimeString('en-IN', {
-          hour: '2-digit',
-          minute: '2-digit'
-        }), middleCol + 10, contentY + 20);
+        doc.text(formatAppTime(movie_date), middleCol + 10, contentY + 20);
 
         doc.setFont('helvetica', 'bold');
         doc.text('Venue:', middleCol, contentY + 26);
@@ -1430,16 +1424,8 @@ router.post('/send-ticket-email', async (req, res) => {
                 <p style="color: #555; font-size: 16px; margin: 0 0 16px 0;">Your booking is confirmed. Your ticket PDF is attached.</p>
 
                 <p style="color: #555; font-size: 16px; margin: 12px 0;"><strong>Movie:</strong> ${booking.movie_title}</p>
-                <p style="color: #555; font-size: 16px; margin: 12px 0;"><strong>Date:</strong> ${booking.movie_date ? new Date(booking.movie_date).toLocaleDateString('en-IN', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric'
-                }) : 'N/A'}</p>
-                <p style="color: #555; font-size: 16px; margin: 12px 0;"><strong>Time:</strong> ${booking.movie_date ? new Date(booking.movie_date).toLocaleTimeString('en-IN', {
-                  hour: '2-digit',
-                  minute: '2-digit'
-                }) : 'N/A'}</p>
+                <p style="color: #555; font-size: 16px; margin: 12px 0;"><strong>Date:</strong> ${formatAppDate(booking.movie_date, { weekday: true })}</p>
+                <p style="color: #555; font-size: 16px; margin: 12px 0;"><strong>Time:</strong> ${formatAppTime(booking.movie_date)}</p>
                 <p style="color: #555; font-size: 16px; margin: 12px 0;"><strong>Venue:</strong> ${booking.movie_venue || 'N/A'}</p>
                 <p style="color: #555; font-size: 16px; margin: 12px 0;"><strong>Seats:</strong> ${selectedSeats.join(', ') || 'N/A'}</p>
                 <p style="color: #555; font-size: 16px; margin: 12px 0;"><strong>Booking ID:</strong> ${booking.booking_code || booking.id}</p>

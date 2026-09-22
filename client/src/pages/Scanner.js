@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Container, Row, Col, Card, Button, Alert, Modal, Badge, Spinner } from 'react-bootstrap';
 import api from '../api/axios';
+import { istDate, istTime, istDateTime } from '../utils/movieStatus';
 import jsQR from 'jsqr';
 
 const Scanner = () => {
@@ -690,7 +691,7 @@ const Scanner = () => {
 
       const scanRecord = {
         id: Date.now(),
-        timestamp: new Date().toLocaleString(),
+        timestamp: istDateTime(),
         data: result,
         valid: result.allowed,
         qrData: qrCode
@@ -755,7 +756,7 @@ const Scanner = () => {
 
       const scanRecord = {
         id: Date.now(),
-        timestamp: new Date().toLocaleString(),
+        timestamp: istDateTime(),
         data: errorResult,
         valid: false,
         qrData: qrCode
@@ -794,7 +795,7 @@ const Scanner = () => {
 
       const scanRecord = {
         id: Date.now(),
-        timestamp: new Date().toLocaleString(),
+        timestamp: istDateTime(),
         data: result,
         valid: result.allowed,
         qrData: partialAdmissionData.booking_id,
@@ -828,7 +829,7 @@ const Scanner = () => {
 
       const scanRecord = {
         id: Date.now(),
-        timestamp: new Date().toLocaleString(),
+        timestamp: istDateTime(),
         data: errorResult,
         valid: false,
         qrData: partialAdmissionData.booking_id

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../api/axios';
+import { istDate, istTime, istDateTime } from '../utils/movieStatus';
 import { buildTicketModel, renderTicketCanvas, ticketCanvasToPdf } from '../utils/ticketPdf';
 import CoinIcon from '../components/CoinIcon';
 
@@ -183,21 +184,21 @@ const PaymentSuccess = () => {
             {/* Date and Time */}
             <div className="badge-row">
               <span className="badge">
-                {ticket.date ? new Date(ticket.date).toLocaleDateString('en-IN', {
+                {ticket.date ? istDate(ticket.date, {
                   weekday: 'short',
                   month: 'short',
                   day: 'numeric'
-                }) : (movie?.date ? new Date(movie.date).toLocaleDateString('en-IN', {
+                }) : (movie?.date ? istDate(movie.date, {
                   weekday: 'short',
                   month: 'short',
                   day: 'numeric'
                 }) : 'N/A')}
               </span>
               <span className="badge">
-                {ticket.date ? new Date(ticket.date).toLocaleTimeString('en-IN', {
+                {ticket.date ? istTime(ticket.date, {
                   hour: '2-digit',
                   minute: '2-digit'
-                }) : (movie?.date ? new Date(movie.date).toLocaleTimeString('en-IN', {
+                }) : (movie?.date ? istTime(movie.date, {
                   hour: '2-digit',
                   minute: '2-digit'
                 }) : 'N/A')}

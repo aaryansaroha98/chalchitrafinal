@@ -24,4 +24,63 @@ const isUpcomingDate = (date, isUpcomingFlag, now = new Date()) => {
   return Number(isUpcomingFlag) === 1;
 };
 
-module.exports = { parseAppDateTime, normalizeAppDateTime, isUpcomingDate };
+const APP_TIME_ZONE = 'Asia/Kolkata';
+
+// Every screening time the server prints — emails, generated PDFs, exports —
+// has to be read and written in IIT Jammu time.
+//
+// Both halves matter. A stored value may be naive ("2026-10-31T21:00", meaning
+// 9pm IST) or absolute ("2026-10-31T15:30:00.000Z", the same moment), and the
+// admin panel has written both over time. parseAppDateTime resolves either to
+// the right instant; without timeZone below, Node then formats that instant in
+// the server's own zone, which on Render is UTC — so a 9pm screening went out
+// in email as 3:30pm.
+const formatAppDate = (value, { weekday = false } = {}) => {
+  const parsed = parseAppDateTime(value);
+  if (!parsed) return 'N/A';
+  return parsed.toLocaleDateString('en-IN', {
+    timeZone: APP_TIME_ZONE,
+    ...(weekday ? { weekday: 'long' } : {}),
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+};
+
+const formatAppTime = (value) => {
+  const parsed = parseAppDateTime(value);
+  if (!parsed) return 'N/A';
+  return parsed.toLocaleTimeString('en-IN', {
+    timeZone: APP_TIME_ZONE,
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
+
+const formatAppDateTime = (value) => {
+  const parsed = parseAppDateTime(value);
+  if (!parsed) return 'N/A';
+  return parsed.toLocaleString('en-IN', {
+    timeZone: APP_TIME_ZONE,
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  });
+};
+
+// For "generated on" stamps, which are a real instant rather than a stored one.
+const formatAppNow = (now = new Date()) => now.toLocaleString('en-IN', {
+  timeZone: APP_TIME_ZONE,
+  dateStyle: 'medium',
+  timeStyle: 'short',
+});
+
+module.exports = {
+  parseAppDateTime,
+  normalizeAppDateTime,
+  isUpcomingDate,
+  APP_TIME_ZONE,
+  formatAppDate,
+  formatAppTime,
+  formatAppDateTime,
+  formatAppNow,
+};
