@@ -52,7 +52,7 @@ html[data-horror="on"] {
   --qt-danger-fg: #e8a5a8;
   --qt-placeholder-bg: #101017;
   --qt-placeholder-fg: #3d3d49;
-  --qt-seat-taken: #1b1b24;
+  --qt-seat-taken: #c3c7ce;   /* silver — see the seat map below */
 
   --primary-color: var(--h-blood);
   --bg-primary: var(--h-void);
@@ -283,11 +283,20 @@ html[data-horror="on"] .seat-button.selected {
   color: #f7ece9 !important;
   animation: h-seat-pulse 2s ease-in-out infinite;
 }
+/* Three states that cannot be mistaken for each other at a glance:
+   available is dark, taken is silver, and yours is blood. Taken used to be
+   #1b1b24 against an available seat of #13131c — eight points apart in each
+   channel, which is no difference at all on a phone in a dark room. */
 html[data-horror="on"] .seat-button.occupied {
-  background: var(--h-seat-taken, #1b1b24) !important;
-  border-color: #262630 !important;
-  color: #45454f !important;
-  opacity: 1;
+  background: var(--qt-seat-taken) !important;
+  border-color: #9aa0a8 !important;
+  color: #22242b !important;
+  opacity: 1 !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35) !important;
+}
+html[data-horror="on"] .seat-button.occupied:hover {
+  background: var(--qt-seat-taken) !important;
+  border-color: #9aa0a8 !important;
 }
 html[data-horror="on"] .booking-seat-screen {
   background: linear-gradient(to bottom, rgba(185, 162, 74, 0.16), transparent) !important;
@@ -646,10 +655,10 @@ html[data-horror="on"] .seat-button.occupied {
   animation-delay: calc(var(--h-seat-i, 0) * -137ms);
 }
 @keyframes h-taken {
-  0%, 95%, 100% { color: #45454f !important; }
-  96%  { color: #8a3b3f !important; }
-  97%  { color: #45454f !important; }
-  98%  { color: #7a3438 !important; }
+  0%, 95%, 100% { color: #22242b !important; }
+  96%  { color: #6d1418 !important; }
+  97%  { color: #22242b !important; }
+  98%  { color: #5c1116 !important; }
 }
 
 /* ============================================================
