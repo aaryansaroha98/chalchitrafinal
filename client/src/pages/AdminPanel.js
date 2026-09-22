@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Container, Row, Col, Card, Button, Alert, Tab, Tabs, Table, Modal, Form, Badge } from 'react-bootstrap';
 import api from '../api/axios';
+import SeatMapView from '../components/SeatMapView';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import autoTable from 'jspdf-autotable';
@@ -254,6 +255,7 @@ const AdminPanel = () => {
   const [coinSelectedIds, setCoinSelectedIds] = useState([]);
   const [coinProgress, setCoinProgress] = useState(null);
   const [coinRefreshing, setCoinRefreshing] = useState(false);
+  const [showSeatMap, setShowSeatMap] = useState(false);
   // Matches the server. No product limit on sending coins; this is simply the
   // largest number the balance column can store.
   const MAX_COINS = 2147483647;
@@ -3322,6 +3324,18 @@ const AdminPanel = () => {
                   </Form.Select>
                 </Form.Group>
               </Col>
+              <Col md={4} className="d-flex align-items-end">
+                <Button
+                  variant="dark"
+                  style={{ borderRadius: 0 }}
+                  onClick={() => setShowSeatMap(true)}
+                  disabled={!movies || movies.length === 0}
+                  title="See the venue laid out, and who is in each seat"
+                >
+                  <i className="fas fa-chair me-2"></i>
+                  Graphical View
+                </Button>
+              </Col>
               <Col md={4}>
                 <Form.Group>
                   <Form.Label>Search User Booking:</Form.Label>
@@ -3893,6 +3907,13 @@ const AdminPanel = () => {
             </Button>
           </Modal.Footer>
         </Modal>
+
+        <SeatMapView
+          show={showSeatMap}
+          movies={movies || []}
+          initialMovieId={selectedMovie}
+          onHide={() => setShowSeatMap(false)}
+        />
 
         {activeTab === 'users' && (
           <div className="text-center text-white py-5">

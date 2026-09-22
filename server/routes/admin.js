@@ -740,6 +740,85 @@ router.put('/users/:id/coins', requireSuperAdmin, (req, res) => {
   });
 });
 
+// Who is sitting where, for one screening.
+//
+// Returns the venue and a seat -> occupant map rather than a list of bookings,
+// because that is the shape the seat map needs: every seat of a booking points
+// at the same person, so the front end never has to unpack selected_seats or
+// guess. The student id is the local part of the IIT Jammu address, which is
+// how the rest of the app derives it — there is no separate column.
+router.get('/movies/:id/seat-map', requireAdmin, (req, res) => {
+  const movieId = Number(req.params.id);
+  if (!Number.isInteger(movieId) || movieId <= 0) {
+    return res.status(400).json({ error: 'Invalid movie id' });
+  }
+
+  db.get('SELECT id, title, date, venue FROM movies WHERE id = ?', [movieId], (movieErr, movie) => {
+    if (movieErr) return res.status(500).json({ error: movieErr.message });
+    if (!movie) return res.status(404).json({ error: 'Movie not found' });
+
+    db.all(
+      `SELECT b.id, b.booking_code, b.selected_seats, b.num_people, b.is_used,
+              b.admitted_people, b.created_at,
+              u.id AS user_id, u.name, u.email
+       FROM bookings b
+       LEFT JOIN users u ON u.id = b.user_id
+       WHERE b.movie_id = ?
+       ORDER BY b.created_at ASC`,
+      [movieId],
+      (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+
+        const seats = {};
+        let seatCount = 0;
+
+        (rows || []).forEach((row) => {
+          let list = [];
+          try {
+            const parsed = typeof row.selected_seats === 'string'
+              ? JSON.parse(row.selected_seats)
+              : row.selected_seats;
+            if (Array.isArray(parsed)) list = parsed.map(String).filter(Boolean);
+          } catch (_err) { /* a booking with unreadable seats simply has none */ }
+
+          const email = row.email || '';
+          const occupant = {
+            bookingId: row.id,
+            bookingCode: row.booking_code || String(row.id),
+            userId: row.user_id,
+            name: row.name || 'Unknown',
+            email,
+            studentId: email.includes('@') ? email.split('@')[0] : '',
+            numPeople: Number(row.num_people) || list.length || 1,
+            seats: list,
+            admitted: Number(row.admitted_people) || 0,
+            isUsed: Number(row.is_used) === 1,
+            bookedAt: row.created_at,
+          };
+
+          list.forEach((seat) => {
+            // A seat held by two bookings should be visible, not hidden behind
+            // whichever happens to be written last.
+            if (seats[seat]) {
+              seats[seat].conflictsWith = seats[seat].conflictsWith || [];
+              seats[seat].conflictsWith.push(occupant.bookingCode);
+              return;
+            }
+            seats[seat] = occupant;
+            seatCount += 1;
+          });
+        });
+
+        res.json({
+          movie: { id: movie.id, title: movie.title, date: movie.date, venue: movie.venue },
+          seats,
+          summary: { bookings: (rows || []).length, seatsTaken: seatCount },
+        });
+      }
+    );
+  });
+});
+
 // Get bookings for admin
 router.get('/bookings', requireAdmin, (req, res) => {
   db.all('SELECT b.*, u.name, u.email, m.title, m.date as movie_date, m.venue FROM bookings b JOIN users u ON b.user_id = u.id JOIN movies m ON b.movie_id = m.id ORDER BY b.created_at DESC',
