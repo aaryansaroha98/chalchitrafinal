@@ -15,6 +15,7 @@ const MyBookings = () => {
   const [error, setError] = useState('');
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [submittingFeedback, setSubmittingFeedback] = useState(false);
   const [feedbackRating, setFeedbackRating] = useState(5);
   const [feedbackComment, setFeedbackComment] = useState('');
   const [downloadingTicket, setDownloadingTicket] = useState(null);
@@ -48,18 +49,25 @@ const MyBookings = () => {
   };
 
   const handleSubmitFeedback = async () => {
+    // One review per movie, so a second press must not create a second row.
+    if (submittingFeedback) return;
+    setSubmittingFeedback(true);
     try {
-      await api.post('/api/feedback', {
+      const res = await api.post('/api/feedback', {
         movie_id: selectedBooking.movie_id,
         rating: feedbackRating,
         comment: feedbackComment
       });
-      alert('Thank you for your feedback!');
+      alert(res.data?.updated
+        ? 'Your review has been updated. Thank you!'
+        : 'Thank you for your feedback!');
       setShowFeedback(false);
       setFeedbackRating(5);
       setFeedbackComment('');
     } catch (error) {
-      alert('Failed to submit feedback');
+      alert('Failed to submit feedback: ' + (error.response?.data?.error || error.message));
+    } finally {
+      setSubmittingFeedback(false);
     }
   };
 
@@ -704,9 +712,10 @@ const MyBookings = () => {
                   e.target.style.borderColor = '#0b0e17';
                 }}
                 onClick={handleSubmitFeedback}
+                disabled={submittingFeedback}
               >
                 <i className="fas fa-paper-plane" style={{marginRight: '0.5rem'}}></i>
-                Submit
+                {submittingFeedback ? 'Sending…' : 'Submit'}
               </Button>
             </Modal.Footer>
           </div>

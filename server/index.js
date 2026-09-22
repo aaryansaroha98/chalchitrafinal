@@ -318,6 +318,9 @@ app.use((err, req, res, next) => {
 const seatClaims = require('./utils/seatClaims');
 app.listen(PORT, '0.0.0.0', () => {
   seatClaims.sweepOrphans(() => seatClaims.backfillFromBookings());
+  // One review per person per movie: remove rows already duplicated, then put
+  // the unique index in place so the database keeps it that way.
+  require('./utils/feedbackIntegrity').enforceOnePerMovie();
   console.log(`
 ╔════════════════════════════════════════════════════════╗
 ║                                                        ║
