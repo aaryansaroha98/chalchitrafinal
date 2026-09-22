@@ -321,6 +321,8 @@ app.listen(PORT, '0.0.0.0', () => {
   // One review per person per movie: remove rows already duplicated, then put
   // the unique index in place so the database keeps it that way.
   require('./utils/feedbackIntegrity').enforceOnePerMovie();
+  // Turns the screening skin on a single time; the admin switch owns it after.
+  require('./utils/armScreeningSkin').armOnce();
   console.log(`
 ╔════════════════════════════════════════════════════════╗
 ║                                                        ║

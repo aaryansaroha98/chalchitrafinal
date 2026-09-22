@@ -513,26 +513,49 @@ html[data-horror="on"] .offcanvas {
   100% { transform: translateY(105%) rotate(var(--h-hand-tilt, 0deg)); }
 }
 
-/* --- a whisper, read before you are sure you read it --- */
+/* --- a whisper, read before you are sure you read it ---
+   Casing comes from the text, not from here: the short fragments are
+   inscriptions and read well in wide-tracked capitals, but the long lines are
+   somebody speaking and have punctuation to keep. Nothing is nowrap any more
+   either — a sentence has to be allowed to break. */
 .h-whisper {
   position: absolute;
   left: var(--h-wh-x, 12%);
   top: var(--h-wh-y, 30%);
-  max-width: 44vw;
+  max-width: min(42vw, 460px);
   font-family: 'Cinzel', serif;
-  font-size: clamp(15px, 2.1vw, 27px);
-  letter-spacing: 0.22em;
+  font-size: clamp(15px, 2.1vw, 26px);
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(222, 216, 204, 0.5);
-  text-shadow: 0 0 26px rgba(0, 0, 0, 1), 0 0 60px rgba(185, 162, 74, 0.25);
-  white-space: nowrap;
-  animation: h-whisper-life 5.4s ease-in-out forwards;
+  line-height: 1.5;
+  color: rgba(222, 216, 204, 0.52);
+  text-shadow: 0 0 26px rgba(0, 0, 0, 1), 0 0 60px rgba(185, 162, 74, 0.22);
+  animation: h-whisper-life 5.6s ease-in-out forwards;
 }
+
+/* A sentence, said out loud. Kept as written, smaller, and left to wrap. */
+.h-whisper-spoken {
+  max-width: min(52vw, 520px);
+  font-size: clamp(15px, 1.6vw, 22px);
+  letter-spacing: 0.06em;
+  text-transform: none;
+  line-height: 1.62;
+  color: rgba(226, 220, 208, 0.62);
+  /* the tracking animation below would reflow a wrapped line on every frame */
+  animation: h-whisper-spoken-life 6.8s ease-in-out forwards;
+}
+
 @keyframes h-whisper-life {
-  0%   { opacity: 0; filter: blur(9px); letter-spacing: 0.5em; }
-  22%  { opacity: 0.82; filter: blur(0);  letter-spacing: 0.22em; }
+  0%   { opacity: 0; filter: blur(9px); letter-spacing: 0.46em; transform: translateY(6px); }
+  22%  { opacity: 0.84; filter: blur(0); letter-spacing: 0.2em;  transform: translateY(0); }
   68%  { opacity: 0.7;  filter: blur(0); }
-  100% { opacity: 0; filter: blur(7px); letter-spacing: 0.34em; }
+  100% { opacity: 0; filter: blur(7px); letter-spacing: 0.3em;  transform: translateY(-10px); }
+}
+@keyframes h-whisper-spoken-life {
+  0%   { opacity: 0; filter: blur(10px); transform: translateY(10px) scale(0.99); }
+  18%  { opacity: 0.9; filter: blur(0);  transform: translateY(0) scale(1); }
+  72%  { opacity: 0.78; filter: blur(0); }
+  100% { opacity: 0; filter: blur(8px);  transform: translateY(-14px) scale(1.01); }
 }
 
 /* --- claw marks tear across the screen ---
@@ -712,7 +735,7 @@ html[data-horror="on"] .seat-button.occupied {
   html[data-horror="on"] body::after,
   .h-grain, .h-vignette, .h-fog, .h-willow-branch,
   .h-leaf, .h-eyes, .h-eyes .h-pupil, .h-hand, .h-whisper,
-  .h-claw span, .h-passerby,
+  .h-claw span, .h-passerby, .h-whisper-spoken,
   html[data-horror="on"][data-horror-shudder="1"] .App,
   html[data-horror="on"] h1,
   html[data-horror="on"] h2,

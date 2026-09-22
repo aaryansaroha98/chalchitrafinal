@@ -182,6 +182,10 @@ const Claw = () => (
   </div>
 );
 
+/* Whispers surface one at a time, at a random place, in the order nobody
+   chooses. Casing is authored rather than forced: the short fragments read as
+   inscriptions, the two long lines are somebody speaking, and flattening
+   either into capitals would lose the difference. */
 const WHISPERS = [
   'make a wish',
   'one wish',
@@ -190,7 +194,12 @@ const WHISPERS = [
   'the willow remembers',
   'something answered',
   'you already asked',
+  'Bear, I love you so, so, so, so, so much.',
+  'Be careful who you wish for.',
 ];
+
+// Long enough to be a sentence rather than an inscription, and styled as one.
+const isSpoken = (text) => text.length > 26;
 
 /* A short, sharp stinger built in the browser. Shipping an mp3 for one
    moment is not worth the payload, and this cannot 404. */
@@ -394,7 +403,7 @@ const HorrorAtmosphere = () => {
         {events.whisper && (
           <div
             key={events.whisper.id}
-            className="h-whisper"
+            className={`h-whisper${isSpoken(WHISPERS[Math.floor(events.whisper.seed * WHISPERS.length) % WHISPERS.length]) ? ' h-whisper-spoken' : ''}`}
             style={{
               '--h-wh-x': `${(6 + events.whisper.seed * 52).toFixed(1)}%`,
               '--h-wh-y': `${(18 + ((events.whisper.seed * 13) % 1) * 62).toFixed(1)}%`,
