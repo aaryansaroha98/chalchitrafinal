@@ -312,7 +312,12 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error: ' + (err.message || 'Unknown error') });
 });
 
+// Mirror existing bookings into seat_claims so previously sold seats stay
+// blocked, report any seat already held by two bookings, and drop claims that
+// never became a booking.
+const seatClaims = require('./utils/seatClaims');
 app.listen(PORT, '0.0.0.0', () => {
+  seatClaims.sweepOrphans(() => seatClaims.backfillFromBookings());
   console.log(`
 ╔════════════════════════════════════════════════════════╗
 ║                                                        ║

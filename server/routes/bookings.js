@@ -1,5 +1,6 @@
 const express = require('express');
 const db = require('../database');
+const seatClaims = require('../utils/seatClaims');
 const QRCode = require('qrcode');
 const crypto = require('crypto');
 const fs = require('fs');
@@ -305,6 +306,32 @@ router.post('/', async (req, res) => {
         return res.status(400).json({ error: `Seats ${conflictingSeats.join(', ')} are already booked` });
       }
 
+      // The check above is advisory only: several more round-trips happen
+      // before the booking is inserted, and two people confirming the same
+      // seats inside that window both used to pass it. Take the seats now, in
+      // one atomic statement the unique index arbitrates, so exactly one of
+      // them can win.
+      seatClaims.claimSeats(movie_id, selectedSeats, req.user.id).then((claim) => {
+      if (!claim.ok) {
+        return res.status(409).json({
+          error: `Seats ${selectedSeats.join(', ')} were just taken by someone else. Please pick different seats.`,
+        });
+      }
+
+      // From here on the seats are held, so every way out of this handler has
+      // to give them back. Rather than thread that through every branch, any
+      // error response releases them on the way out.
+      let seatsSettled = false;
+      const settle = () => { const first = !seatsSettled; seatsSettled = true; return first; };
+      const sendJson = res.json.bind(res);
+      res.json = (payload) => {
+        if (res.statusCode >= 400 && settle()) {
+          seatClaims.releaseSeats(movie_id, selectedSeats, () => sendJson(payload));
+          return res;
+        }
+        return sendJson(payload);
+      };
+
       // Get movie details
     db.get('SELECT * FROM movies WHERE id = ?', [movie_id], (err, movie) => {
       if (err) return res.status(500).json({ error: err.message });
@@ -442,6 +469,10 @@ router.post('/', async (req, res) => {
               if (err) return res.status(500).json({ error: err.message });
 
               const databaseId = this.lastID; // Get the auto-generated database ID
+              // The seats are now owned by a real booking, so they are no
+              // longer an orphan claim the sweeper could reclaim.
+              settle();
+              seatClaims.attachBooking(movie_id, selectedSeats, databaseId);
 
               // Create QR code data with minimal info to avoid size limits
               const qrData = {
@@ -534,6 +565,7 @@ router.post('/', async (req, res) => {
         }
       }
     });
+      }); // End atomic seat claim
   });
   }); // End duplicate booking check
 });
@@ -1114,6 +1146,8 @@ router.delete('/:id', (req, res) => {
     if (booking.user_id !== req.user.id) return res.status(403).json({ error: 'You can only delete your own bookings' });
 
     // Delete the booking
+    // Deleting a booking must put its seats back on sale.
+    seatClaims.releaseForBooking(bookingId);
     db.run('DELETE FROM bookings WHERE id = ?', [bookingId], function(err) {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ message: 'Booking deleted successfully' });

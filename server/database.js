@@ -318,6 +318,26 @@ if (usePostgres) {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`,
+      // One row per seat held for a movie, with a unique index on
+      // (movie_id, seat). This is what makes a seat impossible to sell twice:
+      // the booking route previously read the taken seats, then did five more
+      // round-trips before inserting, and two people confirming inside that
+      // window both passed the check and both got the seat.
+      `CREATE TABLE IF NOT EXISTS seat_claims (
+        id SERIAL PRIMARY KEY,
+        movie_id INTEGER NOT NULL,
+        seat TEXT NOT NULL,
+        booking_id INTEGER,
+        user_id INTEGER,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )`,
+      `CREATE UNIQUE INDEX IF NOT EXISTS idx_seat_claims_movie_seat ON seat_claims (movie_id, seat)`,
+      // The route checks "one booking per user per movie" and then makes
+      // several more round-trips before inserting, so the same user clicking
+      // twice could slip two bookings through. Creating this index fails
+      // loudly if legacy duplicates already exist, which is the signal to
+      // clean them up; it does not stop the app starting.
+      `CREATE UNIQUE INDEX IF NOT EXISTS idx_bookings_user_movie ON bookings (user_id, movie_id)`,
       `CREATE TABLE IF NOT EXISTS coin_transactions (
         id SERIAL PRIMARY KEY,
         user_id INTEGER NOT NULL,
@@ -707,6 +727,19 @@ if (usePostgres) {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )`,
+      // One row per seat held for a movie, with a unique index on
+      // (movie_id, seat). This is what makes a seat impossible to sell twice:
+      // the booking route previously read the taken seats, then did five more
+      // round-trips before inserting, and two people confirming inside that
+      // window both passed the check and both got the seat.
+      `CREATE TABLE IF NOT EXISTS seat_claims (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        movie_id INTEGER NOT NULL,
+        seat TEXT NOT NULL,
+        booking_id INTEGER,
+        user_id INTEGER,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )`,
       `CREATE TABLE IF NOT EXISTS coin_transactions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER NOT NULL,
@@ -755,14 +788,23 @@ if (usePostgres) {
   function createIndices() {
     console.log('🔧 Ensuring database indices...');
     const indices = [
-      `CREATE UNIQUE INDEX IF NOT EXISTS idx_booking_food_status_unique ON booking_food_status (booking_id, food_id)`
+      `CREATE UNIQUE INDEX IF NOT EXISTS idx_booking_food_status_unique ON booking_food_status (booking_id, food_id)`,
+      // The guarantee that a seat cannot be sold twice.
+      `CREATE UNIQUE INDEX IF NOT EXISTS idx_seat_claims_movie_seat ON seat_claims (movie_id, seat)`,
+      // The route checks "one booking per user per movie" and then makes
+      // several more round-trips before inserting, so the same user clicking
+      // twice could slip two bookings through. Creating this index fails
+      // loudly if legacy duplicates already exist, which is the signal to
+      // clean them up; it does not stop the app starting.
+      `CREATE UNIQUE INDEX IF NOT EXISTS idx_bookings_user_movie ON bookings (user_id, movie_id)`
     ];
     indices.forEach((sql) => {
+      const name = (sql.match(/INDEX IF NOT EXISTS (\w+)/) || [, 'index'])[1];
       db.run(sql, function (err) {
         if (err) {
-          console.log('⚠️  Index creation error:', err.message);
+          console.log(`⚠️  Could not create ${name}:`, err.message);
         } else {
-          console.log('✅ Index ensured');
+          console.log(`✅ ${name} ready`);
         }
       });
     });

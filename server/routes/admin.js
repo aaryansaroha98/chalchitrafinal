@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const { isCloudinaryConfigured, getUpload, getUploadUrl, deleteImage } = require('../utils/cloudinary');
 const { isUpcomingDate } = require('../utils/datetime');
+const seatClaims = require('../utils/seatClaims');
 
 const router = express.Router();
 
@@ -616,6 +617,7 @@ router.delete('/users/:id', requireAdmin, (req, res) => {
         // 6. Delete admin_permissions for user
         (cb) => db.run('DELETE FROM admin_permissions WHERE admin_user_id = ?', [userId], cb),
         // 7. Delete bookings for user
+        (cb) => db.run('DELETE FROM seat_claims WHERE booking_id IN (SELECT id FROM bookings WHERE user_id = ?)', [userId], () => cb()),
         (cb) => db.run('DELETE FROM bookings WHERE user_id = ?', [userId], cb),
         // 8. Finally delete the user
         (cb) => db.run('DELETE FROM users WHERE id = ?', [userId], cb),
@@ -730,6 +732,8 @@ router.delete('/bookings/reset', requireAdmin, (req, res) => {
         if (err2) console.error('Error deleting booking_food_status:', err2.message);
 
         // Delete bookings
+        // Put every reset booking's seats back on sale.
+        seatClaims.releaseForMovie(movie_id);
         db.run(`DELETE FROM bookings ${where}`, params, function (err3) {
           if (err3) return res.status(500).json({ error: err3.message });
           console.log(`Reset ${this.changes} bookings${movie_id ? ` for movie ${movie_id}` : ''}`);
@@ -756,6 +760,7 @@ router.delete('/bookings/:id', requireAdmin, (req, res) => {
       if (err2) console.error('Error deleting booking_food_status:', err2.message);
 
       // Delete booking
+      seatClaims.releaseForBooking(bookingId);
       db.run('DELETE FROM bookings WHERE id = ?', [bookingId], function (err3) {
         if (err3) return res.status(500).json({ error: err3.message });
         if (this.changes === 0) return res.status(404).json({ error: 'Booking not found' });
