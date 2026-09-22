@@ -92,6 +92,12 @@ const requireAdmin = (req, res, next) => {
 
 // Middleware to restrict an action to the super admin only
 const SUPER_ADMIN_EMAIL = (process.env.SUPER_ADMIN_EMAIL || '2025uee0154@iitjammu.ac.in').trim().toLowerCase();
+// users.coins is a Postgres INTEGER, so this is the largest value the column
+// can hold. There is no product limit on sending coins — this exists only so
+// an over-large amount is refused with a sentence instead of arriving at the
+// database and coming back as "integer out of range".
+const MAX_COINS = 2147483647;
+
 const getRequestActor = (req) => req.user || req.session?.adminUser || null;
 const isSuperAdminEmail = (email) => typeof email === 'string' && email.trim().toLowerCase() === SUPER_ADMIN_EMAIL;
 
@@ -639,8 +645,8 @@ router.post('/users/:id/grant-coins', requireSuperAdmin, (req, res) => {
     : '';
 
   const amount = Number(rawAmount);
-  if (!Number.isInteger(amount) || amount <= 0 || amount > 100000) {
-    return res.status(400).json({ error: 'Amount must be a whole number between 1 and 100000' });
+  if (!Number.isInteger(amount) || amount <= 0 || amount > MAX_COINS) {
+    return res.status(400).json({ error: `Amount must be a whole number of at least 1 (up to ${MAX_COINS.toLocaleString('en-IN')})` });
   }
   if (!Number.isInteger(userId)) {
     return res.status(400).json({ error: 'Invalid user id' });
@@ -649,6 +655,13 @@ router.post('/users/:id/grant-coins', requireSuperAdmin, (req, res) => {
   db.get('SELECT id, COALESCE(coins, 0) as coins FROM users WHERE id = ?', [userId], (err, user) => {
     if (err) return res.status(500).json({ error: err.message });
     if (!user) return res.status(404).json({ error: 'User not found' });
+
+    // Adding is what overflows, so check the sum rather than the amount alone.
+    if (user.coins + amount > MAX_COINS) {
+      return res.status(400).json({
+        error: `That would put them over the maximum a balance can hold (${MAX_COINS.toLocaleString('en-IN')}). They already have ${user.coins.toLocaleString('en-IN')}.`
+      });
+    }
 
     const reason = note ? `admin_grant: ${note}`.slice(0, 255) : 'admin_grant';
     // Record the sender so the recipient can be told who sent it. announced_at
@@ -692,8 +705,8 @@ router.put('/users/:id/coins', requireSuperAdmin, (req, res) => {
   if (!Number.isInteger(userId)) {
     return res.status(400).json({ error: 'Invalid user id' });
   }
-  if (!Number.isInteger(target) || target < 0 || target > 100000) {
-    return res.status(400).json({ error: 'Balance must be a whole number between 0 and 100000' });
+  if (!Number.isInteger(target) || target < 0 || target > MAX_COINS) {
+    return res.status(400).json({ error: `Balance must be a whole number from 0 up to ${MAX_COINS.toLocaleString('en-IN')}` });
   }
 
   db.get('SELECT id, name, COALESCE(coins, 0) AS coins FROM users WHERE id = ?', [userId], (err, user) => {

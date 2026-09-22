@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Container, Row, Col, Card, Button, Alert, Tab, Tabs, Table, Modal, Form, Badge } from 'react-bootstrap';
 import api from '../api/axios';
 import jsPDF from 'jspdf';
@@ -254,10 +254,42 @@ const AdminPanel = () => {
   const [coinSelectedIds, setCoinSelectedIds] = useState([]);
   const [coinProgress, setCoinProgress] = useState(null);
   const [coinRefreshing, setCoinRefreshing] = useState(false);
+  // Matches the server. No product limit on sending coins; this is simply the
+  // largest number the balance column can store.
+  const MAX_COINS = 2147483647;
+
+  // While coin management is open, re-read the balances on a slow tick as well
+  // as after each action, so a change made elsewhere — another admin, a
+  // booking spending coins — appears without anyone pressing anything. One
+  // request every eight seconds, and only while the sheet is open: firing a
+  // dozen at once is what previously tripped the rate limiter.
+  //
+  // Both of these must stay above `if (loading) return <Loader/>` further
+  // down. A hook declared below it is skipped on the first render and runs on
+  // the next, which React treats as the component changing shape, and the
+  // whole panel unmounts with no visible error.
+  const refreshRef = useRef(null);
+
   const [coinAmount, setCoinAmount] = useState('');
   const [coinNote, setCoinNote] = useState('');
   const [coinSending, setCoinSending] = useState(false);
   const [coinFeedback, setCoinFeedback] = useState(null); // { type: 'success' | 'error', text }
+
+  // Keep the balances current while coin management is open, so a change made
+  // elsewhere shows up without anyone pressing anything. Deliberately one
+  // request every eight seconds and only while the sheet is open.
+  //
+  // This sits below the coin state on purpose: an effect's dependency array is
+  // evaluated during render, so referencing state declared further down throws
+  // "cannot access before initialization" and takes the whole panel with it.
+  useEffect(() => {
+    if (!showCoinManager) return undefined;
+    const tick = setInterval(() => {
+      // never poll over the top of a batch that is still running
+      if (!coinSending && refreshRef.current) refreshRef.current();
+    }, 8000);
+    return () => clearInterval(tick);
+  }, [showCoinManager, coinSending]);
   const [movieForm, setMovieForm] = useState({
     title: '',
     description: '',
@@ -1135,6 +1167,8 @@ const AdminPanel = () => {
     }
   };
 
+  refreshRef.current = refreshUserBalances;
+
   // Coin actions run over a list: the rows ticked in the table, or the single
   // user picked by search if none are. Requests go one at a time on purpose —
   // firing one per user in parallel is what previously burst the rate limit
@@ -1191,8 +1225,8 @@ const AdminPanel = () => {
       return;
     }
     const amount = Number(coinAmount);
-    if (!Number.isInteger(amount) || amount <= 0 || amount > 100000) {
-      setCoinFeedback({ type: 'error', text: 'Enter a whole number between 1 and 100000.' });
+    if (!Number.isInteger(amount) || amount <= 0 || amount > MAX_COINS) {
+      setCoinFeedback({ type: 'error', text: `Enter a whole number of at least 1 (up to ${MAX_COINS.toLocaleString('en-IN')}).` });
       return;
     }
     if (targets.length > 1 && !window.confirm(`Send ${amount} coins to ${targets.length} users? Each of them will see a message from you.`)) {
@@ -1221,8 +1255,8 @@ const AdminPanel = () => {
       return;
     }
     const target = Number(coinAmount);
-    if (!Number.isInteger(target) || target < 0 || target > 100000) {
-      setCoinFeedback({ type: 'error', text: 'Enter a whole number between 0 and 100000.' });
+    if (!Number.isInteger(target) || target < 0 || target > MAX_COINS) {
+      setCoinFeedback({ type: 'error', text: `Enter a whole number from 0 up to ${MAX_COINS.toLocaleString('en-IN')}.` });
       return;
     }
     const who = targets.length === 1
