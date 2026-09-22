@@ -583,42 +583,92 @@ router.get('/my', (req, res) => {
     });
 });
 
-// Scanner dashboard overview (all-time totals)
+// Scanner dashboard overview, for one screening.
+//
+// This used to count every booking ever taken, so the door showed totals that
+// included every past movie and the numbers meant nothing for the screening
+// actually happening. It now answers for a single movie, and also returns the
+// movie list and which one to default to, so the scanner can offer a picker
+// without a second request.
 router.get('/scanner-overview', requireScannerAccess, (req, res) => {
-  const scannerStatsQuery = `
-    SELECT
-      COUNT(*) AS total_bookings,
-      COALESCE(SUM(
-        CASE
-          WHEN COALESCE(admitted_people, 0) > 0 OR COALESCE(is_used, 0) = 1 THEN 1
-          ELSE 0
-        END
-      ), 0) AS total_scanned_tickets,
-      COALESCE(SUM(
-        CASE
-          WHEN COALESCE(remaining_people, 0) > 0 THEN COALESCE(remaining_people, 0)
-          WHEN COALESCE(remaining_people, 0) = 0
-               AND COALESCE(admitted_people, 0) = 0
-               AND COALESCE(num_people, 0) > 0
-            THEN COALESCE(num_people, 0)
-          ELSE 0
-        END
-      ), 0) AS total_remaining_tickets,
-      COALESCE(SUM(COALESCE(admitted_people, 0)), 0) AS total_seats_filled
-    FROM bookings
-  `;
+  const requested = Number(req.query.movie_id);
+  const hasRequested = Number.isInteger(requested) && requested > 0;
 
-  db.get(scannerStatsQuery, [], (err, row) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
+  db.all('SELECT id, title, date, venue FROM movies', [], (moviesErr, allMovies) => {
+    if (moviesErr) return res.status(500).json({ error: moviesErr.message });
+
+    const now = new Date();
+    const dated = (allMovies || []).map((m) => ({ ...m, when: parseAppDateTime(m.date) }));
+
+    // Upcoming screenings first, soonest at the top, then past ones with the
+    // most recent first. Someone on the door is working the next screening,
+    // not scrolling past two years of history to find it.
+    const rank = (m) => (m.when && m.when >= now ? 0 : 1);
+    const movies = dated
+      .slice()
+      .sort((a, b) => {
+        if (rank(a) !== rank(b)) return rank(a) - rank(b);
+        const at = a.when ? a.when.getTime() : 0;
+        const bt = b.when ? b.when.getTime() : 0;
+        return rank(a) === 0 ? at - bt : bt - at;
+      })
+      .map(({ when, ...m }) => ({ ...m, upcoming: rank({ when: m.date ? parseAppDateTime(m.date) : null }) === 0 }));
+
+    // The default is the screening the door is most likely working: the next
+    // one still to come, or failing that the one that just happened.
+    const upcoming = dated
+      .filter((m) => m.when && m.when >= now)
+      .sort((a, b) => a.when - b.when)[0];
+    const lastPast = dated
+      .filter((m) => m.when && m.when < now)
+      .sort((a, b) => b.when - a.when)[0];
+    const fallback = upcoming || lastPast || dated[0] || null;
+
+    const movieId = hasRequested ? requested : (fallback ? fallback.id : null);
+    const selected = movies.find((m) => m.id === movieId) || null;
+
+    if (!movieId) {
+      return res.json({
+        movies, movie: null, movie_id: null,
+        total_bookings: 0, total_scanned_tickets: 0,
+        total_remaining_tickets: 0, total_seats_filled: 0,
+      });
     }
 
-    res.json({
-      total_bookings: Number(row?.total_bookings) || 0,
-      total_scanned_tickets: Number(row?.total_scanned_tickets) || 0,
-      total_remaining_tickets: Number(row?.total_remaining_tickets) || 0,
-      total_seats_filled: Number(row?.total_seats_filled) || 0
-    });
+    db.get(
+      `SELECT
+         COUNT(*) AS total_bookings,
+         COALESCE(SUM(
+           CASE WHEN COALESCE(admitted_people, 0) > 0 OR COALESCE(is_used, 0) = 1
+                THEN 1 ELSE 0 END
+         ), 0) AS total_scanned_tickets,
+         COALESCE(SUM(
+           CASE
+             WHEN COALESCE(remaining_people, 0) > 0 THEN COALESCE(remaining_people, 0)
+             WHEN COALESCE(remaining_people, 0) = 0
+                  AND COALESCE(admitted_people, 0) = 0
+                  AND COALESCE(num_people, 0) > 0
+               THEN COALESCE(num_people, 0)
+             ELSE 0
+           END
+         ), 0) AS total_remaining_tickets,
+         COALESCE(SUM(COALESCE(admitted_people, 0)), 0) AS total_seats_filled
+       FROM bookings
+       WHERE movie_id = ?`,
+      [movieId],
+      (err, row) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({
+          movies,
+          movie: selected,
+          movie_id: movieId,
+          total_bookings: Number(row?.total_bookings) || 0,
+          total_scanned_tickets: Number(row?.total_scanned_tickets) || 0,
+          total_remaining_tickets: Number(row?.total_remaining_tickets) || 0,
+          total_seats_filled: Number(row?.total_seats_filled) || 0,
+        });
+      }
+    );
   });
 });
 

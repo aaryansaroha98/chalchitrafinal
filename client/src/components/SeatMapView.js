@@ -123,7 +123,7 @@ const SeatMapView = ({ show, movies = [], initialMovieId, onHide }) => {
           Graphical View
           {data?.movie?.date && (
             <span className="text-muted" style={{ fontSize: '0.85rem', fontWeight: 400 }}>
-              {' '}&middot; {data.movie.title} &middot; {istDate(data.movie.date)} {istTime(data.movie.date)}
+              {' '}&middot; {data.movie.title} &middot; {istDate(data.movie.date)} {istTime(data.movie.date, { hour: '2-digit', minute: '2-digit' })}
             </span>
           )}
         </Modal.Title>
@@ -262,7 +262,7 @@ const SeatMapView = ({ show, movies = [], initialMovieId, onHide }) => {
                 <span>Seats on this booking</span><strong>{picked.seats.join(', ')}</strong>
                 <span>People</span><strong>{picked.numPeople}</strong>
                 <span>Booked at</span>
-                <strong>{picked.bookedAt ? `${istDate(picked.bookedAt)} ${istTime(picked.bookedAt)}` : '—'}</strong>
+                <strong>{picked.bookedAt ? `${istDate(picked.bookedAt)} ${istTime(picked.bookedAt, { hour: '2-digit', minute: '2-digit' })}` : '—'}</strong>
               </div>
             </div>
           )

@@ -18,6 +18,11 @@ const Scanner = () => {
   });
   const [isTestingServer, setIsTestingServer] = useState(false);
   const [serverStatsUpdatedAt, setServerStatsUpdatedAt] = useState(null);
+  // The door works one screening at a time. These totals used to be every
+  // booking ever taken, which made them meaningless on the night.
+  const [scannerMovies, setScannerMovies] = useState([]);
+  const [scannerMovieId, setScannerMovieId] = useState(null);
+  const [scannerMovie, setScannerMovie] = useState(null);
   const [showManualInput, setShowManualInput] = useState(false);
   const [availableCameras, setAvailableCameras] = useState([]);
   const [selectedCamera, setSelectedCamera] = useState('');
@@ -312,13 +317,15 @@ const Scanner = () => {
     return Number(value).toLocaleString();
   };
 
-  const loadServerScannerOverview = async (showAlert = false, useButtonLoader = false) => {
+  const loadServerScannerOverview = async (showAlert = false, useButtonLoader = false, movieId = scannerMovieId) => {
     if (useButtonLoader) {
       setIsTestingServer(true);
     }
 
     try {
-      const response = await api.get('/api/bookings/scanner-overview');
+      const response = await api.get('/api/bookings/scanner-overview', {
+        params: movieId ? { movie_id: movieId } : {}
+      });
       const overview = response.data || {};
       const normalizedStats = {
         totalScannedTickets: Number(overview.total_scanned_tickets) || 0,
@@ -327,11 +334,17 @@ const Scanner = () => {
       };
 
       setServerStats(normalizedStats);
+      setScannerMovies(Array.isArray(overview.movies) ? overview.movies : []);
+      setScannerMovie(overview.movie || null);
+      // The server picks the screening on the first call — the next one due —
+      // and we hold on to it so later refreshes stay on the same one.
+      if (overview.movie_id) setScannerMovieId(overview.movie_id);
       setServerStatsUpdatedAt(new Date());
 
       if (showAlert) {
         alert(
           `Server connection OK!\n\n` +
+          `Screening: ${overview.movie ? overview.movie.title : 'none selected'}\n` +
           `Total Tickets Scanned: ${normalizedStats.totalScannedTickets}\n` +
           `Total Remaining Tickets: ${normalizedStats.totalRemainingTickets}\n` +
           `Total Seats Filled: ${normalizedStats.totalSeatsFilled}`
@@ -1137,6 +1150,36 @@ const Scanner = () => {
           </Badge>
         </div>
 
+        {/* Which screening these numbers are for. */}
+        <div className="scanner-movie-picker mb-3">
+          <label htmlFor="scanner-movie" className="scanner-movie-label">
+            <i className="fas fa-film me-2"></i>Screening
+          </label>
+          <select
+            id="scanner-movie"
+            className="form-select"
+            value={scannerMovieId || ''}
+            onChange={(e) => {
+              const next = Number(e.target.value) || null;
+              setScannerMovieId(next);
+              loadServerScannerOverview(false, false, next);
+            }}
+          >
+            {scannerMovies.length === 0 && <option value="">Loading screenings…</option>}
+            {scannerMovies.map((m) => (
+              <option key={m.id} value={m.id}>
+                {m.upcoming ? '' : 'Past — '}{m.title} · {istDate(m.date)} {istTime(m.date, { hour: '2-digit', minute: '2-digit' })}
+                {m.venue ? ` · ${m.venue}` : ''}
+              </option>
+            ))}
+          </select>
+          {scannerMovie && (
+            <span className="scanner-movie-hint">
+              Numbers below are for this screening only.
+            </span>
+          )}
+        </div>
+
         {/* Stats Dashboard */}
         <Row className="mb-4 g-3 g-md-4 scanner-stats-row">
           <Col md={4} xs={4}>
@@ -1148,7 +1191,7 @@ const Scanner = () => {
               <Card.Body className="py-3">
                 <h3 className="mb-1 scanner-stat-value">{formatStatValue(serverStats.totalScannedTickets)}</h3>
                 <p className="mb-0 fw-semibold scanner-stat-label">Total Tickets Scanned</p>
-                <small className="scanner-stat-sub">All time</small>
+                <small className="scanner-stat-sub">This screening</small>
               </Card.Body>
             </Card>
           </Col>

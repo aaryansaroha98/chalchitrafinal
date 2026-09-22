@@ -54,20 +54,24 @@ export const compareMovieDatesAsc = (a, b) =>
 // without which the browser prints it in whatever zone the device is set to,
 // so the same screening read differently on different phones and disagreed
 // with the confirmation email).
+// Called with no argument these mean "now", which is what the code they
+// replaced (new Date().toLocaleString(...)) did — scan history stamps the
+// moment of the scan. An explicit null or empty string still means missing
+// data and still reads N/A, so a real gap is never dressed up as today.
 export const istDate = (value, options = {}) => {
-  const parsed = parseMovieDate(value);
+  const parsed = value === undefined ? new Date() : parseMovieDate(value);
   if (!parsed) return 'N/A';
   return parsed.toLocaleDateString('en-IN', { timeZone: APP_TIME_ZONE, ...options });
 };
 
 export const istTime = (value, options = {}) => {
-  const parsed = parseMovieDate(value);
+  const parsed = value === undefined ? new Date() : parseMovieDate(value);
   if (!parsed) return 'N/A';
   return parsed.toLocaleTimeString('en-IN', { timeZone: APP_TIME_ZONE, ...options });
 };
 
 export const istDateTime = (value, options = {}) => {
-  const parsed = parseMovieDate(value);
+  const parsed = value === undefined ? new Date() : parseMovieDate(value);
   if (!parsed) return 'N/A';
   return parsed.toLocaleString('en-IN', { timeZone: APP_TIME_ZONE, ...options });
 };

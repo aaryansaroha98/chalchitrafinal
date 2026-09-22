@@ -3694,3 +3694,37 @@ a:hover {
   z-index: 4;
   box-shadow: 0 0 0 3px rgba(183, 121, 31, 0.25);
 }
+
+/* Which screening the door is working. Sits above the totals because those
+   numbers are meaningless without it. */
+.scanner-movie-picker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--qt-line);
+  background: var(--qt-surface);
+}
+.scanner-movie-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--qt-muted);
+  margin: 0;
+  white-space: nowrap;
+}
+.scanner-movie-picker .form-select {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+.scanner-movie-hint {
+  flex: 1 1 100%;
+  font-size: 0.8rem;
+  color: var(--qt-quiet);
+}
+@media (max-width: 575px) {
+  .scanner-movie-picker { padding: 10px; }
+  .scanner-movie-label { flex: 1 1 100%; }
+}
