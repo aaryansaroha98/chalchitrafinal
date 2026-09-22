@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../api/axios';
-import { captureTicketCanvas, ticketCanvasToPdf } from '../utils/ticketPdf';
+import { buildTicketModel, renderTicketCanvas, ticketCanvasToPdf } from '../utils/ticketPdf';
 import CoinIcon from '../components/CoinIcon';
 
 const PaymentSuccess = () => {
@@ -53,91 +53,17 @@ const PaymentSuccess = () => {
         setEmailStatus('sending');
         setEmailError('');
 
-        const ticketBgUrl = `${window.location.origin}/misc/ticc.png`;
+        const canvas = await renderTicketCanvas(buildTicketModel({
+          bookingCode: ticket.booking_id,
+          title: ticket.movie,
+          persons: ticket.num_people || navCustomerDetails?.numPeople || 1,
+          seats: ticket.selected_seats,
+          date: ticket.date,
+          venue: ticket.venue,
+          qrDataUrl: ticket.qr_code,
+          backgroundUrl: `${window.location.origin}/misc/ticc.png`,
+        }));
 
-        const ticketHTML = `
-          <div style="
-            width: 800px;
-            height: 260px;
-            position: relative;
-            font-family: Arial, sans-serif;
-            color: #0b1a2b;
-            box-sizing: border-box;
-          " id="ticket-design">
-            <img
-              src="${ticketBgUrl}"
-              alt="Ticket Background"
-              style="width: 100%; height: 100%; object-fit: cover; display: block;"
-              crossorigin="anonymous"
-            />
-
-            <div style="position: absolute; left: 227px; top: 117.5px; width: 230px; color: #000000; fontFamily: 'Tahoma, Arial, sans-serif';">
-              <div style="font-size: 12px; font-weight: 400; letter-spacing: 0.2px;">
-                ${ticket.booking_id}
-              </div>
-            </div>
-
-            <div style="position: absolute; left: 227px; top: 141.5px; width: 230px; color: #000000; fontFamily: 'Tahoma, Arial, sans-serif';">
-              <div style="font-size: 12px; font-weight: 400; letter-spacing: 0.2px;">
-                ${ticket.movie}
-              </div>
-            </div>
-
-            <div style="position: absolute; left: 227px; top: 165px; width: 230px; color: #000000; fontFamily: 'Tahoma, Arial, sans-serif';">
-              <div style="font-size: 12px; font-weight: 400; letter-spacing: 0.2px;">
-                ${selectedSeats?.length || 1}
-              </div>
-            </div>
-
-            <div style="position: absolute; left: 227px; top: 189px; width: 260px; color: #000000; fontFamily: 'Tahoma, Arial, sans-serif';">
-              <div style="font-size: 12px; font-weight: 400; letter-spacing: 0.2px;">
-                ${selectedSeats ? selectedSeats.map(seat => String(seat)).join(', ') : 'N/A'}
-              </div>
-            </div>
-
-            <div style="position: absolute; left: 635px; top: 62.5px; color: #1a5f7a; fontSize: 15px; fontWeight: 'bold';">:</div>
-            <div style="position: absolute; right: -25px; top: 67px; width: 180px; color: #000000; textAlign: 'left'; fontFamily: 'Tahoma, Arial, sans-serif';">
-              <div style="font-size: 13px; font-weight: 400; letter-spacing: 0.2px; line-height: 1.2; text-transform: uppercase;">
-                ${ticket.date ? new Date(ticket.date).toLocaleDateString('en-IN', { weekday: 'long' }) : 'N/A'}
-              </div>
-              <div style="font-size: 13px; font-weight: 400; letter-spacing: 0.2px; line-height: 1.2; marginTop: '2px';">
-                ${ticket.date ? new Date(ticket.date).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' }) : ''}
-              </div>
-            </div>
-
-            <div style="position: absolute; left: 635px; top: 113.5px; color: #1a5f7a; fontSize: 15px; fontWeight: 'bold';">:</div>
-            <div style="position: absolute; right: -25px; top: 118px; width: 180px; color: #000000; textAlign: 'left'; fontFamily: 'Tahoma, Arial, sans-serif';">
-              <div style="font-size: 13px; font-weight: 400; letter-spacing: 0.2px; line-height: 1.2;">
-                ${ticket.date ? new Date(ticket.date).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : 'N/A'}
-              </div>
-            </div>
-
-            <div style="position: absolute; left: 641px; top: 165.5px; color: #1a5f7a; fontSize: 15px; fontWeight: 'bold';">:</div>
-            <div style="position: absolute; right: -30px; top: 171px; width: 180px; color: #000000; textAlign: 'left'; fontFamily: 'Tahoma, Arial, sans-serif';">
-              <div style="font-size: 13px; font-weight: 400; letter-spacing: 0.2px; line-height: 1.2;">
-                ${ticket.venue || 'N/A'}
-              </div>
-            </div>
-
-            <div style="
-              position: absolute;
-              left: 472px;
-              top: 98px;
-              width: 98px;
-              height: 98px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-            ">
-              ${ticket.qr_code && ticket.qr_code.trim() !== '' ?
-                '<img src="' + ticket.qr_code + '" style="width: 98px; height: 98px; object-fit: contain; display: block;" alt="QR Code" crossorigin="anonymous" />' :
-                '<div style="width: 98px; height: 98px; background: transparent; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #666; font-weight: 400;">QR NOT FOUND</div>'
-              }
-            </div>
-          </div>
-        `;
-
-        const canvas = await captureTicketCanvas(ticketHTML);
         const pdf = ticketCanvasToPdf(canvas);
         const pdfDataUri = pdf.output('datauristring');
         const pdfBase64 = pdfDataUri.split(',')[1];

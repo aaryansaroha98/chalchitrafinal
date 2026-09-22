@@ -3,7 +3,7 @@ import { Container, Row, Col, Button, Modal, Card, Badge, Alert } from 'react-bo
 import { useSearchParams } from 'react-router-dom';
 import api from '../api/axios';
 import Loader from '../components/Loader';
-import { captureTicketCanvas, ticketCanvasToPdf } from '../utils/ticketPdf';
+import { buildTicketModel, renderTicketCanvas, ticketCanvasToPdf } from '../utils/ticketPdf';
 
 // Keep relative assets on the frontend origin so hosting rewrites proxy them.
 // This avoids direct browser requests to Render, which some campus networks block.
@@ -70,98 +70,18 @@ const MyBookings = () => {
       // Set downloading state
       setDownloadingTicket(booking.id);
 
-      const ticketBgUrl = `${window.location.origin}/misc/ticc.png`;
+      const canvas = await renderTicketCanvas(buildTicketModel({
+        bookingCode: booking.booking_code || booking.id,
+        title: booking.title,
+        persons: booking.num_people || 1,
+        seats: booking.selected_seats,
+        date: booking.date,
+        venue: booking.venue,
+        qrDataUrl: booking.qr_code,
+        backgroundUrl: `${window.location.origin}/misc/ticc.png`,
+      }));
 
-      // Generate the ticket HTML (same as PaymentSuccess) - updated visual design
-      const ticketHTML = `
-        <div style="
-          width: 800px;
-          height: 260px;
-          position: relative;
-          font-family: Arial, sans-serif;
-          color: #0b1a2b;
-          box-sizing: border-box;
-        " id="ticket-design">
-          <img
-            src="${ticketBgUrl}"
-            alt="Ticket Background"
-            style="width: 100%; height: 100%; object-fit: cover; display: block;"
-            crossorigin="anonymous"
-          />
-
-          <div style="position: absolute; left: 227px; top: 117.5px; width: 230px; color: #000000; fontFamily: 'Tahoma, Arial, sans-serif';">
-            <div style="font-size: 12px; font-weight: 400; letter-spacing: 0.2px;">
-              ${booking.booking_code || booking.id}
-            </div>
-          </div>
-
-          <div style="position: absolute; left: 227px; top: 141.5px; width: 230px; color: #000000; fontFamily: 'Tahoma, Arial, sans-serif';">
-            <div style="font-size: 12px; font-weight: 400; letter-spacing: 0.2px;">
-              ${booking.title}
-            </div>
-          </div>
-
-          <div style="position: absolute; left: 227px; top: 165px; width: 230px; color: #000000; fontFamily: 'Tahoma, Arial, sans-serif';">
-            <div style="font-size: 12px; font-weight: 400; letter-spacing: 0.2px;">
-              ${booking.num_people || 1}
-            </div>
-          </div>
-
-          <div style="position: absolute; left: 227px; top: 189px; width: 260px; color: #000000; fontFamily: 'Tahoma, Arial, sans-serif';">
-            <div style="font-size: 12px; font-weight: 400; letter-spacing: 0.2px;">
-              ${booking.selected_seats
-                ? (() => { try { const seats = typeof booking.selected_seats === 'string' ? JSON.parse(booking.selected_seats) : booking.selected_seats; return Array.isArray(seats) ? seats.map(seat => String(seat)).join(', ') : 'N/A'; } catch(e) { return 'N/A'; } })()
-                : 'N/A'}
-            </div>
-          </div>
-
-          <div style="position: absolute; left: 635px; top: 62.5px; color: #1a5f7a; fontSize: 15px; fontWeight: 'bold';">:</div>
-          <div style="position: absolute; right: -25px; top: 67px; width: 180px; color: #000000; textAlign: 'left'; fontFamily: 'Tahoma, Arial, sans-serif';">
-            <div style="font-size: 13px; font-weight: 400; letter-spacing: 0.2px; line-height: 1.2; text-transform: uppercase;">
-              ${booking.date ? new Date(booking.date).toLocaleDateString('en-IN', { weekday: 'long' }) : 'N/A'}
-            </div>
-            <div style="font-size: 13px; font-weight: 400; letter-spacing: 0.2px; line-height: 1.2; marginTop: '2px';">
-              ${booking.date ? new Date(booking.date).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' }) : ''}
-            </div>
-          </div>
-
-          <div style="position: absolute; left: 635px; top: 113.5px; color: #1a5f7a; fontSize: 15px; fontWeight: 'bold';">:</div>
-          <div style="position: absolute; right: -25px; top: 118px; width: 180px; color: #000000; textAlign: 'left'; fontFamily: 'Tahoma, Arial, sans-serif';">
-            <div style="font-size: 13px; font-weight: 400; letter-spacing: 0.2px; line-height: 1.2;">
-              ${booking.date ? new Date(booking.date).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : 'N/A'}
-            </div>
-          </div>
-
-          <div style="position: absolute; left: 641px; top: 165.5px; color: #1a5f7a; fontSize: 15px; fontWeight: 'bold';">:</div>
-          <div style="position: absolute; right: -30px; top: 171px; width: 180px; color: #000000; textAlign: 'left'; fontFamily: 'Tahoma, Arial, sans-serif';">
-            <div style="font-size: 13px; font-weight: 400; letter-spacing: 0.2px; line-height: 1.2;">
-              ${booking.venue || 'N/A'}
-            </div>
-          </div>
-
-          <div style="
-            position: absolute;
-            left: 472px;
-            top: 98px;
-            width: 98px;
-            height: 98px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          ">
-            ${booking.qr_code && booking.qr_code.trim() !== '' ?
-              '<img src="' + booking.qr_code + '" style="width: 98px; height: 98px; object-fit: contain; display: block;" alt="QR Code" crossorigin="anonymous" />' :
-              '<div style="width: 98px; height: 98px; background: transparent; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #666; font-weight: 400;">QR NOT FOUND</div>'
-            }
-          </div>
-        </div>
-      `;
-
-      // The ticket is rendered in its own isolated surface — see utils/ticketPdf.
-      console.log('Capturing ticket...');
-      const canvas = await captureTicketCanvas(ticketHTML);
-
-      console.log('Canvas created, dimensions:', canvas.width, 'x', canvas.height);
+      console.log('Ticket rendered:', canvas.width, 'x', canvas.height);
 
       const pdf = ticketCanvasToPdf(canvas);
 
