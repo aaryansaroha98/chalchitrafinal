@@ -41,7 +41,14 @@ export const HorrorThemeProvider = ({ children }) => {
     let cancelled = false;
     api.get('/api/admin/settings')
       .then((res) => {
-        if (!cancelled) setRemoteEnabled(Number(res.data?.horror_theme) === 1);
+        if (cancelled) return;
+        // The skin is on for the Obsession run. Once the backend has armed it
+        // (horror_theme_armed), the admin switch is the authority and is
+        // obeyed exactly; until then default to on, so the run does not wait
+        // on a backend restart to reach the site.
+        const armed = Number(res.data?.horror_theme_armed) === 1;
+        const switchedOn = Number(res.data?.horror_theme) === 1;
+        setRemoteEnabled(armed ? switchedOn : true);
       })
       .catch(() => {
         if (!cancelled) setRemoteEnabled(false); // never break the site over a skin
