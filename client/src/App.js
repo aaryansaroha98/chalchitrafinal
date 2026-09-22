@@ -12,6 +12,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Loader from './components/Loader';
 import HorrorAtmosphere from './components/HorrorAtmosphere';
+import CoinGiftModal from './components/CoinGiftModal';
 
 // Pages
 import Home from './pages/Home';
@@ -71,6 +72,7 @@ function App() {
           <ScrollToTop />
           <div className="App">
             <HorrorAtmosphere />
+            <CoinGiftModal />
             <Navbar />
             <Routes>
               <Route path="/" element={<Home />} />

@@ -645,10 +645,14 @@ router.post('/users/:id/grant-coins', requireSuperAdmin, (req, res) => {
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     const reason = note ? `admin_grant: ${note}`.slice(0, 255) : 'admin_grant';
+    // Record the sender so the recipient can be told who sent it. announced_at
+    // stays null until they have actually been shown the message.
+    const actor = getRequestActor(req);
+    const actorName = (actor && (actor.name || actor.email)) || 'Chalchitra';
 
     db.run(
-      'INSERT INTO coin_transactions (user_id, amount, type, reason) VALUES (?, ?, ?, ?)',
-      [userId, amount, 'credit', reason],
+      'INSERT INTO coin_transactions (user_id, amount, type, reason, actor_name, actor_user_id) VALUES (?, ?, ?, ?, ?, ?)',
+      [userId, amount, 'credit', reason, actorName, (actor && actor.id) || null],
       function (insertErr) {
         if (insertErr) return res.status(500).json({ error: insertErr.message });
 
@@ -662,6 +666,53 @@ router.post('/users/:id/grant-coins', requireSuperAdmin, (req, res) => {
             res.json({ success: true, coins: newBalance });
           }
         );
+      }
+    );
+  });
+});
+
+// Set a user's balance to an exact number. Granting is additive only, so
+// there was previously no way to correct a balance downwards. The difference
+// is written as a transaction so the ledger still adds up, and a top-up is
+// announced to the user exactly like a grant.
+router.put('/users/:id/coins', requireSuperAdmin, (req, res) => {
+  const userId = parseInt(req.params.id, 10);
+  const target = Number(req.body && req.body.coins);
+  const note = (req.body && typeof req.body.reason === 'string') ? req.body.reason.trim() : '';
+
+  if (!Number.isInteger(userId)) {
+    return res.status(400).json({ error: 'Invalid user id' });
+  }
+  if (!Number.isInteger(target) || target < 0 || target > 100000) {
+    return res.status(400).json({ error: 'Balance must be a whole number between 0 and 100000' });
+  }
+
+  db.get('SELECT id, name, COALESCE(coins, 0) AS coins FROM users WHERE id = ?', [userId], (err, user) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    const delta = target - user.coins;
+    const finish = () => db.run('UPDATE users SET coins = ? WHERE id = ?', [target, userId], (updErr) => {
+      if (updErr) return res.status(500).json({ error: updErr.message });
+      console.log(`✅ Admin set user ${userId} balance ${user.coins} -> ${target}`);
+      res.json({ success: true, coins: target, previous: user.coins, delta });
+    });
+
+    if (delta === 0) return finish();
+
+    const actor = getRequestActor(req);
+    const actorName = (actor && (actor.name || actor.email)) || 'Chalchitra';
+    const reason = note ? `admin_adjust: ${note}`.slice(0, 255) : 'admin_adjust';
+    // Only a top-up is worth announcing; a correction downwards is not news
+    // the recipient wants a popup about.
+    const announced = delta > 0 ? null : new Date().toISOString();
+
+    db.run(
+      'INSERT INTO coin_transactions (user_id, amount, type, reason, actor_name, actor_user_id, announced_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [userId, Math.abs(delta), delta > 0 ? 'credit' : 'debit', reason, actorName, (actor && actor.id) || null, announced],
+      (insErr) => {
+        if (insErr) return res.status(500).json({ error: insErr.message });
+        finish();
       }
     );
   });

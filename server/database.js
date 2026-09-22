@@ -449,6 +449,10 @@ if (usePostgres) {
       await pool.query('ALTER TABLE bookings ADD COLUMN IF NOT EXISTS age_confirmed INTEGER DEFAULT 0');
       await pool.query('ALTER TABLE movie_foods ADD COLUMN IF NOT EXISTS is_free INTEGER DEFAULT 0');
       await pool.query('ALTER TABLE settings ADD COLUMN IF NOT EXISTS horror_theme INTEGER DEFAULT 0');
+      // Who sent a coin grant, and whether the recipient has been told yet.
+      await pool.query('ALTER TABLE coin_transactions ADD COLUMN IF NOT EXISTS actor_name TEXT');
+      await pool.query('ALTER TABLE coin_transactions ADD COLUMN IF NOT EXISTS actor_user_id INTEGER');
+      await pool.query('ALTER TABLE coin_transactions ADD COLUMN IF NOT EXISTS announced_at TIMESTAMP');
       await pool.query('ALTER TABLE team ADD COLUMN IF NOT EXISTS section TEXT DEFAULT \'current_team\'');
       await pool.query('ALTER TABLE team ADD COLUMN IF NOT EXISTS display_order INTEGER DEFAULT 0');
       console.log('✅ movies/movie_foods/team columns ensured');
@@ -774,6 +778,7 @@ if (usePostgres) {
           ensureCouponWinnerColumns();
           ensureMovieFoodIsFreeColumn();
           ensureSettingsHorrorThemeColumn();
+          ensureCoinTransactionActorColumns();
           ensureUserCoinsColumn();
           ensureBookingCoinAmountColumn();
           ensureBookingCoinsRefundedColumn();
@@ -1106,6 +1111,30 @@ if (usePostgres) {
           }
         });
       }
+    });
+  }
+
+  // A coin grant needs to name its sender and remember whether the recipient
+  // has been shown it, so the announcement fires once and not on every visit.
+  function ensureCoinTransactionActorColumns() {
+    db.all('PRAGMA table_info(coin_transactions)', [], (err, columns) => {
+      if (err) {
+        console.log('\u26a0\ufe0f  Could not inspect coin_transactions columns:', err.message);
+        return;
+      }
+      const have = Array.isArray(columns) ? columns.map((c) => c.name) : [];
+      const wanted = [
+        ['actor_name', 'TEXT'],
+        ['actor_user_id', 'INTEGER'],
+        ['announced_at', 'DATETIME'],
+      ];
+      wanted.forEach(([name, type]) => {
+        if (have.includes(name)) return;
+        db.run(`ALTER TABLE coin_transactions ADD COLUMN ${name} ${type}`, (alterErr) => {
+          if (alterErr) console.log(`\u26a0\ufe0f  Could not add coin_transactions.${name}:`, alterErr.message);
+          else console.log(`\u2705 coin_transactions.${name} column added`);
+        });
+      });
     });
   }
 
