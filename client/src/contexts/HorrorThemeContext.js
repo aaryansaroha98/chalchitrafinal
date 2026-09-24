@@ -42,13 +42,10 @@ export const HorrorThemeProvider = ({ children }) => {
     api.get('/api/admin/settings')
       .then((res) => {
         if (cancelled) return;
-        // The skin is on for the Obsession run. Once the backend has armed it
-        // (horror_theme_armed), the admin switch is the authority and is
-        // obeyed exactly; until then default to on, so the run does not wait
-        // on a backend restart to reach the site.
-        const armed = Number(res.data?.horror_theme_armed) === 1;
-        const switchedOn = Number(res.data?.horror_theme) === 1;
-        setRemoteEnabled(armed ? switchedOn : true);
+        // The permanent light design is the default. The screening skin only
+        // appears when someone switches it on in Admin → Settings; it briefly
+        // defaulted to on for the Obsession run and no longer does.
+        setRemoteEnabled(Number(res.data?.horror_theme) === 1);
       })
       .catch(() => {
         if (!cancelled) setRemoteEnabled(false); // never break the site over a skin

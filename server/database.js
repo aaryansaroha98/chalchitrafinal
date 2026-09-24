@@ -453,6 +453,8 @@ if (usePostgres) {
       // step below turns it on at this deploy and never overrides the admin
       // switch again afterwards.
       await pool.query('ALTER TABLE settings ADD COLUMN IF NOT EXISTS horror_theme_armed INTEGER DEFAULT 0');
+      // Records that the screening skin has been switched back off once.
+      await pool.query('ALTER TABLE settings ADD COLUMN IF NOT EXISTS horror_theme_retired INTEGER DEFAULT 0');
       // Who sent a coin grant, and whether the recipient has been told yet.
       await pool.query('ALTER TABLE coin_transactions ADD COLUMN IF NOT EXISTS actor_name TEXT');
       await pool.query('ALTER TABLE coin_transactions ADD COLUMN IF NOT EXISTS actor_user_id INTEGER');
@@ -1155,6 +1157,13 @@ if (usePostgres) {
         return;
       }
       const colNames = Array.isArray(columns) ? columns.map(c => c.name) : [];
+      if (!colNames.includes('horror_theme_retired')) {
+        db.run('ALTER TABLE settings ADD COLUMN horror_theme_retired INTEGER DEFAULT 0', (alterErr) => {
+          if (alterErr) console.log('\u26a0\ufe0f  Could not add settings.horror_theme_retired:', alterErr.message);
+          else console.log('\u2705 settings.horror_theme_retired column added');
+        });
+      }
+
       if (!colNames.includes('horror_theme_armed')) {
         db.run('ALTER TABLE settings ADD COLUMN horror_theme_armed INTEGER DEFAULT 0', (alterErr) => {
           if (alterErr) console.log('\u26a0\ufe0f  Could not add settings.horror_theme_armed:', alterErr.message);
