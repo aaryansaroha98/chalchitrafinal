@@ -5,13 +5,11 @@ import './App.css';
 
 // Contexts
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { HorrorThemeProvider } from './contexts/HorrorThemeContext';
 
 // Components
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Loader from './components/Loader';
-import HorrorAtmosphere from './components/HorrorAtmosphere';
 import CoinGiftModal from './components/CoinGiftModal';
 
 // Pages
@@ -68,31 +66,28 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <HorrorThemeProvider>
-          <ScrollToTop />
-          <div className="App">
-            <HorrorAtmosphere />
-            <CoinGiftModal />
-            <Navbar />
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/upcoming-movies" element={<UpcomingMovies />} />
-              <Route path="/past-movies" element={<PastMovies />} />
-              <Route path="/gallery" element={<Gallery />} />
-              <Route path="/team" element={<Team />} />
-              <Route path="/booking/:movieId" element={<ProtectedRoute><Booking /></ProtectedRoute>} />
-              <Route path="/payment" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
-              <Route path="/payment-success" element={<ProtectedRoute renderWhileLoading><PaymentSuccess /></ProtectedRoute>} />
-              <Route path="/my-bookings" element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
-              <Route path="/admin" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
-              <Route path="/scanner" element={<ProtectedRoute><Scanner /></ProtectedRoute>} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/terms-of-service" element={<TermsOfService />} />
-            </Routes>
-            <Footer />
-          </div>
-        </HorrorThemeProvider>
+        <ScrollToTop />
+        <div className="App">
+          <CoinGiftModal />
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/upcoming-movies" element={<UpcomingMovies />} />
+            <Route path="/past-movies" element={<PastMovies />} />
+            <Route path="/gallery" element={<Gallery />} />
+            <Route path="/team" element={<Team />} />
+            <Route path="/booking/:movieId" element={<ProtectedRoute><Booking /></ProtectedRoute>} />
+            <Route path="/payment" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
+            <Route path="/payment-success" element={<ProtectedRoute renderWhileLoading><PaymentSuccess /></ProtectedRoute>} />
+            <Route path="/my-bookings" element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
+            <Route path="/admin" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
+            <Route path="/scanner" element={<ProtectedRoute><Scanner /></ProtectedRoute>} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
+          </Routes>
+          <Footer />
+        </div>
       </Router>
     </AuthProvider>
   );

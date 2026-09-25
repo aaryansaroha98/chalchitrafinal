@@ -54,7 +54,6 @@
   --qt-danger-fg: #721c24;
   --qt-placeholder-bg: #e9ecef; /* poster/image placeholder */
   --qt-placeholder-fg: #adb5bd;
-  --qt-seat-taken: #b8bcc4;
 
   /* Legacy variable bridges — old code references these */
   --primary-color: var(--qt-ink);

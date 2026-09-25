@@ -6,7 +6,6 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './quantify-theme.css';
-import './horror-theme.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

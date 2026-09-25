@@ -448,13 +448,6 @@ if (usePostgres) {
       await pool.query('ALTER TABLE movies ADD COLUMN IF NOT EXISTS age_gate_note TEXT');
       await pool.query('ALTER TABLE bookings ADD COLUMN IF NOT EXISTS age_confirmed INTEGER DEFAULT 0');
       await pool.query('ALTER TABLE movie_foods ADD COLUMN IF NOT EXISTS is_free INTEGER DEFAULT 0');
-      await pool.query('ALTER TABLE settings ADD COLUMN IF NOT EXISTS horror_theme INTEGER DEFAULT 0');
-      // Remembers that the screening skin has been switched on once, so the
-      // step below turns it on at this deploy and never overrides the admin
-      // switch again afterwards.
-      await pool.query('ALTER TABLE settings ADD COLUMN IF NOT EXISTS horror_theme_armed INTEGER DEFAULT 0');
-      // Records that the screening skin has been switched back off once.
-      await pool.query('ALTER TABLE settings ADD COLUMN IF NOT EXISTS horror_theme_retired INTEGER DEFAULT 0');
       // Who sent a coin grant, and whether the recipient has been told yet.
       await pool.query('ALTER TABLE coin_transactions ADD COLUMN IF NOT EXISTS actor_name TEXT');
       await pool.query('ALTER TABLE coin_transactions ADD COLUMN IF NOT EXISTS actor_user_id INTEGER');
@@ -785,7 +778,6 @@ if (usePostgres) {
           ensureMovieSpecialColumns();
           ensureCouponWinnerColumns();
           ensureMovieFoodIsFreeColumn();
-          ensureSettingsHorrorThemeColumn();
           ensureCoinTransactionActorColumns();
           ensureUserCoinsColumn();
           ensureBookingCoinAmountColumn();
@@ -1145,41 +1137,6 @@ if (usePostgres) {
           else console.log(`\u2705 coin_transactions.${name} column added`);
         });
       });
-    });
-  }
-
-  // Screening skin switch. A column rather than a constant so the theme can be
-  // turned off from the admin panel the moment the run ends, without a deploy.
-  function ensureSettingsHorrorThemeColumn() {
-    db.all('PRAGMA table_info(settings)', [], (err, columns) => {
-      if (err) {
-        console.log('\u26a0\ufe0f  Could not inspect settings table columns:', err.message);
-        return;
-      }
-      const colNames = Array.isArray(columns) ? columns.map(c => c.name) : [];
-      if (!colNames.includes('horror_theme_retired')) {
-        db.run('ALTER TABLE settings ADD COLUMN horror_theme_retired INTEGER DEFAULT 0', (alterErr) => {
-          if (alterErr) console.log('\u26a0\ufe0f  Could not add settings.horror_theme_retired:', alterErr.message);
-          else console.log('\u2705 settings.horror_theme_retired column added');
-        });
-      }
-
-      if (!colNames.includes('horror_theme_armed')) {
-        db.run('ALTER TABLE settings ADD COLUMN horror_theme_armed INTEGER DEFAULT 0', (alterErr) => {
-          if (alterErr) console.log('\u26a0\ufe0f  Could not add settings.horror_theme_armed:', alterErr.message);
-          else console.log('\u2705 settings.horror_theme_armed column added');
-        });
-      }
-
-      if (!colNames.includes('horror_theme')) {
-        db.run('ALTER TABLE settings ADD COLUMN horror_theme INTEGER DEFAULT 0', (alterErr) => {
-          if (alterErr) {
-            console.log('\u26a0\ufe0f  Could not add settings.horror_theme:', alterErr.message);
-          } else {
-            console.log('\u2705 settings.horror_theme column added');
-          }
-        });
-      }
     });
   }
 

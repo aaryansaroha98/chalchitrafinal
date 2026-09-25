@@ -1303,8 +1303,6 @@ router.put('/settings', requireAdmin, uploadFields, (req, res) => {
   console.log('Files:', req.files);
 
   const { tagline, hero_background, about_text } = req.body;
-  // Multipart form fields arrive as strings; accept the usual truthy spellings.
-  const horror_theme = ['1', 'true', 'on', 'yes'].includes(String(req.body.horror_theme).toLowerCase()) ? 1 : 0;
   const about_image = getUploadUrl(req.files?.about_image?.[0], '/about') || req.body.about_image;
   const hero_background_image = getUploadUrl(req.files?.hero_background_image?.[0], '/hero') || req.body.hero_background_image;
   const hero_background_video = getUploadUrl(req.files?.hero_background_video?.[0], '/hero') || (req.body.hero_background_video === '' ? null : req.body.hero_background_video);
@@ -1313,8 +1311,8 @@ router.put('/settings', requireAdmin, uploadFields, (req, res) => {
     tagline, hero_background, hero_background_image, hero_background_video, about_text, about_image
   });
 
-  db.run('UPDATE settings SET tagline = ?, hero_background = ?, hero_background_image = ?, hero_background_video = ?, about_text = ?, about_image = ?, horror_theme = ? WHERE id = 1',
-    [tagline, hero_background, hero_background_image, hero_background_video, about_text, about_image, horror_theme], function (err) {
+  db.run('UPDATE settings SET tagline = ?, hero_background = ?, hero_background_image = ?, hero_background_video = ?, about_text = ?, about_image = ? WHERE id = 1',
+    [tagline, hero_background, hero_background_image, hero_background_video, about_text, about_image], function (err) {
       if (err) {
         console.error('Database error:', err);
         return res.status(500).json({ error: err.message });
