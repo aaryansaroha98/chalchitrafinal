@@ -1,0 +1,120 @@
+/* ============================================================
+   KATHAL — jackfruits for the "Kathal: A Jackfruit Mystery" run
+   Rendered by <JackfruitRain /> on the booking page and
+   <JackfruitBurst /> on payment success, only while the movie
+   being booked matches that title (see components/Jackfruit.js).
+   Both layers sit under the navbar (9999) and under any modal
+   (Bootstrap 1050+) and never take a click.
+   ============================================================ */
+
+.jf-rain,
+.jf-burst {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+/* --- small jackfruits, drifting down the booking page --- */
+.jf-fruit {
+  position: absolute;
+  top: -8vh;
+  left: var(--jf-x, 50%);
+  width: var(--jf-size, 20px);
+  height: calc(var(--jf-size, 20px) * 1.25);
+  opacity: 0;
+  will-change: transform;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.18));
+  animation: jf-fall var(--jf-dur, 13s) linear var(--jf-delay, 0s) infinite;
+}
+@keyframes jf-fall {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
+  5%   { opacity: 0.95; }
+  92%  { opacity: 0.9; }
+  100% { transform: translate3d(var(--jf-drift, 60px), 115vh, 0) rotate(var(--jf-spin, 180deg)); opacity: 0; }
+}
+
+/* --- the one that drops onto the confirmation and bursts --- */
+.jf-drop {
+  position: absolute;
+  left: var(--jf-x, 50%);
+  top: var(--jf-y, 30%);
+  width: 96px;
+  height: 120px;
+  margin: -60px 0 0 -48px;
+  transform-origin: 50% 100%;
+  filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.22));
+  animation: jf-drop-fall 1050ms forwards;
+}
+@keyframes jf-drop-fall {
+  0%   { transform: translateY(calc(-1 * var(--jf-y, 30vh) - 70px)) rotate(-8deg); animation-timing-function: cubic-bezier(0.4, 0, 0.85, 0.5); }
+  84%  { transform: translateY(0) rotate(0deg) scale(1, 1); animation-timing-function: ease-out; }
+  100% { transform: translateY(8px) scale(1.22, 0.78); }
+}
+
+/* impact ring and a flat splat where it landed */
+.jf-puff,
+.jf-splat {
+  position: absolute;
+  left: var(--jf-x, 50%);
+  top: var(--jf-y, 30%);
+  /* the base theme squares every corner globally; these have to win */
+  border-radius: 50% !important;
+}
+.jf-puff {
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  border: 4px solid rgba(244, 183, 49, 0.9);
+  animation: jf-puff 700ms ease-out forwards;
+}
+@keyframes jf-puff {
+  0%   { transform: scale(0.3); opacity: 1; }
+  100% { transform: scale(5.5); opacity: 0; }
+}
+.jf-splat {
+  width: 120px;
+  height: 46px;
+  margin: -18px 0 0 -60px;
+  background: radial-gradient(ellipse at center, rgba(244, 183, 49, 0.55), rgba(244, 183, 49, 0) 70%);
+  animation: jf-splat 1300ms ease-out forwards;
+}
+@keyframes jf-splat {
+  0%   { transform: scale(0.4); opacity: 1; }
+  30%  { transform: scale(1.1); opacity: 0.9; }
+  100% { transform: scale(1.3); opacity: 0; }
+}
+
+/* bulbs, rind and seeds flung out, then pulled back down */
+.jf-piece {
+  position: absolute;
+  left: var(--jf-x, 50%);
+  top: var(--jf-y, 30%);
+  width: var(--jf-ps, 18px);
+  height: var(--jf-ps, 18px);
+  margin: calc(var(--jf-ps, 18px) / -2) 0 0 calc(var(--jf-ps, 18px) / -2);
+  opacity: 0;
+  will-change: transform;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
+  animation: jf-fly 1300ms forwards;
+  animation-delay: var(--jf-pd, 0ms);
+}
+@keyframes jf-fly {
+  0%   { transform: translate(0, 0) scale(0.3) rotate(0deg); opacity: 1;
+         animation-timing-function: cubic-bezier(0.15, 0.85, 0.3, 1); }
+  55%  { transform: translate(var(--jf-dx, 80px), var(--jf-dy, -60px)) scale(1) rotate(var(--jf-rot, 180deg)); opacity: 1;
+         animation-timing-function: cubic-bezier(0.5, 0, 0.9, 0.4); }
+  100% { transform: translate(var(--jf-dx, 80px), calc(var(--jf-dy, -60px) + 170px)) scale(0.9) rotate(calc(var(--jf-rot, 180deg) * 1.5)); opacity: 0; }
+}
+
+/* the confirmation mark waits under the falling fruit, then scales in as usual */
+.check-icon.check-icon--held {
+  opacity: 0;
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jf-rain,
+  .jf-burst { display: none !important; }
+}

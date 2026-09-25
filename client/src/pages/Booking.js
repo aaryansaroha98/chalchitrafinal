@@ -1,4 +1,5 @@
  import React, { useState, useEffect, useRef } from 'react';
+import { JackfruitRain, isJackfruitMovie } from '../components/Jackfruit';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
@@ -393,6 +394,7 @@ const Booking = () => {
 
   return (
     <div className="bg-void" style={{ minHeight: '100vh' }}>
+      {isJackfruitMovie(movie?.title) && <JackfruitRain />}
       <AgeGateModal
         show={ageGateOpen}
         movie={movie}

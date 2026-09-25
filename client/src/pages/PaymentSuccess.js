@@ -4,6 +4,7 @@ import api from '../api/axios';
 import { istDate, istTime, istDateTime } from '../utils/movieStatus';
 import { buildTicketModel, renderTicketCanvas, ticketCanvasToPdf } from '../utils/ticketPdf';
 import CoinIcon from '../components/CoinIcon';
+import { JackfruitBurst, isJackfruitMovie } from '../components/Jackfruit';
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
@@ -30,6 +31,10 @@ const PaymentSuccess = () => {
   const hasAttemptedEmailRef = useRef(false);
   const [emailStatus, setEmailStatus] = useState('idle'); // idle | sending | sent | failed
   const [emailError, setEmailError] = useState('');
+  // Kathal run: the tick stays hidden until the jackfruit lands on it.
+  const jackfruit = isJackfruitMovie(ticket?.movie || movie?.title);
+  const checkRef = useRef(null);
+  const [holdCheck, setHoldCheck] = useState(jackfruit);
   
   // Log what we have for debugging
   useEffect(() => {
@@ -122,10 +127,11 @@ const PaymentSuccess = () => {
 
   return (
     <div className="payment-success-page">
+      {jackfruit && <JackfruitBurst targetRef={checkRef} onLanded={() => setHoldCheck(false)} />}
       <div className="success-container">
         {/* Success Header */}
         <div className="success-header">
-          <div className="check-icon"></div>
+          <div ref={checkRef} className={`check-icon${holdCheck ? ' check-icon--held' : ''}`}></div>
           <h1 className="success-title">Payment Success</h1>
           <p className="success-subtitle">Your cinematic experience awaits you!</p>
         </div>
